@@ -202,6 +202,69 @@ export type Database = {
           },
         ]
       }
+      schedules: {
+        Row: {
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          end_time: string
+          id: string
+          is_published: boolean | null
+          is_recorded: boolean | null
+          location: string | null
+          platform: string | null
+          recording_url: string | null
+          speaker_name: string | null
+          speaker_photo_url: string | null
+          start_time: string
+          title: string
+          type: string
+          updated_at: string
+          virtual_link: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          date: string
+          description?: string | null
+          end_time: string
+          id?: string
+          is_published?: boolean | null
+          is_recorded?: boolean | null
+          location?: string | null
+          platform?: string | null
+          recording_url?: string | null
+          speaker_name?: string | null
+          speaker_photo_url?: string | null
+          start_time: string
+          title: string
+          type: string
+          updated_at?: string
+          virtual_link?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          end_time?: string
+          id?: string
+          is_published?: boolean | null
+          is_recorded?: boolean | null
+          location?: string | null
+          platform?: string | null
+          recording_url?: string | null
+          speaker_name?: string | null
+          speaker_photo_url?: string | null
+          start_time?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          virtual_link?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
