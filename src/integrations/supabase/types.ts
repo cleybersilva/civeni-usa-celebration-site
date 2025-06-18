@@ -39,6 +39,39 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_logs: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          message: string
+          recipient: string
+          recipient_type: string
+          status: string | null
+          triggered_by_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          message: string
+          recipient: string
+          recipient_type: string
+          status?: string | null
+          triggered_by_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          message?: string
+          recipient?: string
+          recipient_type?: string
+          status?: string | null
+          triggered_by_id?: string | null
+        }
+        Relationships: []
+      }
       coupon_codes: {
         Row: {
           category_id: string | null
@@ -346,6 +379,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: Json
       }
+      generate_daily_report: {
+        Args: { report_date?: string }
+        Returns: Json
+      }
       is_admin_root_user: {
         Args: { user_email: string }
         Returns: boolean
@@ -369,6 +406,10 @@ export type Database = {
           user_id: string
           new_user_type: Database["public"]["Enums"]["admin_user_type"]
         }
+        Returns: Json
+      }
+      validate_coupon: {
+        Args: { coupon_code: string }
         Returns: Json
       }
       verify_admin_login: {

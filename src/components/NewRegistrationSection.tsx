@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -204,16 +205,25 @@ const NewRegistrationSection = () => {
     if (!couponCode) return null;
     
     try {
-      const { data, error } = await supabase.rpc('validate_coupon', {
-        coupon_code: couponCode
-      });
+      // Use raw SQL query since the function might not be in the types yet
+      const { data, error } = await supabase
+        .from('coupon_codes')
+        .select('*')
+        .eq('code', couponCode)
+        .eq('is_active', true)
+        .single();
       
       if (error) throw error;
       
-      return data && data.length > 0 ? data[0] : null;
+      // Check usage limit
+      if (data && (data.usage_limit === null || (data.used_count || 0) < data.usage_limit)) {
+        return { is_valid: true, coupon_id: data.id, category_id: data.category_id };
+      }
+      
+      return { is_valid: false };
     } catch (error) {
       console.error('Error validating coupon:', error);
-      return null;
+      return { is_valid: false };
     }
   };
 

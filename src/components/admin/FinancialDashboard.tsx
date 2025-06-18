@@ -75,24 +75,40 @@ const FinancialDashboard = () => {
 
   const fetchAlerts = async () => {
     try {
+      // Try to fetch from alert_logs, but handle gracefully if table doesn't exist
       const { data, error } = await supabase
-        .from('alert_logs')
+        .from('alert_logs' as any)
         .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar alertas:', error);
+        setAlerts([]);
+        return;
+      }
+      
       setAlerts(data || []);
     } catch (error) {
       console.error('Erro ao buscar alertas:', error);
+      setAlerts([]);
     }
   };
 
   const generateDailyReport = async () => {
     try {
-      const { data, error } = await supabase.rpc('generate_daily_report');
+      // Try to call the function, but handle if it doesn't exist
+      const { data, error } = await supabase.rpc('generate_daily_report' as any);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao gerar relatório:', error);
+        toast({
+          title: "Erro",
+          description: "Erro ao gerar relatório diário",
+          variant: "destructive"
+        });
+        return;
+      }
       
       toast({
         title: "Relatório Gerado",
