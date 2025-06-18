@@ -1,0 +1,338 @@
+
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { Calendar, Clock, Users, DollarSign, Ticket, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface Batch {
+  id: string;
+  batch_number: number;
+  start_date: string;
+  end_date: string;
+  days_remaining: number;
+}
+
+interface Category {
+  id: string;
+  category_name: string;
+  price_brl: number;
+  requires_proof: boolean;
+  is_exempt: boolean;
+}
+
+const NewRegistrationSection = () => {
+  const { t, i18n } = useTranslation();
+  const [currentBatch, setCurrentBatch] = useState<Batch | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    email: '',
+    fullName: '',
+    categoryId: '',
+    couponCode: ''
+  });
+
+  const getCurrency = () => {
+    switch (i18n.language) {
+      case 'en': return 'USD';
+      case 'es': return 'USD'; // or 'ARS' for Argentina
+      default: return 'BRL';
+    }
+  };
+
+  const formatPrice = (price: number) => {
+    const currency = getCurrency();
+    const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language === 'en' ? 'en-US' : 'es-ES';
+    
+    let convertedPrice = price;
+    if (currency === 'USD') {
+      convertedPrice = price / 5.5; // Simple conversion - use real rates in production
+    }
+    
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency
+    }).format(convertedPrice);
+  };
+
+  const getCategoryName = (categoryName: string) => {
+    const translations: Record<string, string> = {
+      'vccu_student_presentation': t('registration.categories.vccuStudentPresentation'),
+      'vccu_student_listener': t('registration.categories.vccuStudentListener'),
+      'vccu_professor_partner': t('registration.categories.vccuProfessorPartner'),
+      'general_participant': t('registration.categories.generalParticipant')
+    };
+    return translations[categoryName] || categoryName;
+  };
+
+  useEffect(() => {
+    fetchCurrentBatch();
+  }, []);
+
+  useEffect(() => {
+    if (currentBatch) {
+      fetchCategories();
+    }
+  }, [currentBatch]);
+
+  const fetchCurrentBatch = async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_current_batch');
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setCurrentBatch(data[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching current batch:', error);
+      setError(t('registration.errors.batchError'));
+    }
+  };
+
+  const fetchCategories = async () => {
+    if (!currentBatch) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('registration_categories')
+        .select('*')
+        .eq('batch_id', currentBatch.id);
+      
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError(t('registration.errors.categoriesError'));
+    }
+  };
+
+  const validateCoupon = async (couponCode: string) => {
+    if (!couponCode) return null;
+    
+    try {
+      const { data, error } = await supabase.rpc('validate_coupon', { 
+        coupon_code: couponCode 
+      });
+      
+      if (error) throw error;
+      return data?.[0] || null;
+    } catch (error) {
+      console.error('Error validating coupon:', error);
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentBatch || !formData.categoryId) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Validate coupon if provided
+      let validCoupon = null;
+      if (formData.couponCode) {
+        validCoupon = await validateCoupon(formData.couponCode);
+        if (!validCoupon?.is_valid) {
+          throw new Error(t('registration.errors.invalidCoupon'));
+        }
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-registration-payment', {
+        body: {
+          email: formData.email,
+          fullName: formData.fullName,
+          categoryId: formData.categoryId,
+          batchId: currentBatch.id,
+          couponCode: formData.couponCode,
+          currency: getCurrency()
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.payment_required === false) {
+        // Free registration completed
+        alert(t('registration.success.freeRegistration'));
+        setFormData({ email: '', fullName: '', categoryId: '', couponCode: '' });
+      } else if (data.url) {
+        // Redirect to Stripe checkout
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      setError(error.message || t('registration.errors.general'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!currentBatch) {
+    return (
+      <section id="registration" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {t('registration.noBatchActive')}
+            </AlertDescription>
+          </Alert>
+        </div>
+      </section>
+    );
+  }
+
+  const selectedCategory = categories.find(cat => cat.id === formData.categoryId);
+
+  return (
+    <section id="registration" className="py-20 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <div className="inline-block bg-civeni-red text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
+            {t('registration.urgent')}
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
+            {t('registration.newTitle')}
+          </h2>
+          
+          {/* Batch Info */}
+          <Card className="max-w-md mx-auto mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center gap-2">
+                <Calendar className="w-5 h-5" />
+                {t('registration.currentBatch')} {currentBatch.batch_number}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Clock className="w-4 h-4" />
+                <span className="text-lg font-semibold text-civeni-red">
+                  {currentBatch.days_remaining} {t('registration.daysRemaining')}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">
+                {t('registration.validUntil')}: {new Date(currentBatch.end_date).toLocaleDateString()}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="w-5 h-5" />
+                {t('registration.formTitle')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="fullName">{t('registration.fullName')}</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">{t('registration.email')}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="category">{t('registration.category')}</Label>
+                  <Select value={formData.categoryId} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('registration.selectCategory')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          <div className="flex justify-between w-full">
+                            <span>{getCategoryName(category.category_name)}</span>
+                            <span className="ml-4 font-semibold">
+                              {category.is_exempt ? t('registration.free') : formatPrice(category.price_brl)}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedCategory?.is_exempt && (
+                  <div>
+                    <Label htmlFor="couponCode">{t('registration.couponCode')}</Label>
+                    <Input
+                      id="couponCode"
+                      type="text"
+                      value={formData.couponCode}
+                      onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
+                      placeholder={t('registration.couponPlaceholder')}
+                      required
+                    />
+                  </div>
+                )}
+
+                {selectedCategory && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="w-5 h-5 text-civeni-blue" />
+                      <span className="font-semibold">{t('registration.totalAmount')}</span>
+                    </div>
+                    <div className="text-2xl font-bold text-civeni-blue">
+                      {selectedCategory.is_exempt ? t('registration.free') : formatPrice(selectedCategory.price_brl)}
+                    </div>
+                    {selectedCategory.requires_proof && (
+                      <p className="text-sm text-amber-600 mt-2">
+                        {t('registration.proofRequired')}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
+                  disabled={loading || !formData.categoryId}
+                >
+                  {loading ? t('registration.processing') : t('registration.registerNow')}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default NewRegistrationSection;

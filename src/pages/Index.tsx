@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import HeroBanner from '../components/HeroBanner';
 import CountdownTimer from '../components/CountdownTimer';
 import ScheduleSection from '../components/ScheduleSection';
-import RegistrationSection from '../components/RegistrationSection';
+import NewRegistrationSection from '../components/NewRegistrationSection';
 import AboutSection from '../components/AboutSection';
 import SpeakersSection from '../components/SpeakersSection';
 import VideosSection from '../components/VideosSection';
@@ -20,7 +20,7 @@ const Index = () => {
       <HeroBanner />
       <CountdownTimer />
       <ScheduleSection />
-      <RegistrationSection />
+      <NewRegistrationSection />
       <AboutSection />
       <SpeakersSection />
       <VideosSection />
