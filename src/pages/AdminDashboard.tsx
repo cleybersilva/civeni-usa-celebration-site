@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -169,9 +170,9 @@ const AdminDashboardContent = () => {
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <Tabs defaultValue="dashboard" className="space-y-6">
+        <Tabs defaultValue="financeiro" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
             {hasPermission('write') && <TabsTrigger value="speakers">Palestrantes</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="banner">Banner</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="registration">Inscrições</TabsTrigger>}
@@ -184,7 +185,7 @@ const AdminDashboardContent = () => {
             {hasPermission('write') && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="dashboard">
+          <TabsContent value="financeiro">
             <DashboardOverview />
           </TabsContent>
 
