@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface Speaker {
   id: string;
@@ -180,8 +179,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loadContent = async () => {
     try {
-      // Para agora, usar conteúdo padrão
-      // Em produção, isso carregaria do Supabase
       setContent(defaultContent);
     } catch (error) {
       console.error('Error loading content:', error);
@@ -193,7 +190,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateSpeakers = async (speakers: Speaker[]) => {
     try {
       setContent(prev => ({ ...prev, speakers }));
-      // Aqui salvaria no Supabase
     } catch (error) {
       console.error('Error updating speakers:', error);
     }
@@ -202,7 +198,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateBannerSlides = async (bannerSlides: BannerSlide[]) => {
     try {
       setContent(prev => ({ ...prev, bannerSlides }));
-      // Aqui salvaria no Supabase
     } catch (error) {
       console.error('Error updating banner slides:', error);
     }
@@ -211,7 +206,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateRegistrationTiers = async (registrationTiers: RegistrationTier[]) => {
     try {
       setContent(prev => ({ ...prev, registrationTiers }));
-      // Aqui salvaria no Supabase
     } catch (error) {
       console.error('Error updating registration tiers:', error);
     }
@@ -220,7 +214,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateBatchInfo = async (batchInfo: string) => {
     try {
       setContent(prev => ({ ...prev, batchInfo }));
-      // Aqui salvaria no Supabase
     } catch (error) {
       console.error('Error updating batch info:', error);
     }

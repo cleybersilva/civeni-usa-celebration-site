@@ -288,8 +288,8 @@ const resources = {
         title: "Experiencia en Formato Híbrido",
         description: "Elige entre participación presencial y en línea para satisfacer tus necesidades y preferencias",
         whyChoose: "¿Por Qué Elegir Formato Híbrido?",
-        inPersonBenefits: "Beneficios Presenciales",
-        onlineBenefits: "Beneficios En Línea"
+        inPersonBenefits: "Benefícios Presenciales",
+        onlineBenefits: "Benefícios En Línea"
       }
     }
   }
