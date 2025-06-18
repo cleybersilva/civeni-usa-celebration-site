@@ -1,12 +1,31 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import Header from '../components/Header';
+import HeroBanner from '../components/HeroBanner';
+import CountdownTimer from '../components/CountdownTimer';
+import ScheduleSection from '../components/ScheduleSection';
+import RegistrationSection from '../components/RegistrationSection';
+import AboutSection from '../components/AboutSection';
+import SpeakersSection from '../components/SpeakersSection';
+import HybridFormatSection from '../components/HybridFormatSection';
+import VenueSection from '../components/VenueSection';
+import PartnersSection from '../components/PartnersSection';
+import Footer from '../components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-white font-poppins">
+      <Header />
+      <HeroBanner />
+      <CountdownTimer />
+      <ScheduleSection />
+      <RegistrationSection />
+      <AboutSection />
+      <SpeakersSection />
+      <HybridFormatSection />
+      <VenueSection />
+      <PartnersSection />
+      <Footer />
     </div>
   );
 };
