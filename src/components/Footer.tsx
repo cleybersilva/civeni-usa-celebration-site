@@ -1,6 +1,6 @@
-
 import React from 'react';
-import { Instagram, Facebook, Youtube } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const quickLinks = [
@@ -23,7 +23,7 @@ const Footer = () => {
               III International Multidisciplinary Congress of VCCU<br/>
               December 8-10, 2025 • Celebration, Florida
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-6">
               <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
                 <Instagram size={24} />
               </a>
@@ -33,6 +33,18 @@ const Footer = () => {
               <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
                 <Youtube size={24} />
               </a>
+            </div>
+            
+            {/* Seção de Acesso Restrito */}
+            <div className="border-t border-white border-opacity-20 pt-4">
+              <p className="text-sm opacity-75 mb-2">Acesso Restrito</p>
+              <Link 
+                to="/admin" 
+                className="inline-flex items-center gap-2 text-sm opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
+              >
+                <Settings size={16} />
+                Área Administrativa
+              </Link>
             </div>
           </div>
           
