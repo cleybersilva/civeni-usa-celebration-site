@@ -28,7 +28,7 @@ const Footer = () => {
               III International Multidisciplinary Congress of VCCU<br/>
               December 8-10, 2025 • Celebration, Florida
             </p>
-            <div className="flex space-x-4">
+            <div className="flex items-center space-x-4 mb-4">
               <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
                 <Instagram size={24} />
               </a>
@@ -38,6 +38,13 @@ const Footer = () => {
               <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
                 <Youtube size={24} />
               </a>
+            </div>
+            <div className="flex justify-start">
+              <img 
+                src="/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png" 
+                alt="III Civeni 2025 Logo" 
+                className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity"
+              />
             </div>
           </div>
           

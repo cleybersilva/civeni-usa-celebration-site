@@ -54,22 +54,24 @@ const PartnersSection = () => {
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
                 {t('partners.academicPartners')}
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                {academicPartners.map((partner, index) => (
-                  <div
-                    key={index}
-                    className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-105"
-                  >
-                    <div className="bg-white rounded-xl shadow-md p-6 h-32 flex flex-col items-center justify-center group-hover:shadow-xl group-hover:bg-gray-50 transition-all duration-300">
-                      <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">
-                        {partner.logo}
+              <div className="flex justify-center">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-5xl">
+                  {academicPartners.map((partner, index) => (
+                    <div
+                      key={index}
+                      className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-105"
+                    >
+                      <div className="bg-white rounded-xl shadow-md p-6 h-32 flex flex-col items-center justify-center group-hover:shadow-xl group-hover:bg-gray-50 transition-all duration-300">
+                        <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">
+                          {partner.logo}
+                        </div>
+                        <h4 className="text-xs font-semibold text-gray-700 text-center leading-tight">
+                          {partner.name}
+                        </h4>
                       </div>
-                      <h4 className="text-xs font-semibold text-gray-700 text-center leading-tight">
-                        {partner.name}
-                      </h4>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
