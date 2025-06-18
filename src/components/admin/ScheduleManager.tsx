@@ -73,17 +73,36 @@ const ScheduleManager = () => {
 
   // Create/Update schedule mutation
   const scheduleUpsertMutation = useMutation({
-    mutationFn: async (data: ScheduleFormData) => {
+    mutationFn: async (formData: ScheduleFormData) => {
+      // Ensure all required fields are present for database insertion
+      const dataToInsert = {
+        type: formData.type,
+        date: formData.date,
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+        title: formData.title,
+        category: formData.category,
+        description: formData.description || null,
+        speaker_name: formData.speaker_name || null,
+        speaker_photo_url: formData.speaker_photo_url || null,
+        location: formData.location || null,
+        virtual_link: formData.virtual_link || null,
+        platform: formData.platform || null,
+        is_recorded: formData.is_recorded,
+        recording_url: formData.recording_url || null,
+        is_published: formData.is_published,
+      };
+
       if (editingSchedule) {
         const { error } = await supabase
           .from('schedules')
-          .update(data)
+          .update(dataToInsert)
           .eq('id', editingSchedule.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('schedules')
-          .insert(data);
+          .insert(dataToInsert);
         if (error) throw error;
       }
     },
