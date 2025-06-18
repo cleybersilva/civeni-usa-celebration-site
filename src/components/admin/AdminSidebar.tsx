@@ -25,20 +25,6 @@ import {
   Settings,
 } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import DashboardOverview from '@/components/admin/AdminDashboard';
-import BannerManager from '@/components/admin/BannerManager';
-import EventConfigManager from '@/components/admin/EventConfigManager';
-import CopyrightManager from '@/components/admin/CopyrightManager';
-import ScheduleManager from '@/components/admin/ScheduleManager';
-import RegistrationManager from '@/components/admin/RegistrationManager';
-import VenueConfigManager from '@/components/admin/VenueConfigManager';
-import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
-import SpeakersManager from '@/components/admin/SpeakersManager';
-import PartnersManager from '@/components/admin/PartnersManager';
-import SiteTextsManager from '@/components/admin/SiteTextsManager';
-import VideosManager from '@/components/admin/VideosManager';
-import UsersManager from '@/components/admin/UsersManager';
-import PermissionGuard from '@/components/admin/PermissionGuard';
 
 const AdminSidebar = () => {
   const { hasPermission, isAdminRoot, user } = useAdminAuth();
@@ -55,160 +41,112 @@ const AdminSidebar = () => {
   const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
 
   const menuItems = [
+    // Financeiro sempre primeiro para Admin Root e Admin
     {
       id: 'financeiro',
       label: 'Financeiro',
       icon: BarChart3,
       show: canViewFinanceiro,
-      component: <DashboardOverview />
+      order: 0
     },
+    // Demais itens em ordem alfabética
     {
       id: 'banner',
       label: 'Banner',
       icon: Image,
       show: hasPermission('banner') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="banner">
-          <BannerManager />
-        </PermissionGuard>
-      )
+      order: 1
     },
     {
       id: 'contador',
       label: 'Contador',
       icon: Timer,
       show: hasPermission('contador') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="contador">
-          <EventConfigManager />
-        </PermissionGuard>
-      )
+      order: 2
     },
     {
       id: 'copyright',
       label: 'Copyright',
       icon: Copyright,
       show: hasPermission('copyright') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="copyright">
-          <CopyrightManager />
-        </PermissionGuard>
-      )
+      order: 3
     },
     {
       id: 'cronograma',
       label: 'Cronograma',
       icon: Calendar,
       show: hasPermission('cronograma') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="cronograma">
-          <ScheduleManager />
-        </PermissionGuard>
-      )
+      order: 4
     },
     {
       id: 'inscricoes',
       label: 'Inscrições',
       icon: UserPlus,
       show: hasPermission('inscricoes') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="inscricoes">
-          <RegistrationManager />
-        </PermissionGuard>
-      )
+      order: 5
     },
     {
       id: 'local',
       label: 'Local',
       icon: MapPin,
       show: hasPermission('local') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="local">
-          <VenueConfigManager />
-        </PermissionGuard>
-      )
+      order: 6
     },
     {
       id: 'online',
       label: 'Online',
       icon: Monitor,
       show: hasPermission('online') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="online">
-          <OnlineConfigManager />
-        </PermissionGuard>
-      )
+      order: 7
     },
     {
       id: 'palestrantes',
       label: 'Palestrantes',
       icon: Users,
       show: hasPermission('palestrantes') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="palestrantes">
-          <SpeakersManager />
-        </PermissionGuard>
-      )
+      order: 8
     },
     {
       id: 'parceiros',
       label: 'Parceiros',
       icon: Handshake,
       show: hasPermission('parceiros') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="parceiros">
-          <PartnersManager />
-        </PermissionGuard>
-      )
+      order: 9
     },
     {
       id: 'textos',
       label: 'Textos',
       icon: Type,
       show: hasPermission('textos') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="textos">
-          <SiteTextsManager />
-        </PermissionGuard>
-      )
-    },
-    {
-      id: 'videos',
-      label: 'Vídeos',
-      icon: Play,
-      show: hasPermission('videos') || isAdminRoot(),
-      component: (
-        <PermissionGuard resource="videos">
-          <VideosManager />
-        </PermissionGuard>
-      )
+      order: 10
     },
     {
       id: 'usuarios',
       label: 'Usuários',
       icon: Settings,
       show: canViewUsuarios,
-      component: <UsersManager />
+      order: 11
+    },
+    {
+      id: 'videos',
+      label: 'Vídeos',
+      icon: Play,
+      show: hasPermission('videos') || isAdminRoot(),
+      order: 12
     }
   ];
 
-  const visibleItems = menuItems.filter(item => item.show);
-  const activeItem = visibleItems.find(item => item.id === activeTab);
+  const visibleItems = menuItems
+    .filter(item => item.show)
+    .sort((a, b) => a.order - b.order);
 
-  // Renderizar o conteúdo da aba ativa
+  // Comunicar mudança de aba para o componente pai
   React.useEffect(() => {
-    const contentElement = document.getElementById('admin-content');
-    if (contentElement && activeItem) {
-      const root = document.createElement('div');
-      contentElement.innerHTML = '';
-      contentElement.appendChild(root);
-      
-      import('react-dom/client').then(({ createRoot }) => {
-        const reactRoot = createRoot(root);
-        reactRoot.render(activeItem.component);
-      });
-    }
-  }, [activeTab, activeItem]);
+    // Dispatch custom event para comunicar mudança de aba
+    window.dispatchEvent(new CustomEvent('adminTabChange', { 
+      detail: { activeTab } 
+    }));
+  }, [activeTab]);
 
   return (
     <Sidebar className="border-r">
