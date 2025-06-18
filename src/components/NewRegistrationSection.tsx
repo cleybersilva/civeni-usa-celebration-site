@@ -74,6 +74,38 @@ const NewRegistrationSection = () => {
     return translations[categoryName] || categoryName;
   };
 
+  const getBatchStatusInfo = (daysRemaining: number) => {
+    if (daysRemaining > 15) {
+      return {
+        color: 'bg-green-500',
+        message: '1º lote (Atual)',
+        textColor: 'text-green-600',
+        animate: 'animate-pulse'
+      };
+    } else if (daysRemaining > 5) {
+      return {
+        color: 'bg-yellow-500',
+        message: 'Últimos dias para o encerramento do 1º lote',
+        textColor: 'text-yellow-600',
+        animate: 'animate-pulse'
+      };
+    } else if (daysRemaining > 0) {
+      return {
+        color: 'bg-red-500',
+        message: `Faltam ${daysRemaining} dias para o encerramento do 1º lote`,
+        textColor: 'text-red-600',
+        animate: 'animate-pulse'
+      };
+    } else {
+      return {
+        color: 'bg-gray-500',
+        message: '1º lote encerrado',
+        textColor: 'text-gray-600',
+        animate: ''
+      };
+    }
+  };
+
   useEffect(() => {
     fetchCurrentBatch();
   }, []);
@@ -86,34 +118,60 @@ const NewRegistrationSection = () => {
 
   const fetchCurrentBatch = async () => {
     try {
-      // Use type assertion to work around missing type definitions
-      const { data, error } = await (supabase as any)
+      const today = new Date();
+      const todayString = today.toISOString().split('T')[0];
+      
+      // First try to get batch 1 if it's still active
+      const { data: batch1, error: error1 } = await (supabase as any)
         .from('registration_batches')
         .select('*')
-        .gte('end_date', new Date().toISOString().split('T')[0])
-        .lte('start_date', new Date().toISOString().split('T')[0])
-        .order('batch_number')
-        .limit(1)
+        .eq('batch_number', 1)
+        .lte('start_date', todayString)
+        .gte('end_date', todayString)
         .single();
       
-      if (error && error.code !== 'PGRST116') throw error;
-      
-      if (data) {
-        const endDate = new Date(data.end_date);
-        const today = new Date();
+      if (batch1 && !error1) {
+        const endDate = new Date(batch1.end_date);
         const daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         
         setCurrentBatch({
-          id: data.id,
-          batch_number: data.batch_number,
-          start_date: data.start_date,
-          end_date: data.end_date,
+          id: batch1.id,
+          batch_number: batch1.batch_number,
+          start_date: batch1.start_date,
+          end_date: batch1.end_date,
           days_remaining: Math.max(0, daysRemaining)
         });
+        return;
       }
+      
+      // If batch 1 is not active, try batch 2
+      const { data: batch2, error: error2 } = await (supabase as any)
+        .from('registration_batches')
+        .select('*')
+        .eq('batch_number', 2)
+        .lte('start_date', todayString)
+        .gte('end_date', todayString)
+        .single();
+      
+      if (batch2 && !error2) {
+        const endDate = new Date(batch2.end_date);
+        const daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        setCurrentBatch({
+          id: batch2.id,
+          batch_number: batch2.batch_number,
+          start_date: batch2.start_date,
+          end_date: batch2.end_date,
+          days_remaining: Math.max(0, daysRemaining)
+        });
+        return;
+      }
+      
+      // No active batch found
+      setCurrentBatch(null);
     } catch (error) {
       console.error('Error fetching current batch:', error);
-      setError(t('registration.errors.batchError'));
+      setError('Erro ao carregar informações do lote atual');
     }
   };
 
@@ -121,7 +179,6 @@ const NewRegistrationSection = () => {
     if (!currentBatch) return;
     
     try {
-      // Use type assertion to work around missing type definitions
       const { data, error } = await (supabase as any)
         .from('registration_categories')
         .select('*')
@@ -131,7 +188,7 @@ const NewRegistrationSection = () => {
       setCategories(data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setError(t('registration.errors.categoriesError'));
+      setError('Erro ao carregar categorias de inscrição');
     }
   };
 
@@ -139,7 +196,6 @@ const NewRegistrationSection = () => {
     if (!couponCode) return null;
     
     try {
-      // Use type assertion to work around missing type definitions
       const { data, error } = await (supabase as any)
         .from('coupon_codes')
         .select(`
@@ -184,7 +240,7 @@ const NewRegistrationSection = () => {
       if (formData.couponCode) {
         validCoupon = await validateCoupon(formData.couponCode);
         if (!validCoupon?.is_valid) {
-          throw new Error(t('registration.errors.invalidCoupon'));
+          throw new Error('Código de cupom inválido ou expirado');
         }
       }
 
@@ -203,7 +259,7 @@ const NewRegistrationSection = () => {
 
       if (data.payment_required === false) {
         // Free registration completed
-        alert(t('registration.success.freeRegistration'));
+        alert('Inscrição gratuita realizada com sucesso!');
         setFormData({ email: '', fullName: '', categoryId: '', couponCode: '' });
       } else if (data.url) {
         // Redirect to Stripe checkout
@@ -211,7 +267,7 @@ const NewRegistrationSection = () => {
       }
     } catch (error: any) {
       console.error('Registration error:', error);
-      setError(error.message || t('registration.errors.general'));
+      setError(error.message || 'Erro ao processar inscrição');
     } finally {
       setLoading(false);
     }
@@ -224,7 +280,7 @@ const NewRegistrationSection = () => {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {t('registration.noBatchActive')}
+              Não há lotes de inscrição ativos no momento.
             </AlertDescription>
           </Alert>
         </div>
@@ -232,6 +288,7 @@ const NewRegistrationSection = () => {
     );
   }
 
+  const statusInfo = getBatchStatusInfo(currentBatch.days_remaining);
   const selectedCategory = categories.find(cat => cat.id === formData.categoryId);
 
   return (
@@ -239,29 +296,30 @@ const NewRegistrationSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="inline-block bg-civeni-red text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
-            {t('registration.urgent')}
+            INSCRIÇÕES ABERTAS
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
             {t('registration.newTitle')}
           </h2>
           
-          {/* Batch Info */}
+          {/* Batch Info with Status Light */}
           <Card className="max-w-md mx-auto mb-8">
             <CardHeader>
               <CardTitle className="flex items-center justify-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${statusInfo.color} ${statusInfo.animate}`}></div>
                 <Calendar className="w-5 h-5" />
-                {t('registration.currentBatch')} {currentBatch.batch_number}
+                {statusInfo.message}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Clock className="w-4 h-4" />
-                <span className="text-lg font-semibold text-civeni-red">
-                  {currentBatch.days_remaining} {t('registration.daysRemaining')}
+                <span className={`text-lg font-semibold ${statusInfo.textColor}`}>
+                  {currentBatch.days_remaining} dias restantes
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                {t('registration.validUntil')}: {new Date(currentBatch.end_date).toLocaleDateString()}
+                Válido até: {new Date(currentBatch.end_date).toLocaleDateString('pt-BR')}
               </p>
             </CardContent>
           </Card>
@@ -272,7 +330,7 @@ const NewRegistrationSection = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Ticket className="w-5 h-5" />
-                {t('registration.formTitle')}
+                Formulário de Inscrição
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -286,7 +344,7 @@ const NewRegistrationSection = () => {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="fullName">{t('registration.fullName')}</Label>
+                    <Label htmlFor="fullName">Nome Completo</Label>
                     <Input
                       id="fullName"
                       type="text"
@@ -296,7 +354,7 @@ const NewRegistrationSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">{t('registration.email')}</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -308,10 +366,10 @@ const NewRegistrationSection = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">{t('registration.category')}</Label>
+                  <Label htmlFor="category">Categoria de Inscrição</Label>
                   <Select value={formData.categoryId} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t('registration.selectCategory')} />
+                      <SelectValue placeholder="Selecione uma categoria" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -319,7 +377,7 @@ const NewRegistrationSection = () => {
                           <div className="flex justify-between w-full">
                             <span>{getCategoryName(category.category_name)}</span>
                             <span className="ml-4 font-semibold">
-                              {category.is_exempt ? t('registration.free') : formatPrice(category.price_brl)}
+                              {category.is_exempt ? 'Gratuito' : formatPrice(category.price_brl)}
                             </span>
                           </div>
                         </SelectItem>
@@ -330,13 +388,13 @@ const NewRegistrationSection = () => {
 
                 {selectedCategory?.is_exempt && (
                   <div>
-                    <Label htmlFor="couponCode">{t('registration.couponCode')}</Label>
+                    <Label htmlFor="couponCode">Código do Cupom</Label>
                     <Input
                       id="couponCode"
                       type="text"
                       value={formData.couponCode}
                       onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
-                      placeholder={t('registration.couponPlaceholder')}
+                      placeholder="Digite seu código de cupom"
                       required
                     />
                   </div>
@@ -346,14 +404,14 @@ const NewRegistrationSection = () => {
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <DollarSign className="w-5 h-5 text-civeni-blue" />
-                      <span className="font-semibold">{t('registration.totalAmount')}</span>
+                      <span className="font-semibold">Valor Total</span>
                     </div>
                     <div className="text-2xl font-bold text-civeni-blue">
-                      {selectedCategory.is_exempt ? t('registration.free') : formatPrice(selectedCategory.price_brl)}
+                      {selectedCategory.is_exempt ? 'Gratuito' : formatPrice(selectedCategory.price_brl)}
                     </div>
                     {selectedCategory.requires_proof && (
                       <p className="text-sm text-amber-600 mt-2">
-                        {t('registration.proofRequired')}
+                        Esta categoria requer comprovação
                       </p>
                     )}
                   </div>
@@ -364,7 +422,7 @@ const NewRegistrationSection = () => {
                   className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
                   disabled={loading || !formData.categoryId}
                 >
-                  {loading ? t('registration.processing') : t('registration.registerNow')}
+                  {loading ? 'Processando...' : 'INSCREVER-SE AGORA!'}
                 </Button>
               </form>
             </CardContent>
