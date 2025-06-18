@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SpeakersManager from '@/components/admin/SpeakersManager';
@@ -22,6 +21,9 @@ const AdminTabs = () => {
   // Verificar se o usuário pode ver a guia Financeiro (apenas Admin Root e Admin)
   const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
 
+  // Verificar se o usuário pode ver a guia Usuários (apenas Admin Root e Admin)
+  const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
+
   return (
     <Tabs defaultValue={canViewFinanceiro ? "financeiro" : "banner"} className="space-y-6">
       <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
@@ -36,7 +38,7 @@ const AdminTabs = () => {
         {(hasPermission('parceiros') || isAdminRoot()) && <TabsTrigger value="parceiros">Parceiros</TabsTrigger>}
         {(hasPermission('textos') || isAdminRoot()) && <TabsTrigger value="textos">Textos</TabsTrigger>}
         {(hasPermission('videos') || isAdminRoot()) && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
-        {isAdminRoot() && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
+        {canViewUsuarios && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
       </TabsList>
 
       {canViewFinanceiro && (
@@ -125,7 +127,7 @@ const AdminTabs = () => {
         </TabsContent>
       )}
 
-      {isAdminRoot() && (
+      {canViewUsuarios && (
         <TabsContent value="usuarios">
           <UsersManager />
         </TabsContent>

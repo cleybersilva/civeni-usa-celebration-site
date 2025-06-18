@@ -24,8 +24,10 @@ const UsersManager = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const { user } = useAdminAuth();
 
   // Form state
@@ -33,6 +35,11 @@ const UsersManager = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    user_type: 'viewer' as const
+  });
+
+  // Edit form state
+  const [editFormData, setEditFormData] = useState({
     user_type: 'viewer' as const
   });
 
@@ -91,6 +98,44 @@ const UsersManager = () => {
     } catch (error) {
       setError('Erro ao criar usuário');
       console.error('Error creating user:', error);
+    }
+  };
+
+  const handleEditUser = (adminUser: AdminUser) => {
+    setEditingUser(adminUser);
+    setEditFormData({
+      user_type: adminUser.user_type as any
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!editingUser) return;
+
+    try {
+      const { data, error } = await supabase.rpc('update_admin_user_type', {
+        user_id: editingUser.user_id,
+        new_user_type: editFormData.user_type
+      });
+
+      if (error) throw error;
+
+      const result = data as any;
+      if (result.success) {
+        setSuccess(result.message);
+        setIsEditDialogOpen(false);
+        setEditingUser(null);
+        fetchUsers();
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      setError('Erro ao atualizar usuário');
+      console.error('Error updating user:', error);
     }
   };
 
@@ -321,6 +366,7 @@ const UsersManager = () => {
                             <Button
                               variant="outline"
                               size="sm"
+                              onClick={() => handleEditUser(adminUser)}
                               className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                             >
                               <Edit className="w-4 h-4" />
@@ -355,6 +401,51 @@ const UsersManager = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit User Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Usuário</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdateUser} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email</label>
+              <Input
+                type="email"
+                value={editingUser?.email || ''}
+                disabled
+                className="bg-gray-100"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
+              <Select 
+                value={editFormData.user_type}
+                onValueChange={(value) => setEditFormData(prev => ({ ...prev, user_type: value as any }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="viewer">Visualizador</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="design">Designer</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                Atualizar Usuário
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
