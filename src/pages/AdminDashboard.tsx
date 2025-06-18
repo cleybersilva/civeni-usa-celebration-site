@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import PartnersManager from '@/components/admin/PartnersManager';
 import VideosManager from '@/components/admin/VideosManager';
 import CopyrightManager from '@/components/admin/CopyrightManager';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
+import AdminDashboard from '@/components/admin/AdminDashboard';
 import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
 import { CMSProvider } from '@/contexts/CMSContext';
 
@@ -168,8 +170,9 @@ const AdminDashboardContent = () => {
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <Tabs defaultValue="speakers" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             {hasPermission('write') && <TabsTrigger value="speakers">Palestrantes</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="banner">Banner</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="registration">Inscrições</TabsTrigger>}
@@ -181,6 +184,10 @@ const AdminDashboardContent = () => {
             {hasPermission('write') && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
           </TabsList>
+
+          <TabsContent value="dashboard">
+            <AdminDashboard />
+          </TabsContent>
 
           {hasPermission('write') && (
             <>
