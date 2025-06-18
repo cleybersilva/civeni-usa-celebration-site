@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { DollarSign, Users, TrendingUp, Download, Calendar, CreditCard } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Download, Calendar, CreditCard, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -127,6 +127,36 @@ const AdminDashboard = () => {
     return { total, byType, byPaymentMethod, byBatch, dailyRevenue };
   }, [registrations]);
 
+  // Calculate category statistics
+  const categoryStats = React.useMemo(() => {
+    return registrations.reduce((acc, r) => {
+      const displayName = getCategoryDisplayName(r.category_name);
+      if (!acc[displayName]) {
+        acc[displayName] = {
+          total: 0,
+          paid: 0,
+          pending: 0,
+          revenue: 0
+        };
+      }
+      acc[displayName].total++;
+      if (r.payment_status === 'paid') {
+        acc[displayName].paid++;
+        acc[displayName].revenue += r.amount_paid || 0;
+      } else if (r.payment_status === 'pending') {
+        acc[displayName].pending++;
+      }
+      return acc;
+    }, {} as Record<string, { total: number; paid: number; pending: number; revenue: number }>);
+  }, [registrations]);
+
+  const categoryChartData = Object.entries(categoryStats).map(([category, stats]) => ({
+    category: category.replace('Aluno VCCU', 'VCCU').replace('Participante', 'Part.'),
+    total: stats.total,
+    paid: stats.paid,
+    pending: stats.pending
+  }));
+
   const pieChartData = Object.entries(paymentData.byPaymentMethod).map(([method, amount]) => ({
     name: method,
     value: amount,
@@ -220,8 +250,30 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
+      {/* Category Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Object.entries(categoryStats).map(([category, stats], index) => (
+          <Card key={category} className="border-l-4" style={{ borderLeftColor: COLORS[index % COLORS.length] }}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{category}</CardTitle>
+              <UserCheck className="h-4 w-4 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="flex justify-between text-xs text-gray-600 mt-1">
+                <span className="text-green-600">{stats.paid} pagos</span>
+                <span className="text-yellow-600">{stats.pending} pendentes</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                R$ {stats.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Payment Methods Pie Chart */}
         <Card>
           <CardHeader>
@@ -276,6 +328,43 @@ const AdminDashboard = () => {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Category Distribution Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserCheck className="h-5 w-5 text-civeni-blue" />
+              Inscrições por Categoria
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                total: { label: "Total", color: "#3B82F6" },
+                paid: { label: "Pagas", color: "#10B981" },
+                pending: { label: "Pendentes", color: "#F59E0B" }
+              }}
+              className="h-64"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="category" 
+                    fontSize={12}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis fontSize={12} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="paid" fill="#10B981" name="Pagas" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="pending" fill="#F59E0B" name="Pendentes" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
 
