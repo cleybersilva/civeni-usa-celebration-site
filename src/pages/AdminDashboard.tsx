@@ -173,16 +173,16 @@ const AdminDashboardContent = () => {
         <Tabs defaultValue="financeiro" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
             <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-            {hasPermission('write') && <TabsTrigger value="speakers">Palestrantes</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="banner">Banner</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="registration">Inscrições</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="event">Contador</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="texts">Textos</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="venue">Local</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="online">Online</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="partners">Parceiros</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="contador">Contador</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="local">Local</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="online">Online</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="palestrantes">Palestrantes</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="parceiros">Parceiros</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="textos">Textos</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="financeiro">
@@ -191,27 +191,23 @@ const AdminDashboardContent = () => {
 
           {hasPermission('write') && (
             <>
-              <TabsContent value="speakers">
-                <SpeakersManager />
-              </TabsContent>
-
               <TabsContent value="banner">
                 <BannerManager />
               </TabsContent>
 
-              <TabsContent value="registration">
-                <RegistrationManager />
-              </TabsContent>
-
-              <TabsContent value="event">
+              <TabsContent value="contador">
                 <EventConfigManager />
               </TabsContent>
 
-              <TabsContent value="texts">
-                <SiteTextsManager />
+              <TabsContent value="copyright">
+                <CopyrightManager />
               </TabsContent>
 
-              <TabsContent value="venue">
+              <TabsContent value="inscricoes">
+                <RegistrationManager />
+              </TabsContent>
+
+              <TabsContent value="local">
                 <VenueConfigManager />
               </TabsContent>
 
@@ -219,16 +215,20 @@ const AdminDashboardContent = () => {
                 <OnlineConfigManager />
               </TabsContent>
 
-              <TabsContent value="partners">
+              <TabsContent value="palestrantes">
+                <SpeakersManager />
+              </TabsContent>
+
+              <TabsContent value="parceiros">
                 <PartnersManager />
+              </TabsContent>
+
+              <TabsContent value="textos">
+                <SiteTextsManager />
               </TabsContent>
 
               <TabsContent value="videos">
                 <VideosManager />
-              </TabsContent>
-
-              <TabsContent value="copyright">
-                <CopyrightManager />
               </TabsContent>
             </>
           )}
