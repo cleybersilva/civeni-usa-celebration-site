@@ -88,9 +88,12 @@ const FinancialDashboard = () => {
         return;
       }
       
-      // Safely set alerts data
-      const alertsData = data as AlertLog[] || [];
-      setAlerts(alertsData);
+      // Safely set alerts data with proper type handling
+      if (data && Array.isArray(data)) {
+        setAlerts(data as unknown as AlertLog[]);
+      } else {
+        setAlerts([]);
+      }
     } catch (error) {
       console.error('Erro ao buscar alertas:', error);
       setAlerts([]);
