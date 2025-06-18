@@ -69,10 +69,10 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.contactInfo')}</h3>
             <div className="space-y-3 opacity-90">
-              <p>📧 {content.siteTexts.contactEmail}</p>
+              <p>📧 contact@civeni.com</p>
               <p>📞 {content.siteTexts.contactPhone}</p>
               <p>📍 Celebration, FL 34747</p>
-              <p>🌐 www.civeniusa.org</p>
+              <p>🌐 www.civeni.com</p>
             </div>
           </div>
         </div>

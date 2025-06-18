@@ -375,7 +375,7 @@ const defaultContent: CMSContent = {
     videosTitle: "Videos from II Civeni 2024",
     videosDescription: "Relive the highlights from our previous congress and get inspired to join us in 2025",
     footerCopyright: "© 2025 VCCU. All rights reserved.",
-    contactEmail: "contact@civeniusa2025.com",
+    contactEmail: "contact@civeni.com",
     contactPhone: "+1 (555) 123-4567",
     organizedBy: "Veni Creator Christian University"
   }
