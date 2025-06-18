@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SpeakersManager from '@/components/admin/SpeakersManager';
@@ -38,7 +37,7 @@ const AdminTabs = () => {
   };
 
   return (
-    <Tabs defaultValue={getDefaultTab()} className="space-y-6">
+    <Tabs defaultValue={getDefaultTab()} className="space-y-8">
       <TabsList className="grid w-full grid-cols-7 lg:grid-cols-13">
         {canViewFinanceiro && <TabsTrigger value="financeiro">Financeiro</TabsTrigger>}
         {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
