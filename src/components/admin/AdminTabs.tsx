@@ -37,7 +37,7 @@ const AdminTabs = () => {
   };
 
   return (
-    <Tabs defaultValue={getDefaultTab()} className="space-y-8">
+    <Tabs defaultValue={getDefaultTab()} className="space-y-12">
       <TabsList className="grid w-full grid-cols-7 lg:grid-cols-13">
         {canViewFinanceiro && <TabsTrigger value="financeiro">Financeiro</TabsTrigger>}
         {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
