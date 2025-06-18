@@ -1,3 +1,4 @@
+
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -60,13 +61,31 @@ const resources = {
         digitalCertificate: "Digital certificate"
       },
       registration: {
-        urgent: "🔥 FEW IN-PERSON SPOTS LEFT",
+        urgent: "🔥 REGISTRATIONS OPEN",
         title: "REGISTER NOW!",
         description: "Secure your spot at the premier multidisciplinary congress",
         batchInfo: "FIRST BATCH: November 1 - December 15, 2024",
         tier1: "Our Students and Partners",
         tier2: "Students from Other Institutions",
         tier3: "Other Professionals",
+        newTitle: "Register for III Civeni USA 2025",
+        currentBatch: "Current Batch",
+        daysRemaining: "days remaining",
+        validUntil: "Valid until",
+        formTitle: "Registration Form",
+        fullName: "Full Name",
+        email: "Email",
+        category: "Category",
+        selectCategory: "Select a category",
+        couponCode: "Coupon Code",
+        couponPlaceholder: "Enter coupon code",
+        totalAmount: "Total Amount",
+        free: "FREE",
+        proofRequired: "* Proof required",
+        processing: "Processing...",
+        registerNow: "REGISTER NOW!",
+        noBatchActive: "No registration batches are currently active.",
+        verifyingPayment: "Verifying payment...",
         features: {
           sessions: "Access to all sessions",
           certificate: "Digital certificate",
@@ -79,7 +98,40 @@ const resources = {
           vip: "VIP reception access"
         },
         registerButton: "Register Here",
-        mostPopular: "MOST POPULAR"
+        mostPopular: "MOST POPULAR",
+        categories: {
+          vccuStudentPresentation: "VCCU Students (with presentation)",
+          vccuStudentListener: "VCCU Students (listener)",
+          vccuProfessorPartner: "VCCU Professors and Partners",
+          generalParticipant: "General Participants"
+        },
+        success: {
+          title: "Registration Confirmed!",
+          message: "Your registration has been processed successfully.",
+          emailSent: "Receipt Sent",
+          checkEmail: "Check your email for registration details.",
+          nextSteps: "Next Steps:",
+          step1: "Save your registration receipt",
+          step2: "Stay tuned for email updates",
+          step3: "Get ready for the event in December!",
+          freeRegistration: "Free registration completed successfully!"
+        },
+        canceled: {
+          title: "Payment Canceled",
+          message: "Your payment was canceled. No charges were made.",
+          noCharge: "No charges were made to your card."
+        },
+        error: {
+          title: "Payment Error",
+          message: "There was a problem processing your payment. Please try again."
+        },
+        errors: {
+          batchError: "Error loading batch information",
+          categoriesError: "Error loading categories",
+          invalidCoupon: "Invalid coupon code",
+          general: "Internal error. Please try again."
+        },
+        tryAgain: "Try Again"
       },
       about: {
         title: "About the Congress",
@@ -166,6 +218,9 @@ const resources = {
         copyright: "© 2024 VCCU. All rights reserved.",
         organizedBy: "Organized by VCCU & Hope and Justice",
         privacyPolicy: "Privacy Policy | Terms of Service"
+      },
+      common: {
+        backToHome: "Back to Home"
       }
     }
   },
@@ -201,14 +256,14 @@ const resources = {
         fullName: "Nome Completo",
         email: "E-mail",
         category: "Categoria",
-        selectCategory: "Selec. uma categoria",
+        selectCategory: "Selecione uma categoria",
         couponCode: "Código do Cupom",
         couponPlaceholder: "Digite o código do cupom",
         totalAmount: "Valor Total",
-        free: "ISENTO",
+        free: "GRATUITO",
         proofRequired: "* Comprovante obrigatório",
         processing: "Processando...",
-        registerNow: "Inscrever-se Agora",
+        registerNow: "INSCREVER-SE AGORA!",
         noBatchActive: "Não há lotes de inscrição ativos no momento.",
         verifyingPayment: "Verificando pagamento...",
         categories: {
@@ -290,14 +345,14 @@ const resources = {
         fullName: "Nombre Completo",
         email: "Correo Electrónico",
         category: "Categoría",
-        selectCategory: "Selec. una categoría",
+        selectCategory: "Seleccione una categoría",
         couponCode: "Código de Cupón",
         couponPlaceholder: "Ingrese el código de cupón",
         totalAmount: "Monto Total",
         free: "GRATIS",
         proofRequired: "* Comprobante obligatorio",
         processing: "Procesando...",
-        registerNow: "Inscribirse Ahora",
+        registerNow: "¡INSCRIBIRSE AHORA!",
         noBatchActive: "No hay lotes de inscripción activos en este momento.",
         verifyingPayment: "Verificando pago...",
         categories: {

@@ -75,31 +75,40 @@ const NewRegistrationSection = () => {
   };
 
   const getBatchStatusInfo = (daysRemaining: number) => {
+    const currentBatchText = t('registration.currentBatch');
+    const daysRemainingText = t('registration.daysRemaining');
+    
     if (daysRemaining > 15) {
       return {
         color: 'bg-green-500',
-        message: '1º lote (Atual)',
+        message: `1º ${currentBatchText.toLowerCase()}`,
         textColor: 'text-green-600',
         animate: 'animate-pulse'
       };
     } else if (daysRemaining > 5) {
       return {
         color: 'bg-yellow-500',
-        message: 'Últimos dias para o encerramento do 1º lote',
+        message: i18n.language === 'pt' ? 'Últimos dias para o encerramento do 1º lote' : 
+                i18n.language === 'en' ? 'Last days to close the 1st batch' :
+                'Últimos días para el cierre del 1er lote',
         textColor: 'text-yellow-600',
         animate: 'animate-pulse'
       };
     } else if (daysRemaining > 0) {
       return {
         color: 'bg-red-500',
-        message: `Faltam ${daysRemaining} dias para o encerramento do 1º lote`,
+        message: i18n.language === 'pt' ? `Faltam ${daysRemaining} dias para o encerramento do 1º lote` :
+                i18n.language === 'en' ? `${daysRemaining} days left to close the 1st batch` :
+                `Faltan ${daysRemaining} días para el cierre del 1er lote`,
         textColor: 'text-red-600',
         animate: 'animate-pulse'
       };
     } else {
       return {
         color: 'bg-gray-500',
-        message: '1º lote encerrado',
+        message: i18n.language === 'pt' ? '1º lote encerrado' :
+                i18n.language === 'en' ? '1st batch closed' :
+                '1er lote cerrado',
         textColor: 'text-gray-600',
         animate: ''
       };
@@ -240,7 +249,7 @@ const NewRegistrationSection = () => {
       if (formData.couponCode) {
         validCoupon = await validateCoupon(formData.couponCode);
         if (!validCoupon?.is_valid) {
-          throw new Error('Código de cupom inválido ou expirado');
+          throw new Error(t('registration.errors.invalidCoupon'));
         }
       }
 
@@ -259,7 +268,7 @@ const NewRegistrationSection = () => {
 
       if (data.payment_required === false) {
         // Free registration completed
-        alert('Inscrição gratuita realizada com sucesso!');
+        alert(t('registration.success.freeRegistration'));
         setFormData({ email: '', fullName: '', categoryId: '', couponCode: '' });
       } else if (data.url) {
         // Redirect to Stripe checkout
@@ -267,7 +276,7 @@ const NewRegistrationSection = () => {
       }
     } catch (error: any) {
       console.error('Registration error:', error);
-      setError(error.message || 'Erro ao processar inscrição');
+      setError(error.message || t('registration.errors.general'));
     } finally {
       setLoading(false);
     }
@@ -280,7 +289,7 @@ const NewRegistrationSection = () => {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Não há lotes de inscrição ativos no momento.
+              {t('registration.noBatchActive')}
             </AlertDescription>
           </Alert>
         </div>
@@ -296,7 +305,7 @@ const NewRegistrationSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="inline-block bg-civeni-red text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
-            INSCRIÇÕES ABERTAS
+            {t('registration.urgent')}
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
             {t('registration.newTitle')}
@@ -315,11 +324,14 @@ const NewRegistrationSection = () => {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Clock className="w-4 h-4" />
                 <span className={`text-lg font-semibold ${statusInfo.textColor}`}>
-                  {currentBatch.days_remaining} dias restantes
+                  {currentBatch.days_remaining} {t('registration.daysRemaining')}
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                Válido até: {new Date(currentBatch.end_date).toLocaleDateString('pt-BR')}
+                {t('registration.validUntil')}: {new Date(currentBatch.end_date).toLocaleDateString(
+                  i18n.language === 'pt' ? 'pt-BR' : 
+                  i18n.language === 'en' ? 'en-US' : 'es-ES'
+                )}
               </p>
             </CardContent>
           </Card>
@@ -330,7 +342,7 @@ const NewRegistrationSection = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Ticket className="w-5 h-5" />
-                Formulário de Inscrição
+                {t('registration.formTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -344,7 +356,7 @@ const NewRegistrationSection = () => {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="fullName">Nome Completo</Label>
+                    <Label htmlFor="fullName">{t('registration.fullName')}</Label>
                     <Input
                       id="fullName"
                       type="text"
@@ -354,7 +366,7 @@ const NewRegistrationSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('registration.email')}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -366,10 +378,10 @@ const NewRegistrationSection = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Categoria de Inscrição</Label>
+                  <Label htmlFor="category">{t('registration.category')}</Label>
                   <Select value={formData.categoryId} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma categoria" />
+                      <SelectValue placeholder={t('registration.selectCategory')} />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category) => (
@@ -377,7 +389,7 @@ const NewRegistrationSection = () => {
                           <div className="flex justify-between w-full">
                             <span>{getCategoryName(category.category_name)}</span>
                             <span className="ml-4 font-semibold">
-                              {category.is_exempt ? 'Gratuito' : formatPrice(category.price_brl)}
+                              {category.is_exempt ? t('registration.free') : formatPrice(category.price_brl)}
                             </span>
                           </div>
                         </SelectItem>
@@ -388,13 +400,13 @@ const NewRegistrationSection = () => {
 
                 {selectedCategory?.is_exempt && (
                   <div>
-                    <Label htmlFor="couponCode">Código do Cupom</Label>
+                    <Label htmlFor="couponCode">{t('registration.couponCode')}</Label>
                     <Input
                       id="couponCode"
                       type="text"
                       value={formData.couponCode}
                       onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
-                      placeholder="Digite seu código de cupom"
+                      placeholder={t('registration.couponPlaceholder')}
                       required
                     />
                   </div>
@@ -404,14 +416,14 @@ const NewRegistrationSection = () => {
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <DollarSign className="w-5 h-5 text-civeni-blue" />
-                      <span className="font-semibold">Valor Total</span>
+                      <span className="font-semibold">{t('registration.totalAmount')}</span>
                     </div>
                     <div className="text-2xl font-bold text-civeni-blue">
-                      {selectedCategory.is_exempt ? 'Gratuito' : formatPrice(selectedCategory.price_brl)}
+                      {selectedCategory.is_exempt ? t('registration.free') : formatPrice(selectedCategory.price_brl)}
                     </div>
                     {selectedCategory.requires_proof && (
                       <p className="text-sm text-amber-600 mt-2">
-                        Esta categoria requer comprovação
+                        {t('registration.proofRequired')}
                       </p>
                     )}
                   </div>
@@ -422,7 +434,7 @@ const NewRegistrationSection = () => {
                   className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
                   disabled={loading || !formData.categoryId}
                 >
-                  {loading ? 'Processando...' : 'INSCREVER-SE AGORA!'}
+                  {loading ? t('registration.processing') : t('registration.registerNow')}
                 </Button>
               </form>
             </CardContent>
