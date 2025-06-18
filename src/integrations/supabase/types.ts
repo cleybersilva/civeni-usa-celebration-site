@@ -241,6 +241,13 @@ export type Database = {
         Args: { user_email: string }
         Returns: boolean
       }
+      update_admin_user_type: {
+        Args: {
+          user_id: string
+          new_user_type: Database["public"]["Enums"]["admin_user_type"]
+        }
+        Returns: Json
+      }
       verify_admin_login: {
         Args: { user_email: string; user_password: string }
         Returns: {
