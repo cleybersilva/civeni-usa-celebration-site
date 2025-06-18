@@ -8,7 +8,7 @@ const HeroBanner = () => {
   const { content } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  const slides = content.bannerSlides.sort((a, b) => a.order - b.order);
+  const slides = content.bannerSlides.sort((a, b) => (a.order || 0) - (b.order || 0));
 
   useEffect(() => {
     if (slides.length === 0) return;
@@ -34,7 +34,7 @@ const HeroBanner = () => {
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${slide.bgImage})` }}
+            style={{ backgroundImage: `url(${slide.bgImage || slide.image})` }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
           
@@ -46,9 +46,11 @@ const HeroBanner = () => {
               <p className="text-xl md:text-2xl mb-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 {slide.subtitle}
               </p>
-              <p className="text-lg md:text-xl mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                {slide.description}
-              </p>
+              {slide.description && (
+                <p className="text-lg md:text-xl mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                  {slide.description}
+                </p>
+              )}
               <a 
                 href={slide.buttonLink}
                 className="bg-civeni-red text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins"

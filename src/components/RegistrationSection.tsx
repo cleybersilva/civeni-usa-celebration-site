@@ -7,7 +7,7 @@ const RegistrationSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
 
-  const registrationTiers = content.registrationTiers.sort((a, b) => a.order - b.order);
+  const registrationTiers = content.registrationTiers.sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
     <section id="registration" className="py-20 bg-white">
@@ -22,11 +22,13 @@ const RegistrationSection = () => {
           <p className="text-xl text-gray-600 mb-8">
             {t('registration.description')}
           </p>
-          <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 max-w-md mx-auto">
-            <p className="text-yellow-800 font-semibold">
-              {content.batchInfo}
-            </p>
-          </div>
+          {content.batchInfo && (
+            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 max-w-md mx-auto">
+              <p className="text-yellow-800 font-semibold">
+                {content.batchInfo}
+              </p>
+            </div>
+          )}
         </div>
         
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -49,7 +51,7 @@ const RegistrationSection = () => {
               
               <div className="p-8">
                 <h3 className="text-xl font-bold text-civeni-blue text-center mb-6 font-poppins">
-                  {tier.title}
+                  {tier.title || tier.name}
                 </h3>
                 
                 <div className="text-center mb-8">
