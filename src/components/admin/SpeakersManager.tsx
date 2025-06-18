@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { DialogTrigger } from '@/components/ui/dialog';
 import { useCMS, Speaker } from '@/contexts/CMSContext';
 import { Plus } from 'lucide-react';
 import SpeakerCard from './SpeakerCard';
@@ -90,12 +89,10 @@ const SpeakersManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Palestrantes</h2>
-        <DialogTrigger asChild>
-          <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Palestrante
-          </Button>
-        </DialogTrigger>
+        <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+          <Plus className="w-4 h-4 mr-2" />
+          Adicionar Palestrante
+        </Button>
       </div>
 
       <SpeakerFormDialog
