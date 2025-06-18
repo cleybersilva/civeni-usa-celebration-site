@@ -207,6 +207,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_user_permission: {
+        Args: { user_email: string; permission_type: string; resource: string }
+        Returns: boolean
+      }
+      is_admin_root_user: {
+        Args: { user_email: string }
+        Returns: boolean
+      }
       request_password_reset: {
         Args: { user_email: string }
         Returns: boolean

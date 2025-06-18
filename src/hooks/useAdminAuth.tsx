@@ -5,14 +5,16 @@ import { supabase } from '@/integrations/supabase/client';
 interface AdminUser {
   id: string;
   email: string;
-  user_type: 'admin' | 'editor' | 'viewer';
+  user_type: 'admin' | 'editor' | 'viewer' | 'design' | 'admin_root';
+  is_admin_root?: boolean;
 }
 
 interface AdminAuthContextType {
   user: AdminUser | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  hasPermission: (permission: string) => boolean;
+  hasPermission: (resource: string) => boolean;
+  isAdminRoot: () => boolean;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
@@ -38,10 +40,17 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
       if (data && data.length > 0) {
         const userData = data[0];
+        
+        // Verificar se é admin root
+        const { data: isRootData } = await supabase.rpc('is_admin_root_user', {
+          user_email: email
+        });
+
         const adminUser: AdminUser = {
           id: userData.user_id,
           email: userData.email,
-          user_type: userData.user_type
+          user_type: userData.user_type,
+          is_admin_root: isRootData || false
         };
         
         setUser(adminUser);
@@ -60,20 +69,31 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     localStorage.removeItem('adminUser');
   };
 
-  const hasPermission = (permission: string) => {
+  const hasPermission = (resource: string) => {
     if (!user) return false;
     
+    // Admin Root tem acesso total
+    if (user.user_type === 'admin_root' || user.is_admin_root) {
+      return true;
+    }
+    
+    // Definir permissões por categoria
     const permissions = {
-      admin: ['read', 'write', 'delete', 'manage_users'],
-      editor: ['read', 'write'],
-      viewer: ['read']
+      admin: ['banner', 'contador', 'copyright', 'inscricoes', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'],
+      design: ['banner', 'palestrantes', 'videos'],
+      editor: ['contador', 'inscricoes', 'local', 'online', 'parceiros', 'textos'],
+      viewer: ['read'] // Apenas visualização
     };
 
-    return permissions[user.user_type]?.includes(permission) || false;
+    return permissions[user.user_type]?.includes(resource) || false;
+  };
+
+  const isAdminRoot = () => {
+    return user?.user_type === 'admin_root' || user?.is_admin_root === true;
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, login, logout, hasPermission }}>
+    <AdminAuthContext.Provider value={{ user, login, logout, hasPermission, isAdminRoot }}>
       {children}
     </AdminAuthContext.Provider>
   );
