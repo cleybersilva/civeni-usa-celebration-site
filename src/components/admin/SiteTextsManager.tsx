@@ -5,16 +5,29 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCMS } from '@/contexts/CMSContext';
-import { Type, Save } from 'lucide-react';
+import { Type, Save, Copyright } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const SiteTextsManager = () => {
   const { content, updateSiteTexts } = useCMS();
   const [formData, setFormData] = useState(content.siteTexts);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateSiteTexts(formData);
-    alert('Textos do site atualizados com sucesso!');
+    try {
+      await updateSiteTexts(formData);
+      toast({
+        title: "Textos atualizados",
+        description: "Textos do site atualizados com sucesso!",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar os textos. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleChange = (field: keyof typeof formData, value: string) => {
@@ -63,15 +76,6 @@ const SiteTextsManager = () => {
                 <Input
                   value={formData.contactPhone}
                   onChange={(e) => handleChange('contactPhone', e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Copyright do Rodapé</label>
-                <Input
-                  value={formData.footerCopyright}
-                  onChange={(e) => handleChange('footerCopyright', e.target.value)}
                   required
                 />
               </div>
@@ -206,6 +210,41 @@ const SiteTextsManager = () => {
               Salvar Todos os Textos
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Seção de Copyright */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Copyright className="w-5 h-5" />
+            Configurações de Copyright
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Copyright do Rodapé</label>
+              <Input
+                value={formData.footerCopyright}
+                onChange={(e) => handleChange('footerCopyright', e.target.value)}
+                placeholder="Ex: © 2025 VCCU. All rights reserved."
+                required
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Este texto aparecerá no rodapé do site
+              </p>
+            </div>
+
+            <Button 
+              type="button" 
+              onClick={handleSubmit}
+              className="bg-civeni-green hover:bg-green-600"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Salvar Copyright
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
