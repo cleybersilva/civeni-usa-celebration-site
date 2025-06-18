@@ -32,8 +32,8 @@ const Header = () => {
     {
       title: t('header.schedule'),
       items: [
-        { name: t('header.inPerson'), href: '#in-person' },
-        { name: t('header.online'), href: '#online' }
+        { name: t('header.inPerson'), href: '/cronograma-presencial' },
+        { name: t('header.online'), href: '/cronograma-online' }
       ]
     },
     {
@@ -120,11 +120,13 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
             <div className="flex items-center">
-              <img 
-                src="/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png" 
-                alt="III Civeni 2025 Logo" 
-                className="h-14 w-auto"
-              />
+              <Link to="/">
+                <img 
+                  src="/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png" 
+                  alt="III Civeni 2025 Logo" 
+                  className="h-14 w-auto"
+                />
+              </Link>
             </div>
             
             <div className="hidden lg:flex items-center space-x-8">
@@ -140,14 +142,25 @@ const Header = () => {
                   {item.items.length > 0 && openDropdown === item.title && (
                     <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-lg border z-50">
                       {item.items.map((subItem) => (
-                        <a
-                          key={subItem.name}
-                          href={subItem.href}
-                          className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-civeni-red transition-colors"
-                          onClick={() => setOpenDropdown(null)}
-                        >
-                          {subItem.name}
-                        </a>
+                        subItem.href.startsWith('#') ? (
+                          <a
+                            key={subItem.name}
+                            href={subItem.href}
+                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-civeni-red transition-colors"
+                            onClick={() => setOpenDropdown(null)}
+                          >
+                            {subItem.name}
+                          </a>
+                        ) : (
+                          <Link
+                            key={subItem.name}
+                            to={subItem.href}
+                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-civeni-red transition-colors"
+                            onClick={() => setOpenDropdown(null)}
+                          >
+                            {subItem.name}
+                          </Link>
+                        )
                       ))}
                     </div>
                   )}
