@@ -26,15 +26,15 @@ const AdminHeader = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-civeni-blue to-civeni-blue/90 border-b">
-      <div className="flex justify-between items-center px-6 py-4">
+    <header className="bg-gradient-to-r from-civeni-blue to-civeni-blue/90 border-b h-16">
+      <div className="flex justify-between items-center px-6 py-3 h-full">
         <div className="flex items-center space-x-4">
           <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80" />
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-xl font-bold text-white">
               Dashboard
             </h1>
-            <p className="text-sm text-white/80">
+            <p className="text-xs text-white/80">
               {user?.email} ({getUserTypeLabel(user?.user_type || '')})
               {isAdminRoot() && <span className="ml-2 text-red-300 font-bold">[ROOT]</span>}
             </p>
@@ -45,7 +45,7 @@ const AdminHeader = () => {
             variant="outline" 
             onClick={() => navigate('/')}
             size="sm"
-            className="border-white/30 text-white hover:bg-white/20 hover:text-white"
+            className="border-white text-white bg-white/10 hover:bg-white hover:text-civeni-blue transition-all duration-200"
           >
             Ver Site
           </Button>
