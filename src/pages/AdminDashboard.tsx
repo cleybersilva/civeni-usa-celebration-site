@@ -16,6 +16,7 @@ import PartnersManager from '@/components/admin/PartnersManager';
 import CopyrightManager from '@/components/admin/CopyrightManager';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
+import { CMSProvider } from '@/contexts/CMSContext';
 
 const AdminLoginForm = () => {
   const [email, setEmail] = useState('');
@@ -215,7 +216,9 @@ const AdminDashboardContent = () => {
 const AdminDashboard = () => {
   return (
     <AdminAuthProvider>
-      <AdminDashboardInner />
+      <CMSProvider>
+        <AdminDashboardInner />
+      </CMSProvider>
     </AdminAuthProvider>
   );
 };
