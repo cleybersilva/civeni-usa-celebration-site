@@ -71,11 +71,11 @@ const Footer = () => {
         <div className="border-t border-white border-opacity-20 mt-12 pt-8 text-center">
           <div className="grid md:grid-cols-3 gap-4 items-center">
             <div className="text-sm opacity-75">
-              {content.siteTexts.footerCopyright}
+              {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
               {content.siteTexts.organizedBy ? 
-                `Organizado por: ${content.siteTexts.organizedBy}` : 
+                `${t('footer.organizedBy')}: ${content.siteTexts.organizedBy}` : 
                 t('footer.organizedBy')
               }
             </div>

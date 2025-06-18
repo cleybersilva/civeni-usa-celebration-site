@@ -21,7 +21,7 @@ const resources = {
         speakers: "SPEAKERS",
         registration: "REGISTRATION",
         contact: "CONTACT",
-        adminArea: "Administrative Area"
+        adminArea: "Restricted Access"
       },
       hero: {
         title1: "III International Multidisciplinary Congress",
@@ -178,7 +178,7 @@ const resources = {
         speakers: "PALESTRANTES",
         registration: "INSCRIÇÕES",
         contact: "CONTATO",
-        adminArea: "Área Administrativa"
+        adminArea: "Acesso Restrito"
       },
       hero: {
         title1: "III Congresso Internacional Multidisciplinar",
@@ -335,7 +335,7 @@ const resources = {
         speakers: "PONENTES",
         registration: "INSCRIPCIONES",
         contact: "CONTACTO",
-        adminArea: "Área Administrativa"
+        adminArea: "Acceso Restringido"
       },
       hero: {
         title1: "III Congreso Internacional Multidisciplinario",
