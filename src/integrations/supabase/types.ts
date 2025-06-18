@@ -14,6 +14,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          is_admin_root: boolean | null
           password_hash: string
           updated_at: string
           user_type: Database["public"]["Enums"]["admin_user_type"]
@@ -22,6 +23,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          is_admin_root?: boolean | null
           password_hash: string
           updated_at?: string
           user_type?: Database["public"]["Enums"]["admin_user_type"]
@@ -30,6 +32,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          is_admin_root?: boolean | null
           password_hash?: string
           updated_at?: string
           user_type?: Database["public"]["Enums"]["admin_user_type"]
@@ -218,7 +221,7 @@ export type Database = {
       }
     }
     Enums: {
-      admin_user_type: "admin" | "editor" | "viewer"
+      admin_user_type: "admin" | "editor" | "viewer" | "design" | "admin_root"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -334,7 +337,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      admin_user_type: ["admin", "editor", "viewer"],
+      admin_user_type: ["admin", "editor", "viewer", "design", "admin_root"],
     },
   },
 } as const
