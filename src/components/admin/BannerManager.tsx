@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCMS, BannerSlide } from '@/contexts/CMSContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import ImageGuide from './ImageGuide';
 
 const BannerManager = () => {
   const { content, updateBannerSlides } = useCMS();
@@ -95,72 +96,81 @@ const BannerManager = () => {
               Adicionar Slide
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingSlide ? 'Editar Slide' : 'Adicionar Slide'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Título</label>
+                    <Input
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Subtítulo</label>
+                    <Input
+                      value={formData.subtitle}
+                      onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Descrição</label>
+                    <Textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      rows={2}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">URL da Imagem de Fundo</label>
+                    <Input
+                      type="url"
+                      value={formData.bgImage}
+                      onChange={(e) => setFormData({...formData, bgImage: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Texto do Botão</label>
+                    <Input
+                      value={formData.buttonText}
+                      onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Link do Botão</label>
+                    <Input
+                      value={formData.buttonLink}
+                      onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                      {editingSlide ? 'Atualizar' : 'Adicionar'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-2">Título</label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  required
-                />
+                <ImageGuide type="banner" title="Banner" />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Subtítulo</label>
-                <Input
-                  value={formData.subtitle}
-                  onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição</label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  rows={2}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">URL da Imagem de Fundo</label>
-                <Input
-                  type="url"
-                  value={formData.bgImage}
-                  onChange={(e) => setFormData({...formData, bgImage: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Texto do Botão</label>
-                <Input
-                  value={formData.buttonText}
-                  onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Link do Botão</label>
-                <Input
-                  value={formData.buttonLink}
-                  onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                  {editingSlide ? 'Atualizar' : 'Adicionar'}
-                </Button>
-              </div>
-            </form>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCMS, Speaker } from '@/contexts/CMSContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import ImageGuide from './ImageGuide';
 
 const SpeakersManager = () => {
   const { content, updateSpeakers } = useCMS();
@@ -92,64 +93,73 @@ const SpeakersManager = () => {
               Adicionar Palestrante
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingSpeaker ? 'Editar Palestrante' : 'Adicionar Palestrante'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Nome</label>
+                    <Input
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Título/Cargo</label>
+                    <Input
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Instituição</label>
+                    <Input
+                      value={formData.institution}
+                      onChange={(e) => setFormData({...formData, institution: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">URL da Imagem</label>
+                    <Input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) => setFormData({...formData, image: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Biografia</label>
+                    <Textarea
+                      value={formData.bio}
+                      onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                      rows={4}
+                      required
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                      {editingSpeaker ? 'Atualizar' : 'Adicionar'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-2">Nome</label>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
+                <ImageGuide type="speaker" title="Palestrante" />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Título/Cargo</label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Instituição</label>
-                <Input
-                  value={formData.institution}
-                  onChange={(e) => setFormData({...formData, institution: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">URL da Imagem</label>
-                <Input
-                  type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData({...formData, image: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Biografia</label>
-                <Textarea
-                  value={formData.bio}
-                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                  rows={4}
-                  required
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                  {editingSpeaker ? 'Atualizar' : 'Adicionar'}
-                </Button>
-              </div>
-            </form>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
