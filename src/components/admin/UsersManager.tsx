@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, Users, Shield, Eye, Edit, UserPlus } from 'lucide-react';
+import { Trash2, Plus, Users, Shield, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -25,12 +25,15 @@ const UsersManager = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { user } = useAdminAuth();
 
   // Form state
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
     user_type: 'viewer' as const
   });
 
@@ -58,8 +61,13 @@ const UsersManager = () => {
     setError('');
     setSuccess('');
 
-    if (!formData.email || !formData.password) {
-      setError('Email e senha são obrigatórios');
+    if (!formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Todos os campos são obrigatórios');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('As senhas não coincidem');
       return;
     }
 
@@ -75,7 +83,7 @@ const UsersManager = () => {
       const result = data as any;
       if (result.success) {
         setSuccess(result.message);
-        setFormData({ email: '', password: '', user_type: 'viewer' });
+        setFormData({ email: '', password: '', confirmPassword: '', user_type: 'viewer' });
         setIsDialogOpen(false);
         fetchUsers();
       } else {
@@ -179,13 +187,53 @@ const UsersManager = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Senha</label>
-                <Input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  placeholder="Digite a senha"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="Digite a senha"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Confirmar Senha</label>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    placeholder="Confirme a senha"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
@@ -201,7 +249,6 @@ const UsersManager = () => {
                     <SelectItem value="editor">Editor</SelectItem>
                     <SelectItem value="design">Designer</SelectItem>
                     <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="admin_root">Admin Root</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

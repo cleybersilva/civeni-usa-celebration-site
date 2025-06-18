@@ -17,12 +17,15 @@ import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
-  const { hasPermission, isAdminRoot } = useAdminAuth();
+  const { hasPermission, isAdminRoot, user } = useAdminAuth();
+
+  // Verificar se o usuário pode ver a guia Financeiro (apenas Admin Root e Admin)
+  const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
 
   return (
-    <Tabs defaultValue="financeiro" className="space-y-6">
+    <Tabs defaultValue={canViewFinanceiro ? "financeiro" : "banner"} className="space-y-6">
       <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
-        <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+        {canViewFinanceiro && <TabsTrigger value="financeiro">Financeiro</TabsTrigger>}
         {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
         {(hasPermission('contador') || isAdminRoot()) && <TabsTrigger value="contador">Contador</TabsTrigger>}
         {(hasPermission('copyright') || isAdminRoot()) && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
@@ -36,9 +39,11 @@ const AdminTabs = () => {
         {isAdminRoot() && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
       </TabsList>
 
-      <TabsContent value="financeiro">
-        <DashboardOverview />
-      </TabsContent>
+      {canViewFinanceiro && (
+        <TabsContent value="financeiro">
+          <DashboardOverview />
+        </TabsContent>
+      )}
 
       {(hasPermission('banner') || isAdminRoot()) && (
         <TabsContent value="banner">
