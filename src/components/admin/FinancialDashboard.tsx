@@ -75,7 +75,7 @@ const FinancialDashboard = () => {
 
   const fetchAlerts = async () => {
     try {
-      // Try to fetch from alert_logs, but handle gracefully if table doesn't exist
+      // Query alert_logs table directly with proper error handling
       const { data, error } = await supabase
         .from('alert_logs' as any)
         .select('*')
@@ -88,7 +88,9 @@ const FinancialDashboard = () => {
         return;
       }
       
-      setAlerts(data || []);
+      // Safely set alerts data
+      const alertsData = data as AlertLog[] || [];
+      setAlerts(alertsData);
     } catch (error) {
       console.error('Erro ao buscar alertas:', error);
       setAlerts([]);
@@ -97,7 +99,7 @@ const FinancialDashboard = () => {
 
   const generateDailyReport = async () => {
     try {
-      // Try to call the function, but handle if it doesn't exist
+      // Call the generate_daily_report function directly
       const { data, error } = await supabase.rpc('generate_daily_report' as any);
       
       if (error) {
