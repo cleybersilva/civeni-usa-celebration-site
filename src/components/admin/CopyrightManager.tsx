@@ -14,6 +14,7 @@ const CopyrightManager = () => {
   const [formData, setFormData] = useState({
     footerCopyright: content.siteTexts.footerCopyright,
     institutionalLink: content.siteTexts.institutionalLink || '',
+    organizedBy: content.siteTexts.organizedBy || '',
     copyrightEn: content.siteTexts.copyrightEn || '',
     copyrightPt: content.siteTexts.copyrightPt || '',
     copyrightEs: content.siteTexts.copyrightEs || ''
@@ -72,6 +73,18 @@ const CopyrightManager = () => {
             </div>
 
             <div>
+              <label className="block text-sm font-medium mb-2">Organizado por</label>
+              <Input
+                value={formData.organizedBy}
+                onChange={(e) => handleChange('organizedBy', e.target.value)}
+                placeholder="Ex: Veni Creator Christian University"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Nome da organização responsável pelo evento
+              </p>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium mb-2">Link Institucional (Opcional)</label>
               <Input
                 type="url"
@@ -123,6 +136,11 @@ const CopyrightManager = () => {
               <p className="text-sm text-gray-700">
                 {formData.footerCopyright || "© 2025 VCCU. Todos os direitos reservados."}
               </p>
+              {formData.organizedBy && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Organizado por: {formData.organizedBy}
+                </p>
+              )}
               {formData.institutionalLink && (
                 <a 
                   href={formData.institutionalLink} 

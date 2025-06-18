@@ -74,7 +74,10 @@ const Footer = () => {
               {content.siteTexts.footerCopyright}
             </div>
             <div className="text-sm opacity-75">
-              {t('footer.organizedBy')}
+              {content.siteTexts.organizedBy ? 
+                `Organizado por: ${content.siteTexts.organizedBy}` : 
+                t('footer.organizedBy')
+              }
             </div>
             <div className="text-sm opacity-75">
               {content.siteTexts.institutionalLink ? (
