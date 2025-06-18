@@ -53,6 +53,12 @@ const SpeakersManager = () => {
       speakers.push(newSpeaker);
     }
 
+    // Fix Dr. Maria Rodriguez image if it exists
+    const mariaIndex = speakers.findIndex(s => s.name.includes('Maria Rodriguez'));
+    if (mariaIndex !== -1 && speakers[mariaIndex].image.includes('/lovable-uploads/')) {
+      speakers[mariaIndex].image = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+    }
+
     await updateSpeakers(speakers);
     setIsDialogOpen(false);
     resetForm();
@@ -169,7 +175,10 @@ const SpeakersManager = () => {
           <Card key={speaker.id}>
             <CardHeader className="pb-2">
               <img
-                src={speaker.image}
+                src={speaker.name.includes('Maria Rodriguez') ? 
+                  'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' : 
+                  speaker.image
+                }
                 alt={speaker.name}
                 className="w-full h-48 object-cover rounded-lg"
               />

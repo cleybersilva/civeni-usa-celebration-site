@@ -59,53 +59,58 @@ const Header = () => {
       {/* Top Bar */}
       <div className="bg-civeni-blue py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex space-x-4">
-            <a href="#" className="text-white hover:text-civeni-red transition-colors">
-              <Instagram size={20} />
-            </a>
-            <a href="#" className="text-white hover:text-civeni-red transition-colors">
-              <Facebook size={20} />
-            </a>
-            <a href="#" className="text-white hover:text-civeni-red transition-colors">
-              <Youtube size={20} />
-            </a>
+          <div>
             <Link 
               to="/admin" 
-              className="flex items-center gap-2 text-white hover:text-civeni-red transition-colors ml-4"
+              className="flex items-center gap-2 text-white hover:text-civeni-red transition-colors"
             >
               <Settings size={16} />
               <span className="text-sm">{t('header.adminArea')}</span>
             </Link>
           </div>
           
-          <div className="relative">
-            <button
-              onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
-              className="flex items-center space-x-2 text-white hover:text-civeni-red transition-colors bg-white bg-opacity-10 px-3 py-1 rounded-md hover:bg-opacity-20"
-            >
-              <span className="text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
-              <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>
-              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+          <div className="flex items-center space-x-6">
+            <div className="flex space-x-4">
+              <a href="#" className="text-white hover:text-civeni-red transition-colors">
+                <Instagram size={20} />
+              </a>
+              <a href="#" className="text-white hover:text-civeni-red transition-colors">
+                <Facebook size={20} />
+              </a>
+              <a href="#" className="text-white hover:text-civeni-red transition-colors">
+                <Youtube size={20} />
+              </a>
+            </div>
             
-            {openDropdown === 'language' && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[99999] overflow-hidden">
-                {languages.map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => changeLanguage(lang.code)}
-                    className={`w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
-                      selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
-                    }`}
-                  >
-                    <span className="text-lg">{lang.flag}</span>
-                    <span className="text-sm">{lang.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
+                className="flex items-center space-x-2 text-white hover:text-civeni-red transition-colors bg-white bg-opacity-10 px-3 py-1 rounded-md hover:bg-opacity-20"
+              >
+                <span className="text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
+                <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {openDropdown === 'language' && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[99999] overflow-hidden">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => changeLanguage(lang.code)}
+                      className={`w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
+                        selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
+                      }`}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <span className="text-sm">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
