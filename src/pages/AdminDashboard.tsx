@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -145,7 +144,7 @@ const AdminDashboardContent = () => {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-civeni-blue">
-                Painel Administrativo - III Civeni USA 2025
+                Dashboard - VCCU/Civeni USA
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Logado como: {user?.email} ({getUserTypeLabel(user?.user_type || '')})
