@@ -86,7 +86,8 @@ const NewRegistrationSection = () => {
 
   const fetchCurrentBatch = async () => {
     try {
-      const { data, error } = await supabase
+      // Use type assertion to work around missing type definitions
+      const { data, error } = await (supabase as any)
         .from('registration_batches')
         .select('*')
         .gte('end_date', new Date().toISOString().split('T')[0])
@@ -120,7 +121,8 @@ const NewRegistrationSection = () => {
     if (!currentBatch) return;
     
     try {
-      const { data, error } = await supabase
+      // Use type assertion to work around missing type definitions
+      const { data, error } = await (supabase as any)
         .from('registration_categories')
         .select('*')
         .eq('batch_id', currentBatch.id);
@@ -137,7 +139,8 @@ const NewRegistrationSection = () => {
     if (!couponCode) return null;
     
     try {
-      const { data, error } = await supabase
+      // Use type assertion to work around missing type definitions
+      const { data, error } = await (supabase as any)
         .from('coupon_codes')
         .select(`
           id,
