@@ -24,8 +24,19 @@ const AdminTabs = () => {
   // Verificar se o usuário pode ver a guia Usuários (apenas Admin Root e Admin)
   const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
 
+  // Definir a guia padrão baseada no tipo de usuário
+  const getDefaultTab = () => {
+    if (user?.user_type === 'editor') {
+      return 'contador';
+    }
+    if (canViewFinanceiro) {
+      return 'financeiro';
+    }
+    return 'banner';
+  };
+
   return (
-    <Tabs defaultValue={canViewFinanceiro ? "financeiro" : "banner"} className="space-y-6">
+    <Tabs defaultValue={getDefaultTab()} className="space-y-6">
       <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
         {canViewFinanceiro && <TabsTrigger value="financeiro">Financeiro</TabsTrigger>}
         {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
