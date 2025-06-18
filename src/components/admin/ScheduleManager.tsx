@@ -83,7 +83,7 @@ const ScheduleManager = () => {
       } else {
         const { error } = await supabase
           .from('schedules')
-          .insert([data]);
+          .insert(data);
         if (error) throw error;
       }
     },
