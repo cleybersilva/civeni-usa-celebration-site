@@ -69,12 +69,29 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-white border-opacity-20 mt-12 pt-8 text-center">
-          <div className="grid md:grid-cols-2 gap-4 items-center">
+          <div className="grid md:grid-cols-3 gap-4 items-center">
             <div className="text-sm opacity-75">
               {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
-              {t('footer.organizedBy')}: VCCU - Veni Creator Christian University
+              {content.siteTexts.organizedBy ? 
+                `${t('footer.organizedBy')}: ${content.siteTexts.organizedBy}` : 
+                t('footer.organizedBy')
+              }
+            </div>
+            <div className="text-sm opacity-75">
+              {content.siteTexts.institutionalLink ? (
+                <a 
+                  href={content.siteTexts.institutionalLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-civeni-red transition-colors"
+                >
+                  {t('footer.privacyPolicy')}
+                </a>
+              ) : (
+                t('footer.privacyPolicy')
+              )}
             </div>
           </div>
         </div>
