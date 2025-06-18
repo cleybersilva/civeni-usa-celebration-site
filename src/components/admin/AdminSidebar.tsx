@@ -8,6 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  SidebarFooter,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   BarChart3,
@@ -28,6 +30,7 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminSidebar = () => {
   const { hasPermission, isAdminRoot, user } = useAdminAuth();
+  const { state } = useSidebar();
   const [activeTab, setActiveTab] = useState(() => {
     if (user?.user_type === 'editor') {
       return 'contador';
@@ -149,37 +152,53 @@ const AdminSidebar = () => {
   }, [activeTab]);
 
   return (
-    <Sidebar className="border-r">
-      <SidebarHeader className="border-b px-6 py-4">
+    <Sidebar className="border-r bg-white shadow-sm">
+      <SidebarHeader className="border-b px-4 py-4 bg-gradient-to-r from-civeni-blue to-civeni-blue/90">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-civeni-blue">
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-white">
               Admin Panel
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-white/80">
               VCCU/Civeni USA
             </p>
           </div>
-          <SidebarTrigger className="h-8 w-8" />
+          <SidebarTrigger className="h-8 w-8 text-white hover:bg-white/20 transition-colors duration-200 rounded-md flex items-center justify-center">
+            <div className="relative w-5 h-5 flex flex-col justify-center items-center">
+              <span className={`block w-5 h-0.5 bg-current transition-all duration-300 ${state === 'collapsed' ? 'rotate-45 translate-y-0.5' : 'mb-1'}`}></span>
+              <span className={`block w-5 h-0.5 bg-current transition-all duration-300 ${state === 'collapsed' ? 'opacity-0' : 'mb-1'}`}></span>
+              <span className={`block w-5 h-0.5 bg-current transition-all duration-300 ${state === 'collapsed' ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
+            </div>
+          </SidebarTrigger>
         </div>
       </SidebarHeader>
       
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="px-2 py-4 flex-1">
         <SidebarMenu className="space-y-1">
           {visibleItems.map((item) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton
                 isActive={activeTab === item.id}
                 onClick={() => setActiveTab(item.id)}
-                className="w-full justify-start px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-civeni-blue/10 data-[active=true]:bg-civeni-blue data-[active=true]:text-white"
+                className="w-full justify-start px-4 py-3 text-sm font-medium transition-all duration-300 hover:bg-civeni-blue/10 hover:text-civeni-blue data-[active=true]:bg-civeni-blue data-[active=true]:text-white data-[active=true]:shadow-md rounded-lg group"
               >
-                <item.icon className="h-5 w-5 mr-3" />
-                <span>{item.label}</span>
+                <item.icon className="h-5 w-5 mr-3 transition-transform duration-200 group-hover:scale-110" />
+                <span className="transition-all duration-200">{item.label}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
       </SidebarContent>
+
+      <SidebarFooter className="border-t p-4 bg-gray-50/50">
+        <div className="flex justify-center items-center">
+          <img 
+            src="/lovable-uploads/02742229-722b-483d-b3fa-def871f44852.png" 
+            alt="Civeni 2025" 
+            className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-200"
+          />
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
