@@ -31,11 +31,71 @@ export interface RegistrationTier {
   order: number;
 }
 
+export interface EventConfig {
+  eventDate: string;
+  eventLocation: string;
+  eventCity: string;
+}
+
+export interface VenueConfig {
+  venueName: string;
+  venueAddress: string;
+  venueCity: string;
+  venueState: string;
+  venueZip: string;
+  venueCountry: string;
+  facilities: string[];
+  mapEmbedUrl: string;
+  nearbyAirport: string;
+  airportDistance: string;
+  parkingInfo: string;
+  accommodationInfo: string;
+}
+
+export interface OnlineConfig {
+  platform: string;
+  channelName: string;
+  features: string[];
+  accessInfo: string;
+}
+
+export interface Partner {
+  id: string;
+  name: string;
+  logo: string;
+  type: 'organizer' | 'academic' | 'sponsor';
+  order: number;
+}
+
+export interface SiteTexts {
+  siteTitle: string;
+  aboutTitle: string;
+  aboutDescription: string;
+  scheduleTitle: string;
+  scheduleDescription: string;
+  speakersTitle: string;
+  speakersDescription: string;
+  registrationTitle: string;
+  registrationDescription: string;
+  venueTitle: string;
+  venueDescription: string;
+  partnersTitle: string;
+  partnersDescription: string;
+  footerCopyright: string;
+  contactEmail: string;
+  contactPhone: string;
+}
+
 export interface CMSContent {
   speakers: Speaker[];
   bannerSlides: BannerSlide[];
   registrationTiers: RegistrationTier[];
   batchInfo: string;
+  eventConfig: EventConfig;
+  venueConfig: VenueConfig;
+  onlineConfig: OnlineConfig;
+  partners: Partner[];
+  siteTexts: SiteTexts;
 }
 
 interface CMSContextType {
@@ -45,6 +105,11 @@ interface CMSContextType {
   updateBannerSlides: (slides: BannerSlide[]) => Promise<void>;
   updateRegistrationTiers: (tiers: RegistrationTier[]) => Promise<void>;
   updateBatchInfo: (info: string) => Promise<void>;
+  updateEventConfig: (config: EventConfig) => Promise<void>;
+  updateVenueConfig: (config: VenueConfig) => Promise<void>;
+  updateOnlineConfig: (config: OnlineConfig) => Promise<void>;
+  updatePartners: (partners: Partner[]) => Promise<void>;
+  updateSiteTexts: (texts: SiteTexts) => Promise<void>;
 }
 
 const defaultContent: CMSContent = {
@@ -164,7 +229,104 @@ const defaultContent: CMSContent = {
       order: 3
     }
   ],
-  batchInfo: "FIRST BATCH: November 1 - December 15, 2024"
+  batchInfo: "FIRST BATCH: November 1 - December 15, 2024",
+  eventConfig: {
+    eventDate: "2025-12-08",
+    eventLocation: "Celebration, Florida",
+    eventCity: "Celebration"
+  },
+  venueConfig: {
+    venueName: "VCCU Conference Center",
+    venueAddress: "123 Innovation Drive",
+    venueCity: "Celebration",
+    venueState: "FL",
+    venueZip: "34747",
+    venueCountry: "United States",
+    facilities: [
+      "State-of-the-art auditoriums",
+      "Modern exhibition spaces",
+      "Networking lounges",
+      "Free Wi-Fi and parking"
+    ],
+    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3509.123456789!2d-81.234567!3d28.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCelebration%2C%20FL!5e0!3m2!1sen!2sus!4v1234567890",
+    nearbyAirport: "Orlando International Airport (MCO)",
+    airportDistance: "20 minutes drive",
+    parkingInfo: "Free parking available",
+    accommodationInfo: "Partner hotels nearby with special rates"
+  },
+  onlineConfig: {
+    platform: "YouTube Live",
+    channelName: "@CiveniUSA2025",
+    features: [
+      "HD video streaming",
+      "Real-time interaction",
+      "Session recordings",
+      "Digital certificates"
+    ],
+    accessInfo: "Live streaming of keynote sessions with interactive chat and Q&A"
+  },
+  partners: [
+    {
+      id: '1',
+      name: "VCCU",
+      logo: "🎓",
+      type: "organizer",
+      order: 1
+    },
+    {
+      id: '2',
+      name: "Hope & Justice",
+      logo: "⚖️",
+      type: "organizer",
+      order: 2
+    },
+    {
+      id: '3',
+      name: "Harvard University",
+      logo: "🏛️",
+      type: "academic",
+      order: 1
+    },
+    {
+      id: '4',
+      name: "Stanford University",
+      logo: "🌟",
+      type: "academic",
+      order: 2
+    },
+    {
+      id: '5',
+      name: "MIT",
+      logo: "🔬",
+      type: "academic",
+      order: 3
+    },
+    {
+      id: '6',
+      name: "Oxford University",
+      logo: "📚",
+      type: "academic",
+      order: 4
+    }
+  ],
+  siteTexts: {
+    siteTitle: "III International Multidisciplinary Congress",
+    aboutTitle: "About the Congress",
+    aboutDescription: "The III International Multidisciplinary Congress of VCCU brings together researchers, academics, and professionals from diverse fields to share knowledge, foster collaboration, and drive innovation.",
+    scheduleTitle: "CHECK THE CONGRESS SCHEDULE",
+    scheduleDescription: "Choose your preferred format and explore our comprehensive program",
+    speakersTitle: "Keynote Speakers",
+    speakersDescription: "Learn from world-renowned experts who are shaping the future of their fields",
+    registrationTitle: "REGISTER NOW!",
+    registrationDescription: "Secure your spot at the premier multidisciplinary congress",
+    venueTitle: "Event Location",
+    venueDescription: "Join us in beautiful Celebration, Florida, or participate online from anywhere in the world",
+    partnersTitle: "Our Partners",
+    partnersDescription: "Proudly organized and supported by leading international institutions",
+    footerCopyright: "© 2025 VCCU. All rights reserved.",
+    contactEmail: "contact@civeniusa2025.com",
+    contactPhone: "+1 (555) 123-4567"
+  }
 };
 
 const CMSContext = createContext<CMSContextType | undefined>(undefined);
@@ -219,6 +381,46 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const updateEventConfig = async (eventConfig: EventConfig) => {
+    try {
+      setContent(prev => ({ ...prev, eventConfig }));
+    } catch (error) {
+      console.error('Error updating event config:', error);
+    }
+  };
+
+  const updateVenueConfig = async (venueConfig: VenueConfig) => {
+    try {
+      setContent(prev => ({ ...prev, venueConfig }));
+    } catch (error) {
+      console.error('Error updating venue config:', error);
+    }
+  };
+
+  const updateOnlineConfig = async (onlineConfig: OnlineConfig) => {
+    try {
+      setContent(prev => ({ ...prev, onlineConfig }));
+    } catch (error) {
+      console.error('Error updating online config:', error);
+    }
+  };
+
+  const updatePartners = async (partners: Partner[]) => {
+    try {
+      setContent(prev => ({ ...prev, partners }));
+    } catch (error) {
+      console.error('Error updating partners:', error);
+    }
+  };
+
+  const updateSiteTexts = async (siteTexts: SiteTexts) => {
+    try {
+      setContent(prev => ({ ...prev, siteTexts }));
+    } catch (error) {
+      console.error('Error updating site texts:', error);
+    }
+  };
+
   return (
     <CMSContext.Provider
       value={{
@@ -228,6 +430,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateBannerSlides,
         updateRegistrationTiers,
         updateBatchInfo,
+        updateEventConfig,
+        updateVenueConfig,
+        updateOnlineConfig,
+        updatePartners,
+        updateSiteTexts,
       }}
     >
       {children}

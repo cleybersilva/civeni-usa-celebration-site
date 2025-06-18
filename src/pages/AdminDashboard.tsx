@@ -9,6 +9,11 @@ import { useCMS } from '@/contexts/CMSContext';
 import SpeakersManager from '@/components/admin/SpeakersManager';
 import BannerManager from '@/components/admin/BannerManager';
 import RegistrationManager from '@/components/admin/RegistrationManager';
+import EventConfigManager from '@/components/admin/EventConfigManager';
+import SiteTextsManager from '@/components/admin/SiteTextsManager';
+import VenueConfigManager from '@/components/admin/VenueConfigManager';
+import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
+import PartnersManager from '@/components/admin/PartnersManager';
 
 const AdminDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -112,10 +117,15 @@ const AdminDashboard = () => {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="speakers" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
             <TabsTrigger value="speakers">Palestrantes</TabsTrigger>
-            <TabsTrigger value="banner">Banner Principal</TabsTrigger>
+            <TabsTrigger value="banner">Banner</TabsTrigger>
             <TabsTrigger value="registration">Inscrições</TabsTrigger>
+            <TabsTrigger value="event">Contador</TabsTrigger>
+            <TabsTrigger value="texts">Textos</TabsTrigger>
+            <TabsTrigger value="venue">Local</TabsTrigger>
+            <TabsTrigger value="online">Online</TabsTrigger>
+            <TabsTrigger value="partners">Parceiros</TabsTrigger>
           </TabsList>
 
           <TabsContent value="speakers">
@@ -128,6 +138,26 @@ const AdminDashboard = () => {
 
           <TabsContent value="registration">
             <RegistrationManager />
+          </TabsContent>
+
+          <TabsContent value="event">
+            <EventConfigManager />
+          </TabsContent>
+
+          <TabsContent value="texts">
+            <SiteTextsManager />
+          </TabsContent>
+
+          <TabsContent value="venue">
+            <VenueConfigManager />
+          </TabsContent>
+
+          <TabsContent value="online">
+            <OnlineConfigManager />
+          </TabsContent>
+
+          <TabsContent value="partners">
+            <PartnersManager />
           </TabsContent>
         </Tabs>
       </main>
