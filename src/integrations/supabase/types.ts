@@ -211,9 +211,31 @@ export type Database = {
         Args: { user_email: string; permission_type: string; resource: string }
         Returns: boolean
       }
+      create_admin_user: {
+        Args: {
+          user_email: string
+          user_password: string
+          user_type?: Database["public"]["Enums"]["admin_user_type"]
+        }
+        Returns: Json
+      }
+      delete_admin_user: {
+        Args: { user_id: string }
+        Returns: Json
+      }
       is_admin_root_user: {
         Args: { user_email: string }
         Returns: boolean
+      }
+      list_admin_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          email: string
+          user_type: Database["public"]["Enums"]["admin_user_type"]
+          is_admin_root: boolean
+          created_at: string
+        }[]
       }
       request_password_reset: {
         Args: { user_email: string }

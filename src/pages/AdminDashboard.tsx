@@ -19,6 +19,7 @@ import CopyrightManager from '@/components/admin/CopyrightManager';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import DashboardOverview from '@/components/admin/AdminDashboard';
 import UserInfo from '@/components/admin/UserInfo';
+import UsersManager from '@/components/admin/UsersManager';
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
 import { CMSProvider } from '@/contexts/CMSContext';
@@ -178,7 +179,7 @@ const AdminDashboardContent = () => {
         <UserInfo />
         
         <Tabs defaultValue="financeiro" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
             <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
             {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
             {(hasPermission('contador') || isAdminRoot()) && <TabsTrigger value="contador">Contador</TabsTrigger>}
@@ -190,6 +191,7 @@ const AdminDashboardContent = () => {
             {(hasPermission('parceiros') || isAdminRoot()) && <TabsTrigger value="parceiros">Parceiros</TabsTrigger>}
             {(hasPermission('textos') || isAdminRoot()) && <TabsTrigger value="textos">Textos</TabsTrigger>}
             {(hasPermission('videos') || isAdminRoot()) && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
+            {isAdminRoot() && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="financeiro">
@@ -273,6 +275,12 @@ const AdminDashboardContent = () => {
               <PermissionGuard resource="videos">
                 <VideosManager />
               </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {isAdminRoot() && (
+            <TabsContent value="usuarios">
+              <UsersManager />
             </TabsContent>
           )}
         </Tabs>
