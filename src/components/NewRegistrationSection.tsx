@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -131,7 +130,7 @@ const NewRegistrationSection = () => {
       const todayString = today.toISOString().split('T')[0];
       
       // First try to get batch 1 if it's still active
-      const { data: batch1, error: error1 } = await (supabase as any)
+      const { data: batch1, error: error1 } = await supabase
         .from('registration_batches')
         .select('*')
         .eq('batch_number', 1)
@@ -154,7 +153,7 @@ const NewRegistrationSection = () => {
       }
       
       // If batch 1 is not active, try batch 2
-      const { data: batch2, error: error2 } = await (supabase as any)
+      const { data: batch2, error: error2 } = await supabase
         .from('registration_batches')
         .select('*')
         .eq('batch_number', 2)
@@ -188,7 +187,7 @@ const NewRegistrationSection = () => {
     if (!currentBatch) return;
     
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('registration_categories')
         .select('*')
         .eq('batch_id', currentBatch.id);
@@ -205,31 +204,13 @@ const NewRegistrationSection = () => {
     if (!couponCode) return null;
     
     try {
-      const { data, error } = await (supabase as any)
-        .from('coupon_codes')
-        .select(`
-          id,
-          code,
-          is_active,
-          usage_limit,
-          used_count,
-          registration_categories (
-            id,
-            category_name
-          )
-        `)
-        .eq('code', couponCode)
-        .single();
+      const { data, error } = await supabase.rpc('validate_coupon', {
+        coupon_code: couponCode
+      });
       
       if (error) throw error;
       
-      const isValid = data.is_active && (data.usage_limit === null || data.used_count < data.usage_limit);
-      
-      return {
-        is_valid: isValid,
-        category_id: data.registration_categories?.id,
-        category_name: data.registration_categories?.category_name
-      };
+      return data && data.length > 0 ? data[0] : null;
     } catch (error) {
       console.error('Error validating coupon:', error);
       return null;

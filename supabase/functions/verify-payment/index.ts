@@ -29,7 +29,7 @@ serve(async (req) => {
     );
 
     if (session.payment_status === 'paid') {
-      // Update registration status
+      // Update registration status in event_registrations table
       await supabaseClient
         .from('event_registrations')
         .update({ 

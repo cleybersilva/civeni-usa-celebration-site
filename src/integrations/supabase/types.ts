@@ -80,6 +80,66 @@ export type Database = {
           },
         ]
       }
+      event_registrations: {
+        Row: {
+          amount_paid: number | null
+          batch_id: string | null
+          category_id: string | null
+          coupon_code: string | null
+          created_at: string
+          currency: string | null
+          email: string
+          full_name: string
+          id: string
+          payment_status: string | null
+          stripe_session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number | null
+          batch_id?: string | null
+          category_id?: string | null
+          coupon_code?: string | null
+          created_at?: string
+          currency?: string | null
+          email: string
+          full_name: string
+          id?: string
+          payment_status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number | null
+          batch_id?: string | null
+          category_id?: string | null
+          coupon_code?: string | null
+          created_at?: string
+          currency?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          payment_status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "registration_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "registration_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registration_batches: {
         Row: {
           batch_number: number

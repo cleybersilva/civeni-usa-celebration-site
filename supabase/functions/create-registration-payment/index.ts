@@ -14,7 +14,16 @@ serve(async (req) => {
   }
 
   try {
-    const { email, fullName, categoryId, batchId, couponCode, currency = 'BRL' } = await req.json();
+    const {
+      email,
+      fullName,
+      categoryId,
+      batchId,
+      couponCode,
+      currency = "BRL"
+    } = await req.json();
+
+    console.log("Creating registration for:", { email, fullName, categoryId, batchId, couponCode, currency });
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -22,103 +31,119 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Check if email already registered
-    const { data: existingRegistration } = await supabaseClient
-      .from('event_registrations')
-      .select('id')
-      .eq('email', email)
+    // Get category details
+    const { data: category, error: categoryError } = await supabaseClient
+      .from("registration_categories")
+      .select("*")
+      .eq("id", categoryId)
       .single();
 
-    if (existingRegistration) {
-      throw new Error('Este email já está registrado para o evento');
+    if (categoryError || !category) {
+      throw new Error("Categoria não encontrada");
     }
 
-    // Get batch and category information
-    const { data: batch } = await supabaseClient
-      .from('registration_batches')
-      .select('*')
-      .eq('id', batchId)
-      .single();
+    console.log("Category found:", category);
 
-    const { data: category } = await supabaseClient
-      .from('registration_categories')
-      .select('*')
-      .eq('id', categoryId)
-      .single();
-
-    if (!batch || !category) {
-      throw new Error('Batch ou categoria inválida');
-    }
-
-    let finalPrice = category.price_brl;
-    let validCoupon = null;
-
-    // Validate coupon if provided
-    if (couponCode) {
-      const { data: couponData } = await supabaseClient
-        .rpc('validate_coupon', { coupon_code: couponCode });
-      
-      if (couponData && couponData.length > 0 && couponData[0].is_valid) {
-        validCoupon = couponData[0];
-        if (validCoupon.category_id === categoryId) {
-          finalPrice = 0; // Exempt category
-        }
+    // Check if registration is free (exempt category)
+    if (category.is_exempt) {
+      // Validate coupon for exempt categories
+      if (!couponCode) {
+        throw new Error("Código de cupom é obrigatório para esta categoria");
       }
-    }
 
-    // Convert currency if needed
-    let stripeAmount = Math.round(finalPrice * 100); // Convert to cents
-    let stripeCurrency = 'brl';
+      const { data: couponValidation, error: couponError } = await supabaseClient
+        .rpc('validate_coupon', { coupon_code: couponCode });
 
-    if (currency === 'USD') {
-      // Simple conversion rate - in production, use real-time rates
-      stripeAmount = Math.round((finalPrice / 5.5) * 100); // Approximate BRL to USD
-      stripeCurrency = 'usd';
-    }
+      if (couponError || !couponValidation || couponValidation.length === 0 || !couponValidation[0].is_valid) {
+        throw new Error("Código de cupom inválido ou expirado");
+      }
 
-    // If price is 0 (exempt), create registration directly
-    if (finalPrice === 0) {
-      const { data: registration } = await supabaseClient
-        .from('event_registrations')
+      // Create free registration directly in event_registrations table
+      const { data: registration, error: regError } = await supabaseClient
+        .from("event_registrations")
         .insert({
           email,
           full_name: fullName,
           category_id: categoryId,
           batch_id: batchId,
-          payment_status: 'completed',
+          coupon_code: couponCode,
+          payment_status: "completed",
           amount_paid: 0,
-          currency: stripeCurrency.toUpperCase(),
-          coupon_code: couponCode
+          currency: currency
         })
         .select()
         .single();
 
-      return new Response(JSON.stringify({ 
-        success: true, 
-        registration_id: registration.id,
-        payment_required: false 
+      if (regError) {
+        console.error("Registration error:", regError);
+        throw new Error("Erro ao criar inscrição");
+      }
+
+      // Update coupon usage
+      await supabaseClient
+        .from("coupon_codes")
+        .update({ used_count: supabaseClient.raw('used_count + 1') })
+        .eq("code", couponCode);
+
+      console.log("Free registration created:", registration);
+
+      return new Response(JSON.stringify({
+        success: true,
+        payment_required: false,
+        registration_id: registration.id
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    // Create Stripe payment session
+    // For paid categories, create Stripe checkout session
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
 
+    // Convert price based on currency
+    let price = category.price_brl;
+    if (currency === "USD") {
+      price = Math.round(price / 5.5 * 100); // Convert BRL to USD cents
+    } else {
+      price = Math.round(price * 100); // Convert BRL to cents
+    }
+
+    console.log("Creating Stripe session with price:", price, currency);
+
+    // Create registration record first
+    const { data: registration, error: regError } = await supabaseClient
+      .from("event_registrations")
+      .insert({
+        email,
+        full_name: fullName,
+        category_id: categoryId,
+        batch_id: batchId,
+        coupon_code: couponCode,
+        payment_status: "pending",
+        amount_paid: price / 100,
+        currency: currency
+      })
+      .select()
+      .single();
+
+    if (regError) {
+      console.error("Registration error:", regError);
+      throw new Error("Erro ao criar inscrição");
+    }
+
     const session = await stripe.checkout.sessions.create({
-      customer_email: email,
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
-            currency: stripeCurrency,
+            currency: currency.toLowerCase(),
             product_data: {
-              name: `III Civeni USA 2025 - ${category.category_name}`,
-              description: `Lote ${batch.batch_number} - Inscrição para o evento`,
+              name: `Inscrição VCCU - ${category.category_name}`,
+              description: `Inscrição para o evento VCCU/Civeni USA`,
             },
-            unit_amount: stripeAmount,
+            unit_amount: price,
           },
           quantity: 1,
         },
@@ -126,33 +151,28 @@ serve(async (req) => {
       mode: "payment",
       success_url: `${req.headers.get("origin")}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/registration-canceled`,
+      customer_email: email,
       metadata: {
-        email,
-        fullName,
-        categoryId,
-        batchId,
-        couponCode: couponCode || '',
+        registration_id: registration.id,
+        category_id: categoryId,
+        batch_id: batchId,
       },
     });
 
-    // Create pending registration
+    // Update registration with Stripe session ID
     await supabaseClient
-      .from('event_registrations')
-      .insert({
-        email,
-        full_name: fullName,
-        category_id: categoryId,
-        batch_id: batchId,
-        stripe_session_id: session.id,
-        payment_status: 'pending',
-        amount_paid: finalPrice,
-        currency: stripeCurrency.toUpperCase(),
-        coupon_code: couponCode
-      });
+      .from("event_registrations")
+      .update({ stripe_session_id: session.id })
+      .eq("id", registration.id);
 
-    return new Response(JSON.stringify({ 
+    console.log("Stripe session created:", session.id);
+
+    return new Response(JSON.stringify({
+      success: true,
+      payment_required: true,
       url: session.url,
-      session_id: session.id
+      session_id: session.id,
+      registration_id: registration.id
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
@@ -160,8 +180,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Error:", error);
-    return new Response(JSON.stringify({ 
-      error: error.message || "Erro interno do servidor" 
+    return new Response(JSON.stringify({
+      error: error.message || "Erro interno do servidor"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
