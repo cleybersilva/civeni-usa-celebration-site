@@ -1,148 +1,242 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface Speaker {
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface Speaker {
   id: string;
   name: string;
   title: string;
-  company: string;
-  institution?: string;
-  bio: string;
+  institution: string;
   image: string;
-  order?: number;
+  bio: string;
+  order: number;
 }
 
-interface BannerSlide {
+export interface BannerSlide {
   id: string;
-  image: string;
-  bgImage?: string;
   title: string;
   subtitle: string;
-  description?: string;
+  description: string;
+  bgImage: string;
   buttonText: string;
   buttonLink: string;
-  order?: number;
+  order: number;
 }
 
-interface RegistrationTier {
+export interface RegistrationTier {
   id: string;
-  name: string;
-  title?: string;
+  title: string;
   price: string;
-  description: string;
   features: string[];
-  highlighted?: boolean;
-  recommended?: boolean;
-  order?: number;
+  recommended: boolean;
+  order: number;
 }
 
-interface CMSContent {
+export interface CMSContent {
   speakers: Speaker[];
   bannerSlides: BannerSlide[];
   registrationTiers: RegistrationTier[];
-  batchInfo?: string;
+  batchInfo: string;
 }
 
 interface CMSContextType {
   content: CMSContent;
-  updateSpeakers: (speakers: Speaker[]) => void;
-  updateBannerSlides: (slides: BannerSlide[]) => void;
-  updateRegistrationTiers: (tiers: RegistrationTier[]) => void;
+  loading: boolean;
+  updateSpeakers: (speakers: Speaker[]) => Promise<void>;
+  updateBannerSlides: (slides: BannerSlide[]) => Promise<void>;
+  updateRegistrationTiers: (tiers: RegistrationTier[]) => Promise<void>;
+  updateBatchInfo: (info: string) => Promise<void>;
 }
 
-const CMSContext = createContext<CMSContextType | undefined>(undefined);
-
-const initialContent: CMSContent = {
+const defaultContent: CMSContent = {
   speakers: [
     {
       id: '1',
-      name: 'Dr. Maria Silva',
-      title: 'Director of Research',
-      company: 'International University',
-      institution: 'International University',
-      bio: 'Leading expert in multidisciplinary research with over 20 years of experience.',
-      image: '/placeholder.svg',
+      name: "Dr. Maria Rodriguez",
+      title: "Professor of Biomedical Engineering",
+      institution: "Harvard Medical School",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bb?auto=format&fit=crop&w=400&q=80",
+      bio: "Leading researcher in regenerative medicine and tissue engineering with over 20 years of experience.",
       order: 1
     },
     {
       id: '2',
-      name: 'Prof. John Anderson',
-      title: 'Department Head',
-      company: 'Global Institute',
-      institution: 'Global Institute',
-      bio: 'Renowned scientist and educator in innovative methodologies.',
-      image: '/placeholder.svg',
+      name: "Prof. James Chen",
+      title: "Director of AI Research",
+      institution: "Stanford University",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+      bio: "Pioneer in artificial intelligence and machine learning applications in healthcare.",
       order: 2
+    },
+    {
+      id: '3',
+      name: "Dr. Elena Kowalski",
+      title: "Environmental Scientist",
+      institution: "MIT",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
+      bio: "Expert in climate change research and sustainable technology development.",
+      order: 3
+    },
+    {
+      id: '4',
+      name: "Dr. Ahmed Hassan",
+      title: "Professor of Psychology",
+      institution: "Oxford University",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      bio: "Renowned researcher in cognitive psychology and behavioral sciences.",
+      order: 4
     }
   ],
   bannerSlides: [
     {
       id: '1',
-      image: '/placeholder.svg',
-      bgImage: '/placeholder.svg',
-      title: 'III International Multidisciplinary Congress',
-      subtitle: 'Join us for three days of innovation and discovery',
-      description: 'December 8-10, 2025 • Celebration, Florida',
-      buttonText: 'Register Now',
-      buttonLink: '#registration',
+      title: "III International Multidisciplinary Congress",
+      subtitle: "Join us for three days of innovation and discovery",
+      description: "December 8-10, 2025 • Celebration, Florida",
+      bgImage: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Register Here",
+      buttonLink: "#registration",
       order: 1
+    },
+    {
+      id: '2',
+      title: "World-Class Speakers",
+      subtitle: "Learn from international experts in various fields",
+      description: "Keynote presentations and panel discussions",
+      bgImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Register Here",
+      buttonLink: "#registration",
+      order: 2
+    },
+    {
+      id: '3',
+      title: "Submit Your Research",
+      subtitle: "Share your work with the global community",
+      description: "Oral presentations and poster sessions available",
+      bgImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Register Here",
+      buttonLink: "#registration",
+      order: 3
     }
   ],
   registrationTiers: [
     {
       id: '1',
-      name: 'Students and Partners',
-      title: 'Students and Partners',
-      price: '$150',
-      description: 'Special rate for our students and institutional partners',
-      features: ['Access to all sessions', 'Digital certificate', 'Conference materials', 'Coffee breaks included'],
+      title: "Our Students and Partners",
+      price: "$150",
+      features: [
+        "Access to all sessions",
+        "Digital certificate",
+        "Conference materials",
+        "Networking opportunities",
+        "Coffee breaks included"
+      ],
+      recommended: false,
       order: 1
     },
     {
       id: '2',
-      name: 'Students from Other Institutions',
-      title: 'Students from Other Institutions',
-      price: '$200',
-      description: 'Discounted rate for students from other institutions',
-      features: ['Access to all sessions', 'Digital certificate', 'Conference materials', 'Networking opportunities', 'Coffee breaks included'],
-      highlighted: true,
+      title: "Students from Other Institutions",
+      price: "$200",
+      features: [
+        "Access to all sessions",
+        "Digital certificate",
+        "Conference materials",
+        "Networking opportunities",
+        "Coffee breaks included",
+        "Student discount applied"
+      ],
       recommended: true,
       order: 2
     },
     {
       id: '3',
-      name: 'Other Professionals',
-      title: 'Other Professionals',
-      price: '$300',
-      description: 'Standard rate for professionals and researchers',
-      features: ['Access to all sessions', 'Digital certificate', 'Conference materials', 'Premium networking access', 'All meals included', 'VIP reception access'],
+      title: "Other Professionals",
+      price: "$300",
+      features: [
+        "Access to all sessions",
+        "Digital certificate",
+        "Conference materials",
+        "Premium networking access",
+        "All meals included",
+        "VIP reception access"
+      ],
+      recommended: false,
       order: 3
     }
   ],
-  batchInfo: 'FIRST BATCH: November 1 - December 15, 2024'
+  batchInfo: "FIRST BATCH: November 1 - December 15, 2024"
 };
 
-export const CMSProvider = ({ children }: { children: ReactNode }) => {
-  const [content, setContent] = useState<CMSContent>(initialContent);
+const CMSContext = createContext<CMSContextType | undefined>(undefined);
 
-  const updateSpeakers = (speakers: Speaker[]) => {
-    setContent(prev => ({ ...prev, speakers }));
+export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [content, setContent] = useState<CMSContent>(defaultContent);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadContent();
+  }, []);
+
+  const loadContent = async () => {
+    try {
+      // Para agora, usar conteúdo padrão
+      // Em produção, isso carregaria do Supabase
+      setContent(defaultContent);
+    } catch (error) {
+      console.error('Error loading content:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateBannerSlides = (bannerSlides: BannerSlide[]) => {
-    setContent(prev => ({ ...prev, bannerSlides }));
+  const updateSpeakers = async (speakers: Speaker[]) => {
+    try {
+      setContent(prev => ({ ...prev, speakers }));
+      // Aqui salvaria no Supabase
+    } catch (error) {
+      console.error('Error updating speakers:', error);
+    }
   };
 
-  const updateRegistrationTiers = (registrationTiers: RegistrationTier[]) => {
-    setContent(prev => ({ ...prev, registrationTiers }));
+  const updateBannerSlides = async (bannerSlides: BannerSlide[]) => {
+    try {
+      setContent(prev => ({ ...prev, bannerSlides }));
+      // Aqui salvaria no Supabase
+    } catch (error) {
+      console.error('Error updating banner slides:', error);
+    }
+  };
+
+  const updateRegistrationTiers = async (registrationTiers: RegistrationTier[]) => {
+    try {
+      setContent(prev => ({ ...prev, registrationTiers }));
+      // Aqui salvaria no Supabase
+    } catch (error) {
+      console.error('Error updating registration tiers:', error);
+    }
+  };
+
+  const updateBatchInfo = async (batchInfo: string) => {
+    try {
+      setContent(prev => ({ ...prev, batchInfo }));
+      // Aqui salvaria no Supabase
+    } catch (error) {
+      console.error('Error updating batch info:', error);
+    }
   };
 
   return (
-    <CMSContext.Provider value={{
-      content,
-      updateSpeakers,
-      updateBannerSlides,
-      updateRegistrationTiers
-    }}>
+    <CMSContext.Provider
+      value={{
+        content,
+        loading,
+        updateSpeakers,
+        updateBannerSlides,
+        updateRegistrationTiers,
+        updateBatchInfo,
+      }}
+    >
       {children}
     </CMSContext.Provider>
   );
@@ -150,7 +244,7 @@ export const CMSProvider = ({ children }: { children: ReactNode }) => {
 
 export const useCMS = () => {
   const context = useContext(CMSContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useCMS must be used within a CMSProvider');
   }
   return context;

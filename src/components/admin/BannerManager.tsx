@@ -2,118 +2,207 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCMS } from '@/contexts/CMSContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useCMS, BannerSlide } from '@/contexts/CMSContext';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 
 const BannerManager = () => {
   const { content, updateBannerSlides } = useCMS();
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingSlide, setEditingSlide] = useState<BannerSlide | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const [formData, setFormData] = useState({
-    image: '/placeholder.svg',
     title: '',
     subtitle: '',
+    description: '',
+    bgImage: '',
     buttonText: '',
     buttonLink: ''
   });
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      subtitle: '',
+      description: '',
+      bgImage: '',
+      buttonText: '',
+      buttonLink: ''
+    });
+    setEditingSlide(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const slides = [...content.bannerSlides];
+    
+    if (editingSlide) {
+      const index = slides.findIndex(s => s.id === editingSlide.id);
+      slides[index] = {
+        ...editingSlide,
+        ...formData
+      };
+    } else {
+      const newSlide: BannerSlide = {
+        id: Date.now().toString(),
+        ...formData,
+        order: slides.length + 1
+      };
+      slides.push(newSlide);
+    }
+
+    await updateBannerSlides(slides);
+    setIsDialogOpen(false);
+    resetForm();
+  };
+
+  const handleEdit = (slide: BannerSlide) => {
+    setEditingSlide(slide);
+    setFormData({
+      title: slide.title,
+      subtitle: slide.subtitle,
+      description: slide.description,
+      bgImage: slide.bgImage,
+      buttonText: slide.buttonText,
+      buttonLink: slide.buttonLink
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (slideId: string) => {
+    if (confirm('Tem certeza que deseja excluir este slide?')) {
+      const slides = content.bannerSlides.filter(s => s.id !== slideId);
+      await updateBannerSlides(slides);
+    }
+  };
+
   const handleAdd = () => {
-    const newSlide = {
-      id: Date.now().toString(),
-      ...formData
-    };
-    updateBannerSlides([...content.bannerSlides, newSlide]);
-    setFormData({ image: '/placeholder.svg', title: '', subtitle: '', buttonText: '', buttonLink: '' });
-  };
-
-  const handleEdit = (slide: any) => {
-    setEditingId(slide.id);
-    setFormData(slide);
-  };
-
-  const handleUpdate = () => {
-    const updatedSlides = content.bannerSlides.map(slide =>
-      slide.id === editingId ? { ...slide, ...formData } : slide
-    );
-    updateBannerSlides(updatedSlides);
-    setEditingId(null);
-    setFormData({ image: '/placeholder.svg', title: '', subtitle: '', buttonText: '', buttonLink: '' });
-  };
-
-  const handleDelete = (id: string) => {
-    const filteredSlides = content.bannerSlides.filter(slide => slide.id !== id);
-    updateBannerSlides(filteredSlides);
+    resetForm();
+    setIsDialogOpen(true);
   };
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{editingId ? 'Editar Slide' : 'Adicionar Slide ao Banner'}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            placeholder="URL da Imagem"
-            value={formData.image}
-            onChange={(e) => setFormData({...formData, image: e.target.value})}
-          />
-          <Input
-            placeholder="Título"
-            value={formData.title}
-            onChange={(e) => setFormData({...formData, title: e.target.value})}
-          />
-          <Input
-            placeholder="Subtítulo"
-            value={formData.subtitle}
-            onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
-          />
-          <Input
-            placeholder="Texto do Botão"
-            value={formData.buttonText}
-            onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
-          />
-          <Input
-            placeholder="Link do Botão"
-            value={formData.buttonLink}
-            onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
-          />
-          <Button 
-            onClick={editingId ? handleUpdate : handleAdd}
-            className="bg-civeni-blue hover:bg-blue-700"
-          >
-            {editingId ? 'Atualizar' : 'Adicionar'} Slide
-          </Button>
-          {editingId && (
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setEditingId(null);
-                setFormData({ image: '/placeholder.svg', title: '', subtitle: '', buttonText: '', buttonLink: '' });
-              }}
-            >
-              Cancelar
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Banner Principal</h2>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar Slide
             </Button>
-          )}
-        </CardContent>
-      </Card>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editingSlide ? 'Editar Slide' : 'Adicionar Slide'}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Título</label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Subtítulo</label>
+                <Input
+                  value={formData.subtitle}
+                  onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Descrição</label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  rows={2}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">URL da Imagem de Fundo</label>
+                <Input
+                  type="url"
+                  value={formData.bgImage}
+                  onChange={(e) => setFormData({...formData, bgImage: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Texto do Botão</label>
+                <Input
+                  value={formData.buttonText}
+                  onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Link do Botão</label>
+                <Input
+                  value={formData.buttonLink}
+                  onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                  {editingSlide ? 'Atualizar' : 'Adicionar'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {content.bannerSlides.map((slide) => (
           <Card key={slide.id}>
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold">{slide.title}</h3>
-                  <p className="text-sm text-gray-600">{slide.subtitle}</p>
-                  <p className="text-sm mt-2">Botão: {slide.buttonText} → {slide.buttonLink}</p>
+            <CardHeader>
+              <div className="relative h-48 rounded-lg overflow-hidden">
+                <img
+                  src={slide.bgImage}
+                  alt={slide.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <h3 className="text-xl font-bold mb-2">{slide.title}</h3>
+                    <p className="text-sm">{slide.subtitle}</p>
+                  </div>
                 </div>
-                <div className="space-x-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(slide)}>
-                    Editar
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(slide.id)}>
-                    Excluir
-                  </Button>
-                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <p><strong>Descrição:</strong> {slide.description}</p>
+                <p><strong>Botão:</strong> {slide.buttonText} → {slide.buttonLink}</p>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(slide)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(slide.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>

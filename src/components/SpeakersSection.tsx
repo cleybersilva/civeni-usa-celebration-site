@@ -8,7 +8,7 @@ const SpeakersSection = () => {
   const { content } = useCMS();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
-  const speakers = content.speakers.sort((a, b) => (a.order || 0) - (b.order || 0));
+  const speakers = content.speakers.sort((a, b) => a.order - b.order);
 
   const nextSpeaker = () => {
     setCurrentSpeaker((prev) => (prev + 1) % speakers.length);
@@ -52,7 +52,7 @@ const SpeakersSection = () => {
                   {speakers[currentSpeaker].title}
                 </p>
                 <p className="text-lg text-gray-600 mb-6">
-                  {speakers[currentSpeaker].institution || speakers[currentSpeaker].company}
+                  {speakers[currentSpeaker].institution}
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-8">
                   {speakers[currentSpeaker].bio}
