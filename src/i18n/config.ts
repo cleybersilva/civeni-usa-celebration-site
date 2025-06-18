@@ -49,7 +49,15 @@ const resources = {
         inPersonTitle: "IN PERSON",
         inPersonDescription: "Live Experience in Celebration, FL",
         onlineTitle: "ONLINE",
-        onlineDescription: "Virtual Participation via YouTube"
+        onlineDescription: "Virtual Participation via YouTube",
+        inPersonButton: "View In-Person Schedule",
+        onlineButton: "View Online Schedule",
+        faceToFaceNetworking: "Face-to-face networking",
+        interactiveWorkshops: "Interactive workshops",
+        exhibitionStands: "Exhibition stands",
+        liveStreaming: "Live streaming",
+        qaSessions: "Q&A sessions",
+        digitalCertificate: "Digital certificate"
       },
       registration: {
         urgent: "🔥 FEW IN-PERSON SPOTS LEFT",
@@ -97,7 +105,59 @@ const resources = {
         description: "Choose between in-person and online participation to suit your needs and preferences",
         whyChoose: "Why Choose Hybrid Format?",
         inPersonBenefits: "In-Person Benefits",
-        onlineBenefits: "Online Benefits"
+        onlineBenefits: "Online Benefits",
+        directNetworking: "Direct networking opportunities",
+        handsOnWorkshops: "Hands-on workshop participation",
+        accessExhibition: "Access to exhibition stands",
+        faceToFaceInteractions: "Face-to-face interactions",
+        globalAccessibility: "Global accessibility",
+        costEffective: "Cost-effective participation",
+        recordedSessions: "Recorded session access",
+        interactiveQA: "Interactive Q&A sessions",
+        exhibitionStands: "Exhibition Stands",
+        exhibitionDesc: "Explore innovative research and technology displays",
+        keynoteLectures: "Keynote Lectures",
+        keynoteDesc: "Inspiring presentations from world-class speakers",
+        panelDiscussions: "Panel Discussions",
+        panelDesc: "Interactive debates on cutting-edge topics",
+        oralCommunications: "Oral Communications",
+        oralDesc: "Present your research to an international audience"
+      },
+      venue: {
+        title: "Event Location",
+        description: "Join us in beautiful Celebration, Florida, or participate online from anywhere in the world",
+        inPersonVenue: "In-Person Venue",
+        onlinePlatform: "Online Platform",
+        facilities: "Facilities",
+        features: "Features",
+        gettingTo: "Getting to Celebration, FL",
+        byAir: "By Air",
+        byCar: "By Car",
+        accommodation: "Accommodation",
+        airportDesc: "Orlando International Airport (MCO)\n20 minutes drive to venue\nMultiple airlines and connections",
+        carDesc: "Easy access via I-4\nFree parking available\nGPS: 123 Innovation Drive",
+        hotelDesc: "Partner hotels nearby\nSpecial congress rates\nShuttle service available"
+      },
+      partners: {
+        title: "Our Partners",
+        description: "Proudly organized and supported by leading international institutions",
+        organizedBy: "Promoted and Organized By",
+        academicPartners: "Academic Partners",
+        becomePartner: "Become a Partner",
+        partnerDesc: "Join our network of prestigious institutions and help advance multidisciplinary research",
+        partnerButton: "Partnership Opportunities"
+      },
+      footer: {
+        quickLinks: "Quick Links",
+        contactInfo: "Contact Info",
+        about: "About",
+        schedule: "Schedule",
+        speakers: "Speakers",
+        registration: "Registration",
+        contact: "Contact",
+        copyright: "© 2024 VCCU. All rights reserved.",
+        organizedBy: "Organized by VCCU & Hope and Justice",
+        privacyPolicy: "Privacy Policy | Terms of Service"
       }
     }
   },
@@ -145,7 +205,15 @@ const resources = {
         inPersonTitle: "PRESENCIAL",
         inPersonDescription: "Experiência Ao Vivo em Celebration, FL",
         onlineTitle: "ONLINE",
-        onlineDescription: "Participação Virtual via YouTube"
+        onlineDescription: "Participação Virtual via YouTube",
+        inPersonButton: "Ver Programação Presencial",
+        onlineButton: "Ver Programação Online",
+        faceToFaceNetworking: "Networking presencial",
+        interactiveWorkshops: "Workshops interativos",
+        exhibitionStands: "Estandes de exposição",
+        liveStreaming: "Transmissão ao vivo",
+        qaSessions: "Sessões de perguntas",
+        digitalCertificate: "Certificado digital"
       },
       registration: {
         urgent: "🔥 POUCAS VAGAS PRESENCIAIS RESTANTES",
@@ -193,7 +261,59 @@ const resources = {
         description: "Escolha entre participação presencial e online para atender às suas necessidades e preferências",
         whyChoose: "Por Que Escolher Formato Híbrido?",
         inPersonBenefits: "Benefícios Presenciais",
-        onlineBenefits: "Benefícios Online"
+        onlineBenefits: "Benefícios Online",
+        directNetworking: "Oportunidades de networking direto",
+        handsOnWorkshops: "Participação em workshops práticos",
+        accessExhibition: "Acesso aos estandes de exposição",
+        faceToFaceInteractions: "Interações cara a cara",
+        globalAccessibility: "Acessibilidade global",
+        costEffective: "Participação econômica",
+        recordedSessions: "Acesso às sessões gravadas",
+        interactiveQA: "Sessões interativas de P&R",
+        exhibitionStands: "Estandes de Exposição",
+        exhibitionDesc: "Explore pesquisas inovadoras e demonstrações tecnológicas",
+        keynoteLectures: "Palestras Principais",
+        keynoteDesc: "Apresentações inspiradoras de palestrantes de classe mundial",
+        panelDiscussions: "Discussões em Painel",
+        panelDesc: "Debates interativos sobre tópicos de ponta",
+        oralCommunications: "Comunicações Orais",
+        oralDesc: "Apresente sua pesquisa para uma audiência internacional"
+      },
+      venue: {
+        title: "Local do Evento",
+        description: "Junte-se a nós na bela Celebration, Flórida, ou participe online de qualquer lugar do mundo",
+        inPersonVenue: "Local Presencial",
+        onlinePlatform: "Plataforma Online",
+        facilities: "Instalações",
+        features: "Recursos",
+        gettingTo: "Como Chegar a Celebration, FL",
+        byAir: "De Avião",
+        byCar: "De Carro",
+        accommodation: "Hospedagem",
+        airportDesc: "Aeroporto Internacional de Orlando (MCO)\n20 minutos de carro até o local\nVárias companhias aéreas e conexões",
+        carDesc: "Fácil acesso pela I-4\nEstacionamento gratuito disponível\nGPS: 123 Innovation Drive",
+        hotelDesc: "Hotéis parceiros próximos\nTarifas especiais do congresso\nServiço de transporte disponível"
+      },
+      partners: {
+        title: "Nossos Parceiros",
+        description: "Orgulhosamente organizado e apoiado por instituições internacionais líderes",
+        organizedBy: "Promovido e Organizado Por",
+        academicPartners: "Parceiros Acadêmicos",
+        becomePartner: "Torne-se um Parceiro",
+        partnerDesc: "Junte-se à nossa rede de instituições prestigiosas e ajude a avançar a pesquisa multidisciplinar",
+        partnerButton: "Oportunidades de Parceria"
+      },
+      footer: {
+        quickLinks: "Links Rápidos",
+        contactInfo: "Informações de Contato",
+        about: "Sobre",
+        schedule: "Programação",
+        speakers: "Palestrantes",
+        registration: "Inscrições",
+        contact: "Contato",
+        copyright: "© 2024 VCCU. Todos os direitos reservados.",
+        organizedBy: "Organizado por VCCU & Hope and Justice",
+        privacyPolicy: "Política de Privacidade | Termos de Serviço"
       }
     }
   },
@@ -241,7 +361,15 @@ const resources = {
         inPersonTitle: "PRESENCIAL",
         inPersonDescription: "Experiencia en Vivo en Celebration, FL",
         onlineTitle: "EN LÍNEA",
-        onlineDescription: "Participación Virtual vía YouTube"
+        onlineDescription: "Participación Virtual vía YouTube",
+        inPersonButton: "Ver Programación Presencial",
+        onlineButton: "Ver Programación En Línea",
+        faceToFaceNetworking: "Networking cara a cara",
+        interactiveWorkshops: "Talleres interactivos",
+        exhibitionStands: "Stands de exposición",
+        liveStreaming: "Transmisión en vivo",
+        qaSessions: "Sesiones de preguntas",
+        digitalCertificate: "Certificado digital"
       },
       registration: {
         urgent: "🔥 POCAS PLAZAS PRESENCIALES DISPONIBLES",
@@ -288,8 +416,60 @@ const resources = {
         title: "Experiencia en Formato Híbrido",
         description: "Elige entre participación presencial y en línea para satisfacer tus necesidades y preferencias",
         whyChoose: "¿Por Qué Elegir Formato Híbrido?",
-        inPersonBenefits: "Benefícios Presenciales",
-        onlineBenefits: "Benefícios En Línea"
+        inPersonBenefits: "Beneficios Presenciales",
+        onlineBenefits: "Beneficios En Línea",
+        directNetworking: "Oportunidades de networking directo",
+        handsOnWorkshops: "Participación en talleres prácticos",
+        accessExhibition: "Acceso a stands de exposición",
+        faceToFaceInteractions: "Interacciones cara a cara",
+        globalAccessibility: "Accesibilidad global",
+        costEffective: "Participación económica",
+        recordedSessions: "Acceso a sesiones grabadas",
+        interactiveQA: "Sesiones interactivas de preguntas",
+        exhibitionStands: "Stands de Exposición",
+        exhibitionDesc: "Explora investigaciones innovadoras y demostraciones tecnológicas",
+        keynoteLectures: "Conferencias Magistrales",
+        keynoteDesc: "Presentaciones inspiradoras de ponentes de clase mundial",
+        panelDiscussions: "Discusiones de Panel",
+        panelDesc: "Debates interactivos sobre temas de vanguardia",
+        oralCommunications: "Comunicaciones Orales",
+        oralDesc: "Presenta tu investigación a una audiencia internacional"
+      },
+      venue: {
+        title: "Ubicación del Evento",
+        description: "Únete a nosotros en la hermosa Celebration, Florida, o participa en línea desde cualquier lugar del mundo",
+        inPersonVenue: "Sede Presencial",
+        onlinePlatform: "Plataforma En Línea",
+        facilities: "Instalaciones",
+        features: "Características",
+        gettingTo: "Cómo Llegar a Celebration, FL",
+        byAir: "En Avión",
+        byCar: "En Coche",
+        accommodation: "Alojamiento",
+        airportDesc: "Aeropuerto Internacional de Orlando (MCO)\n20 minutos en coche hasta la sede\nVarias aerolíneas y conexiones",
+        carDesc: "Fácil acceso vía I-4\nAparcamiento gratuito disponible\nGPS: 123 Innovation Drive",
+        hotelDesc: "Hoteles socios cercanos\nTarifas especiales del congreso\nServicio de transporte disponible"
+      },
+      partners: {
+        title: "Nuestros Socios",
+        description: "Orgullosamente organizado y apoyado por instituciones internacionales líderes",
+        organizedBy: "Promovido y Organizado Por",
+        academicPartners: "Socios Académicos",
+        becomePartner: "Conviértete en Socio",
+        partnerDesc: "Únete a nuestra red de instituciones prestigiosas y ayuda a avanzar la investigación multidisciplinaria",
+        partnerButton: "Oportunidades de Asociación"
+      },
+      footer: {
+        quickLinks: "Enlaces Rápidos",
+        contactInfo: "Información de Contacto",
+        about: "Acerca de",
+        schedule: "Programación",
+        speakers: "Ponentes",
+        registration: "Inscripciones",
+        contact: "Contacto",
+        copyright: "© 2024 VCCU. Todos los derechos reservados.",
+        organizedBy: "Organizado por VCCU & Hope and Justice",
+        privacyPolicy: "Política de Privacidad | Términos de Servicio"
       }
     }
   }
@@ -301,6 +481,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
+    lng: 'en', // Força o inglês como idioma inicial
     debug: false,
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],

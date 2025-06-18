@@ -1,7 +1,10 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const PartnersSection = () => {
+  const { t } = useTranslation();
+  
   const organizers = [
     { name: "VCCU", logo: "🎓" },
     { name: "Hope & Justice", logo: "⚖️" }
@@ -21,17 +24,17 @@ const PartnersSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            Our Partners
+            {t('partners.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Proudly organized and supported by leading international institutions
+            {t('partners.description')}
           </p>
         </div>
         
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-              Promoted and Organized By
+              {t('partners.organizedBy')}
             </h3>
             <div className="flex justify-center items-center space-x-12">
               {organizers.map((org, index) => (
@@ -54,7 +57,7 @@ const PartnersSection = () => {
           
           <div>
             <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-              Academic Partners
+              {t('partners.academicPartners')}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {partners.map((partner, index) => (
@@ -79,13 +82,13 @@ const PartnersSection = () => {
         <div className="mt-16 text-center">
           <div className="bg-civeni-blue text-white rounded-2xl p-8 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold mb-4 font-poppins">
-              Become a Partner
+              {t('partners.becomePartner')}
             </h3>
             <p className="text-lg opacity-90 mb-6">
-              Join our network of prestigious institutions and help advance multidisciplinary research
+              {t('partners.partnerDesc')}
             </p>
             <button className="bg-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins">
-              Partnership Opportunities
+              {t('partners.partnerButton')}
             </button>
           </div>
         </div>

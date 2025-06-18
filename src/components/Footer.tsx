@@ -1,14 +1,17 @@
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const { t } = useTranslation();
+  
   const quickLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Schedule', href: '#schedule' },
-    { name: 'Speakers', href: '#speakers' },
-    { name: 'Registration', href: '#registration' },
-    { name: 'Contact', href: '#contact' }
+    { name: t('footer.about'), href: '#about' },
+    { name: t('footer.schedule'), href: '#schedule' },
+    { name: t('footer.speakers'), href: '#speakers' },
+    { name: t('footer.registration'), href: '#registration' },
+    { name: t('footer.contact'), href: '#contact' }
   ];
 
   return (
@@ -37,7 +40,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-bold mb-6 font-poppins">Quick Links</h3>
+            <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.quickLinks')}</h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
@@ -53,7 +56,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-xl font-bold mb-6 font-poppins">Contact Info</h3>
+            <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.contactInfo')}</h3>
             <div className="space-y-3 opacity-90">
               <p>📧 info@civeniusa.org</p>
               <p>📞 +1 (555) 123-4567</p>
@@ -66,13 +69,13 @@ const Footer = () => {
         <div className="border-t border-white border-opacity-20 mt-12 pt-8 text-center">
           <div className="grid md:grid-cols-3 gap-4 items-center">
             <div className="text-sm opacity-75">
-              © 2024 VCCU. All rights reserved.
+              {t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
-              Organized by VCCU & Hope and Justice
+              {t('footer.organizedBy')}
             </div>
             <div className="text-sm opacity-75">
-              Privacy Policy | Terms of Service
+              {t('footer.privacyPolicy')}
             </div>
           </div>
         </div>

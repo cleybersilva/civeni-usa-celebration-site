@@ -1,27 +1,30 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const AboutSection = () => {
+  const { t } = useTranslation();
+  
   const highlights = [
     {
       icon: '📅',
-      title: '3 Days of Innovation',
-      description: 'Comprehensive program covering multiple disciplines'
+      title: t('about.highlight1Title'),
+      description: t('about.highlight1Desc')
     },
     {
       icon: '🎤',
-      title: 'International Speakers',
-      description: 'Renowned experts from around the world'
+      title: t('about.highlight2Title'),
+      description: t('about.highlight2Desc')
     },
     {
       icon: '📺',
-      title: 'Live Streaming',
-      description: 'Selected sessions broadcast globally'
+      title: t('about.highlight3Title'),
+      description: t('about.highlight3Desc')
     },
     {
       icon: '🏆',
-      title: 'Participation Certificate',
-      description: 'Official recognition for all attendees'
+      title: t('about.highlight4Title'),
+      description: t('about.highlight4Desc')
     }
   ];
 
@@ -30,12 +33,10 @@ const AboutSection = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-8 font-poppins">
-            About the Congress
+            {t('about.title')}
           </h2>
           <p className="text-xl text-gray-600 leading-relaxed mb-12">
-            The III International Multidisciplinary Congress of VCCU brings together researchers, 
-            academics, and professionals from diverse fields to share knowledge, foster collaboration, 
-            and drive innovation. Join us for an inspiring three-day journey of discovery and learning.
+            {t('about.description')}
           </p>
         </div>
         
@@ -62,7 +63,7 @@ const AboutSection = () => {
         
         <div className="mt-16 text-center">
           <button className="bg-civeni-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 font-poppins">
-            Learn More About VCCU
+            {t('about.learnMore')}
           </button>
         </div>
       </div>

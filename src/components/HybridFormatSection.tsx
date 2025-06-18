@@ -1,27 +1,30 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const HybridFormatSection = () => {
+  const { t } = useTranslation();
+  
   const activities = [
     {
-      title: "Exhibition Stands",
+      title: t('hybrid.exhibitionStands'),
       image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=600&q=80",
-      description: "Explore innovative research and technology displays"
+      description: t('hybrid.exhibitionDesc')
     },
     {
-      title: "Keynote Lectures", 
+      title: t('hybrid.keynoteLectures'), 
       image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
-      description: "Inspiring presentations from world-class speakers"
+      description: t('hybrid.keynoteDesc')
     },
     {
-      title: "Panel Discussions",
+      title: t('hybrid.panelDiscussions'),
       image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-      description: "Interactive debates on cutting-edge topics"
+      description: t('hybrid.panelDesc')
     },
     {
-      title: "Oral Communications",
+      title: t('hybrid.oralCommunications'),
       image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-      description: "Present your research to an international audience"
+      description: t('hybrid.oralDesc')
     }
   ];
 
@@ -30,10 +33,10 @@ const HybridFormatSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            Hybrid Format Experience
+            {t('hybrid.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Choose between in-person and online participation to suit your needs and preferences
+            {t('hybrid.description')}
           </p>
         </div>
         
@@ -68,25 +71,25 @@ const HybridFormatSection = () => {
         <div className="mt-16 text-center">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold text-civeni-blue mb-4 font-poppins">
-              Why Choose Hybrid Format?
+              {t('hybrid.whyChoose')}
             </h3>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="text-left">
-                <h4 className="text-lg font-semibold text-civeni-red mb-3">In-Person Benefits</h4>
+                <h4 className="text-lg font-semibold text-civeni-red mb-3">{t('hybrid.inPersonBenefits')}</h4>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Direct networking opportunities</li>
-                  <li>• Hands-on workshop participation</li>
-                  <li>• Access to exhibition stands</li>
-                  <li>• Face-to-face interactions</li>
+                  <li>• {t('hybrid.directNetworking')}</li>
+                  <li>• {t('hybrid.handsOnWorkshops')}</li>
+                  <li>• {t('hybrid.accessExhibition')}</li>
+                  <li>• {t('hybrid.faceToFaceInteractions')}</li>
                 </ul>
               </div>
               <div className="text-left">
-                <h4 className="text-lg font-semibold text-civeni-red mb-3">Online Benefits</h4>
+                <h4 className="text-lg font-semibold text-civeni-red mb-3">{t('hybrid.onlineBenefits')}</h4>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Global accessibility</li>
-                  <li>• Cost-effective participation</li>
-                  <li>• Recorded session access</li>
-                  <li>• Interactive Q&A sessions</li>
+                  <li>• {t('hybrid.globalAccessibility')}</li>
+                  <li>• {t('hybrid.costEffective')}</li>
+                  <li>• {t('hybrid.recordedSessions')}</li>
+                  <li>• {t('hybrid.interactiveQA')}</li>
                 </ul>
               </div>
             </div>

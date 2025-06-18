@@ -1,23 +1,26 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const VenueSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            Event Location
+            {t('venue.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Join us in beautiful Celebration, Florida, or participate online from anywhere in the world
+            {t('venue.description')}
           </p>
         </div>
         
         <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
           <div className="space-y-8">
             <div className="bg-gradient-to-br from-civeni-blue to-blue-600 text-white rounded-2xl p-8">
-              <h3 className="text-2xl font-bold mb-6 font-poppins">🏢 In-Person Venue</h3>
+              <h3 className="text-2xl font-bold mb-6 font-poppins">🏢 {t('venue.inPersonVenue')}</h3>
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">Address:</h4>
@@ -29,7 +32,7 @@ const VenueSection = () => {
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Facilities:</h4>
+                  <h4 className="font-semibold mb-2">{t('venue.facilities')}:</h4>
                   <ul className="space-y-1 opacity-90">
                     <li>• State-of-the-art auditoriums</li>
                     <li>• Modern exhibition spaces</li>
@@ -41,7 +44,7 @@ const VenueSection = () => {
             </div>
             
             <div className="bg-gradient-to-br from-civeni-red to-red-600 text-white rounded-2xl p-8">
-              <h3 className="text-2xl font-bold mb-6 font-poppins">💻 Online Platform</h3>
+              <h3 className="text-2xl font-bold mb-6 font-poppins">💻 {t('venue.onlinePlatform')}</h3>
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">YouTube Live Channel:</h4>
@@ -52,7 +55,7 @@ const VenueSection = () => {
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Features:</h4>
+                  <h4 className="font-semibold mb-2">{t('venue.features')}:</h4>
                   <ul className="space-y-1 opacity-90">
                     <li>• HD video streaming</li>
                     <li>• Real-time interaction</li>
@@ -83,31 +86,25 @@ const VenueSection = () => {
         <div className="mt-16 text-center">
           <div className="bg-gray-50 rounded-2xl p-8 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold text-civeni-blue mb-4 font-poppins">
-              Getting to Celebration, FL
+              {t('venue.gettingTo')}
             </h3>
             <div className="grid md:grid-cols-3 gap-6 text-left">
               <div>
-                <h4 className="font-semibold text-civeni-red mb-2">✈️ By Air</h4>
+                <h4 className="font-semibold text-civeni-red mb-2">✈️ {t('venue.byAir')}</h4>
                 <p className="text-gray-600 text-sm">
-                  Orlando International Airport (MCO)<br/>
-                  20 minutes drive to venue<br/>
-                  Multiple airlines and connections
+                  {t('venue.airportDesc')}
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-civeni-red mb-2">🚗 By Car</h4>
+                <h4 className="font-semibold text-civeni-red mb-2">🚗 {t('venue.byCar')}</h4>
                 <p className="text-gray-600 text-sm">
-                  Easy access via I-4<br/>
-                  Free parking available<br/>
-                  GPS: 123 Innovation Drive
+                  {t('venue.carDesc')}
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-civeni-red mb-2">🏨 Accommodation</h4>
+                <h4 className="font-semibold text-civeni-red mb-2">🏨 {t('venue.accommodation')}</h4>
                 <p className="text-gray-600 text-sm">
-                  Partner hotels nearby<br/>
-                  Special congress rates<br/>
-                  Shuttle service available
+                  {t('venue.hotelDesc')}
                 </p>
               </div>
             </div>
