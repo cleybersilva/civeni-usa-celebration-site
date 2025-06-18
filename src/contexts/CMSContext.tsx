@@ -85,6 +85,7 @@ export interface SiteTexts {
   contactEmail: string;
   contactPhone: string;
   institutionalLink?: string;
+  organizedBy?: string;
   copyrightEn?: string;
   copyrightPt?: string;
   copyrightEs?: string;
@@ -329,7 +330,8 @@ const defaultContent: CMSContent = {
     partnersDescription: "Proudly organized and supported by leading international institutions",
     footerCopyright: "© 2025 VCCU. All rights reserved.",
     contactEmail: "contact@civeniusa2025.com",
-    contactPhone: "+1 (555) 123-4567"
+    contactPhone: "+1 (555) 123-4567",
+    organizedBy: "Veni Creator Christian University"
   }
 };
 
