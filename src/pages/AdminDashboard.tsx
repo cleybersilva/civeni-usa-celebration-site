@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useCMS } from '@/contexts/CMSContext';
 import SpeakersManager from '@/components/admin/SpeakersManager';
 import BannerManager from '@/components/admin/BannerManager';
 import RegistrationManager from '@/components/admin/RegistrationManager';
@@ -14,89 +13,118 @@ import SiteTextsManager from '@/components/admin/SiteTextsManager';
 import VenueConfigManager from '@/components/admin/VenueConfigManager';
 import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
 import PartnersManager from '@/components/admin/PartnersManager';
+import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
+import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
 
-const AdminDashboard = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
+const AdminLoginForm = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAdminAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Credenciais temporárias para demonstração
-    if (username === 'admin' && password === 'civeni2025') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Credenciais inválidas');
+    setIsLoading(true);
+    setError('');
+
+    const result = await login(email, password);
+    
+    if (!result.success) {
+      setError(result.error || 'Erro ao fazer login');
     }
+    
+    setIsLoading(false);
   };
 
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center text-civeni-blue">
+            Painel Administrativo
+            <br />
+            III Civeni USA 2025
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Digite seu email"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Senha</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite sua senha"
+                required
+              />
+            </div>
+            {error && (
+              <div className="text-red-600 text-sm bg-red-50 p-3 rounded">{error}</div>
+            )}
+            <Button 
+              type="submit" 
+              className="w-full bg-civeni-blue hover:bg-blue-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Entrando...' : 'Entrar'}
+            </Button>
+          </form>
+          
+          <div className="mt-4 text-center">
+            <PasswordResetDialog>
+              <Button variant="link" className="text-civeni-blue">
+                Esqueceu sua senha?
+              </Button>
+            </PasswordResetDialog>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const AdminDashboardContent = () => {
+  const navigate = useNavigate();
+  const { user, logout, hasPermission } = useAdminAuth();
+
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUsername('');
-    setPassword('');
+    logout();
     navigate('/');
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center text-civeni-blue">
-              Painel Administrativo
-              <br />
-              III Civeni USA 2025
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Usuário</label>
-                <Input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Digite seu usuário"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Senha</label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Digite sua senha"
-                  required
-                />
-              </div>
-              {error && (
-                <div className="text-red-600 text-sm">{error}</div>
-              )}
-              <Button type="submit" className="w-full bg-civeni-blue hover:bg-blue-700">
-                Entrar
-              </Button>
-            </form>
-            <div className="mt-4 p-3 bg-blue-50 rounded text-sm text-blue-700">
-              <strong>Demo:</strong> Use "admin" e "civeni2025"
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const getUserTypeLabel = (userType: string) => {
+    const labels = {
+      admin: 'Administrador',
+      editor: 'Editor',
+      viewer: 'Visualizador'
+    };
+    return labels[userType as keyof typeof labels] || userType;
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-civeni-blue">
-              Painel Administrativo - III Civeni USA 2025
-            </h1>
+            <div>
+              <h1 className="text-3xl font-bold text-civeni-blue">
+                Painel Administrativo - III Civeni USA 2025
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Logado como: {user?.email} ({getUserTypeLabel(user?.user_type || '')})
+              </p>
+            </div>
             <div className="flex space-x-4">
               <Button 
                 variant="outline" 
@@ -118,51 +146,82 @@ const AdminDashboard = () => {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="speakers" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
-            <TabsTrigger value="speakers">Palestrantes</TabsTrigger>
-            <TabsTrigger value="banner">Banner</TabsTrigger>
-            <TabsTrigger value="registration">Inscrições</TabsTrigger>
-            <TabsTrigger value="event">Contador</TabsTrigger>
-            <TabsTrigger value="texts">Textos</TabsTrigger>
-            <TabsTrigger value="venue">Local</TabsTrigger>
-            <TabsTrigger value="online">Online</TabsTrigger>
-            <TabsTrigger value="partners">Parceiros</TabsTrigger>
+            {hasPermission('write') && <TabsTrigger value="speakers">Palestrantes</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="banner">Banner</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="registration">Inscrições</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="event">Contador</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="texts">Textos</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="venue">Local</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="online">Online</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="partners">Parceiros</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="speakers">
-            <SpeakersManager />
-          </TabsContent>
+          {hasPermission('write') && (
+            <>
+              <TabsContent value="speakers">
+                <SpeakersManager />
+              </TabsContent>
 
-          <TabsContent value="banner">
-            <BannerManager />
-          </TabsContent>
+              <TabsContent value="banner">
+                <BannerManager />
+              </TabsContent>
 
-          <TabsContent value="registration">
-            <RegistrationManager />
-          </TabsContent>
+              <TabsContent value="registration">
+                <RegistrationManager />
+              </TabsContent>
 
-          <TabsContent value="event">
-            <EventConfigManager />
-          </TabsContent>
+              <TabsContent value="event">
+                <EventConfigManager />
+              </TabsContent>
 
-          <TabsContent value="texts">
-            <SiteTextsManager />
-          </TabsContent>
+              <TabsContent value="texts">
+                <SiteTextsManager />
+              </TabsContent>
 
-          <TabsContent value="venue">
-            <VenueConfigManager />
-          </TabsContent>
+              <TabsContent value="venue">
+                <VenueConfigManager />
+              </TabsContent>
 
-          <TabsContent value="online">
-            <OnlineConfigManager />
-          </TabsContent>
+              <TabsContent value="online">
+                <OnlineConfigManager />
+              </TabsContent>
 
-          <TabsContent value="partners">
-            <PartnersManager />
-          </TabsContent>
+              <TabsContent value="partners">
+                <PartnersManager />
+              </TabsContent>
+            </>
+          )}
+
+          {!hasPermission('write') && (
+            <div className="text-center py-8">
+              <p className="text-gray-600">
+                Você não tem permissão para editar conteúdo. 
+                Contate um administrador para obter acesso.
+              </p>
+            </div>
+          )}
         </Tabs>
       </main>
     </div>
   );
+};
+
+const AdminDashboard = () => {
+  return (
+    <AdminAuthProvider>
+      <AdminDashboardInner />
+    </AdminAuthProvider>
+  );
+};
+
+const AdminDashboardInner = () => {
+  const { user } = useAdminAuth();
+
+  if (!user) {
+    return <AdminLoginForm />;
+  }
+
+  return <AdminDashboardContent />;
 };
 
 export default AdminDashboard;
