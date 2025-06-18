@@ -1,19 +1,26 @@
 
 import React from 'react';
 import AdminHeader from '@/components/admin/AdminHeader';
-import AdminTabs from '@/components/admin/AdminTabs';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import UserInfo from '@/components/admin/UserInfo';
 
 const AdminDashboardContent = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <AdminHeader />
-
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <UserInfo />
-        <AdminTabs />
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="min-h-screen bg-gray-100 flex w-full">
+        <AdminSidebar />
+        <SidebarInset>
+          <AdminHeader />
+          <main className="flex-1 space-y-6 p-6">
+            <UserInfo />
+            <div id="admin-content" className="space-y-6">
+              {/* O conteúdo das abas será renderizado aqui */}
+            </div>
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 
