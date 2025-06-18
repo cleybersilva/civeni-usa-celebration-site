@@ -7,6 +7,7 @@ import ScheduleSection from '../components/ScheduleSection';
 import RegistrationSection from '../components/RegistrationSection';
 import AboutSection from '../components/AboutSection';
 import SpeakersSection from '../components/SpeakersSection';
+import VideosSection from '../components/VideosSection';
 import HybridFormatSection from '../components/HybridFormatSection';
 import VenueSection from '../components/VenueSection';
 import PartnersSection from '../components/PartnersSection';
@@ -22,6 +23,7 @@ const Index = () => {
       <RegistrationSection />
       <AboutSection />
       <SpeakersSection />
+      <VideosSection />
       <HybridFormatSection />
       <VenueSection />
       <PartnersSection />

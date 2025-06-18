@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Instagram, Facebook, Youtube } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Lock } from 'lucide-react';
 import { useCMS } from '@/contexts/CMSContext';
 
 const Footer = () => {
@@ -28,7 +28,7 @@ const Footer = () => {
               III International Multidisciplinary Congress of VCCU<br/>
               December 8-10, 2025 • Celebration, Florida
             </p>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 mb-4">
               <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
                 <Instagram size={24} />
               </a>
@@ -37,6 +37,15 @@ const Footer = () => {
               </a>
               <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
                 <Youtube size={24} />
+              </a>
+            </div>
+            <div className="mt-4">
+              <a 
+                href="/admin" 
+                className="inline-flex items-center space-x-2 bg-civeni-red text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors transform hover:scale-105"
+              >
+                <Lock size={16} />
+                <span className="text-sm font-medium">Acesso Restrito</span>
               </a>
             </div>
           </div>

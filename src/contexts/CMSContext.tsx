@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface Speaker {
@@ -66,6 +67,17 @@ export interface Partner {
   order: number;
 }
 
+export interface Video {
+  id: string;
+  title: string;
+  description: string;
+  videoType: 'youtube' | 'upload';
+  youtubeUrl?: string;
+  uploadedVideoUrl?: string;
+  thumbnail: string;
+  order: number;
+}
+
 export interface SiteTexts {
   siteTitle: string;
   aboutTitle: string;
@@ -80,6 +92,8 @@ export interface SiteTexts {
   venueDescription: string;
   partnersTitle: string;
   partnersDescription: string;
+  videosTitle: string;
+  videosDescription: string;
   footerCopyright: string;
   contactEmail: string;
   contactPhone: string;
@@ -99,6 +113,7 @@ export interface CMSContent {
   venueConfig: VenueConfig;
   onlineConfig: OnlineConfig;
   partners: Partner[];
+  videos: Video[];
   siteTexts: SiteTexts;
 }
 
@@ -113,6 +128,7 @@ interface CMSContextType {
   updateVenueConfig: (config: VenueConfig) => Promise<void>;
   updateOnlineConfig: (config: OnlineConfig) => Promise<void>;
   updatePartners: (partners: Partner[]) => Promise<void>;
+  updateVideos: (videos: Video[]) => Promise<void>;
   updateSiteTexts: (texts: SiteTexts) => Promise<void>;
 }
 
@@ -313,6 +329,35 @@ const defaultContent: CMSContent = {
       order: 4
     }
   ],
+  videos: [
+    {
+      id: '1',
+      title: "II Civeni 2024 Opening Ceremony",
+      description: "Highlights from the opening ceremony of the II International Congress",
+      videoType: 'youtube',
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=300&q=80',
+      order: 1
+    },
+    {
+      id: '2',
+      title: "Key Research Presentations",
+      description: "Best moments from the research presentations at II Civeni 2024",
+      videoType: 'youtube',
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=400&h=300&q=80',
+      order: 2
+    },
+    {
+      id: '3',
+      title: "Networking and Cultural Exchange",
+      description: "International collaboration and cultural exchange moments",
+      videoType: 'youtube',
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      thumbnail: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=400&h=300&q=80',
+      order: 3
+    }
+  ],
   siteTexts: {
     siteTitle: "III International Multidisciplinary Congress",
     aboutTitle: "About the Congress",
@@ -327,6 +372,8 @@ const defaultContent: CMSContent = {
     venueDescription: "Join us in beautiful Celebration, Florida, or participate online from anywhere in the world",
     partnersTitle: "Our Partners",
     partnersDescription: "Proudly organized and supported by leading international institutions",
+    videosTitle: "Videos from II Civeni 2024",
+    videosDescription: "Relive the highlights from our previous congress and get inspired to join us in 2025",
     footerCopyright: "© 2025 VCCU. All rights reserved.",
     contactEmail: "contact@civeniusa2025.com",
     contactPhone: "+1 (555) 123-4567",
@@ -418,6 +465,14 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const updateVideos = async (videos: Video[]) => {
+    try {
+      setContent(prev => ({ ...prev, videos }));
+    } catch (error) {
+      console.error('Error updating videos:', error);
+    }
+  };
+
   const updateSiteTexts = async (siteTexts: SiteTexts) => {
     try {
       setContent(prev => ({ ...prev, siteTexts }));
@@ -439,6 +494,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateVenueConfig,
         updateOnlineConfig,
         updatePartners,
+        updateVideos,
         updateSiteTexts,
       }}
     >
