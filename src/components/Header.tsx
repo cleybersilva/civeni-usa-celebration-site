@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
-import { Instagram, Facebook, Youtube } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
@@ -68,6 +68,13 @@ const Header = () => {
             <a href="#" className="text-white hover:text-civeni-red transition-colors">
               <Youtube size={20} />
             </a>
+            <Link 
+              to="/admin" 
+              className="flex items-center gap-2 text-white hover:text-civeni-red transition-colors ml-4"
+            >
+              <Settings size={16} />
+              <span className="text-sm">Área Administrativa</span>
+            </Link>
           </div>
           
           <div className="relative">
