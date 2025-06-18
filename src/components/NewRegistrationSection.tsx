@@ -86,11 +86,29 @@ const NewRegistrationSection = () => {
 
   const fetchCurrentBatch = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_current_batch');
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from('registration_batches')
+        .select('*')
+        .gte('end_date', new Date().toISOString().split('T')[0])
+        .lte('start_date', new Date().toISOString().split('T')[0])
+        .order('batch_number')
+        .limit(1)
+        .single();
       
-      if (data && data.length > 0) {
-        setCurrentBatch(data[0]);
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        const endDate = new Date(data.end_date);
+        const today = new Date();
+        const daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        setCurrentBatch({
+          id: data.id,
+          batch_number: data.batch_number,
+          start_date: data.start_date,
+          end_date: data.end_date,
+          days_remaining: Math.max(0, daysRemaining)
+        });
       }
     } catch (error) {
       console.error('Error fetching current batch:', error);
@@ -119,12 +137,31 @@ const NewRegistrationSection = () => {
     if (!couponCode) return null;
     
     try {
-      const { data, error } = await supabase.rpc('validate_coupon', { 
-        coupon_code: couponCode 
-      });
+      const { data, error } = await supabase
+        .from('coupon_codes')
+        .select(`
+          id,
+          code,
+          is_active,
+          usage_limit,
+          used_count,
+          registration_categories (
+            id,
+            category_name
+          )
+        `)
+        .eq('code', couponCode)
+        .single();
       
       if (error) throw error;
-      return data?.[0] || null;
+      
+      const isValid = data.is_active && (data.usage_limit === null || data.used_count < data.usage_limit);
+      
+      return {
+        is_valid: isValid,
+        category_id: data.registration_categories?.id,
+        category_name: data.registration_categories?.category_name
+      };
     } catch (error) {
       console.error('Error validating coupon:', error);
       return null;
