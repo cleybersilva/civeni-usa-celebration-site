@@ -26,17 +26,17 @@ const AdminHeader = () => {
   };
 
   return (
-    <header className="bg-white border-b">
+    <header className="bg-gradient-to-r from-civeni-blue to-civeni-blue/90 border-b">
       <div className="flex justify-between items-center px-6 py-4">
         <div className="flex items-center space-x-4">
-          <SidebarTrigger className="h-8 w-8" />
+          <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80" />
           <div>
-            <h1 className="text-2xl font-bold text-civeni-blue">
+            <h1 className="text-2xl font-bold text-white">
               Dashboard
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-white/80">
               {user?.email} ({getUserTypeLabel(user?.user_type || '')})
-              {isAdminRoot() && <span className="ml-2 text-red-600 font-bold">[ROOT]</span>}
+              {isAdminRoot() && <span className="ml-2 text-red-300 font-bold">[ROOT]</span>}
             </p>
           </div>
         </div>
@@ -45,6 +45,7 @@ const AdminHeader = () => {
             variant="outline" 
             onClick={() => navigate('/')}
             size="sm"
+            className="border-white/30 text-white hover:bg-white/20 hover:text-white"
           >
             Ver Site
           </Button>
@@ -52,6 +53,7 @@ const AdminHeader = () => {
             variant="destructive" 
             onClick={handleLogout}
             size="sm"
+            className="bg-civeni-red hover:bg-civeni-red/90"
           >
             Sair
           </Button>
