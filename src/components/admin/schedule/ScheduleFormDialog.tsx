@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { UseFormReturn } from 'react-hook-form';
 import { ScheduleFormData } from './scheduleSchema';
+import ImageUploadField from '@/components/admin/ImageUploadField';
 
 interface ScheduleFormDialogProps {
   isOpen: boolean;
@@ -181,13 +182,12 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
                 control={form.control}
                 name="speaker_photo_url"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Foto do Palestrante (URL)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="URL da foto" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <ImageUploadField
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Foto do Palestrante"
+                    type="speaker"
+                  />
                 )}
               />
             </div>
