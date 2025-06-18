@@ -18,6 +18,8 @@ import VideosManager from '@/components/admin/VideosManager';
 import CopyrightManager from '@/components/admin/CopyrightManager';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import DashboardOverview from '@/components/admin/AdminDashboard';
+import UserInfo from '@/components/admin/UserInfo';
+import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
 import { CMSProvider } from '@/contexts/CMSContext';
 
@@ -122,7 +124,7 @@ const AdminLoginForm = () => {
 
 const AdminDashboardContent = () => {
   const navigate = useNavigate();
-  const { user, logout, hasPermission } = useAdminAuth();
+  const { user, logout, hasPermission, isAdminRoot } = useAdminAuth();
 
   const handleLogout = () => {
     logout();
@@ -131,7 +133,9 @@ const AdminDashboardContent = () => {
 
   const getUserTypeLabel = (userType: string) => {
     const labels = {
+      admin_root: 'Admin Root',
       admin: 'Administrador',
+      design: 'Designer',
       editor: 'Editor',
       viewer: 'Visualizador'
     };
@@ -149,6 +153,7 @@ const AdminDashboardContent = () => {
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Logado como: {user?.email} ({getUserTypeLabel(user?.user_type || '')})
+                {isAdminRoot() && <span className="ml-2 text-red-600 font-bold">[ROOT ACCESS]</span>}
               </p>
             </div>
             <div className="flex space-x-4">
@@ -170,76 +175,105 @@ const AdminDashboardContent = () => {
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <UserInfo />
+        
         <Tabs defaultValue="financeiro" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
             <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-            {hasPermission('write') && <TabsTrigger value="banner">Banner</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="contador">Contador</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="local">Local</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="online">Online</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="palestrantes">Palestrantes</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="parceiros">Parceiros</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="textos">Textos</TabsTrigger>}
-            {hasPermission('write') && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
+            {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
+            {(hasPermission('contador') || isAdminRoot()) && <TabsTrigger value="contador">Contador</TabsTrigger>}
+            {(hasPermission('copyright') || isAdminRoot()) && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
+            {(hasPermission('inscricoes') || isAdminRoot()) && <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>}
+            {(hasPermission('local') || isAdminRoot()) && <TabsTrigger value="local">Local</TabsTrigger>}
+            {(hasPermission('online') || isAdminRoot()) && <TabsTrigger value="online">Online</TabsTrigger>}
+            {(hasPermission('palestrantes') || isAdminRoot()) && <TabsTrigger value="palestrantes">Palestrantes</TabsTrigger>}
+            {(hasPermission('parceiros') || isAdminRoot()) && <TabsTrigger value="parceiros">Parceiros</TabsTrigger>}
+            {(hasPermission('textos') || isAdminRoot()) && <TabsTrigger value="textos">Textos</TabsTrigger>}
+            {(hasPermission('videos') || isAdminRoot()) && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="financeiro">
             <DashboardOverview />
           </TabsContent>
 
-          {hasPermission('write') && (
-            <>
-              <TabsContent value="banner">
+          {(hasPermission('banner') || isAdminRoot()) && (
+            <TabsContent value="banner">
+              <PermissionGuard resource="banner">
                 <BannerManager />
-              </TabsContent>
-
-              <TabsContent value="contador">
-                <EventConfigManager />
-              </TabsContent>
-
-              <TabsContent value="copyright">
-                <CopyrightManager />
-              </TabsContent>
-
-              <TabsContent value="inscricoes">
-                <RegistrationManager />
-              </TabsContent>
-
-              <TabsContent value="local">
-                <VenueConfigManager />
-              </TabsContent>
-
-              <TabsContent value="online">
-                <OnlineConfigManager />
-              </TabsContent>
-
-              <TabsContent value="palestrantes">
-                <SpeakersManager />
-              </TabsContent>
-
-              <TabsContent value="parceiros">
-                <PartnersManager />
-              </TabsContent>
-
-              <TabsContent value="textos">
-                <SiteTextsManager />
-              </TabsContent>
-
-              <TabsContent value="videos">
-                <VideosManager />
-              </TabsContent>
-            </>
+              </PermissionGuard>
+            </TabsContent>
           )}
 
-          {!hasPermission('write') && (
-            <div className="text-center py-8">
-              <p className="text-gray-600">
-                Você não tem permissão para editar conteúdo. 
-                Contate um administrador para obter acesso.
-              </p>
-            </div>
+          {(hasPermission('contador') || isAdminRoot()) && (
+            <TabsContent value="contador">
+              <PermissionGuard resource="contador">
+                <EventConfigManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('copyright') || isAdminRoot()) && (
+            <TabsContent value="copyright">
+              <PermissionGuard resource="copyright">
+                <CopyrightManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('inscricoes') || isAdminRoot()) && (
+            <TabsContent value="inscricoes">
+              <PermissionGuard resource="inscricoes">
+                <RegistrationManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('local') || isAdminRoot()) && (
+            <TabsContent value="local">
+              <PermissionGuard resource="local">
+                <VenueConfigManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('online') || isAdminRoot()) && (
+            <TabsContent value="online">
+              <PermissionGuard resource="online">
+                <OnlineConfigManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('palestrantes') || isAdminRoot()) && (
+            <TabsContent value="palestrantes">
+              <PermissionGuard resource="palestrantes">
+                <SpeakersManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('parceiros') || isAdminRoot()) && (
+            <TabsContent value="parceiros">
+              <PermissionGuard resource="parceiros">
+                <PartnersManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('textos') || isAdminRoot()) && (
+            <TabsContent value="textos">
+              <PermissionGuard resource="textos">
+                <SiteTextsManager />
+              </PermissionGuard>
+            </TabsContent>
+          )}
+
+          {(hasPermission('videos') || isAdminRoot()) && (
+            <TabsContent value="videos">
+              <PermissionGuard resource="videos">
+                <VideosManager />
+              </PermissionGuard>
+            </TabsContent>
           )}
         </Tabs>
       </main>
