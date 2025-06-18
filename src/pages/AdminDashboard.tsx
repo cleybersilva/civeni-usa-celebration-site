@@ -13,6 +13,7 @@ import SiteTextsManager from '@/components/admin/SiteTextsManager';
 import VenueConfigManager from '@/components/admin/VenueConfigManager';
 import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
 import PartnersManager from '@/components/admin/PartnersManager';
+import CopyrightManager from '@/components/admin/CopyrightManager';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
 
@@ -145,7 +146,7 @@ const AdminDashboardContent = () => {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="speakers" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9">
             {hasPermission('write') && <TabsTrigger value="speakers">Palestrantes</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="banner">Banner</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="registration">Inscrições</TabsTrigger>}
@@ -154,6 +155,7 @@ const AdminDashboardContent = () => {
             {hasPermission('write') && <TabsTrigger value="venue">Local</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="online">Online</TabsTrigger>}
             {hasPermission('write') && <TabsTrigger value="partners">Parceiros</TabsTrigger>}
+            {hasPermission('write') && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
           </TabsList>
 
           {hasPermission('write') && (
@@ -188,6 +190,10 @@ const AdminDashboardContent = () => {
 
               <TabsContent value="partners">
                 <PartnersManager />
+              </TabsContent>
+
+              <TabsContent value="copyright">
+                <CopyrightManager />
               </TabsContent>
             </>
           )}

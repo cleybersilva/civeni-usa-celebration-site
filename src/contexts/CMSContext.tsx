@@ -84,6 +84,10 @@ export interface SiteTexts {
   footerCopyright: string;
   contactEmail: string;
   contactPhone: string;
+  institutionalLink?: string;
+  copyrightEn?: string;
+  copyrightPt?: string;
+  copyrightEs?: string;
 }
 
 export interface CMSContent {
