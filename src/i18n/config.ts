@@ -147,6 +147,14 @@ const resources = {
         partnerDesc: "Join our network of prestigious institutions and help advance multidisciplinary research",
         partnerButton: "Partnership Opportunities"
       },
+      videos: {
+        watchVideo: "Watch Video",
+        maximize: "Maximize",
+        minimize: "Minimize",
+        openYoutube: "Open on YouTube",
+        close: "Close",
+        registerButton: "Register for III Civeni 2025"
+      },
       footer: {
         quickLinks: "Quick Links",
         contactInfo: "Contact Info",
@@ -304,6 +312,14 @@ const resources = {
         partnerDesc: "Junte-se à nossa rede de instituições prestigiosas e ajude a avançar a pesquisa multidisciplinar",
         partnerButton: "Oportunidades de Parceria"
       },
+      videos: {
+        watchVideo: "Assistir Vídeo",
+        maximize: "Maximizar",
+        minimize: "Minimizar",
+        openYoutube: "Abrir no YouTube",
+        close: "Fechar",
+        registerButton: "Inscreva-se no III Civeni 2025"
+      },
       footer: {
         quickLinks: "Links Rápidos",
         contactInfo: "Informações de Contato",
@@ -460,6 +476,14 @@ const resources = {
         becomePartner: "Conviértete en Socio",
         partnerDesc: "Únete a nuestra red de instituciones prestigiosas y ayuda a avanzar la investigación multidisciplinaria",
         partnerButton: "Oportunidades de Asociación"
+      },
+      videos: {
+        watchVideo: "Ver Video",
+        maximize: "Maximizar",
+        minimize: "Minimizar",
+        openYoutube: "Abrir en YouTube",
+        close: "Cerrar",
+        registerButton: "Regístrate en III Civeni 2025"
       },
       footer: {
         quickLinks: "Enlaces Rápidos",

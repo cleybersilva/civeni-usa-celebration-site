@@ -1,12 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Youtube } from 'lucide-react';
+import { Play, Youtube, Maximize2, ExternalLink, X } from 'lucide-react';
 import { useCMS } from '@/contexts/CMSContext';
 
 const VideosSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [isMaximized, setIsMaximized] = useState(false);
   
   const videos = content.videos.sort((a, b) => a.order - b.order);
 
@@ -23,11 +25,25 @@ const VideosSection = () => {
   };
 
   const handleVideoClick = (video: any) => {
-    if (video.videoType === 'youtube' && video.youtubeUrl) {
-      window.open(video.youtubeUrl, '_blank');
-    } else if (video.videoType === 'upload' && video.uploadedVideoUrl) {
-      window.open(video.uploadedVideoUrl, '_blank');
+    setSelectedVideo(video);
+    setIsMaximized(false);
+  };
+
+  const handleMaximize = () => {
+    setIsMaximized(!isMaximized);
+  };
+
+  const handleOpenYoutube = () => {
+    if (selectedVideo?.videoType === 'youtube' && selectedVideo?.youtubeUrl) {
+      window.open(selectedVideo.youtubeUrl, '_blank');
+    } else if (selectedVideo?.videoType === 'upload' && selectedVideo?.uploadedVideoUrl) {
+      window.open(selectedVideo.uploadedVideoUrl, '_blank');
     }
+  };
+
+  const closeVideo = () => {
+    setSelectedVideo(null);
+    setIsMaximized(false);
   };
 
   if (videos.length === 0) {
@@ -66,7 +82,7 @@ const VideosSection = () => {
                     ) : (
                       <Play size={48} className="mx-auto mb-2" />
                     )}
-                    <p className="text-sm font-medium">Assistir Vídeo</p>
+                    <p className="text-sm font-medium">{t('videos.watchVideo')}</p>
                   </div>
                 </div>
               </div>
@@ -82,12 +98,64 @@ const VideosSection = () => {
           ))}
         </div>
 
+        {/* Video Player Modal */}
+        {selectedVideo && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div className={`bg-white rounded-lg overflow-hidden ${isMaximized ? 'w-full h-full' : 'max-w-4xl w-full max-h-[90vh]'}`}>
+              <div className="flex justify-between items-center p-4 bg-civeni-blue text-white">
+                <h3 className="text-lg font-semibold">{selectedVideo.title}</h3>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleMaximize}
+                    className="p-2 hover:bg-white hover:bg-opacity-20 rounded"
+                    title={isMaximized ? t('videos.minimize') : t('videos.maximize')}
+                  >
+                    <Maximize2 size={20} />
+                  </button>
+                  <button
+                    onClick={handleOpenYoutube}
+                    className="p-2 hover:bg-white hover:bg-opacity-20 rounded"
+                    title={t('videos.openYoutube')}
+                  >
+                    <ExternalLink size={20} />
+                  </button>
+                  <button
+                    onClick={closeVideo}
+                    className="p-2 hover:bg-white hover:bg-opacity-20 rounded"
+                    title={t('videos.close')}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+              <div className={`${isMaximized ? 'h-full' : 'aspect-video'}`}>
+                {selectedVideo.videoType === 'youtube' ? (
+                  <iframe
+                    src={getVideoEmbedUrl(selectedVideo.youtubeUrl)}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allowFullScreen
+                    title={selectedVideo.title}
+                  />
+                ) : (
+                  <video
+                    src={selectedVideo.uploadedVideoUrl}
+                    className="w-full h-full"
+                    controls
+                    title={selectedVideo.title}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="text-center mt-12">
           <a 
             href="#registration"
             className="bg-civeni-red text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 font-poppins"
           >
-            Inscreva-se no III Civeni 2025
+            {t('videos.registerButton')}
           </a>
         </div>
       </div>
