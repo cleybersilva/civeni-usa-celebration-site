@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface Speaker {
@@ -124,7 +123,7 @@ const defaultContent: CMSContent = {
       name: "Dr. Maria Rodriguez",
       title: "Professor of Biomedical Engineering",
       institution: "Harvard Medical School",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bb?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
       bio: "Leading researcher in regenerative medicine and tissue engineering with over 20 years of experience.",
       order: 1
     },
@@ -133,7 +132,7 @@ const defaultContent: CMSContent = {
       name: "Prof. James Chen",
       title: "Director of AI Research",
       institution: "Stanford University",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
       bio: "Pioneer in artificial intelligence and machine learning applications in healthcare.",
       order: 2
     },
@@ -142,7 +141,7 @@ const defaultContent: CMSContent = {
       name: "Dr. Elena Kowalski",
       title: "Environmental Scientist",
       institution: "MIT",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
       bio: "Expert in climate change research and sustainable technology development.",
       order: 3
     },
@@ -151,7 +150,7 @@ const defaultContent: CMSContent = {
       name: "Dr. Ahmed Hassan",
       title: "Professor of Psychology",
       institution: "Oxford University",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
       bio: "Renowned researcher in cognitive psychology and behavioral sciences.",
       order: 4
     }
