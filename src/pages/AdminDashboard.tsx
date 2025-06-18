@@ -17,7 +17,7 @@ import PartnersManager from '@/components/admin/PartnersManager';
 import VideosManager from '@/components/admin/VideosManager';
 import CopyrightManager from '@/components/admin/CopyrightManager';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
-import AdminDashboard from '@/components/admin/AdminDashboard';
+import DashboardOverview from '@/components/admin/AdminDashboard';
 import { useAdminAuth, AdminAuthProvider } from '@/hooks/useAdminAuth';
 import { CMSProvider } from '@/contexts/CMSContext';
 
@@ -186,7 +186,7 @@ const AdminDashboardContent = () => {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <AdminDashboard />
+            <DashboardOverview />
           </TabsContent>
 
           {hasPermission('write') && (
