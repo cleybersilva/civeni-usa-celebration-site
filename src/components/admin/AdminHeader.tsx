@@ -29,7 +29,7 @@ const AdminHeader = () => {
     <header className="bg-white border-b">
       <div className="flex justify-between items-center px-6 py-4">
         <div className="flex items-center space-x-4">
-          <SidebarTrigger className="md:hidden" />
+          <SidebarTrigger className="h-8 w-8" />
           <div>
             <h1 className="text-2xl font-bold text-civeni-blue">
               Dashboard
