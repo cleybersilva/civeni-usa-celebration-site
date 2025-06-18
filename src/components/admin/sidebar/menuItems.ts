@@ -3,7 +3,6 @@ import {
   BarChart3,
   Image,
   Timer,
-  Copyright,
   Calendar,
   UserPlus,
   MapPin,
@@ -47,74 +46,67 @@ export const createMenuItems = (
       order: 2
     },
     {
-      id: 'copyright',
-      label: 'Copyright',
-      icon: Copyright,
-      show: hasPermission('copyright') || isAdminRoot(),
-      order: 3
-    },
-    {
       id: 'cronograma',
       label: 'Cronograma',
       icon: Calendar,
       show: hasPermission('cronograma') || isAdminRoot(),
-      order: 4
+      order: 3
     },
     {
       id: 'inscricoes',
       label: 'Inscrições',
       icon: UserPlus,
       show: hasPermission('inscricoes') || isAdminRoot(),
-      order: 5
+      order: 4
     },
     {
       id: 'local',
       label: 'Local',
       icon: MapPin,
       show: hasPermission('local') || isAdminRoot(),
-      order: 6
+      order: 5
     },
     {
       id: 'online',
       label: 'Online',
       icon: Monitor,
       show: hasPermission('online') || isAdminRoot(),
-      order: 7
+      order: 6
     },
     {
       id: 'palestrantes',
       label: 'Palestrantes',
       icon: Users,
       show: hasPermission('palestrantes') || isAdminRoot(),
-      order: 8
+      order: 7
     },
     {
       id: 'parceiros',
       label: 'Parceiros',
       icon: Handshake,
       show: hasPermission('parceiros') || isAdminRoot(),
-      order: 9
+      order: 8
     },
     {
       id: 'textos',
       label: 'Textos',
       icon: Type,
       show: hasPermission('textos') || isAdminRoot(),
-      order: 10
+      order: 9
     },
     {
       id: 'usuarios',
       label: 'Usuários',
       icon: Settings,
       show: canViewUsuarios,
-      order: 11
+      order: 10
     },
     {
       id: 'videos',
       label: 'Vídeos',
       icon: Play,
       show: hasPermission('videos') || isAdminRoot(),
-      order: 12
+      order: 11
     }
   ];
 };

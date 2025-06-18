@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SpeakersManager from '@/components/admin/SpeakersManager';
@@ -9,7 +10,6 @@ import VenueConfigManager from '@/components/admin/VenueConfigManager';
 import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
 import PartnersManager from '@/components/admin/PartnersManager';
 import VideosManager from '@/components/admin/VideosManager';
-import CopyrightManager from '@/components/admin/CopyrightManager';
 import DashboardOverview from '@/components/admin/AdminDashboard';
 import UsersManager from '@/components/admin/UsersManager';
 import ScheduleManager from '@/components/admin/ScheduleManager';
@@ -38,11 +38,10 @@ const AdminTabs = () => {
 
   return (
     <Tabs defaultValue={getDefaultTab()} className="space-y-12">
-      <TabsList className="grid w-full grid-cols-7 lg:grid-cols-13">
+      <TabsList className="grid w-full grid-cols-7 lg:grid-cols-12">
         {canViewFinanceiro && <TabsTrigger value="financeiro">Financeiro</TabsTrigger>}
         {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
         {(hasPermission('contador') || isAdminRoot()) && <TabsTrigger value="contador">Contador</TabsTrigger>}
-        {(hasPermission('copyright') || isAdminRoot()) && <TabsTrigger value="copyright">Copyright</TabsTrigger>}
         {(hasPermission('cronograma') || isAdminRoot()) && <TabsTrigger value="cronograma">Cronograma</TabsTrigger>}
         {(hasPermission('inscricoes') || isAdminRoot()) && <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>}
         {(hasPermission('local') || isAdminRoot()) && <TabsTrigger value="local">Local</TabsTrigger>}
@@ -72,14 +71,6 @@ const AdminTabs = () => {
         <TabsContent value="contador">
           <PermissionGuard resource="contador">
             <EventConfigManager />
-          </PermissionGuard>
-        </TabsContent>
-      )}
-
-      {(hasPermission('copyright') || isAdminRoot()) && (
-        <TabsContent value="copyright">
-          <PermissionGuard resource="copyright">
-            <CopyrightManager />
           </PermissionGuard>
         </TabsContent>
       )}
