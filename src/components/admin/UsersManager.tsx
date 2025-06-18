@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, Users, Shield, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { Trash2, Plus, Users, Shield, Eye, EyeOff, UserPlus, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -281,7 +280,7 @@ const UsersManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            Usuários Administrativos ({users.length})
+            Administração de Usuários ({users.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -316,21 +315,32 @@ const UsersManager = () => {
                       {new Date(adminUser.created_at).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="p-3">
-                      {adminUser.email !== 'cleyber.silva@live.com' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {adminUser.email === 'cleyber.silva@live.com' && (
-                        <Badge variant="outline" className="text-xs">
-                          Protegido
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {adminUser.email !== 'cleyber.silva@live.com' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                        {adminUser.email === 'cleyber.silva@live.com' && (
+                          <Badge variant="outline" className="text-xs">
+                            Protegido
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
