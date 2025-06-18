@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Instagram, Facebook, Youtube, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -113,15 +114,12 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               <img 
                 src="/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png" 
                 alt="III Civeni 2025 Logo" 
-                className="h-10 w-auto"
+                className="h-14 w-auto"
               />
-              <div className="text-civeni-blue font-bold text-2xl font-poppins">
-                CIVENI USA <span className="text-civeni-red">2025</span>
-              </div>
             </div>
             
             <div className="hidden lg:flex items-center space-x-8">

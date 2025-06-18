@@ -55,7 +55,7 @@ const PartnersSection = () => {
                 {t('partners.academicPartners')}
               </h3>
               <div className="flex justify-center">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-5xl">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl">
                   {academicPartners.map((partner, index) => (
                     <div
                       key={index}
