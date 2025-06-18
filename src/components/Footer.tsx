@@ -22,7 +22,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <div className="text-3xl font-bold mb-4 font-poppins">
-              CIVENI USA <span className="text-civeni-red">2025</span>
+              III CIVENI <span className="text-civeni-red">2025</span>
             </div>
             <p className="text-lg opacity-90 mb-6 leading-relaxed">
               III International Multidisciplinary Congress of VCCU<br/>
@@ -74,10 +74,7 @@ const Footer = () => {
               {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
-              {content.siteTexts.organizedBy ? 
-                `${t('footer.organizedBy')}: ${content.siteTexts.organizedBy}` : 
-                t('footer.organizedBy')
-              }
+              Organized by VCCU: Veni Creator Christian University
             </div>
             <div className="text-sm opacity-75">
               {content.siteTexts.institutionalLink ? (
