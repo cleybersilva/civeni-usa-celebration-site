@@ -1,64 +1,30 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
 
 const RegistrationSection = () => {
-  const registrationTiers = [
-    {
-      title: "Our Students and Partners",
-      price: "$150",
-      features: [
-        "Access to all sessions",
-        "Digital certificate",
-        "Conference materials",
-        "Networking opportunities",
-        "Coffee breaks included"
-      ],
-      recommended: false
-    },
-    {
-      title: "Students from Other Institutions",
-      price: "$200",
-      features: [
-        "Access to all sessions",
-        "Digital certificate",
-        "Conference materials", 
-        "Networking opportunities",
-        "Coffee breaks included",
-        "Student discount applied"
-      ],
-      recommended: true
-    },
-    {
-      title: "Other Professionals",
-      price: "$300",
-      features: [
-        "Access to all sessions",
-        "Digital certificate",
-        "Conference materials",
-        "Premium networking access",
-        "All meals included",
-        "VIP reception access"
-      ],
-      recommended: false
-    }
-  ];
+  const { t } = useTranslation();
+  const { content } = useCMS();
+
+  const registrationTiers = content.registrationTiers.sort((a, b) => a.order - b.order);
 
   return (
     <section id="registration" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="inline-block bg-civeni-red text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
-            🔥 FEW IN-PERSON SPOTS LEFT
+            {t('registration.urgent')}
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            REGISTER NOW!
+            {t('registration.title')}
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Secure your spot at the premier multidisciplinary congress
+            {t('registration.description')}
           </p>
           <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 max-w-md mx-auto">
             <p className="text-yellow-800 font-semibold">
-              FIRST BATCH: November 1 - December 15, 2024
+              {content.batchInfo}
             </p>
           </div>
         </div>
@@ -66,7 +32,7 @@ const RegistrationSection = () => {
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {registrationTiers.map((tier, index) => (
             <div
-              key={index}
+              key={tier.id}
               className={`relative bg-white rounded-2xl shadow-lg border-2 transform transition-all duration-300 hover:scale-105 ${
                 tier.recommended 
                   ? 'border-civeni-red shadow-2xl' 
@@ -76,7 +42,7 @@ const RegistrationSection = () => {
               {tier.recommended && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-civeni-red text-white px-6 py-2 rounded-full text-sm font-bold">
-                    MOST POPULAR
+                    {t('registration.mostPopular')}
                   </div>
                 </div>
               )}
@@ -107,7 +73,7 @@ const RegistrationSection = () => {
                     ? 'bg-civeni-red text-white hover:bg-red-700 transform hover:scale-105'
                     : 'bg-civeni-green text-white hover:bg-green-600'
                 }`}>
-                  Register Here
+                  {t('registration.registerButton')}
                 </button>
               </div>
             </div>

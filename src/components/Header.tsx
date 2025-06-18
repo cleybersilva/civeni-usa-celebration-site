@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const { t, i18n } = useTranslation();
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const languages = [
@@ -12,35 +14,41 @@ const Header = () => {
     { code: 'es', flag: '🇪🇸', name: 'Español' }
   ];
 
+  const changeLanguage = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+    setSelectedLanguage(langCode);
+    setOpenDropdown(null);
+  };
+
   const menuItems = [
     {
-      title: 'THE CONGRESS',
+      title: t('header.congress'),
       items: [
-        { name: 'Presentation', href: '#presentation' },
-        { name: 'Organization Committee', href: '#committee' }
+        { name: t('header.presentation'), href: '#presentation' },
+        { name: t('header.committee'), href: '#committee' }
       ]
     },
     {
-      title: 'SCHEDULE',
+      title: t('header.schedule'),
       items: [
-        { name: 'In-Person', href: '#in-person' },
-        { name: 'Online', href: '#online' }
+        { name: t('header.inPerson'), href: '#in-person' },
+        { name: t('header.online'), href: '#online' }
       ]
     },
     {
-      title: 'PAPERS',
+      title: t('header.papers'),
       items: [
-        { name: 'Oral Presentation', href: '#oral' },
-        { name: 'Poster Sessions', href: '#poster' },
-        { name: 'Accepted Manuscripts', href: '#manuscripts' }
+        { name: t('header.oralPresentation'), href: '#oral' },
+        { name: t('header.posterSessions'), href: '#poster' },
+        { name: t('header.manuscripts'), href: '#manuscripts' }
       ]
     },
     {
-      title: 'THEMATIC AREAS',
+      title: t('header.thematicAreas'),
       items: []
     },
     {
-      title: 'SPEAKERS',
+      title: t('header.speakers'),
       items: []
     }
   ];
@@ -76,10 +84,7 @@ const Header = () => {
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
-                    onClick={() => {
-                      setSelectedLanguage(lang.code);
-                      setOpenDropdown(null);
-                    }}
+                    onClick={() => changeLanguage(lang.code)}
                     className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
                   >
                     <span>{lang.flag}</span>
@@ -134,13 +139,13 @@ const Header = () => {
               href="#registration"
               className="bg-civeni-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition-colors font-poppins"
             >
-              REGISTRATION
+              {t('header.registration')}
             </a>
             <a
               href="#contact"
               className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
             >
-              CONTACT
+              {t('header.contact')}
             </a>
           </div>
         </div>

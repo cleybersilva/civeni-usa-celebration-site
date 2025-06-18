@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const CountdownTimer = () => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -30,20 +32,20 @@ const CountdownTimer = () => {
   }, []);
 
   const timeUnits = [
-    { label: 'Days', value: timeLeft.days },
-    { label: 'Hours', value: timeLeft.hours },
-    { label: 'Minutes', value: timeLeft.minutes },
-    { label: 'Seconds', value: timeLeft.seconds }
+    { label: t('countdown.days'), value: timeLeft.days },
+    { label: t('countdown.hours'), value: timeLeft.hours },
+    { label: t('countdown.minutes'), value: timeLeft.minutes },
+    { label: t('countdown.seconds'), value: timeLeft.seconds }
   ];
 
   return (
     <section className="py-20 bg-gradient-to-r from-civeni-blue to-civeni-red">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-poppins">
-          Event Starts In
+          {t('countdown.title')}
         </h2>
         <p className="text-xl text-white mb-12 opacity-90">
-          December 8-10, 2025 • Celebration, Florida
+          {t('countdown.description')}
         </p>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">

@@ -1,39 +1,14 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
 
 const SpeakersSection = () => {
+  const { t } = useTranslation();
+  const { content } = useCMS();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
-  const speakers = [
-    {
-      name: "Dr. Maria Rodriguez",
-      title: "Professor of Biomedical Engineering",
-      institution: "Harvard Medical School",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bb?auto=format&fit=crop&w=400&q=80",
-      bio: "Leading researcher in regenerative medicine and tissue engineering with over 20 years of experience."
-    },
-    {
-      name: "Prof. James Chen",
-      title: "Director of AI Research",
-      institution: "Stanford University",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
-      bio: "Pioneer in artificial intelligence and machine learning applications in healthcare."
-    },
-    {
-      name: "Dr. Elena Kowalski",
-      title: "Environmental Scientist",
-      institution: "MIT",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
-      bio: "Expert in climate change research and sustainable technology development."
-    },
-    {
-      name: "Dr. Ahmed Hassan",
-      title: "Professor of Psychology",
-      institution: "Oxford University",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-      bio: "Renowned researcher in cognitive psychology and behavioral sciences."
-    }
-  ];
+  const speakers = content.speakers.sort((a, b) => a.order - b.order);
 
   const nextSpeaker = () => {
     setCurrentSpeaker((prev) => (prev + 1) % speakers.length);
@@ -43,15 +18,19 @@ const SpeakersSection = () => {
     setCurrentSpeaker((prev) => (prev - 1 + speakers.length) % speakers.length);
   };
 
+  if (speakers.length === 0) {
+    return <div>Loading speakers...</div>;
+  }
+
   return (
     <section className="py-20 bg-civeni-blue">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 font-poppins">
-            Keynote Speakers
+            {t('speakers.title')}
           </h2>
           <p className="text-xl text-white opacity-90 max-w-3xl mx-auto">
-            Learn from world-renowned experts who are shaping the future of their fields
+            {t('speakers.description')}
           </p>
         </div>
         
@@ -84,7 +63,7 @@ const SpeakersSection = () => {
                     onClick={prevSpeaker}
                     className="bg-civeni-blue text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-poppins"
                   >
-                    ← Previous
+                    {t('speakers.previous')}
                   </button>
                   <div className="flex space-x-2">
                     {speakers.map((_, index) => (
@@ -101,7 +80,7 @@ const SpeakersSection = () => {
                     onClick={nextSpeaker}
                     className="bg-civeni-blue text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-poppins"
                   >
-                    Next →
+                    {t('speakers.next')}
                   </button>
                 </div>
               </div>

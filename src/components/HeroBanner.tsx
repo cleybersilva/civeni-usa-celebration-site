@@ -1,42 +1,33 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
 
 const HeroBanner = () => {
+  const { t } = useTranslation();
+  const { content } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  const slides = [
-    {
-      title: "III International Multidisciplinary Congress",
-      subtitle: "Join us for three days of innovation and discovery",
-      description: "December 8-10, 2025 • Celebration, Florida",
-      bgImage: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=2000&q=80"
-    },
-    {
-      title: "World-Class Speakers",
-      subtitle: "Learn from international experts in various fields",
-      description: "Keynote presentations and panel discussions",
-      bgImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=80"
-    },
-    {
-      title: "Submit Your Research",
-      subtitle: "Share your work with the global community",
-      description: "Oral presentations and poster sessions available",
-      bgImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=2000&q=80"
-    }
-  ];
+  const slides = content.bannerSlides.sort((a, b) => a.order - b.order);
 
   useEffect(() => {
+    if (slides.length === 0) return;
+    
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
+
+  if (slides.length === 0) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <section className="relative h-screen overflow-hidden">
       {slides.map((slide, index) => (
         <div
-          key={index}
+          key={slide.id}
           className={`absolute inset-0 transition-opacity duration-1000 ${
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
@@ -58,12 +49,13 @@ const HeroBanner = () => {
               <p className="text-lg md:text-xl mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 {slide.description}
               </p>
-              <button 
+              <a 
+                href={slide.buttonLink}
                 className="bg-civeni-red text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins"
                 style={{ animationDelay: '0.9s' }}
               >
-                Register Here
-              </button>
+                {slide.buttonText}
+              </a>
             </div>
           </div>
         </div>
