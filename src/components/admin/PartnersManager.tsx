@@ -7,13 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCMS, Partner } from '@/contexts/CMSContext';
 import { Plus, Edit, Trash2, Users } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 const PartnersManager = () => {
   const { content, updatePartners } = useCMS();
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -41,10 +39,6 @@ const PartnersManager = () => {
         ...editingPartner,
         ...formData
       };
-      toast({
-        title: "Parceiro atualizado",
-        description: "O parceiro foi atualizado com sucesso.",
-      });
     } else {
       const sameTypePartners = partners.filter(p => p.type === formData.type);
       const newPartner: Partner = {
@@ -53,10 +47,6 @@ const PartnersManager = () => {
         order: sameTypePartners.length + 1
       };
       partners.push(newPartner);
-      toast({
-        title: "Parceiro adicionado",
-        description: "O parceiro foi adicionado com sucesso.",
-      });
     }
 
     await updatePartners(partners);
@@ -75,32 +65,9 @@ const PartnersManager = () => {
   };
 
   const handleDelete = async (partnerId: string) => {
-    const partnerToDelete = content.partners.find(p => p.id === partnerId);
-    if (!partnerToDelete) {
-      toast({
-        title: "Erro",
-        description: "Parceiro não encontrado.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (window.confirm(`Tem certeza que deseja excluir o parceiro "${partnerToDelete.name}"?`)) {
-      try {
-        const updatedPartners = content.partners.filter(p => p.id !== partnerId);
-        await updatePartners(updatedPartners);
-        toast({
-          title: "Parceiro excluído",
-          description: `O parceiro "${partnerToDelete.name}" foi excluído com sucesso.`,
-        });
-      } catch (error) {
-        console.error('Erro ao excluir parceiro:', error);
-        toast({
-          title: "Erro",
-          description: "Erro ao excluir o parceiro. Tente novamente.",
-          variant: "destructive",
-        });
-      }
+    if (confirm('Tem certeza que deseja excluir este parceiro?')) {
+      const partners = content.partners.filter(p => p.id !== partnerId);
+      await updatePartners(partners);
     }
   };
 

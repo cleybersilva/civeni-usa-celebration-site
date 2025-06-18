@@ -2,11 +2,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import { useCMS } from '@/contexts/CMSContext';
 
 const Footer = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
   
   const quickLinks = [
     { name: t('footer.about'), href: '#about' },
@@ -60,8 +58,8 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.contactInfo')}</h3>
             <div className="space-y-3 opacity-90">
-              <p>📧 {content.siteTexts.contactEmail}</p>
-              <p>📞 {content.siteTexts.contactPhone}</p>
+              <p>📧 info@civeniusa.org</p>
+              <p>📞 +1 (555) 123-4567</p>
               <p>📍 Celebration, FL 34747</p>
               <p>🌐 www.civeniusa.org</p>
             </div>
@@ -71,7 +69,7 @@ const Footer = () => {
         <div className="border-t border-white border-opacity-20 mt-12 pt-8 text-center">
           <div className="grid md:grid-cols-3 gap-4 items-center">
             <div className="text-sm opacity-75">
-              {content.siteTexts.footerCopyright}
+              {t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
               {t('footer.organizedBy')}
