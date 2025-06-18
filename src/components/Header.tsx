@@ -74,7 +74,7 @@ const Header = () => {
               className="flex items-center gap-2 text-white hover:text-civeni-red transition-colors ml-4"
             >
               <Settings size={16} />
-              <span className="text-sm">Área Administrativa</span>
+              <span className="text-sm">{t('header.adminArea')}</span>
             </Link>
           </div>
           
@@ -91,7 +91,7 @@ const Header = () => {
             </button>
             
             {openDropdown === 'language' && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[9999] overflow-hidden">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[99999] overflow-hidden">
                 {languages.map((lang) => (
                   <button
                     key={lang.code}

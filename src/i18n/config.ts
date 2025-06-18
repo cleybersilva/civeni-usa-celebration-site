@@ -1,4 +1,3 @@
-
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -21,7 +20,8 @@ const resources = {
         thematicAreas: "THEMATIC AREAS",
         speakers: "SPEAKERS",
         registration: "REGISTRATION",
-        contact: "CONTACT"
+        contact: "CONTACT",
+        adminArea: "Administrative Area"
       },
       hero: {
         title1: "III International Multidisciplinary Congress",
@@ -177,7 +177,8 @@ const resources = {
         thematicAreas: "ÁREAS TEMÁTICAS",
         speakers: "PALESTRANTES",
         registration: "INSCRIÇÕES",
-        contact: "CONTATO"
+        contact: "CONTATO",
+        adminArea: "Área Administrativa"
       },
       hero: {
         title1: "III Congresso Internacional Multidisciplinar",
@@ -333,7 +334,8 @@ const resources = {
         thematicAreas: "ÁREAS TEMÁTICAS",
         speakers: "PONENTES",
         registration: "INSCRIPCIONES",
-        contact: "CONTACTO"
+        contact: "CONTACTO",
+        adminArea: "Área Administrativa"
       },
       hero: {
         title1: "III Congreso Internacional Multidisciplinario",
@@ -395,7 +397,7 @@ const resources = {
       },
       about: {
         title: "Sobre el Congreso",
-        description: "El III Congreso Internacional Multidisciplinario de VCCU reúne a investigadores, académicos y profesionales de diversos campos para compartir conocimiento, fomentar la colaboración e impulsar la innovación. Únete a nosotros en un viaje inspirador de tres días de descubrimiento y aprendizaje.",
+        description: "El III Congreso Internacional Multidisciplinario de VCCU reúne a investigadores, académicos y profesionales de diversos campos para compartir conocimiento, fomentar la colaboración y impulsar la innovación. Únete a nosotros en un viaje inspirador de tres días de descubrimiento y aprendizaje.",
         highlight1Title: "3 Días de Innovación",
         highlight1Desc: "Programa integral que abarca múltiples disciplinas",
         highlight2Title: "Ponentes Internacionales",
