@@ -79,9 +79,9 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     
     // Definir permissões por categoria
     const permissions = {
-      admin: ['banner', 'contador', 'copyright', 'inscricoes', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'],
+      admin: ['banner', 'contador', 'copyright', 'cronograma', 'inscricoes', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'],
       design: ['banner', 'palestrantes', 'videos'],
-      editor: ['contador', 'inscricoes', 'local', 'online', 'parceiros', 'textos'],
+      editor: ['contador', 'cronograma', 'inscricoes', 'local', 'online', 'parceiros', 'textos'],
       viewer: ['read'] // Apenas visualização
     };
 
