@@ -304,6 +304,9 @@ const UsersManager = () => {
                       <SelectItem value="editor">Editor</SelectItem>
                       <SelectItem value="design">Designer</SelectItem>
                       <SelectItem value="admin">Administrador</SelectItem>
+                      {isAdminRoot() && (
+                        <SelectItem value="admin_root">Admin Root</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -447,6 +450,9 @@ const UsersManager = () => {
                     <SelectItem value="editor">Editor</SelectItem>
                     <SelectItem value="design">Designer</SelectItem>
                     <SelectItem value="admin">Administrador</SelectItem>
+                    {isAdminRoot() && (
+                      <SelectItem value="admin_root">Admin Root</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
