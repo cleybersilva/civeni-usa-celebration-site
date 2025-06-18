@@ -28,7 +28,11 @@ const UsersManager = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-  const { user } = useAdminAuth();
+  const { user, isAdminRoot } = useAdminAuth();
+
+  // Verificar se o usuário pode executar operações de gerenciamento
+  const canManageUsers = isAdminRoot() || user?.user_type === 'admin';
+  const canDeleteUsers = isAdminRoot(); // Apenas Admin Root pode deletar
 
   // Form state
   const [formData, setFormData] = useState({
@@ -145,6 +149,12 @@ const UsersManager = () => {
       return;
     }
 
+    // Verificar se o usuário pode deletar (apenas Admin Root)
+    if (!canDeleteUsers) {
+      setError('Acesso negado: apenas Admin Root pode deletar usuários');
+      return;
+    }
+
     if (!confirm(`Tem certeza que deseja deletar o usuário ${email}?`)) {
       return;
     }
@@ -207,106 +217,108 @@ const UsersManager = () => {
           <p className="text-gray-600">Gerencie usuários administrativos do sistema</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-civeni-blue hover:bg-blue-700">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Novo Usuário
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Criar Novo Usuário</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleCreateUser} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <Input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="Digite o email do usuário"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Senha</label>
-                <div className="relative">
+        {canManageUsers && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-civeni-blue hover:bg-blue-700">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Novo Usuário
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Criar Novo Usuário</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCreateUser} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Email</label>
                   <Input
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="Digite a senha"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Digite o email do usuário"
                     required
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Senha</label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder="Digite a senha"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Confirmar Senha</label>
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      placeholder="Confirme a senha"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
+                  <Select 
+                    value={formData.user_type}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, user_type: value as any }))}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="viewer">Visualizador</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                      <SelectItem value="design">Designer</SelectItem>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                    Criar Usuário
                   </Button>
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Confirmar Senha</label>
-                <div className="relative">
-                  <Input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    placeholder="Confirme a senha"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
-                <Select 
-                  value={formData.user_type}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, user_type: value as any }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="viewer">Visualizador</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="design">Designer</SelectItem>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                  Criar Usuário
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {error && (
@@ -361,7 +373,7 @@ const UsersManager = () => {
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
-                        {adminUser.email !== 'cleyber.silva@live.com' && (
+                        {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
                           <>
                             <Button
                               variant="outline"
@@ -371,14 +383,16 @@ const UsersManager = () => {
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {canDeleteUsers && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </>
                         )}
                         {adminUser.email === 'cleyber.silva@live.com' && (
@@ -403,49 +417,51 @@ const UsersManager = () => {
       </Card>
 
       {/* Edit User Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Usuário</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleUpdateUser} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <Input
-                type="email"
-                value={editingUser?.email || ''}
-                disabled
-                className="bg-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
-              <Select 
-                value={editFormData.user_type}
-                onValueChange={(value) => setEditFormData(prev => ({ ...prev, user_type: value as any }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="viewer">Visualizador</SelectItem>
-                  <SelectItem value="editor">Editor</SelectItem>
-                  <SelectItem value="design">Designer</SelectItem>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                Atualizar Usuário
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {canManageUsers && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Usuário</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleUpdateUser} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Email</label>
+                <Input
+                  type="email"
+                  value={editingUser?.email || ''}
+                  disabled
+                  className="bg-gray-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
+                <Select 
+                  value={editFormData.user_type}
+                  onValueChange={(value) => setEditFormData(prev => ({ ...prev, user_type: value as any }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="viewer">Visualizador</SelectItem>
+                    <SelectItem value="editor">Editor</SelectItem>
+                    <SelectItem value="design">Designer</SelectItem>
+                    <SelectItem value="admin">Administrador</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                  Atualizar Usuário
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
