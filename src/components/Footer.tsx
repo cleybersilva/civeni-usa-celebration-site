@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Instagram, Facebook, Youtube, Lock } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Lock, Linkedin } from 'lucide-react';
 import { useCMS } from '@/contexts/CMSContext';
 
 const Footer = () => {
@@ -53,6 +53,14 @@ const Footer = () => {
               >
                 <Youtube size={24} />
               </a>
+              <a 
+                href="https://www.linkedin.com/company/veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
+              >
+                <Linkedin size={24} />
+              </a>
             </div>
             <div className="mt-4">
               <a 
@@ -87,7 +95,14 @@ const Footer = () => {
               <p>📧 contact@civeni.com</p>
               <p>📞 {content.siteTexts.contactPhone}</p>
               <p>📍 Celebration, FL 34747</p>
-              <p>🌐 www.civeni.com</p>
+              <p>🌐 <a 
+                href="https://www.veniuniversity.net" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-civeni-red transition-colors"
+              >
+                www.veniuniversity.net
+              </a></p>
             </div>
           </div>
         </div>

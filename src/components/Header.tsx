@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Instagram, Facebook, Youtube, Settings } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Settings, Linkedin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -94,6 +94,14 @@ const Header = () => {
                 className="text-white hover:text-civeni-red transition-colors"
               >
                 <Youtube size={20} />
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors"
+              >
+                <Linkedin size={20} />
               </a>
             </div>
             
