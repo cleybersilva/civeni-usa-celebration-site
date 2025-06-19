@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const languages = [
@@ -71,13 +71,28 @@ const Header = () => {
           
           <div className="flex items-center space-x-6">
             <div className="flex space-x-4">
-              <a href="#" className="text-white hover:text-civeni-red transition-colors">
+              <a 
+                href="https://www.instagram.com/veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors"
+              >
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-white hover:text-civeni-red transition-colors">
+              <a 
+                href="https://www.facebook.com/veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors"
+              >
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-white hover:text-civeni-red transition-colors">
+              <a 
+                href="https://www.youtube.com/@veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors"
+              >
                 <Youtube size={20} />
               </a>
             </div>

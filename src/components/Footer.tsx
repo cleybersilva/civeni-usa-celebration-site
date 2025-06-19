@@ -29,13 +29,28 @@ const Footer = () => {
               December 8-10, 2025 • Celebration, Florida
             </p>
             <div className="flex items-center space-x-4 mb-4">
-              <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
+              <a 
+                href="https://www.instagram.com/veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
+              >
                 <Instagram size={24} />
               </a>
-              <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
+              <a 
+                href="https://www.facebook.com/veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
+              >
                 <Facebook size={24} />
               </a>
-              <a href="#" className="text-white hover:text-civeni-red transition-colors transform hover:scale-110">
+              <a 
+                href="https://www.youtube.com/@veniuniversity/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
+              >
                 <Youtube size={24} />
               </a>
             </div>
