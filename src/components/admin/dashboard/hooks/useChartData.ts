@@ -3,18 +3,23 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface ChartData {
+interface RegistrationChartData {
   name: string;
-  inscricoes?: number;
-  faturamento?: number;
+  inscricoes: number;
+  periodo: string;
+}
+
+interface RevenueChartData {
+  name: string;
+  faturamento: number;
   periodo: string;
 }
 
 export const useChartData = () => {
   const [registrationCharts, setRegistrationCharts] = useState<{
-    daily: ChartData[];
-    weekly: ChartData[];
-    batch: ChartData[];
+    daily: RegistrationChartData[];
+    weekly: RegistrationChartData[];
+    batch: RegistrationChartData[];
   }>({
     daily: [],
     weekly: [],
@@ -22,9 +27,9 @@ export const useChartData = () => {
   });
 
   const [revenueCharts, setRevenueCharts] = useState<{
-    daily: ChartData[];
-    weekly: ChartData[];
-    batch: ChartData[];
+    daily: RevenueChartData[];
+    weekly: RevenueChartData[];
+    batch: RevenueChartData[];
   }>({
     daily: [],
     weekly: [],

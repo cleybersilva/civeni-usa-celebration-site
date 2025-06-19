@@ -117,6 +117,7 @@ export type Database = {
         Row: {
           amount_paid: number | null
           batch_id: string | null
+          card_brand: string | null
           category_id: string | null
           coupon_code: string | null
           created_at: string
@@ -124,13 +125,17 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          installments: number | null
+          payment_method: string | null
           payment_status: string | null
+          payment_type: string | null
           stripe_session_id: string | null
           updated_at: string
         }
         Insert: {
           amount_paid?: number | null
           batch_id?: string | null
+          card_brand?: string | null
           category_id?: string | null
           coupon_code?: string | null
           created_at?: string
@@ -138,13 +143,17 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          installments?: number | null
+          payment_method?: string | null
           payment_status?: string | null
+          payment_type?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
         Update: {
           amount_paid?: number | null
           batch_id?: string | null
+          card_brand?: string | null
           category_id?: string | null
           coupon_code?: string | null
           created_at?: string
@@ -152,7 +161,10 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          installments?: number | null
+          payment_method?: string | null
           payment_status?: string | null
+          payment_type?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
