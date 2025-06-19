@@ -73,7 +73,7 @@ export const useChartData = () => {
         if (dailyRegistrations.hasOwnProperty(regDate)) {
           dailyRegistrations[regDate]++;
           if (reg.payment_status === 'completed') {
-            dailyRevenue[regDate] += reg.amount_paid || 0;
+            dailyRevenue[regDate] += Number(reg.amount_paid) || 0;
           }
         }
       });
@@ -97,7 +97,7 @@ export const useChartData = () => {
           if (regDate >= weekStart && regDate <= weekEnd) {
             weeklyRegistrations[weekKey]++;
             if (reg.payment_status === 'completed') {
-              weeklyRevenue[weekKey] += reg.amount_paid || 0;
+              weeklyRevenue[weekKey] += Number(reg.amount_paid) || 0;
             }
           }
         });
@@ -112,7 +112,7 @@ export const useChartData = () => {
         batchRegistrations[batchKey] = (batchRegistrations[batchKey] || 0) + 1;
         
         if (reg.payment_status === 'completed') {
-          batchRevenue[batchKey] = (batchRevenue[batchKey] || 0) + (reg.amount_paid || 0);
+          batchRevenue[batchKey] = (batchRevenue[batchKey] || 0) + (Number(reg.amount_paid) || 0);
         }
       });
 

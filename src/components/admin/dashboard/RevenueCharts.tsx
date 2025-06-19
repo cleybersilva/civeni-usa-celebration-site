@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 interface RevenueData {
   name: string;
@@ -16,12 +16,21 @@ interface RevenueChartsProps {
   batchData: RevenueData[];
 }
 
+const COLORS = ['#059669', '#dc2626', '#2563eb', '#ca8a04', '#9333ea', '#c2410c', '#16a34a', '#7c3aed'];
+
 const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps) => {
   const chartConfig = {
     faturamento: {
       label: "Faturamento (R$)",
       color: "#059669",
     },
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   };
 
   return (
@@ -34,12 +43,24 @@ const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps)
           <ChartContainer config={chartConfig} className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dailyData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <ChartTooltip 
-                  content={<ChartTooltipContent formatter={(value) => [`R$ ${Number(value).toFixed(2)}`, 'Faturamento']} />} 
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 12 }}
+                  axisLine={{ stroke: '#e5e7eb' }}
                 />
-                <Bar dataKey="faturamento" fill="var(--color-faturamento)" />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickFormatter={formatCurrency}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Faturamento']} />} 
+                />
+                <Bar 
+                  dataKey="faturamento" 
+                  fill="#10b981"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -54,12 +75,27 @@ const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps)
           <ChartContainer config={chartConfig} className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={weeklyData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <ChartTooltip 
-                  content={<ChartTooltipContent formatter={(value) => [`R$ ${Number(value).toFixed(2)}`, 'Faturamento']} />} 
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 12 }}
+                  axisLine={{ stroke: '#e5e7eb' }}
                 />
-                <Line type="monotone" dataKey="faturamento" stroke="var(--color-faturamento)" strokeWidth={2} />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickFormatter={formatCurrency}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Faturamento']} />} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="faturamento" 
+                  stroke="#f59e0b" 
+                  strokeWidth={3}
+                  dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, fill: '#d97706' }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -73,14 +109,27 @@ const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps)
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={batchData}>
-                <XAxis dataKey="name" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={batchData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value, percent }) => 
+                    `${name}: ${formatCurrency(value)} (${(percent * 100).toFixed(0)}%)`
+                  }
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="faturamento"
+                >
+                  {batchData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
                 <ChartTooltip 
-                  content={<ChartTooltipContent formatter={(value) => [`R$ ${Number(value).toFixed(2)}`, 'Faturamento']} />} 
+                  content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Faturamento']} />}
                 />
-                <Bar dataKey="faturamento" fill="var(--color-faturamento)" />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
