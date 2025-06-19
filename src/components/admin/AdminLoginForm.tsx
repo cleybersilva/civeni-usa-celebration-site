@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home } from 'lucide-react';
+import { Home, Eye, EyeOff } from 'lucide-react';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -13,6 +13,7 @@ const AdminLoginForm = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAdminAuth();
   const navigate = useNavigate();
 
@@ -44,7 +45,7 @@ const AdminLoginForm = () => {
         <Button
           variant="outline"
           onClick={() => navigate('/')}
-          className="mb-4 text-civeni-blue border-civeni-blue hover:bg-civeni-blue hover:text-white transition-colors"
+          className="mb-4 text-white bg-civeni-red border-civeni-red hover:bg-civeni-blue hover:text-white transition-colors"
         >
           <Home className="w-4 h-4 mr-2" />
           Voltar ao Site
@@ -74,13 +75,26 @@ const AdminLoginForm = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Senha</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Digite sua senha"
-                required
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Digite sua senha"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
             {error && (
               <div className="text-red-600 text-sm bg-red-50 p-3 rounded">{error}</div>
