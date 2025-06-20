@@ -2,79 +2,82 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { useCMS, RegistrationTier } from '@/contexts/CMSContext';
+import { Label } from '@/components/ui/label';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useRegistrationCategories, RegistrationCategory } from '@/hooks/useRegistrationCategories';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const RegistrationManager = () => {
-  const { content, updateRegistrationTiers, updateBatchInfo } = useCMS();
-  const [editingTier, setEditingTier] = useState<RegistrationTier | null>(null);
+  const { categories, loading, createCategory, updateCategory, deleteCategory } = useRegistrationCategories();
+  const [editingCategory, setEditingCategory] = useState<RegistrationCategory | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [batchInfo, setBatchInfo] = useState(content.batchInfo);
 
   const [formData, setFormData] = useState({
-    title: '',
-    price: '',
-    features: [''],
-    recommended: false
+    category_name: '',
+    price_brl: '',
+    requires_proof: false,
+    is_exempt: false
   });
 
   const resetForm = () => {
     setFormData({
-      title: '',
-      price: '',
-      features: [''],
-      recommended: false
+      category_name: '',
+      price_brl: '',
+      requires_proof: false,
+      is_exempt: false
     });
-    setEditingTier(null);
+    setEditingCategory(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const tiers = [...content.registrationTiers];
-    const features = formData.features.filter(f => f.trim() !== '');
-    
-    if (editingTier) {
-      const index = tiers.findIndex(t => t.id === editingTier.id);
-      tiers[index] = {
-        ...editingTier,
-        ...formData,
-        features
-      };
+    const categoryData = {
+      category_name: formData.category_name,
+      price_brl: parseFloat(formData.price_brl),
+      requires_proof: formData.requires_proof,
+      is_exempt: formData.is_exempt,
+      batch_id: null
+    };
+
+    let result;
+    if (editingCategory) {
+      result = await updateCategory(editingCategory.id, categoryData);
     } else {
-      const newTier: RegistrationTier = {
-        id: Date.now().toString(),
-        ...formData,
-        features,
-        order: tiers.length + 1
-      };
-      tiers.push(newTier);
+      result = await createCategory(categoryData);
     }
 
-    await updateRegistrationTiers(tiers);
-    setIsDialogOpen(false);
-    resetForm();
+    if (result.success) {
+      setIsDialogOpen(false);
+      resetForm();
+      alert(editingCategory ? 'Categoria atualizada com sucesso!' : 'Categoria criada com sucesso!');
+    } else {
+      alert('Erro ao salvar categoria. Tente novamente.');
+    }
   };
 
-  const handleEdit = (tier: RegistrationTier) => {
-    setEditingTier(tier);
+  const handleEdit = (category: RegistrationCategory) => {
+    setEditingCategory(category);
     setFormData({
-      title: tier.title,
-      price: tier.price,
-      features: [...tier.features, ''],
-      recommended: tier.recommended
+      category_name: category.category_name,
+      price_brl: category.price_brl.toString(),
+      requires_proof: category.requires_proof,
+      is_exempt: category.is_exempt
     });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (tierId: string) => {
+  const handleDelete = async (categoryId: string) => {
     if (confirm('Tem certeza que deseja excluir esta categoria?')) {
-      const tiers = content.registrationTiers.filter(t => t.id !== tierId);
-      await updateRegistrationTiers(tiers);
+      const result = await deleteCategory(categoryId);
+      if (result.success) {
+        alert('Categoria excluída com sucesso!');
+      } else {
+        alert('Erro ao excluir categoria. Tente novamente.');
+      }
     }
   };
 
@@ -83,46 +86,23 @@ const RegistrationManager = () => {
     setIsDialogOpen(true);
   };
 
-  const handleFeatureChange = (index: number, value: string) => {
-    const newFeatures = [...formData.features];
-    newFeatures[index] = value;
-    setFormData({...formData, features: newFeatures});
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   };
 
-  const addFeature = () => {
-    setFormData({...formData, features: [...formData.features, '']});
-  };
-
-  const removeFeature = (index: number) => {
-    const newFeatures = formData.features.filter((_, i) => i !== index);
-    setFormData({...formData, features: newFeatures});
-  };
-
-  const handleBatchInfoSave = async () => {
-    await updateBatchInfo(batchInfo);
-    alert('Informações do lote atualizadas com sucesso!');
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-lg">Carregando categorias...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Informações do Lote Atual</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-2">
-            <Input
-              value={batchInfo}
-              onChange={(e) => setBatchInfo(e.target.value)}
-              placeholder="Ex: PRIMEIRO LOTE: 1º de Novembro - 15 de Dezembro, 2024"
-            />
-            <Button onClick={handleBatchInfoSave} className="bg-civeni-blue hover:bg-blue-700">
-              Salvar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Categorias de Inscrição</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -132,69 +112,64 @@ const RegistrationManager = () => {
               Adicionar Categoria
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
-                {editingTier ? 'Editar Categoria' : 'Adicionar Categoria'}
+                {editingCategory ? 'Editar Categoria' : 'Adicionar Categoria'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Título</label>
+                <Label htmlFor="category_name" className="block text-sm font-medium mb-2">
+                  Nome da Categoria
+                </Label>
                 <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  id="category_name"
+                  value={formData.category_name}
+                  onChange={(e) => setFormData({...formData, category_name: e.target.value})}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Preço</label>
+                <Label htmlFor="price_brl" className="block text-sm font-medium mb-2">
+                  Preço (R$)
+                </Label>
                 <Input
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                  placeholder="Ex: $150"
+                  id="price_brl"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price_brl}
+                  onChange={(e) => setFormData({...formData, price_brl: e.target.value})}
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Características</label>
-                {formData.features.map((feature, index) => (
-                  <div key={index} className="flex space-x-2 mb-2">
-                    <Input
-                      value={feature}
-                      onChange={(e) => handleFeatureChange(index, e.target.value)}
-                      placeholder="Digite uma característica"
-                    />
-                    {formData.features.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => removeFeature(index)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addFeature}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Característica
-                </Button>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
-                  checked={formData.recommended}
-                  onCheckedChange={(checked) => setFormData({...formData, recommended: checked})}
+                  id="requires_proof"
+                  checked={formData.requires_proof}
+                  onCheckedChange={(checked) => setFormData({...formData, requires_proof: checked})}
                 />
-                <label className="text-sm font-medium">Categoria recomendada (destaque)</label>
+                <Label htmlFor="requires_proof" className="text-sm font-medium">
+                  Requer comprovação
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_exempt"
+                  checked={formData.is_exempt}
+                  onCheckedChange={(checked) => setFormData({...formData, is_exempt: checked})}
+                />
+                <Label htmlFor="is_exempt" className="text-sm font-medium">
+                  Categoria isenta
+                </Label>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancelar
                 </Button>
                 <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                  {editingTier ? 'Atualizar' : 'Adicionar'}
+                  {editingCategory ? 'Atualizar' : 'Adicionar'}
                 </Button>
               </div>
             </form>
@@ -202,50 +177,78 @@ const RegistrationManager = () => {
         </Dialog>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {content.registrationTiers.map((tier) => (
-          <Card key={tier.id} className={tier.recommended ? 'border-civeni-red border-2' : ''}>
-            <CardHeader>
-              {tier.recommended && (
-                <div className="bg-civeni-red text-white px-3 py-1 rounded-full text-sm font-bold text-center mb-2">
-                  MAIS POPULAR
-                </div>
-              )}
-              <CardTitle className="text-center">{tier.title}</CardTitle>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-civeni-red">{tier.price}</div>
-                <div className="text-gray-500">por pessoa</div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 mb-4">
-                {tier.features.map((feature, index) => (
-                  <li key={index} className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                    <span className="text-sm">{feature}</span>
-                  </li>
+      <Card>
+        <CardHeader>
+          <CardTitle>Categorias de Inscrição ({categories.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {categories.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              Nenhuma categoria cadastrada. Clique em "Adicionar Categoria" para começar.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome da Categoria</TableHead>
+                  <TableHead>Preço</TableHead>
+                  <TableHead>Requer Comprovação</TableHead>
+                  <TableHead>Isenta</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell className="font-medium">
+                      {category.category_name}
+                    </TableCell>
+                    <TableCell>
+                      {category.is_exempt ? (
+                        <span className="text-green-600 font-semibold">GRATUITO</span>
+                      ) : (
+                        formatCurrency(category.price_brl)
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {category.requires_proof ? (
+                        <span className="text-blue-600">Sim</span>
+                      ) : (
+                        <span className="text-gray-500">Não</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {category.is_exempt ? (
+                        <span className="text-green-600">Sim</span>
+                      ) : (
+                        <span className="text-gray-500">Não</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit(category)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(category.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </ul>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleEdit(tier)}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(tier.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
