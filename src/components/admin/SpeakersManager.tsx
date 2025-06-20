@@ -16,8 +16,7 @@ const SpeakersManager = () => {
     title: '',
     institution: '',
     image: '',
-    bio: '',
-    description: ''
+    bio: ''
   });
 
   const resetForm = () => {
@@ -26,8 +25,7 @@ const SpeakersManager = () => {
       title: '',
       institution: '',
       image: '',
-      bio: '',
-      description: ''
+      bio: ''
     });
     setEditingSpeaker(null);
   };
@@ -41,14 +39,12 @@ const SpeakersManager = () => {
       const index = speakers.findIndex(s => s.id === editingSpeaker.id);
       speakers[index] = {
         ...editingSpeaker,
-        ...formData,
-        imageUrl: formData.image // Map image to imageUrl for compatibility
+        ...formData
       };
     } else {
       const newSpeaker: Speaker = {
         id: Date.now().toString(),
         ...formData,
-        imageUrl: formData.image, // Map image to imageUrl for compatibility
         order: speakers.length + 1
       };
       speakers.push(newSpeaker);
@@ -58,7 +54,6 @@ const SpeakersManager = () => {
     const mariaIndex = speakers.findIndex(s => s.name.includes('Maria Rodriguez'));
     if (mariaIndex !== -1 && speakers[mariaIndex].image.includes('/lovable-uploads/')) {
       speakers[mariaIndex].image = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
-      speakers[mariaIndex].imageUrl = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
     }
 
     await updateSpeakers(speakers);
@@ -73,8 +68,7 @@ const SpeakersManager = () => {
       title: speaker.title,
       institution: speaker.institution,
       image: speaker.image,
-      bio: speaker.bio,
-      description: speaker.description || speaker.bio // Use bio as fallback for description
+      bio: speaker.bio
     });
     setIsDialogOpen(true);
   };
