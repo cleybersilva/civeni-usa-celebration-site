@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -11,25 +10,6 @@ export interface SiteTexts {
   partnersTitle: string;
   partnersDescription: string;
   copyrightText: string;
-  siteTitle: string;
-  contactEmail: string;
-  contactPhone: string;
-  footerCopyright: string;
-  institutionalLink: string;
-  organizedBy: string;
-  copyrightEn: string;
-  copyrightPt: string;
-  copyrightEs: string;
-  scheduleTitle: string;
-  scheduleDescription: string;
-  speakersTitle: string;
-  speakersDescription: string;
-  registrationTitle: string;
-  registrationDescription: string;
-  venueTitle: string;
-  venueDescription: string;
-  videosTitle: string;
-  videosDescription: string;
 }
 
 export interface Speaker {
@@ -38,66 +18,12 @@ export interface Speaker {
   title: string;
   description: string;
   imageUrl: string;
-  image: string;
-  institution: string;
-  bio: string;
-  order: number;
 }
 
 export interface Video {
   id: string;
   title: string;
   youtubeId: string;
-  description: string;
-  videoType: 'youtube' | 'upload';
-  youtubeUrl?: string;
-  uploadedVideoUrl?: string;
-  thumbnail: string;
-  order: number;
-}
-
-export interface BannerSlide {
-  id: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  bgImage: string;
-  buttonText: string;
-  buttonLink: string;
-  order: number;
-}
-
-export interface RegistrationTier {
-  id: string;
-  title: string;
-  price: string;
-  features: string[];
-  recommended: boolean;
-  order: number;
-}
-
-export interface EventConfig {
-  eventDate: string;
-  eventLocation: string;
-  eventCity: string;
-}
-
-export interface OnlineConfig {
-  platformName: string;
-  platformUrl: string;
-  accessInstructions: string;
-}
-
-export interface VenueConfig {
-  venueName: string;
-  venueAddress: string;
-  venueCity: string;
-  venueState: string;
-  venueZip: string;
-  venueCountry: string;
-  venuePhone: string;
-  venueEmail: string;
-  venueWebsite: string;
 }
 
 export interface Partner {
@@ -113,12 +39,6 @@ export interface CMSContent {
   speakers: Speaker[];
   videos: Video[];
   partners: Partner[];
-  bannerSlides: BannerSlide[];
-  registrationTiers: RegistrationTier[];
-  batchInfo: string;
-  eventConfig: EventConfig;
-  onlineConfig: OnlineConfig;
-  venueConfig: VenueConfig;
 }
 
 interface CMSContextType {
@@ -127,10 +47,6 @@ interface CMSContextType {
   updateSpeakers: (speakers: Speaker[]) => Promise<void>;
   updateVideos: (videos: Video[]) => Promise<void>;
   updatePartners: (partners: Partner[]) => Promise<void>;
-  updateBannerSlides: (slides: BannerSlide[]) => Promise<void>;
-  updateEventConfig: (config: Partial<EventConfig>) => Promise<void>;
-  updateOnlineConfig: (config: Partial<OnlineConfig>) => Promise<void>;
-  updateVenueConfig: (config: Partial<VenueConfig>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -146,54 +62,11 @@ export const CMSProvider = ({ children }: { children: React.ReactNode }) => {
       aboutDescription: 'The III International Congress of Educational Innovation and New Technologies is the premier event bringing together educators, researchers, and technology professionals from around the world.',
       partnersTitle: 'Our Partners',
       partnersDescription: 'Join us in shaping the future of education',
-      copyrightText: '© 2025 III CIVENI USA. All rights reserved.',
-      siteTitle: 'III CIVENI USA 2025',
-      contactEmail: 'contact@civeni.com',
-      contactPhone: '+1 (407) 555-0123',
-      footerCopyright: '© 2025 III CIVENI USA. All rights reserved.',
-      institutionalLink: 'https://www.veniuniversity.net',
-      organizedBy: 'Organized by VCCU',
-      copyrightEn: '© 2025 III CIVENI USA. All rights reserved.',
-      copyrightPt: '© 2025 III CIVENI USA. Todos os direitos reservados.',
-      copyrightEs: '© 2025 III CIVENI USA. Todos los derechos reservados.',
-      scheduleTitle: 'Schedule',
-      scheduleDescription: 'Check out the complete schedule for III Civeni USA 2025',
-      speakersTitle: 'Featured Speakers',
-      speakersDescription: 'Meet our renowned international speakers',
-      registrationTitle: 'Registration',
-      registrationDescription: 'Secure your spot at the most important educational event of the year',
-      venueTitle: 'Venue & Location',
-      venueDescription: 'Join us at our state-of-the-art venue in Celebration, Florida',
-      videosTitle: 'Videos from II Civeni 2024',
-      videosDescription: 'Watch highlights from our previous congress'
+      copyrightText: '© 2025 III CIVENI USA. All rights reserved.'
     },
     speakers: [],
     videos: [],
-    partners: [],
-    bannerSlides: [],
-    registrationTiers: [],
-    batchInfo: 'Early Bird Registration - Save 30%',
-    eventConfig: {
-      eventDate: '2025-12-08',
-      eventLocation: 'Celebration, Florida',
-      eventCity: 'Celebration'
-    },
-    onlineConfig: {
-      platformName: 'Zoom',
-      platformUrl: 'https://zoom.us/j/123456789',
-      accessInstructions: 'Access instructions will be sent via email'
-    },
-    venueConfig: {
-      venueName: 'Celebration Community Center',
-      venueAddress: '800 Celebration Ave',
-      venueCity: 'Celebration',
-      venueState: 'FL',
-      venueZip: '34747',
-      venueCountry: 'USA',
-      venuePhone: '+1 (407) 555-0123',
-      venueEmail: 'venue@civeni.com',
-      venueWebsite: 'https://www.veniuniversity.net'
-    }
+    partners: []
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -289,43 +162,6 @@ export const CMSProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   };
 
-  const updateBannerSlides = async (slides: BannerSlide[]) => {
-    setContent(prev => ({
-      ...prev,
-      bannerSlides: slides
-    }));
-  };
-
-  const updateEventConfig = async (config: Partial<EventConfig>) => {
-    setContent(prev => ({
-      ...prev,
-      eventConfig: {
-        ...prev.eventConfig,
-        ...config
-      }
-    }));
-  };
-
-  const updateOnlineConfig = async (config: Partial<OnlineConfig>) => {
-    setContent(prev => ({
-      ...prev,
-      onlineConfig: {
-        ...prev.onlineConfig,
-        ...config
-      }
-    }));
-  };
-
-  const updateVenueConfig = async (config: Partial<VenueConfig>) => {
-    setContent(prev => ({
-      ...prev,
-      venueConfig: {
-        ...prev.venueConfig,
-        ...config
-      }
-    }));
-  };
-
   return (
     <CMSContext.Provider value={{
       content,
@@ -333,10 +169,6 @@ export const CMSProvider = ({ children }: { children: React.ReactNode }) => {
       updateSpeakers,
       updateVideos,
       updatePartners,
-      updateBannerSlides,
-      updateEventConfig,
-      updateOnlineConfig,
-      updateVenueConfig,
       isLoading
     }}>
       {children}
