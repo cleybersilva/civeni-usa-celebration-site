@@ -41,8 +41,8 @@ const FinancialDashboard = () => {
   }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <div className="flex-shrink-0 space-y-6">
+    <div className="h-full flex flex-col">
+      <div className="flex-shrink-0 space-y-6 p-6">
         <StatsCards stats={stats} />
         <ActionsCard 
           onGenerateReport={generateDailyReport}
@@ -53,9 +53,9 @@ const FinancialDashboard = () => {
         />
       </div>
       
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0">
         <Tabs defaultValue="graficos" className="h-full flex flex-col">
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 px-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="graficos">Gráficos</TabsTrigger>
               <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
@@ -63,40 +63,44 @@ const FinancialDashboard = () => {
             </TabsList>
           </div>
           
-          <div className="flex-1 overflow-hidden">
-            <TabsContent value="graficos" className="h-full m-0 p-0">
+          <div className="flex-1 min-h-0">
+            <TabsContent value="graficos" className="h-full m-0">
               <ScrollArea className="h-full">
-                <div className="space-y-8 p-6">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">Gráficos de Inscrições</h3>
+                <div className="p-6 space-y-8">
+                  <div className="w-full">
+                    <h3 className="text-xl font-semibold mb-6">Gráficos de Inscrições</h3>
                     {chartsLoading ? (
                       <div className="text-center py-8">Carregando gráficos...</div>
                     ) : (
-                      <RegistrationCharts
-                        dailyData={registrationCharts.daily}
-                        weeklyData={registrationCharts.weekly}
-                        batchData={registrationCharts.batch}
-                      />
+                      <div className="w-full">
+                        <RegistrationCharts
+                          dailyData={registrationCharts.daily}
+                          weeklyData={registrationCharts.weekly}
+                          batchData={registrationCharts.batch}
+                        />
+                      </div>
                     )}
                   </div>
                   
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">Gráficos de Faturamento</h3>
+                  <div className="w-full">
+                    <h3 className="text-xl font-semibold mb-6">Gráficos de Faturamento</h3>
                     {chartsLoading ? (
                       <div className="text-center py-8">Carregando gráficos...</div>
                     ) : (
-                      <RevenueCharts
-                        dailyData={revenueCharts.daily}
-                        weeklyData={revenueCharts.weekly}
-                        batchData={revenueCharts.batch}
-                      />
+                      <div className="w-full">
+                        <RevenueCharts
+                          dailyData={revenueCharts.daily}
+                          weeklyData={revenueCharts.weekly}
+                          batchData={revenueCharts.batch}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
               </ScrollArea>
             </TabsContent>
             
-            <TabsContent value="relatorios" className="h-full m-0 p-0">
+            <TabsContent value="relatorios" className="h-full m-0">
               <ScrollArea className="h-full">
                 <div className="p-6">
                   <RegistrationReports />
@@ -104,7 +108,7 @@ const FinancialDashboard = () => {
               </ScrollArea>
             </TabsContent>
             
-            <TabsContent value="alertas" className="h-full m-0 p-0">
+            <TabsContent value="alertas" className="h-full m-0">
               <ScrollArea className="h-full">
                 <div className="p-6">
                   <AlertsLog alerts={alerts} />
