@@ -1,4 +1,3 @@
-
 export const enTranslations = {
   translation: {
     header: {
@@ -197,7 +196,6 @@ export const enTranslations = {
       title: "Our Partners",
       organizedBy: "Organized By",
       academicPartners: "Academic Partners",
-      sponsors: "Sponsors",
       becomePartner: "Become a Partner",
       partnerDesc: "Join us in shaping the future of education",
       partnerButton: "Partner with Us"

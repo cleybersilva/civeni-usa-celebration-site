@@ -48,7 +48,7 @@ const PartnersManager = () => {
       const newPartner: Partner = {
         id: Date.now().toString(),
         ...formData,
-        sort_order: sameTypePartners.length + 1
+        order: sameTypePartners.length + 1
       };
       partners.push(newPartner);
     }

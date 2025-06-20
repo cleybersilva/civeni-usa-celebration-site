@@ -1,4 +1,3 @@
-
 export const esTranslations = {
   translation: {
     header: {
@@ -197,7 +196,6 @@ export const esTranslations = {
       title: "Nuestros Socios",
       organizedBy: "Organizado Por",
       academicPartners: "Socios Académicos",
-      sponsors: "Patrocinadores",
       becomePartner: "Conviértete en Socio",
       partnerDesc: "Únete a nosotros en la formación del futuro de la educación",
       partnerButton: "Asóciate con Nosotros"

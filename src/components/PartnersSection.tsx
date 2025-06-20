@@ -6,10 +6,10 @@ const PartnersSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
   
-  // Filter partners by type
-  const organizers = content.partners.filter(p => p.type === 'organizer');
-  const academicPartners = content.partners.filter(p => p.type === 'academic');
-  const sponsors = content.partners.filter(p => p.type === 'sponsor');
+  // Filter out "Hope & Justice" from all partner types
+  const organizers = content.partners.filter(p => p.type === 'organizer' && !p.name.includes('Hope & Justice'));
+  const academicPartners = content.partners.filter(p => p.type === 'academic' && !p.name.includes('Hope & Justice'));
+  const sponsors = content.partners.filter(p => p.type === 'sponsor' && !p.name.includes('Hope & Justice'));
 
   // Add VCCU as main organizer with the new logo
   const mainOrganizer = {
@@ -56,7 +56,7 @@ const PartnersSection = () => {
           {organizers.length > 0 && (
             <div className="mb-16">
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-                {t('partners.organizedBy')} - {t('partners.organizedBy')}
+                Organizadores Parceiros
               </h3>
               <div className="flex justify-center items-center space-x-12">
                 {organizers.map((org, index) => (
@@ -108,7 +108,7 @@ const PartnersSection = () => {
           {sponsors.length > 0 && (
             <div className="mb-16">
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-                {t('partners.sponsors')}
+                Patrocinadores
               </h3>
               <div className="flex justify-center">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl">
