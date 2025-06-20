@@ -80,7 +80,7 @@ const Footer = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
+                    className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300 text-left"
                   >
                     {link.name}
                   </a>
@@ -91,7 +91,7 @@ const Footer = () => {
           
           <div className="text-left">
             <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.contactInfo')}</h3>
-            <div className="space-y-3 opacity-90">
+            <div className="space-y-3 opacity-90 text-left">
               <p>📧 contact@civeni.com</p>
               <p>📞 {content.siteTexts.contactPhone}</p>
               <p>📍 Celebration, FL 34747</p>
@@ -108,20 +108,20 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-white border-opacity-20 mt-12 pt-8 text-left">
-          <div className="grid md:grid-cols-3 gap-4 items-center">
-            <div className="text-sm opacity-75">
+          <div className="grid md:grid-cols-3 gap-4 items-center text-left">
+            <div className="text-sm opacity-75 text-left">
               {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
-            <div className="text-sm opacity-75">
+            <div className="text-sm opacity-75 text-left">
               Organized by VCCU: Veni Creator Christian University
             </div>
-            <div className="text-sm opacity-75">
+            <div className="text-sm opacity-75 text-left">
               {content.siteTexts.institutionalLink ? (
                 <a 
                   href={content.siteTexts.institutionalLink} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover: transition-colors"
+                  className="hover:text-civeni-red transition-colors"
                 >
                   {t('footer.privacyPolicy')}
                 </a>

@@ -13,11 +13,11 @@ const InscricaoOnline = () => {
       <Header />
       
       <section className="bg-gradient-to-r from-civeni-red to-red-700 text-white py-16">
-        <div className="w-full text-center">
+        <div className="container mx-auto px-4 text-left">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 font-poppins">
             {t('registration.onlineTitle', 'Inscrição Online')}
           </h1>
-          <p className="text-xl max-w-3xl mx-auto">
+          <p className="text-xl max-w-3xl">
             {t('registration.onlineDescription', 'Participe do evento de qualquer lugar do mundo com transmissão ao vivo e interação digital.')}
           </p>
         </div>
@@ -26,17 +26,17 @@ const InscricaoOnline = () => {
       <NewRegistrationSection registrationType="online" />
       
       <section className="py-20 bg-white">
-        <div className="w-full">
-          <div className="text-center mb-16">
+        <div className="container mx-auto px-4">
+          <div className="text-left mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
               {t('schedule.onlineSchedule', 'Cronograma Online')}
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl">
               {t('schedule.onlineScheduleDescription', 'Confira a programação completa para participantes online')}
             </p>
           </div>
           
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="bg-gradient-to-br from-civeni-red to-red-600 p-8 text-white">
                 <h3 className="text-3xl font-bold font-poppins mb-4">Programação Online</h3>

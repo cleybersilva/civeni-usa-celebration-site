@@ -83,6 +83,10 @@ export const esTranslations = {
       couponPlaceholder: "Ingresa el código de cupón",
       free: "Gratis",
       noBatchActive: "No hay lote de inscripción activo",
+      course: "Curso",
+      selectCourse: "Selecciona el Curso",
+      class: "Clase",
+      selectClass: "Selecciona la Clase",
       success: {
         freeRegistration: "¡Inscripción realizada con éxito!"
       },

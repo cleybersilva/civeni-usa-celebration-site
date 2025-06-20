@@ -16,7 +16,7 @@ export const enTranslations = {
       speakers: "Speakers",
       registration: "Registration",
       contact: "Contact",
-      adminArea: "Admin Area"
+      adminArea: "Restricted Area"
     },
     countdown: {
       title: "III CIVENI USA 2025",
@@ -83,6 +83,10 @@ export const enTranslations = {
       couponPlaceholder: "Enter coupon code",
       free: "Free",
       noBatchActive: "No active registration batch",
+      course: "Course",
+      selectCourse: "Select Course",
+      class: "Class",
+      selectClass: "Select Class",
       success: {
         freeRegistration: "Registration completed successfully!"
       },

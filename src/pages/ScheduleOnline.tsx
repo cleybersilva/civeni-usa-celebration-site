@@ -31,27 +31,25 @@ const ScheduleOnline = () => {
       <Header />
       
       <main className="pt-20 p-0 m-0">
-        <div className="w-full p-0 m-0">
-          <div className="text-center mb-8 px-6">
+        <div className="container mx-auto px-4">
+          <div className="text-left mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {t('schedule.onlineTitle')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl">
               {t('schedule.onlineDescription')}
             </p>
           </div>
 
-          <div className="px-6">
-            <ScheduleFilters
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              uniqueDates={uniqueDates}
-              categories={categories}
-              onDownload={handleDownload}
-            />
-          </div>
+          <ScheduleFilters
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            uniqueDates={uniqueDates}
+            categories={categories}
+            onDownload={handleDownload}
+          />
 
           {isLoading ? (
             <div className="text-center py-8">
@@ -59,7 +57,7 @@ const ScheduleOnline = () => {
               <p className="mt-4 text-gray-600">{t('schedule.loading')}</p>
             </div>
           ) : (
-            <div className="space-y-6 px-6">
+            <div className="space-y-6">
               {uniqueDates.map(date => {
                 const daySchedules = filteredSchedules?.filter(s => s.date === date);
                 if (!daySchedules?.length) return null;
