@@ -1,3 +1,4 @@
+
 export const ptTranslations = {
   translation: {
     header: {
@@ -196,6 +197,7 @@ export const ptTranslations = {
       title: "Nossos Parceiros",
       organizedBy: "Organizado Por",
       academicPartners: "Parceiros Acadêmicos",
+      sponsors: "Patrocinadores",
       becomePartner: "Torne-se um Parceiro",
       partnerDesc: "Junte-se a nós na formação do futuro da educação",
       partnerButton: "Seja Nosso Parceiro"

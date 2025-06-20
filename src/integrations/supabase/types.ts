@@ -238,6 +238,36 @@ export type Database = {
           },
         ]
       }
+      partners: {
+        Row: {
+          created_at: string | null
+          id: string
+          logo: string
+          name: string
+          sort_order: number | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          logo: string
+          name: string
+          sort_order?: number | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          logo?: string
+          name?: string
+          sort_order?: number | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       registration_batches: {
         Row: {
           batch_number: number
