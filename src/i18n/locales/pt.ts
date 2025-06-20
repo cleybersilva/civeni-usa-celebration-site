@@ -20,6 +20,8 @@ export const ptTranslations = {
         adminArea: "Área Restrita"
       },
       schedule: {
+        title: "Cronograma",
+        description: "Confira a programação completa do III Civeni USA 2025",
         inPersonTitle: "Cronograma - Presencial",
         inPersonDescription: "Programação completa para os participantes presenciais do III Civeni USA 2025",
         onlineTitle: "Cronograma - Online",
@@ -33,31 +35,81 @@ export const ptTranslations = {
         accessRoom: "Acessar Sala",
         viewRecording: "Ver Gravação",
         live: "AO VIVO",
-        moreInfo: "+ info"
+        moreInfo: "+ info",
+        inPersonButton: "Ver Cronograma Presencial",
+        onlineButton: "Ver Cronograma Online",
+        faceToFaceNetworking: "Networking presencial",
+        interactiveWorkshops: "Workshops interativos",
+        exhibitionStands: "Estandes de exposição",
+        liveStreaming: "Transmissão ao vivo",
+        qaSessions: "Sessões de perguntas",
+        digitalCertificate: "Certificado digital"
       },
       countdown: {
-        title: "countdown.title"
+        title: "III CIVENI USA 2025",
+        description: "Não perca o evento educacional mais importante do ano",
+        days: "Dias",
+        hours: "Horas",
+        minutes: "Minutos",
+        seconds: "Segundos"
       },
       scheduleSection: {
-        title: "schedule.title"
+        title: "Escolha Sua Experiência"
       },
       registration: {
-        title: "registration.new.title"
+        title: "Inscrições",
+        newTitle: "Inscrições",
+        formTitle: "Formulário de Inscrição",
+        description: "Garanta sua vaga no evento educacional mais importante do ano",
+        urgent: "Vagas Limitadas",
+        mostPopular: "Mais Popular",
+        registerButton: "Inscrever-se Agora"
       },
       about: {
-        title: "about.title"
+        title: "Sobre o III CIVENI USA 2025",
+        description: "O III Congresso Internacional de Inovação Educacional e Novas Tecnologias é o principal evento que reúne educadores, pesquisadores e profissionais de tecnologia de todo o mundo.",
+        highlight1Title: "3 Dias de Inovação",
+        highlight1Desc: "Experiência imersiva com as últimas tendências educacionais",
+        highlight2Title: "Palestrantes Internacionais",
+        highlight2Desc: "Especialistas renomados compartilhando conhecimento de ponta",
+        highlight3Title: "Formato Híbrido",
+        highlight3Desc: "Participe presencialmente ou online conforme sua preferência",
+        highlight4Title: "Networking",
+        highlight4Desc: "Conecte-se com profissionais de todo o mundo",
+        learnMore: "Saiba Mais"
       },
       speakers: {
-        title: "speakers.title"
+        title: "Palestrantes em Destaque"
       },
       videos: {
         title: "Vídeos do II Civeni 2024"
       },
       hybrid: {
-        title: "hybrid.title"
+        title: "Formato Híbrido",
+        description: "Experimente o melhor dos dois mundos com nosso formato híbrido inovador",
+        choose: "Escolha Sua Experiência",
+        exhibitionStands: "Estandes de Exposição",
+        exhibitionDesc: "Explore soluções inovadoras de empresas líderes",
+        keynoteLectures: "Palestras Magistrais",
+        keynoteDesc: "Apresentações inspiradoras de especialistas mundialmente reconhecidos",
+        panelDiscussions: "Discussões em Painel",
+        panelDesc: "Debates envolventes sobre tópicos educacionais atuais",
+        oralCommunications: "Comunicações Orais",
+        oralDesc: "Compartilhe e descubra os últimos achados de pesquisa",
+        whyChoose: "Por que Escolher Nosso Formato Híbrido?",
+        inPersonBenefits: "Benefícios Presenciais",
+        onlineBenefits: "Benefícios Online",
+        directNetworking: "Oportunidades de networking direto",
+        handsOnWorkshops: "Workshops práticos",
+        accessExhibition: "Acesso à área de exposição",
+        faceToFaceInteractions: "Interações face a face",
+        globalAccessibility: "Acessibilidade global",
+        costEffective: "Participação econômica",
+        recordedSessions: "Sessões gravadas disponíveis",
+        interactiveQA: "Sessões interativas de perguntas"
       },
       venue: {
-        title: "venue.title"
+        title: "Local e Localização"
       },
       partners: {
         title: "Nossos Parceiros"
