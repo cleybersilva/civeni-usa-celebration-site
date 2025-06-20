@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,6 +58,16 @@ const VideosManager = () => {
     });
   };
 
+  const getYoutubeId = (url: string) => {
+    if (url.includes('youtube.com/watch?v=')) {
+      return url.split('v=')[1].split('&')[0];
+    }
+    if (url.includes('youtu.be/')) {
+      return url.split('youtu.be/')[1];
+    }
+    return '';
+  };
+
   const handleSave = async () => {
     if (!videoForm.title.trim()) {
       toast({
@@ -95,7 +104,8 @@ const VideosManager = () => {
       youtubeUrl: videoForm.videoType === 'youtube' ? videoForm.youtubeUrl : undefined,
       uploadedVideoUrl: videoForm.videoType === 'upload' ? videoForm.uploadedVideoUrl : undefined,
       thumbnail: videoForm.thumbnail || 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=300&q=80',
-      order: videoForm.order
+      order: videoForm.order,
+      youtubeId: videoForm.videoType === 'youtube' ? getYoutubeId(videoForm.youtubeUrl) : ''
     };
 
     let updatedVideos;

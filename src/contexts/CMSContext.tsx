@@ -86,6 +86,10 @@ export interface OnlineConfig {
   platformName: string;
   platformUrl: string;
   accessInstructions: string;
+  platform: string;
+  channelName: string;
+  accessInfo: string;
+  features: string[];
 }
 
 export interface VenueConfig {
@@ -98,6 +102,12 @@ export interface VenueConfig {
   venuePhone: string;
   venueEmail: string;
   venueWebsite: string;
+  mapEmbedUrl: string;
+  nearbyAirport: string;
+  airportDistance: string;
+  parkingInfo: string;
+  accommodationInfo: string;
+  facilities: string[];
 }
 
 export interface Partner {
@@ -181,7 +191,11 @@ export const CMSProvider = ({ children }: { children: React.ReactNode }) => {
     onlineConfig: {
       platformName: 'Zoom',
       platformUrl: 'https://zoom.us/j/123456789',
-      accessInstructions: 'Access instructions will be sent via email'
+      accessInstructions: 'Access instructions will be sent via email',
+      platform: 'YouTube Live',
+      channelName: '@CiveniUSA2025',
+      accessInfo: 'Access instructions will be sent via email',
+      features: ['HD Streaming', 'Interactive Chat', 'Real-time Q&A', 'Session Recordings']
     },
     venueConfig: {
       venueName: 'Celebration Community Center',
@@ -192,7 +206,13 @@ export const CMSProvider = ({ children }: { children: React.ReactNode }) => {
       venueCountry: 'USA',
       venuePhone: '+1 (407) 555-0123',
       venueEmail: 'venue@civeni.com',
-      venueWebsite: 'https://www.veniuniversity.net'
+      venueWebsite: 'https://www.veniuniversity.net',
+      mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3509.123456789!2d-81.234567!3d28.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCelebration%2C%20FL!5e0!3m2!1sen!2sus!4v1234567890',
+      nearbyAirport: 'Orlando International Airport (MCO)',
+      airportDistance: '25 miles (40 km)',
+      parkingInfo: 'Free parking available on-site',
+      accommodationInfo: 'Recommended hotels within 5 miles',
+      facilities: ['Wi-Fi', 'Air Conditioning', 'Audio/Visual Equipment', 'Catering Services']
     }
   });
 
@@ -207,7 +227,14 @@ export const CMSProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
 
-      return data || [];
+      // Transform database data to match Partner interface
+      return (data || []).map(partner => ({
+        id: partner.id,
+        name: partner.name,
+        logo: partner.logo,
+        type: partner.type as 'organizer' | 'academic' | 'sponsor',
+        sort_order: partner.sort_order
+      }));
     } catch (error) {
       console.error('Error fetching partners:', error);
       return [];
