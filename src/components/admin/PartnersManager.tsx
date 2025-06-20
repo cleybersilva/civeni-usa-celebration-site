@@ -266,47 +266,45 @@ const PartnersManager = () => {
         </Card>
 
         {/* Patrocinadores */}
-        {sponsors.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Patrocinadores ({sponsors.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {sponsors.map((partner) => (
-                  <div key={partner.id} className="border rounded-lg p-4 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{partner.logo}</span>
-                      <div>
-                        <h4 className="font-semibold">{partner.name}</h4>
-                        <p className="text-sm text-gray-500">{getTypeLabel(partner.type)}</p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEdit(partner)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDelete(partner.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Patrocinadores ({sponsors.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {sponsors.map((partner) => (
+                <div key={partner.id} className="border rounded-lg p-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{partner.logo}</span>
+                    <div>
+                      <h4 className="font-semibold">{partner.name}</h4>
+                      <p className="text-sm text-gray-500">{getTypeLabel(partner.type)}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                  <div className="flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(partner)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(partner.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
