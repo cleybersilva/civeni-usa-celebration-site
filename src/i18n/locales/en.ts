@@ -18,6 +18,14 @@ export const enTranslations = {
       contact: "Contact",
       adminArea: "Admin Area"
     },
+    countdown: {
+      title: "III CIVENI USA 2025",
+      description: "Don't miss the most important educational event of the year",
+      days: "Days",
+      hours: "Hours",
+      minutes: "Minutes",
+      seconds: "Seconds"
+    },
     schedule: {
       title: "Schedule",
       description: "Check out the complete schedule for III Civeni USA 2025",
@@ -48,14 +56,6 @@ export const enTranslations = {
       onlineSchedule: "Online Schedule",
       onlineScheduleDescription: "Check the complete schedule for online participants"
     },
-    countdown: {
-      title: "III CIVENI USA 2025",
-      description: "Don't miss the most important educational event of the year",
-      days: "Days",
-      hours: "Hours",
-      minutes: "Minutes",
-      seconds: "Seconds"
-    },
     scheduleSection: {
       title: "Choose Your Experience"
     },
@@ -63,14 +63,33 @@ export const enTranslations = {
       title: "Registration",
       newTitle: "Registration",
       formTitle: "Registration Form",
+      presentialFormTitle: "In-Person Registration Form",
+      onlineFormTitle: "Online Registration Form",
       description: "Secure your spot at the most important educational event of the year",
       urgent: "Limited Spots Available",
       mostPopular: "Most Popular",
       registerButton: "Register Now",
+      registerNow: "Register Now",
+      processing: "Processing...",
       presentialTitle: "In-Person Registration",
       presentialDescription: "Participate in-person at the event with direct networking, interactive workshops and full access to activities.",
       onlineTitle: "Online Registration",
-      onlineDescription: "Participate in the event from anywhere in the world with live streaming and digital interaction."
+      onlineDescription: "Participate in the event from anywhere in the world with live streaming and digital interaction.",
+      fullName: "Full Name",
+      email: "Email",
+      category: "Category",
+      selectCategory: "Select Category",
+      couponCode: "Coupon Code",
+      couponPlaceholder: "Enter coupon code",
+      free: "Free",
+      noBatchActive: "No active registration batch",
+      success: {
+        freeRegistration: "Registration completed successfully!"
+      },
+      errors: {
+        invalidCoupon: "Invalid or expired coupon code",
+        general: "Registration error. Please try again."
+      }
     },
     about: {
       title: "About III CIVENI USA 2025",

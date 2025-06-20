@@ -18,6 +18,14 @@ export const ptTranslations = {
       contact: "Contato",
       adminArea: "Área Restrita"
     },
+    countdown: {
+      title: "III CIVENI USA 2025",
+      description: "Não perca o evento educacional mais importante do ano",
+      days: "Dias",
+      hours: "Horas",
+      minutes: "Minutos",
+      seconds: "Segundos"
+    },
     schedule: {
       title: "Cronograma",
       description: "Confira a programação completa do III Civeni USA 2025",
@@ -48,14 +56,6 @@ export const ptTranslations = {
       onlineSchedule: "Cronograma Online",
       onlineScheduleDescription: "Confira a programação completa para participantes online"
     },
-    countdown: {
-      title: "III CIVENI USA 2025",
-      description: "Não perca o evento educacional mais importante do ano",
-      days: "Dias",
-      hours: "Horas",
-      minutes: "Minutos",
-      seconds: "Segundos"
-    },
     scheduleSection: {
       title: "Escolha Sua Experiência"
     },
@@ -63,14 +63,33 @@ export const ptTranslations = {
       title: "Inscrições",
       newTitle: "Inscrições",
       formTitle: "Formulário de Inscrição",
+      presentialFormTitle: "Formulário de Inscrição Presencial",
+      onlineFormTitle: "Formulário de Inscrição Online",
       description: "Garanta sua vaga no evento educacional mais importante do ano",
       urgent: "Vagas Limitadas",
       mostPopular: "Mais Popular",
       registerButton: "Inscrever-se Agora",
+      registerNow: "Inscrever-se Agora",
+      processing: "Processando...",
       presentialTitle: "Inscrição Presencial",
       presentialDescription: "Participe presencialmente do evento com networking direto, workshops interativos e acesso completo às atividades.",
       onlineTitle: "Inscrição Online",
-      onlineDescription: "Participe do evento de qualquer lugar do mundo com transmissão ao vivo e interação digital."
+      onlineDescription: "Participe do evento de qualquer lugar do mundo com transmissão ao vivo e interação digital.",
+      fullName: "Nome Completo",
+      email: "Email",
+      category: "Categoria",
+      selectCategory: "Selecione a Categoria",
+      couponCode: "Código do Cupom",
+      couponPlaceholder: "Digite o código do cupom",
+      free: "Gratuito",
+      noBatchActive: "Nenhum lote de inscrição ativo",
+      success: {
+        freeRegistration: "Inscrição realizada com sucesso!"
+      },
+      errors: {
+        invalidCoupon: "Código de cupom inválido ou expirado",
+        general: "Erro na inscrição. Tente novamente."
+      }
     },
     about: {
       title: "Sobre o III CIVENI USA 2025",

@@ -18,6 +18,14 @@ export const esTranslations = {
       contact: "Contacto",
       adminArea: "Área Restringida"
     },
+    countdown: {
+      title: "III CIVENI USA 2025",
+      description: "No te pierdas el evento educativo más importante del año",
+      days: "Días",
+      hours: "Horas",
+      minutes: "Minutos",
+      seconds: "Segundos"
+    },
     schedule: {
       title: "Cronograma",
       description: "Consulta la programación completa del III Civeni USA 2025",
@@ -48,14 +56,6 @@ export const esTranslations = {
       onlineSchedule: "Cronograma En Línea",
       onlineScheduleDescription: "Consulta la programación completa para participantes en línea"
     },
-    countdown: {
-      title: "III CIVENI USA 2025",
-      description: "No te pierdas el evento educativo más importante del año",
-      days: "Días",
-      hours: "Horas",
-      minutes: "Minutos",
-      seconds: "Segundos"
-    },
     scheduleSection: {
       title: "Elige Tu Experiencia"
     },
@@ -63,14 +63,33 @@ export const esTranslations = {
       title: "Inscripciones",
       newTitle: "Inscripciones",
       formTitle: "Formulario de Inscripción",
+      presentialFormTitle: "Formulario de Inscripción Presencial",
+      onlineFormTitle: "Formulario de Inscripción En Línea",
       description: "Asegura tu lugar en el evento educativo más importante del año",
       urgent: "Plazas Limitadas",
       mostPopular: "Más Popular",
       registerButton: "Inscribirse Ahora",
+      registerNow: "Inscribirse Ahora",
+      processing: "Procesando...",
       presentialTitle: "Inscripción Presencial",
       presentialDescription: "Participa presencialmente en el evento con networking directo, talleres interactivos y acceso completo a las actividades.",
       onlineTitle: "Inscripción En Línea",
-      onlineDescription: "Participa en el evento desde cualquier lugar del mundo con transmisión en vivo e interacción digital."
+      onlineDescription: "Participa en el evento desde cualquier lugar del mundo con transmisión en vivo e interacción digital.",
+      fullName: "Nombre Completo",
+      email: "Email",
+      category: "Categoría",
+      selectCategory: "Selecciona la Categoría",
+      couponCode: "Código de Cupón",
+      couponPlaceholder: "Ingresa el código de cupón",
+      free: "Gratis",
+      noBatchActive: "No hay lote de inscripción activo",
+      success: {
+        freeRegistration: "¡Inscripción realizada con éxito!"
+      },
+      errors: {
+        invalidCoupon: "Código de cupón inválido o expirado",
+        general: "Error en la inscripción. Inténtalo de nuevo."
+      }
     },
     about: {
       title: "Acerca del III CIVENI USA 2025",
