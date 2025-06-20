@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Video, Plus, Download } from 'lucide-react';
+import { Calendar, MapPin, Video, Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { scheduleSchema, ScheduleFormData } from './schedule/scheduleSchema';
 import { useScheduleOperations } from './schedule/useScheduleOperations';
 import ScheduleTable from './schedule/ScheduleTable';
 import ScheduleFormDialog from './schedule/ScheduleFormDialog';
-import { downloadSchedule } from '@/utils/scheduleUtils';
 
 const ScheduleManager = () => {
   const [selectedType, setSelectedType] = useState<'presencial' | 'online'>('presencial');
@@ -81,11 +80,6 @@ const ScheduleManager = () => {
     togglePublishMutation.mutate({ id, is_published: isPublished });
   };
 
-  const handleDownloadSchedule = () => {
-    const publishedSchedules = schedules?.filter(s => s.is_published) || [];
-    downloadSchedule(publishedSchedules, selectedType);
-  };
-
   return (
     <div className="space-y-6">
       <Card>
@@ -111,16 +105,10 @@ const ScheduleManager = () => {
                   Online
                 </TabsTrigger>
               </TabsList>
-              <div className="flex gap-2">
-                <Button onClick={handleDownloadSchedule} variant="outline" className="flex items-center gap-2">
-                  <Download className="h-4 w-4" />
-                  Download PDF
-                </Button>
-                <Button onClick={() => openCreateDialog(selectedType)} className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Novo Item
-                </Button>
-              </div>
+              <Button onClick={() => openCreateDialog(selectedType)} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Novo Item
+              </Button>
             </div>
 
             <TabsContent value="presencial">

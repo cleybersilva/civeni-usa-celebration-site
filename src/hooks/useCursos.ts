@@ -28,12 +28,11 @@ export const useCursos = () => {
       const { data, error } = await supabase
         .from('cursos')
         .select('*')
-        .order('nome_curso', { ascending: true });
+        .order('nome_curso');
 
       if (error) throw error;
       setCursos(data || []);
     } catch (error: any) {
-      console.error('Error fetching cursos:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -63,25 +62,11 @@ export const useTurmas = (cursoId?: string) => {
         .from('turmas')
         .select('*')
         .eq('id_curso', cursoId)
-        .order('nome_turma', { ascending: true });
+        .order('nome_turma');
 
       if (error) throw error;
-      
-      // Ordenar turmas por número se o nome contém números
-      const sortedTurmas = (data || []).sort((a, b) => {
-        const aNum = parseInt(a.nome_turma.match(/\d+/)?.[0] || '0');
-        const bNum = parseInt(b.nome_turma.match(/\d+/)?.[0] || '0');
-        
-        if (aNum && bNum) {
-          return aNum - bNum;
-        }
-        
-        return a.nome_turma.localeCompare(b.nome_turma);
-      });
-      
-      setTurmas(sortedTurmas);
+      setTurmas(data || []);
     } catch (error: any) {
-      console.error('Error fetching turmas:', error);
       setError(error.message);
     } finally {
       setLoading(false);

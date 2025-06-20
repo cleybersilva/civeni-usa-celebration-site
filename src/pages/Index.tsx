@@ -15,7 +15,7 @@ import Footer from '../components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-white font-poppins p-0 m-0">
+    <div className="min-h-screen bg-white font-poppins">
       <Header />
       <HeroBanner />
       <CountdownTimer />
