@@ -50,7 +50,7 @@ const PartnersSection = () => {
           )}
           
           {academicPartners.length > 0 && (
-            <div>
+            <div className="mb-16">
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
                 {t('partners.academicPartners')}
               </h3>
@@ -77,26 +77,28 @@ const PartnersSection = () => {
           )}
 
           {sponsors.length > 0 && (
-            <div className="mt-16">
+            <div className="mb-16">
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
                 Patrocinadores
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {sponsors.map((sponsor, index) => (
-                  <div
-                    key={index}
-                    className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-105"
-                  >
-                    <div className="bg-white rounded-xl shadow-md p-6 h-32 flex flex-col items-center justify-center group-hover:shadow-xl group-hover:bg-gray-50 transition-all duration-300">
-                      <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">
-                        {sponsor.logo}
+              <div className="flex justify-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl">
+                  {sponsors.map((sponsor, index) => (
+                    <div
+                      key={index}
+                      className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-105"
+                    >
+                      <div className="bg-white rounded-xl shadow-md p-6 h-32 flex flex-col items-center justify-center group-hover:shadow-xl group-hover:bg-gray-50 transition-all duration-300">
+                        <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">
+                          {sponsor.logo}
+                        </div>
+                        <h4 className="text-xs font-semibold text-gray-700 text-center leading-tight">
+                          {sponsor.name}
+                        </h4>
                       </div>
-                      <h4 className="text-xs font-semibold text-gray-700 text-center leading-tight">
-                        {sponsor.name}
-                      </h4>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
