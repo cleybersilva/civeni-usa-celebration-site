@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, User, MapPin, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Schedule {
   id: string;
@@ -23,6 +24,8 @@ interface ScheduleCardProps {
 }
 
 const ScheduleCard: React.FC<ScheduleCardProps> = ({ schedule }) => {
+  const { t } = useTranslation();
+
   const getCategoryColor = (category: string) => {
     const colors = {
       palestra: 'bg-blue-500',
@@ -86,7 +89,7 @@ const ScheduleCard: React.FC<ScheduleCardProps> = ({ schedule }) => {
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Info className="w-4 h-4 mr-1" />
-                + info
+                {t('schedule.moreInfo')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">

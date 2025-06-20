@@ -7,8 +7,10 @@ import ScheduleDay from '@/components/schedule/ScheduleDay';
 import ScheduleEmpty from '@/components/schedule/ScheduleEmpty';
 import { useScheduleData } from '@/hooks/useScheduleData';
 import { downloadSchedule } from '@/utils/scheduleUtils';
+import { useTranslation } from 'react-i18next';
 
 const ScheduleInPerson = () => {
+  const { t } = useTranslation();
   const {
     isLoading,
     selectedDate,
@@ -32,10 +34,10 @@ const ScheduleInPerson = () => {
         <div className="w-full p-0 m-0">
           <div className="text-center mb-8 px-6">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Cronograma - Presencial
+              {t('schedule.inPersonTitle')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Programação completa para os participantes presenciais do III Civeni USA 2025
+              {t('schedule.inPersonDescription')}
             </p>
           </div>
 
@@ -54,7 +56,7 @@ const ScheduleInPerson = () => {
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Carregando cronograma...</p>
+              <p className="mt-4 text-gray-600">{t('schedule.loading')}</p>
             </div>
           ) : (
             <div className="space-y-6 px-6">

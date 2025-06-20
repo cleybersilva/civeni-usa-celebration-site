@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 interface ScheduleFiltersProps {
   selectedDate: string;
@@ -24,6 +25,8 @@ const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
   categories,
   onDownload,
 }) => {
+  const { t } = useTranslation();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString + 'T00:00:00');
     return format(date, 'dd/MM/yyyy', { locale: ptBR });
@@ -38,7 +41,7 @@ const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
             onClick={() => setSelectedDate('')}
             size="sm"
           >
-            Todas as Datas
+            {t('schedule.allDates')}
           </Button>
           {uniqueDates.map(date => (
             <Button
@@ -60,7 +63,7 @@ const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
             onClick={() => setSelectedCategory('')}
             size="sm"
           >
-            Todas as Categorias
+            {t('schedule.allCategories')}
           </Button>
           {categories.map(category => (
             <Button
@@ -79,7 +82,7 @@ const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
       <div className="flex justify-center">
         <Button onClick={onDownload} className="flex items-center gap-2">
           <Download className="w-4 h-4" />
-          Download Cronograma
+          {t('schedule.downloadSchedule')}
         </Button>
       </div>
     </div>

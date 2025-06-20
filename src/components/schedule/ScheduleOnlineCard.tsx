@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, User, Globe, Info, Play, Video } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Schedule {
   id: string;
@@ -27,6 +28,8 @@ interface ScheduleOnlineCardProps {
 }
 
 const ScheduleOnlineCard: React.FC<ScheduleOnlineCardProps> = ({ schedule }) => {
+  const { t } = useTranslation();
+
   const getCategoryColor = (category: string) => {
     const colors = {
       palestra: 'bg-blue-500',
@@ -73,7 +76,7 @@ const ScheduleOnlineCard: React.FC<ScheduleOnlineCardProps> = ({ schedule }) => 
               </Badge>
               {live && (
                 <Badge className="bg-red-500 text-white animate-pulse">
-                  AO VIVO
+                  {t('schedule.live')}
                 </Badge>
               )}
             </div>
@@ -104,7 +107,7 @@ const ScheduleOnlineCard: React.FC<ScheduleOnlineCardProps> = ({ schedule }) => 
                 >
                   <a href={schedule.virtual_link} target="_blank" rel="noopener noreferrer">
                     <Play className="w-4 h-4 mr-1" />
-                    {live ? 'Assistir Agora' : 'Acessar Sala'}
+                    {live ? t('schedule.watchNow') : t('schedule.accessRoom')}
                   </a>
                 </Button>
               )}
@@ -117,7 +120,7 @@ const ScheduleOnlineCard: React.FC<ScheduleOnlineCardProps> = ({ schedule }) => 
                 >
                   <a href={schedule.recording_url} target="_blank" rel="noopener noreferrer">
                     <Video className="w-4 h-4 mr-1" />
-                    Ver Gravação
+                    {t('schedule.viewRecording')}
                   </a>
                 </Button>
               )}
@@ -140,7 +143,7 @@ const ScheduleOnlineCard: React.FC<ScheduleOnlineCardProps> = ({ schedule }) => 
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Info className="w-4 h-4 mr-1" />
-                + info
+                {t('schedule.moreInfo')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
