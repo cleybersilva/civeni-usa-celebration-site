@@ -30,52 +30,58 @@ const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
   };
 
   return (
-    <div className="mb-8 flex flex-wrap gap-4 justify-center">
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant={selectedDate === '' ? 'default' : 'outline'}
-          onClick={() => setSelectedDate('')}
-          size="sm"
-        >
-          Todas as Datas
-        </Button>
-        {uniqueDates.map(date => (
+    <div className="mb-8 px-0">
+      <div className="flex flex-wrap gap-4 justify-center mb-4">
+        <div className="flex flex-wrap gap-2">
           <Button
-            key={date}
-            variant={selectedDate === date ? 'default' : 'outline'}
-            onClick={() => setSelectedDate(date)}
+            variant={selectedDate === '' ? 'default' : 'outline'}
+            onClick={() => setSelectedDate('')}
             size="sm"
           >
-            {formatDate(date)}
+            Todas as Datas
           </Button>
-        ))}
+          {uniqueDates.map(date => (
+            <Button
+              key={date}
+              variant={selectedDate === date ? 'default' : 'outline'}
+              onClick={() => setSelectedDate(date)}
+              size="sm"
+            >
+              {formatDate(date)}
+            </Button>
+          ))}
+        </div>
       </div>
       
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant={selectedCategory === '' ? 'default' : 'outline'}
-          onClick={() => setSelectedCategory('')}
-          size="sm"
-        >
-          Todas as Categorias
-        </Button>
-        {categories.map(category => (
+      <div className="flex flex-wrap gap-4 justify-center mb-4">
+        <div className="flex flex-wrap gap-2">
           <Button
-            key={category}
-            variant={selectedCategory === category ? 'default' : 'outline'}
-            onClick={() => setSelectedCategory(category)}
+            variant={selectedCategory === '' ? 'default' : 'outline'}
+            onClick={() => setSelectedCategory('')}
             size="sm"
-            className="capitalize"
           >
-            {category}
+            Todas as Categorias
           </Button>
-        ))}
+          {categories.map(category => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory(category)}
+              size="sm"
+              className="capitalize"
+            >
+              {category}
+            </Button>
+          ))}
+        </div>
       </div>
 
-      <Button onClick={onDownload} className="flex items-center gap-2">
-        <Download className="w-4 h-4" />
-        Download Cronograma
-      </Button>
+      <div className="flex justify-center">
+        <Button onClick={onDownload} className="flex items-center gap-2">
+          <Download className="w-4 h-4" />
+          Download Cronograma
+        </Button>
+      </div>
     </div>
   );
 };

@@ -33,6 +33,7 @@ export const useCursos = () => {
       if (error) throw error;
       setCursos(data || []);
     } catch (error: any) {
+      console.error('Error fetching cursos:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -67,6 +68,7 @@ export const useTurmas = (cursoId?: string) => {
       if (error) throw error;
       setTurmas(data || []);
     } catch (error: any) {
+      console.error('Error fetching turmas:', error);
       setError(error.message);
     } finally {
       setLoading(false);

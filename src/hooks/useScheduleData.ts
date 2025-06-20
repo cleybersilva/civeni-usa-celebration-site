@@ -10,6 +10,7 @@ export const useScheduleData = (type: 'presencial' | 'online') => {
   const { data: schedules, isLoading } = useQuery({
     queryKey: ['schedules', type],
     queryFn: async () => {
+      console.log(`Fetching schedules for type: ${type}`);
       const { data, error } = await supabase
         .from('schedules')
         .select('*')
@@ -18,9 +19,16 @@ export const useScheduleData = (type: 'presencial' | 'online') => {
         .order('date', { ascending: true })
         .order('start_time', { ascending: true });
       
-      if (error) throw error;
-      return data;
-    }
+      if (error) {
+        console.error('Error fetching schedules:', error);
+        throw error;
+      }
+      
+      console.log(`Fetched ${data?.length || 0} schedules for ${type}`);
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 
   const uniqueDates = [...new Set(schedules?.map(s => s.date))].sort();

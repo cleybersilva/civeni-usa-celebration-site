@@ -28,8 +28,8 @@ const ScheduleInPerson = () => {
     <div className="min-h-screen bg-white">
       <Header />
       
-      <main className="pt-20">
-        <div className="w-full">
+      <main className="pt-20 px-0">
+        <div className="w-full px-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Cronograma - Presencial
@@ -55,7 +55,7 @@ const ScheduleInPerson = () => {
               <p className="mt-4 text-gray-600">Carregando cronograma...</p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 px-0">
               {uniqueDates.map(date => {
                 const daySchedules = filteredSchedules?.filter(s => s.date === date);
                 if (!daySchedules?.length) return null;
