@@ -63,11 +63,13 @@ export const useChartData = () => {
         return date.toISOString().split('T')[0];
       }).reverse();
 
+      // Inicializar todos os dias com zero
       last7Days.forEach(date => {
         dailyRegistrations[date] = 0;
         dailyRevenue[date] = 0;
       });
 
+      // Processar registros
       registrations?.forEach(reg => {
         const regDate = reg.created_at.split('T')[0];
         if (dailyRegistrations.hasOwnProperty(regDate)) {
@@ -82,11 +84,12 @@ export const useChartData = () => {
       const weeklyRegistrations: { [key: string]: number } = {};
       const weeklyRevenue: { [key: string]: number } = {};
       
-      for (let i = 0; i < 4; i++) {
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - (i * 7));
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
+      const now = new Date();
+      for (let i = 3; i >= 0; i--) {
+        const weekEnd = new Date(now);
+        weekEnd.setDate(now.getDate() - (i * 7));
+        const weekStart = new Date(weekEnd);
+        weekStart.setDate(weekEnd.getDate() - 6);
         
         const weekKey = `Sem ${4 - i}`;
         weeklyRegistrations[weekKey] = 0;
@@ -116,13 +119,26 @@ export const useChartData = () => {
         }
       });
 
-      // Formatear dados para os gráficos
+      // Se não há dados de lote, criar dados de exemplo
+      if (Object.keys(batchRegistrations).length === 0) {
+        batchRegistrations['Lote 1'] = 0;
+        batchRegistrations['Lote 2'] = 0;
+        batchRevenue['Lote 1'] = 0;
+        batchRevenue['Lote 2'] = 0;
+      }
+
+      // Formatar dados para os gráficos
+      const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      
       setRegistrationCharts({
-        daily: last7Days.map(date => ({
-          name: new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' }),
-          inscricoes: dailyRegistrations[date],
-          periodo: date
-        })),
+        daily: last7Days.map(date => {
+          const dateObj = new Date(date);
+          return {
+            name: dayNames[dateObj.getDay()],
+            inscricoes: dailyRegistrations[date],
+            periodo: date
+          };
+        }),
         weekly: Object.entries(weeklyRegistrations).map(([week, count]) => ({
           name: week,
           inscricoes: count,
@@ -136,11 +152,14 @@ export const useChartData = () => {
       });
 
       setRevenueCharts({
-        daily: last7Days.map(date => ({
-          name: new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' }),
-          faturamento: dailyRevenue[date],
-          periodo: date
-        })),
+        daily: last7Days.map(date => {
+          const dateObj = new Date(date);
+          return {
+            name: dayNames[dateObj.getDay()],
+            faturamento: dailyRevenue[date],
+            periodo: date
+          };
+        }),
         weekly: Object.entries(weeklyRevenue).map(([week, revenue]) => ({
           name: week,
           faturamento: revenue,
