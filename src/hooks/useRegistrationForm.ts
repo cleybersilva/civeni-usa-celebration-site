@@ -1,0 +1,115 @@
+
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
+import { RegistrationFormData } from '@/types/registration';
+import { getCurrency } from '@/utils/registrationUtils';
+
+export const useRegistrationForm = (registrationType?: 'presencial' | 'online') => {
+  const { i18n, t } = useTranslation();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const [formData, setFormData] = useState<RegistrationFormData>({
+    email: '',
+    fullName: '',
+    participantType: '',
+    categoryId: '',
+    cursoId: '',
+    turmaId: '',
+    couponCode: ''
+  });
+
+  const validateCoupon = async (couponCode: string) => {
+    if (!couponCode) return null;
+    
+    try {
+      const { data, error } = await supabase
+        .from('coupon_codes')
+        .select('*')
+        .eq('code', couponCode)
+        .eq('is_active', true)
+        .single();
+      
+      if (error) throw error;
+      
+      if (data && (data.usage_limit === null || (data.used_count || 0) < data.usage_limit)) {
+        return { is_valid: true, coupon_id: data.id, category_id: data.category_id };
+      }
+      
+      return { is_valid: false };
+    } catch (error) {
+      console.error('Error validating coupon:', error);
+      return { is_valid: false };
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent, currentBatch: any) => {
+    e.preventDefault();
+    if (!currentBatch || !formData.categoryId) return;
+    
+    if (formData.participantType === 'vccu_student' && (!formData.cursoId || !formData.turmaId)) {
+      setError('Para alunos da VCCU, os campos Curso e Turma são obrigatórios.');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      let validCoupon = null;
+      if (formData.couponCode) {
+        validCoupon = await validateCoupon(formData.couponCode);
+        if (!validCoupon?.is_valid) {
+          throw new Error(t('registration.errors.invalidCoupon'));
+        }
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-registration-payment', {
+        body: {
+          email: formData.email,
+          fullName: formData.fullName,
+          categoryId: formData.categoryId,
+          batchId: currentBatch.id,
+          couponCode: formData.couponCode,
+          cursoId: formData.cursoId || null,
+          turmaId: formData.turmaId || null,
+          participantType: formData.participantType,
+          registrationType: registrationType || 'geral',
+          currency: getCurrency(i18n.language)
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.payment_required === false) {
+        alert(t('registration.success.freeRegistration'));
+        setFormData({ 
+          email: '', 
+          fullName: '', 
+          participantType: '',
+          categoryId: '', 
+          cursoId: '',
+          turmaId: '',
+          couponCode: '' 
+        });
+      } else if (data.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      setError(error.message || t('registration.errors.general'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    formData,
+    setFormData,
+    loading,
+    error,
+    setError,
+    handleSubmit
+  };
+};
