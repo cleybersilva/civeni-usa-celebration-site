@@ -1,147 +1,163 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import SpeakersManager from '@/components/admin/SpeakersManager';
-import BannerManager from '@/components/admin/BannerManager';
-import RegistrationManager from '@/components/admin/RegistrationManager';
-import EventConfigManager from '@/components/admin/EventConfigManager';
-import SiteTextsManager from '@/components/admin/SiteTextsManager';
-import VenueConfigManager from '@/components/admin/VenueConfigManager';
-import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
-import PartnersManager from '@/components/admin/PartnersManager';
-import VideosManager from '@/components/admin/VideosManager';
-import DashboardOverview from '@/components/admin/AdminDashboard';
-import UsersManager from '@/components/admin/UsersManager';
-import ScheduleManager from '@/components/admin/ScheduleManager';
-import PermissionGuard from '@/components/admin/PermissionGuard';
+import BannerManager from './BannerManager';
+import SpeakersManager from './SpeakersManager';
+import PartnersManager from './PartnersManager';
+import VideosManager from './VideosManager';
+import EventConfigManager from './EventConfigManager';
+import VenueConfigManager from './VenueConfigManager';
+import OnlineConfigManager from './OnlineConfigManager';
+import SiteTextsManager from './SiteTextsManager';
+import ScheduleManager from './ScheduleManager';
+import RegistrationManager from './RegistrationManager';
+import CouponManager from './CouponManager';
+import FinancialDashboard from './FinancialDashboard';
+import UsersManager from './UsersManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
-  const { hasPermission, isAdminRoot, user } = useAdminAuth();
+  const { user } = useAdminAuth();
 
-  // Verificar se o usuário pode ver a guia Financeiro (apenas Admin Root e Admin)
-  const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
+  if (!user) return null;
 
-  // Verificar se o usuário pode ver a guia Usuários (apenas Admin Root e Admin)
-  const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
-
-  // Definir a guia padrão baseada no tipo de usuário
-  const getDefaultTab = () => {
-    if (user?.user_type === 'editor') {
-      return 'contador';
+  const hasPermission = (resource: string) => {
+    if (user.user_type === 'admin_root') return true;
+    if (user.user_type === 'admin') {
+      return ['banner', 'contador', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'].includes(resource);
     }
-    if (canViewFinanceiro) {
-      return 'financeiro';
+    if (user.user_type === 'design') {
+      return ['banner', 'palestrantes', 'videos'].includes(resource);
     }
-    return 'banner';
+    if (user.user_type === 'editor') {
+      return ['contador', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'].includes(resource);
+    }
+    return false;
   };
 
+  const isAdminRoot = () => user.user_type === 'admin_root';
+  const canViewFinanceiro = user.user_type === 'admin_root' || user.user_type === 'admin';
+  const canViewUsuarios = user.user_type === 'admin_root';
+
   return (
-    <Tabs defaultValue={getDefaultTab()} className="space-y-12">
-      <TabsList className="grid w-full grid-cols-7 lg:grid-cols-12">
-        {canViewFinanceiro && <TabsTrigger value="financeiro">Financeiro</TabsTrigger>}
-        {(hasPermission('banner') || isAdminRoot()) && <TabsTrigger value="banner">Banner</TabsTrigger>}
-        {(hasPermission('contador') || isAdminRoot()) && <TabsTrigger value="contador">Contador</TabsTrigger>}
-        {(hasPermission('cronograma') || isAdminRoot()) && <TabsTrigger value="cronograma">Cronograma</TabsTrigger>}
-        {(hasPermission('inscricoes') || isAdminRoot()) && <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>}
-        {(hasPermission('local') || isAdminRoot()) && <TabsTrigger value="local">Local</TabsTrigger>}
-        {(hasPermission('online') || isAdminRoot()) && <TabsTrigger value="online">Online</TabsTrigger>}
-        {(hasPermission('palestrantes') || isAdminRoot()) && <TabsTrigger value="palestrantes">Palestrantes</TabsTrigger>}
-        {(hasPermission('parceiros') || isAdminRoot()) && <TabsTrigger value="parceiros">Parceiros</TabsTrigger>}
-        {(hasPermission('textos') || isAdminRoot()) && <TabsTrigger value="textos">Textos</TabsTrigger>}
-        {(hasPermission('videos') || isAdminRoot()) && <TabsTrigger value="videos">Vídeos</TabsTrigger>}
-        {canViewUsuarios && <TabsTrigger value="usuarios">Usuários</TabsTrigger>}
+    <Tabs defaultValue="banner" className="w-full">
+      <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
+        {canViewFinanceiro && (
+          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+        )}
+        {hasPermission('banner') && (
+          <TabsTrigger value="banner">Banner</TabsTrigger>
+        )}
+        {hasPermission('contador') && (
+          <TabsTrigger value="contador">Contador</TabsTrigger>
+        )}
+        {hasPermission('cronograma') && (
+          <TabsTrigger value="cronograma">Cronograma</TabsTrigger>
+        )}
+        {hasPermission('cupons') && (
+          <TabsTrigger value="cupons">Cupons</TabsTrigger>
+        )}
+        {hasPermission('inscricoes') && (
+          <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
+        )}
+        {hasPermission('local') && (
+          <TabsTrigger value="local">Local</TabsTrigger>
+        )}
+        {hasPermission('online') && (
+          <TabsTrigger value="online">Online</TabsTrigger>
+        )}
+        {hasPermission('palestrantes') && (
+          <TabsTrigger value="palestrantes">Palestrantes</TabsTrigger>
+        )}
+        {hasPermission('parceiros') && (
+          <TabsTrigger value="parceiros">Parceiros</TabsTrigger>
+        )}
+        {hasPermission('textos') && (
+          <TabsTrigger value="textos">Textos</TabsTrigger>
+        )}
+        {canViewUsuarios && (
+          <TabsTrigger value="usuarios">Usuários</TabsTrigger>
+        )}
+        {hasPermission('videos') && (
+          <TabsTrigger value="videos">Vídeos</TabsTrigger>
+        )}
       </TabsList>
 
       {canViewFinanceiro && (
         <TabsContent value="financeiro">
-          <DashboardOverview />
+          <FinancialDashboard />
         </TabsContent>
       )}
 
-      {(hasPermission('banner') || isAdminRoot()) && (
+      {hasPermission('banner') && (
         <TabsContent value="banner">
-          <PermissionGuard resource="banner">
-            <BannerManager />
-          </PermissionGuard>
+          <BannerManager />
         </TabsContent>
       )}
 
-      {(hasPermission('contador') || isAdminRoot()) && (
+      {hasPermission('contador') && (
         <TabsContent value="contador">
-          <PermissionGuard resource="contador">
-            <EventConfigManager />
-          </PermissionGuard>
+          <EventConfigManager />
         </TabsContent>
       )}
 
-      {(hasPermission('cronograma') || isAdminRoot()) && (
+      {hasPermission('cronograma') && (
         <TabsContent value="cronograma">
-          <PermissionGuard resource="cronograma">
-            <ScheduleManager />
-          </PermissionGuard>
+          <ScheduleManager />
         </TabsContent>
       )}
 
-      {(hasPermission('inscricoes') || isAdminRoot()) && (
+      {hasPermission('cupons') && (
+        <TabsContent value="cupons">
+          <CouponManager />
+        </TabsContent>
+      )}
+
+      {hasPermission('inscricoes') && (
         <TabsContent value="inscricoes">
-          <PermissionGuard resource="inscricoes">
-            <RegistrationManager />
-          </PermissionGuard>
+          <RegistrationManager />
         </TabsContent>
       )}
 
-      {(hasPermission('local') || isAdminRoot()) && (
+      {hasPermission('local') && (
         <TabsContent value="local">
-          <PermissionGuard resource="local">
-            <VenueConfigManager />
-          </PermissionGuard>
+          <VenueConfigManager />
         </TabsContent>
       )}
 
-      {(hasPermission('online') || isAdminRoot()) && (
+      {hasPermission('online') && (
         <TabsContent value="online">
-          <PermissionGuard resource="online">
-            <OnlineConfigManager />
-          </PermissionGuard>
+          <OnlineConfigManager />
         </TabsContent>
       )}
 
-      {(hasPermission('palestrantes') || isAdminRoot()) && (
+      {hasPermission('palestrantes') && (
         <TabsContent value="palestrantes">
-          <PermissionGuard resource="palestrantes">
-            <SpeakersManager />
-          </PermissionGuard>
+          <SpeakersManager />
         </TabsContent>
       )}
 
-      {(hasPermission('parceiros') || isAdminRoot()) && (
+      {hasPermission('parceiros') && (
         <TabsContent value="parceiros">
-          <PermissionGuard resource="parceiros">
-            <PartnersManager />
-          </PermissionGuard>
+          <PartnersManager />
         </TabsContent>
       )}
 
-      {(hasPermission('textos') || isAdminRoot()) && (
+      {hasPermission('textos') && (
         <TabsContent value="textos">
-          <PermissionGuard resource="textos">
-            <SiteTextsManager />
-          </PermissionGuard>
-        </TabsContent>
-      )}
-
-      {(hasPermission('videos') || isAdminRoot()) && (
-        <TabsContent value="videos">
-          <PermissionGuard resource="videos">
-            <VideosManager />
-          </PermissionGuard>
+          <SiteTextsManager />
         </TabsContent>
       )}
 
       {canViewUsuarios && (
         <TabsContent value="usuarios">
           <UsersManager />
+        </TabsContent>
+      )}
+
+      {hasPermission('videos') && (
+        <TabsContent value="videos">
+          <VideosManager />
         </TabsContent>
       )}
     </Tabs>

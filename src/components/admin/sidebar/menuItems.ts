@@ -12,6 +12,7 @@ import {
   Type,
   Play,
   Settings,
+  Tag,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -53,60 +54,67 @@ export const createMenuItems = (
       order: 3
     },
     {
+      id: 'cupons',
+      label: 'Cupons',
+      icon: Tag,
+      show: hasPermission('inscricoes') || isAdminRoot(),
+      order: 4
+    },
+    {
       id: 'inscricoes',
       label: 'Inscrições',
       icon: UserPlus,
       show: hasPermission('inscricoes') || isAdminRoot(),
-      order: 4
+      order: 5
     },
     {
       id: 'local',
       label: 'Local',
       icon: MapPin,
       show: hasPermission('local') || isAdminRoot(),
-      order: 5
+      order: 6
     },
     {
       id: 'online',
       label: 'Online',
       icon: Monitor,
       show: hasPermission('online') || isAdminRoot(),
-      order: 6
+      order: 7
     },
     {
       id: 'palestrantes',
       label: 'Palestrantes',
       icon: Users,
       show: hasPermission('palestrantes') || isAdminRoot(),
-      order: 7
+      order: 8
     },
     {
       id: 'parceiros',
       label: 'Parceiros',
       icon: Handshake,
       show: hasPermission('parceiros') || isAdminRoot(),
-      order: 8
+      order: 9
     },
     {
       id: 'textos',
       label: 'Textos',
       icon: Type,
       show: hasPermission('textos') || isAdminRoot(),
-      order: 9
+      order: 10
     },
     {
       id: 'usuarios',
       label: 'Usuários',
       icon: Settings,
       show: canViewUsuarios,
-      order: 10
+      order: 11
     },
     {
       id: 'videos',
       label: 'Vídeos',
       icon: Play,
       show: hasPermission('videos') || isAdminRoot(),
-      order: 11
+      order: 12
     }
   ];
 };

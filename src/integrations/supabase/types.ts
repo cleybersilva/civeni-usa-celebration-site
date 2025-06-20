@@ -77,6 +77,9 @@ export type Database = {
           category_id: string | null
           code: string
           created_at: string
+          description: string | null
+          discount_type: string | null
+          discount_value: number | null
           id: string
           is_active: boolean | null
           updated_at: string
@@ -87,6 +90,9 @@ export type Database = {
           category_id?: string | null
           code: string
           created_at?: string
+          description?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
           id?: string
           is_active?: boolean | null
           updated_at?: string
@@ -97,6 +103,9 @@ export type Database = {
           category_id?: string | null
           code?: string
           created_at?: string
+          description?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
           id?: string
           is_active?: boolean | null
           updated_at?: string
