@@ -87,6 +87,9 @@ export const esTranslations = {
       selectCourse: "Selecciona el Curso",
       class: "Clase",
       selectClass: "Selecciona la Clase",
+      currentBatch: "Lote Actual",
+      daysRemaining: "Días Restantes",
+      validUntil: "Válido Hasta",
       success: {
         freeRegistration: "¡Inscripción realizada con éxito!"
       },
@@ -115,7 +118,13 @@ export const esTranslations = {
       next: "Siguiente"
     },
     videos: {
-      title: "Videos del II Civeni 2024"
+      title: "Videos del II Civeni 2024",
+      watchVideo: "Ver Video",
+      minimize: "Minimizar",
+      maximize: "Maximizar",
+      openYoutube: "Abrir en YouTube",
+      close: "Cerrar",
+      registerButton: "Inscribirse Ahora"
     },
     hybrid: {
       title: "Formato Híbrido",
@@ -131,7 +140,7 @@ export const esTranslations = {
       oralDesc: "Comparte y descubre los últimos hallazgos de investigación",
       whyChoose: "¿Por qué Elegir Nuestro Formato Híbrido?",
       inPersonBenefits: "Beneficios Presenciales",
-      onlineBenefits: "Beneficios En Línea",
+      onlineBenefits: "Beneficios En Lín ea",
       directNetworking: "Oportunidades de networking directo",
       handsOnWorkshops: "Talleres prácticos",
       accessExhibition: "Acceso al área de exposición",

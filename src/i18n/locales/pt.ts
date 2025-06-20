@@ -87,6 +87,9 @@ export const ptTranslations = {
       selectCourse: "Selecione o Curso",
       class: "Turma",
       selectClass: "Selecione a Turma",
+      currentBatch: "Lote Atual",
+      daysRemaining: "Dias Restantes",
+      validUntil: "Válido Até",
       success: {
         freeRegistration: "Inscrição realizada com sucesso!"
       },
@@ -115,7 +118,13 @@ export const ptTranslations = {
       next: "Próximo"
     },
     videos: {
-      title: "Vídeos do II Civeni 2024"
+      title: "Vídeos do II Civeni 2024",
+      watchVideo: "Assistir Vídeo",
+      minimize: "Minimizar",
+      maximize: "Maximizar",
+      openYoutube: "Abrir no YouTube",
+      close: "Fechar",
+      registerButton: "Inscrever-se Agora"
     },
     hybrid: {
       title: "Formato Híbrido",

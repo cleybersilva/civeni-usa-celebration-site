@@ -87,6 +87,9 @@ export const enTranslations = {
       selectCourse: "Select Course",
       class: "Class",
       selectClass: "Select Class",
+      currentBatch: "Current Batch",
+      daysRemaining: "Days Remaining",
+      validUntil: "Valid Until",
       success: {
         freeRegistration: "Registration completed successfully!"
       },
@@ -115,7 +118,13 @@ export const enTranslations = {
       next: "Next"
     },
     videos: {
-      title: "Videos from II Civeni 2024"
+      title: "Videos from II Civeni 2024",
+      watchVideo: "Watch Video",
+      minimize: "Minimize",
+      maximize: "Maximize",
+      openYoutube: "Open in YouTube",
+      close: "Close",
+      registerButton: "Register Now"
     },
     hybrid: {
       title: "Hybrid Format",

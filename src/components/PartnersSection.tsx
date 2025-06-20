@@ -7,9 +7,10 @@ const PartnersSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
   
-  const organizers = content.partners.filter(p => p.type === 'organizer');
-  const academicPartners = content.partners.filter(p => p.type === 'academic');
-  const sponsors = content.partners.filter(p => p.type === 'sponsor');
+  // Filter out "Hope & Justice" from all partner types
+  const organizers = content.partners.filter(p => p.type === 'organizer' && !p.name.includes('Hope & Justice'));
+  const academicPartners = content.partners.filter(p => p.type === 'academic' && !p.name.includes('Hope & Justice'));
+  const sponsors = content.partners.filter(p => p.type === 'sponsor' && !p.name.includes('Hope & Justice'));
 
   return (
     <section className="py-20 bg-gray-50">
