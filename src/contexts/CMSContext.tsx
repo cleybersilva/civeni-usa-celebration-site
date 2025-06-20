@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { CMSContent, CMSContextType, SiteTexts, Speaker, Video, Partner, BannerSlide, EventConfig, OnlineConfig, VenueConfig } from './types';
+import { CMSContent, CMSContextType, SiteTexts, Speaker, Video, Partner, BannerSlide, EventConfig, OnlineConfig, VenueConfig, RegistrationTier } from './types';
 import { defaultContent } from './defaultContent';
 import { fetchPartners, updatePartnersInDatabase } from './partnerService';
 
