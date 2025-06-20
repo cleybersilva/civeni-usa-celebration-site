@@ -1,4 +1,3 @@
-
 export const ptTranslations = {
   translation: {
     header: {
@@ -17,6 +16,34 @@ export const ptTranslations = {
       registration: "Inscrições",
       contact: "Contato",
       adminArea: "Área Restrita"
+    },
+    contact: {
+      title: "Entre em Contato",
+      description: "Estamos aqui para ajudar. Entre em contato conosco para dúvidas, informações ou sugestões.",
+      formTitle: "Formulário de Contato",
+      contactInfo: "Informações de Contato",
+      location: "Nossa Localização",
+      fullName: "Nome Completo",
+      email: "E-mail",
+      phone: "Telefone",
+      phoneOptional: "Digite seu telefone (opcional)",
+      subject: "Assunto",
+      selectSubject: "Selecione o assunto",
+      message: "Mensagem",
+      messagePlaceholder: "Digite sua mensagem",
+      sendMessage: "Enviar Mensagem",
+      sending: "Enviando...",
+      address: "Endereço:",
+      addressLine1: "800 Celebration Ave. Unit 305&306",
+      addressLine2: "Celebration, FL 34747 - EUA",
+      subjects: {
+        doubts: "Dúvidas",
+        information: "Informações",
+        suggestions: "Sugestões",
+        complaint: "Reclamação"
+      },
+      success: "Mensagem enviada com sucesso! Entraremos em contato em breve.",
+      error: "Erro ao enviar mensagem. Tente novamente."
     },
     countdown: {
       title: "III CIVENI USA 2025",

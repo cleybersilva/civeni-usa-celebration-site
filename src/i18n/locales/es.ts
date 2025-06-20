@@ -1,4 +1,3 @@
-
 export const esTranslations = {
   translation: {
     header: {
@@ -17,6 +16,34 @@ export const esTranslations = {
       registration: "Inscripciones",
       contact: "Contacto",
       adminArea: "Área Restringida"
+    },
+    contact: {
+      title: "Contáctanos",
+      description: "Estamos aquí para ayudar. Contáctanos para dudas, información o sugerencias.",
+      formTitle: "Formulario de Contacto",
+      contactInfo: "Información de Contacto",
+      location: "Nuestra Ubicación",
+      fullName: "Nombre Completo",
+      email: "Email",
+      phone: "Teléfono",
+      phoneOptional: "Ingresa tu teléfono (opcional)",
+      subject: "Asunto",
+      selectSubject: "Selecciona el asunto",
+      message: "Mensaje",
+      messagePlaceholder: "Ingresa tu mensaje",
+      sendMessage: "Enviar Mensaje",
+      sending: "Enviando...",
+      address: "Dirección:",
+      addressLine1: "800 Celebration Ave. Unit 305&306",
+      addressLine2: "Celebration, FL 34747 - EUA",
+      subjects: {
+        doubts: "Dudas",
+        information: "Información",
+        suggestions: "Sugerencias",
+        complaint: "Queja"
+      },
+      success: "¡Mensaje enviado exitosamente! Te contactaremos pronto.",
+      error: "Error al enviar mensaje. Inténtalo de nuevo."
     },
     countdown: {
       title: "III CIVENI USA 2025",
@@ -140,7 +167,7 @@ export const esTranslations = {
       oralDesc: "Comparte y descubre los últimos hallazgos de investigación",
       whyChoose: "¿Por qué Elegir Nuestro Formato Híbrido?",
       inPersonBenefits: "Beneficios Presenciales",
-      onlineBenefits: "Beneficios En Lín ea",
+      onlineBenefits: "Beneficios En Línea",
       directNetworking: "Oportunidades de networking directo",
       handsOnWorkshops: "Talleres prácticos",
       accessExhibition: "Acceso al área de exposición",

@@ -21,10 +21,10 @@ const Contato = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const subjects = [
-    { value: 'duvidas', label: 'Dúvidas' },
-    { value: 'informacoes', label: 'Informações' },
-    { value: 'sugestoes', label: 'Sugestões' },
-    { value: 'reclamacao', label: 'Reclamação' }
+    { value: 'duvidas', label: t('contact.subjects.doubts') },
+    { value: 'informacoes', label: t('contact.subjects.information') },
+    { value: 'sugestoes', label: t('contact.subjects.suggestions') },
+    { value: 'reclamacao', label: t('contact.subjects.complaint') }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +38,7 @@ const Contato = () => {
       // Simulação de envio
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+      alert(t('contact.success'));
       setFormData({
         fullName: '',
         email: '',
@@ -47,7 +47,7 @@ const Contato = () => {
         message: ''
       });
     } catch (error) {
-      alert('Erro ao enviar mensagem. Tente novamente.');
+      alert(t('contact.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -68,10 +68,10 @@ const Contato = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-              Entre em Contato
+              {t('contact.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Estamos aqui para ajudar. Entre em contato conosco para dúvidas, informações ou sugestões.
+              {t('contact.description')}
             </p>
           </div>
           
@@ -79,19 +79,19 @@ const Contato = () => {
             {/* Formulário de Contato */}
             <div className="bg-white rounded-2xl shadow-lg p-8">
               <h2 className="text-2xl font-bold text-civeni-blue mb-6 font-poppins text-center">
-                Formulário de Contato
+                {t('contact.formTitle')}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nome Completo *
+                    {t('contact.fullName')} *
                   </label>
                   <Input
                     type="text"
                     value={formData.fullName}
                     onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    placeholder="Digite seu nome completo"
+                    placeholder={t('contact.fullName')}
                     required
                     className="w-full"
                   />
@@ -99,13 +99,13 @@ const Contato = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    E-mail *
+                    {t('contact.email')} *
                   </label>
                   <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="Digite seu e-mail"
+                    placeholder={t('contact.email')}
                     required
                     className="w-full"
                   />
@@ -113,24 +113,24 @@ const Contato = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Telefone
+                    {t('contact.phone')}
                   </label>
                   <Input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Digite seu telefone (opcional)"
+                    placeholder={t('contact.phoneOptional')}
                     className="w-full"
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Assunto *
+                    {t('contact.subject')} *
                   </label>
                   <Select value={formData.subject} onValueChange={(value) => handleInputChange('subject', value)}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione o assunto" />
+                      <SelectValue placeholder={t('contact.selectSubject')} />
                     </SelectTrigger>
                     <SelectContent>
                       {subjects.map((subject) => (
@@ -144,12 +144,12 @@ const Contato = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mensagem *
+                    {t('contact.message')} *
                   </label>
                   <Textarea
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
-                    placeholder="Digite sua mensagem"
+                    placeholder={t('contact.messagePlaceholder')}
                     required
                     rows={5}
                     className="w-full"
@@ -161,7 +161,7 @@ const Contato = () => {
                   disabled={isSubmitting}
                   className="w-full bg-civeni-blue hover:bg-blue-700 text-white font-semibold py-3"
                 >
-                  {isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
+                  {isSubmitting ? t('contact.sending') : t('contact.sendMessage')}
                 </Button>
               </form>
             </div>
@@ -171,32 +171,44 @@ const Contato = () => {
               {/* Informações de Contato */}
               <div className="bg-civeni-blue text-white rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6 font-poppins text-center">
-                  Informações de Contato
+                  {t('contact.contactInfo')}
                 </h2>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
+                <div className="space-y-4 text-center">
+                  <div className="flex flex-col items-center space-y-2">
                     <MapPin className="w-6 h-6 text-civeni-red" />
                     <div>
-                      <p className="font-semibold">Endereço:</p>
-                      <p>800 Celebration Ave. Unit 305&306</p>
-                      <p>Celebration, FL 34747 - EUA</p>
+                      <p className="font-semibold">{t('contact.address')}</p>
+                      <p>{t('contact.addressLine1')}</p>
+                      <p>{t('contact.addressLine2')}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col items-center space-y-2">
                     <Mail className="w-6 h-6 text-civeni-red" />
                     <div>
-                      <p className="font-semibold">E-mail:</p>
-                      <p>contact@civeni.com</p>
+                      <p className="font-semibold">{t('contact.email')}:</p>
+                      <a 
+                        href="mailto:contact@civeni.com" 
+                        className="hover:text-civeni-red transition-colors"
+                      >
+                        contact@civeni.com
+                      </a>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col items-center space-y-2">
                     <Phone className="w-6 h-6 text-civeni-red" />
                     <div>
-                      <p className="font-semibold">Telefone:</p>
-                      <p>+1 (407) 555-0123</p>
+                      <p className="font-semibold">{t('contact.phone')}:</p>
+                      <a 
+                        href="https://wa.me/14075550123" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hover:text-civeni-red transition-colors"
+                      >
+                        +1 (407) 555-0123
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -206,7 +218,7 @@ const Contato = () => {
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div className="p-4 bg-civeni-blue text-white">
                   <h3 className="text-lg font-bold font-poppins text-center">
-                    Nossa Localização
+                    {t('contact.location')}
                   </h3>
                 </div>
                 <div className="aspect-video">
@@ -218,7 +230,7 @@ const Contato = () => {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Localização III CIVENI 2025"
+                    title={t('contact.location')}
                   />
                 </div>
               </div>
