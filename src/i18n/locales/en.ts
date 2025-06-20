@@ -1,20 +1,8 @@
 
-import { header } from './en/header';
-import { contact } from './en/contact';
-import { countdown } from './en/countdown';
-import { schedule } from './en/schedule';
-import { registration } from './en/registration';
-import { content } from './en/content';
-import { footer } from './en/footer';
+import { enTranslations } from './en';
 
 export const en = {
-  ...header,
-  ...contact,
-  ...countdown,
-  ...schedule,
-  ...registration,
-  ...content,
-  ...footer,
+  ...enTranslations.translation,
   common: {
     loading: "Loading...",
     error: "Error",

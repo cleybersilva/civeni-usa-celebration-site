@@ -1,5 +1,5 @@
 
-export const headerTranslations = {
+export const header = {
   header: {
     congress: "Congress",
     presentation: "Presentation",

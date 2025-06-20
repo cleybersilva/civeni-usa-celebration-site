@@ -1,5 +1,5 @@
 
-export const registrationTranslations = {
+export const registration = {
   registration: {
     title: "Registration",
     newTitle: "Registration",

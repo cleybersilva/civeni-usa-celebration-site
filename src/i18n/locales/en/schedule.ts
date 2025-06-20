@@ -1,5 +1,5 @@
 
-export const scheduleTranslations = {
+export const schedule = {
   schedule: {
     title: "Schedule",
     description: "Check out the complete schedule for III Civeni USA 2025",
