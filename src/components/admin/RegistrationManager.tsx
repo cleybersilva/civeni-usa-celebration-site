@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { useRegistrationCategories, RegistrationCategory } from '@/hooks/useRegistrationCategories';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CouponManager from './CouponManager';
 
 const RegistrationManager = () => {
   const { categories, loading, createCategory, updateCategory, deleteCategory } = useRegistrationCategories();
@@ -103,152 +105,167 @@ const RegistrationManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Categorias de Inscrição</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar Categoria
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {editingCategory ? 'Editar Categoria' : 'Adicionar Categoria'}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="category_name" className="block text-sm font-medium mb-2">
-                  Nome da Categoria
-                </Label>
-                <Input
-                  id="category_name"
-                  value={formData.category_name}
-                  onChange={(e) => setFormData({...formData, category_name: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="price_brl" className="block text-sm font-medium mb-2">
-                  Preço (R$)
-                </Label>
-                <Input
-                  id="price_brl"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.price_brl}
-                  onChange={(e) => setFormData({...formData, price_brl: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="requires_proof"
-                  checked={formData.requires_proof}
-                  onCheckedChange={(checked) => setFormData({...formData, requires_proof: checked})}
-                />
-                <Label htmlFor="requires_proof" className="text-sm font-medium">
-                  Requer comprovação
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_exempt"
-                  checked={formData.is_exempt}
-                  onCheckedChange={(checked) => setFormData({...formData, is_exempt: checked})}
-                />
-                <Label htmlFor="is_exempt" className="text-sm font-medium">
-                  Categoria isenta
-                </Label>
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancelar
+      <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Inscrições</h2>
+      
+      <Tabs defaultValue="categories" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="categories">Categorias</TabsTrigger>
+          <TabsTrigger value="coupons">Cupons</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="categories" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-semibold text-civeni-blue">Categorias de Inscrição</h3>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Categoria
                 </Button>
-                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                  {editingCategory ? 'Atualizar' : 'Adicionar'}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingCategory ? 'Editar Categoria' : 'Adicionar Categoria'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="category_name" className="block text-sm font-medium mb-2">
+                      Nome da Categoria
+                    </Label>
+                    <Input
+                      id="category_name"
+                      value={formData.category_name}
+                      onChange={(e) => setFormData({...formData, category_name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="price_brl" className="block text-sm font-medium mb-2">
+                      Preço (R$)
+                    </Label>
+                    <Input
+                      id="price_brl"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.price_brl}
+                      onChange={(e) => setFormData({...formData, price_brl: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="requires_proof"
+                      checked={formData.requires_proof}
+                      onCheckedChange={(checked) => setFormData({...formData, requires_proof: checked})}
+                    />
+                    <Label htmlFor="requires_proof" className="text-sm font-medium">
+                      Requer comprovação
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_exempt"
+                      checked={formData.is_exempt}
+                      onCheckedChange={(checked) => setFormData({...formData, is_exempt: checked})}
+                    />
+                    <Label htmlFor="is_exempt" className="text-sm font-medium">
+                      Categoria isenta
+                    </Label>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                      {editingCategory ? 'Atualizar' : 'Adicionar'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Categorias de Inscrição ({categories.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {categories.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              Nenhuma categoria cadastrada. Clique em "Adicionar Categoria" para começar.
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome da Categoria</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Requer Comprovação</TableHead>
-                  <TableHead>Isenta</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {categories.map((category) => (
-                  <TableRow key={category.id}>
-                    <TableCell className="font-medium">
-                      {category.category_name}
-                    </TableCell>
-                    <TableCell>
-                      {category.is_exempt ? (
-                        <span className="text-green-600 font-semibold">GRATUITO</span>
-                      ) : (
-                        formatCurrency(category.price_brl)
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {category.requires_proof ? (
-                        <span className="text-blue-600">Sim</span>
-                      ) : (
-                        <span className="text-gray-500">Não</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {category.is_exempt ? (
-                        <span className="text-green-600">Sim</span>
-                      ) : (
-                        <span className="text-gray-500">Não</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(category)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(category.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Categorias de Inscrição ({categories.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {categories.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Nenhuma categoria cadastrada. Clique em "Adicionar Categoria" para começar.
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome da Categoria</TableHead>
+                      <TableHead>Preço</TableHead>
+                      <TableHead>Requer Comprovação</TableHead>
+                      <TableHead>Isenta</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {categories.map((category) => (
+                      <TableRow key={category.id}>
+                        <TableCell className="font-medium">
+                          {category.category_name}
+                        </TableCell>
+                        <TableCell>
+                          {category.is_exempt ? (
+                            <span className="text-green-600 font-semibold">GRATUITO</span>
+                          ) : (
+                            formatCurrency(category.price_brl)
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {category.requires_proof ? (
+                            <span className="text-blue-600">Sim</span>
+                          ) : (
+                            <span className="text-gray-500">Não</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {category.is_exempt ? (
+                            <span className="text-green-600">Sim</span>
+                          ) : (
+                            <span className="text-gray-500">Não</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(category)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDelete(category.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="coupons">
+          <CouponManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

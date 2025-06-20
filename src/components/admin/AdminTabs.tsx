@@ -11,7 +11,6 @@ import OnlineConfigManager from './OnlineConfigManager';
 import SiteTextsManager from './SiteTextsManager';
 import ScheduleManager from './ScheduleManager';
 import RegistrationManager from './RegistrationManager';
-import CouponManager from './CouponManager';
 import FinancialDashboard from './FinancialDashboard';
 import UsersManager from './UsersManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -53,9 +52,6 @@ const AdminTabs = () => {
         )}
         {hasPermission('cronograma') && (
           <TabsTrigger value="cronograma">Cronograma</TabsTrigger>
-        )}
-        {(hasPermission('cupons') || hasPermission('inscricoes')) && (
-          <TabsTrigger value="cupons">Cupons</TabsTrigger>
         )}
         {hasPermission('inscricoes') && (
           <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
@@ -104,12 +100,6 @@ const AdminTabs = () => {
       {hasPermission('cronograma') && (
         <TabsContent value="cronograma">
           <ScheduleManager />
-        </TabsContent>
-      )}
-
-      {(hasPermission('cupons') || hasPermission('inscricoes')) && (
-        <TabsContent value="cupons">
-          <CouponManager />
         </TabsContent>
       )}
 
