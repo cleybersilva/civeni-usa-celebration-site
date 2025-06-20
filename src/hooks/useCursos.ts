@@ -28,7 +28,7 @@ export const useCursos = () => {
       const { data, error } = await supabase
         .from('cursos')
         .select('*')
-        .order('nome_curso');
+        .order('nome_curso', { ascending: true });
 
       if (error) throw error;
       setCursos(data || []);
@@ -62,7 +62,7 @@ export const useTurmas = (cursoId?: string) => {
         .from('turmas')
         .select('*')
         .eq('id_curso', cursoId)
-        .order('nome_turma');
+        .order('nome_turma', { ascending: true });
 
       if (error) throw error;
       setTurmas(data || []);

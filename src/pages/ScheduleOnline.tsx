@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Calendar, Clock, Globe, User, Info, Play, Video } from 'lucide-react';
+import { Calendar, Clock, Globe, User, Info, Play, Video, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -76,13 +76,38 @@ const ScheduleOnline = () => {
     return now > endDate;
   };
 
+  const downloadSchedule = () => {
+    const scheduleData = filteredSchedules?.map(schedule => ({
+      data: formatDate(schedule.date),
+      horario: `${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}`,
+      titulo: schedule.title,
+      categoria: schedule.category,
+      palestrante: schedule.speaker_name || '',
+      plataforma: schedule.platform || '',
+      link: schedule.virtual_link || '',
+      descricao: schedule.description || ''
+    }));
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "Data,Horário,Título,Categoria,Palestrante,Plataforma,Link,Descrição\n"
+      + scheduleData?.map(row => Object.values(row).join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "cronograma_online.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
       
       <main className="pt-20">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center mb-8">
+        <div className="w-full">
+          <div className="text-center mb-8 px-4">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Cronograma - Online
             </h1>
@@ -92,7 +117,7 @@ const ScheduleOnline = () => {
           </div>
 
           {/* Filtros */}
-          <div className="mb-8 flex flex-wrap gap-4 justify-center">
+          <div className="mb-8 flex flex-wrap gap-4 justify-center px-4">
             <div className="flex flex-wrap gap-2">
               <Button
                 variant={selectedDate === '' ? 'default' : 'outline'}
@@ -133,6 +158,11 @@ const ScheduleOnline = () => {
                 </Button>
               ))}
             </div>
+
+            <Button onClick={downloadSchedule} className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              Download Cronograma
+            </Button>
           </div>
 
           {/* Cronograma */}
@@ -142,7 +172,7 @@ const ScheduleOnline = () => {
               <p className="mt-4 text-gray-600">Carregando cronograma...</p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 px-4">
               {uniqueDates.map(date => {
                 const daySchedules = filteredSchedules?.filter(s => s.date === date);
                 if (!daySchedules?.length) return null;
