@@ -32,11 +32,11 @@ const ScheduleOnline = () => {
       
       <main className="pt-20 p-0 m-0">
         <div className="container mx-auto px-4">
-          <div className="text-left mb-8">
+          <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               {t('schedule.onlineTitle')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               {t('schedule.onlineDescription')}
             </p>
           </div>
