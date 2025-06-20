@@ -79,7 +79,10 @@ export const enTranslations = {
         learnMore: "Learn More"
       },
       speakers: {
-        title: "Featured Speakers"
+        title: "Featured Speakers",
+        description: "Meet our renowned international speakers",
+        previous: "Previous",
+        next: "Next"
       },
       videos: {
         title: "Videos from II Civeni 2024"
@@ -109,10 +112,38 @@ export const enTranslations = {
         interactiveQA: "Interactive Q&A sessions"
       },
       venue: {
-        title: "Venue & Location"
+        title: "Venue & Location",
+        description: "Join us at our state-of-the-art venue in Celebration, Florida",
+        inPersonVenue: "In-Person Venue",
+        onlinePlatform: "Online Platform",
+        facilities: "Facilities",
+        features: "Features",
+        gettingTo: "Getting to the Venue",
+        byAir: "By Air",
+        byCar: "By Car",
+        accommodation: "Accommodation",
+        airportDesc: "Orlando International Airport is 30 minutes away",
+        carDesc: "Free parking available on-site",
+        hotelDesc: "Partner hotels with special rates available"
       },
       partners: {
-        title: "Our Partners"
+        title: "Our Partners",
+        organizedBy: "Organized By",
+        academicPartners: "Academic Partners",
+        becomePartner: "Become a Partner",
+        partnerDesc: "Join us in shaping the future of education",
+        partnerButton: "Partner with Us"
+      },
+      footer: {
+        quickLinks: "Quick Links",
+        contactInfo: "Contact Information",
+        about: "About",
+        schedule: "Schedule",
+        speakers: "Speakers",
+        registration: "Registration",
+        contact: "Contact",
+        copyright: "© 2025 III CIVENI USA. All rights reserved.",
+        privacyPolicy: "Privacy Policy"
       }
     }
   }

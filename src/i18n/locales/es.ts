@@ -79,7 +79,10 @@ export const esTranslations = {
         learnMore: "Conoce Más"
       },
       speakers: {
-        title: "Ponentes Destacados"
+        title: "Ponentes Destacados",
+        description: "Conoce a nuestros reconocidos ponentes internacionales",
+        previous: "Anterior",
+        next: "Siguiente"
       },
       videos: {
         title: "Videos del II Civeni 2024"
@@ -109,10 +112,38 @@ export const esTranslations = {
         interactiveQA: "Sesiones interactivas de preguntas"
       },
       venue: {
-        title: "Sede y Ubicación"
+        title: "Sede y Ubicación",
+        description: "Únete a nosotros en nuestra sede de última generación en Celebration, Florida",
+        inPersonVenue: "Sede Presencial",
+        onlinePlatform: "Plataforma En Línea",
+        facilities: "Instalaciones",
+        features: "Características",
+        gettingTo: "Cómo Llegar a la Sede",
+        byAir: "En Avión",
+        byCar: "En Coche",
+        accommodation: "Alojamiento",
+        airportDesc: "El Aeropuerto Internacional de Orlando está a 30 minutos",
+        carDesc: "Estacionamiento gratuito disponible en el lugar",
+        hotelDesc: "Hoteles asociados con tarifas especiales disponibles"
       },
       partners: {
-        title: "Nuestros Socios"
+        title: "Nuestros Socios",
+        organizedBy: "Organizado Por",
+        academicPartners: "Socios Académicos",
+        becomePartner: "Conviértete en Socio",
+        partnerDesc: "Únete a nosotros en la formación del futuro de la educación",
+        partnerButton: "Asóciate con Nosotros"
+      },
+      footer: {
+        quickLinks: "Enlaces Rápidos",
+        contactInfo: "Información de Contacto",
+        about: "Acerca de",
+        schedule: "Cronograma",
+        speakers: "Ponentes",
+        registration: "Inscripciones",
+        contact: "Contacto",
+        copyright: "© 2025 III CIVENI USA. Todos los derechos reservados.",
+        privacyPolicy: "Política de Privacidad"
       }
     }
   }
