@@ -1,5 +1,10 @@
+
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-createRoot(document.getElementById("root")!).render(<App />);
+const root = document.getElementById("root")!;
+root.style.padding = '0';
+root.style.margin = '0';
+
+createRoot(root).render(<App />);

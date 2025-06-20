@@ -4,19 +4,16 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewRegistrationSection from '@/components/NewRegistrationSection';
 import { useTranslation } from 'react-i18next';
-import { useCMS } from '@/contexts/CMSContext';
 
 const InscricaoOnline = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-civeni-red to-red-700 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
+        <div className="w-full text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 font-poppins">
             {t('registration.onlineTitle', 'Inscrição Online')}
           </h1>
@@ -26,12 +23,10 @@ const InscricaoOnline = () => {
         </div>
       </section>
 
-      {/* Registration Form */}
       <NewRegistrationSection registrationType="online" />
       
-      {/* Online Schedule */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="w-full">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
               {t('schedule.onlineSchedule', 'Cronograma Online')}

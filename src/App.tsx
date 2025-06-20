@@ -33,8 +33,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/cronograma/presencial" element={<ScheduleInPerson />} />
-                <Route path="/cronograma/online" element={<ScheduleOnline />} />
+                <Route path="/cronograma-presencial" element={<ScheduleInPerson />} />
+                <Route path="/cronograma-online" element={<ScheduleOnline />} />
                 <Route path="/inscricao-presencial" element={<InscricaoPresencial />} />
                 <Route path="/inscricao-online" element={<InscricaoOnline />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />

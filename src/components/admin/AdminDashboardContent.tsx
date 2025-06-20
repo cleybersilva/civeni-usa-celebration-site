@@ -33,6 +33,7 @@ const AdminDashboardContent = () => {
   // Escutar mudanças de aba vindas do sidebar
   useEffect(() => {
     const handleTabChange = (event: CustomEvent) => {
+      console.log('Tab changed to:', event.detail.activeTab);
       setActiveTab(event.detail.activeTab);
     };
 
@@ -47,6 +48,8 @@ const AdminDashboardContent = () => {
   const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
 
   const renderTabContent = () => {
+    console.log('Rendering tab content for:', activeTab);
+    
     switch (activeTab) {
       case 'financeiro':
         return canViewFinanceiro ? <DashboardOverview /> : null;
@@ -73,6 +76,7 @@ const AdminDashboardContent = () => {
         ) : null;
       
       case 'cronograma':
+        console.log('Rendering ScheduleManager for cronograma tab');
         return (hasPermission('cronograma') || isAdminRoot()) ? (
           <PermissionGuard resource="cronograma">
             <ScheduleManager />

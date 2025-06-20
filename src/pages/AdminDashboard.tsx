@@ -9,17 +9,27 @@ const AdminDashboardInner = () => {
   const { user } = useAdminAuth();
 
   if (!user) {
-    return <AdminLoginForm />;
+    return (
+      <div className="p-0 m-0">
+        <AdminLoginForm />
+      </div>
+    );
   }
 
-  return <AdminDashboardContent />;
+  return (
+    <div className="p-0 m-0">
+      <AdminDashboardContent />
+    </div>
+  );
 };
 
 const AdminDashboard = () => {
   return (
     <AdminAuthProvider>
       <CMSProvider>
-        <AdminDashboardInner />
+        <div className="p-0 m-0">
+          <AdminDashboardInner />
+        </div>
       </CMSProvider>
     </AdminAuthProvider>
   );
