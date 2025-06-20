@@ -1,217 +1,82 @@
 
-export const enTranslations = {
-  translation: {
-    header: {
-      congress: "Congress",
-      presentation: "Presentation",
-      committee: "Committee",
-      schedule: "Schedule",
-      inPerson: "In Person",
-      online: "Online",
-      papers: "Papers",
-      oralPresentation: "Oral Presentation",
-      posterSessions: "Poster Sessions",
-      manuscripts: "Manuscripts",
-      thematicAreas: "Thematic Areas",
-      speakers: "Speakers",
-      registration: "Registration",
-      contact: "Contact",
-      adminArea: "Restricted Area"
-    },
-    contact: {
-      title: "Contact Us",
-      description: "We're here to help. Contact us for questions, information, or suggestions.",
-      formTitle: "Contact Form",
-      contactInfo: "Contact Information",
-      location: "Our Location",
-      fullName: "Full Name",
-      email: "Email",
-      phone: "Phone",
-      phoneOptional: "Enter your phone (optional)",
-      subject: "Subject",
-      selectSubject: "Select subject",
-      message: "Message",
-      messagePlaceholder: "Enter your message",
-      sendMessage: "Send Message",
-      sending: "Sending...",
-      address: "Address:",
-      addressLine1: "800 Celebration Ave. Unit 305&306",
-      addressLine2: "Celebration, FL 34747 - USA",
-      subjects: {
-        doubts: "Questions",
-        information: "Information",
-        suggestions: "Suggestions",
-        complaint: "Complaint"
-      },
-      success: "Message sent successfully! We'll contact you soon.",
-      error: "Error sending message. Please try again."
-    },
-    countdown: {
-      title: "III CIVENI USA 2025",
-      description: "Don't miss the most important educational event of the year",
-      days: "Days",
-      hours: "Hours",
-      minutes: "Minutes",
-      seconds: "Seconds"
-    },
-    schedule: {
-      title: "Schedule",
-      description: "Check out the complete schedule for III Civeni USA 2025",
-      inPersonTitle: "Schedule - In Person",
-      inPersonDescription: "Complete programming for in-person participants of III Civeni USA 2025",
-      onlineTitle: "Schedule - Online",
-      onlineDescription: "Specific schedule of activities for remote participants of III Civeni USA 2025",
-      loading: "Loading schedule...",
-      noSchedule: "No schedule available",
-      downloadSchedule: "Download Schedule",
-      allDates: "All Dates",
-      allCategories: "All Categories",
-      watchNow: "Watch Now",
-      accessRoom: "Access Room",
-      viewRecording: "View Recording",
-      live: "LIVE",
-      moreInfo: "+ info",
-      inPersonButton: "View In-Person Schedule",
-      onlineButton: "View Online Schedule",
-      faceToFaceNetworking: "Face-to-face networking",
-      interactiveWorkshops: "Interactive workshops",
-      exhibitionStands: "Exhibition stands",
-      liveStreaming: "Live streaming",
-      qaSessions: "Q&A sessions",
-      digitalCertificate: "Digital certificate",
-      inPersonSchedule: "In-Person Schedule",
-      inPersonScheduleDescription: "Check the complete schedule for in-person participants",
-      onlineSchedule: "Online Schedule",
-      onlineScheduleDescription: "Check the complete schedule for online participants"
-    },
-    scheduleSection: {
-      title: "Choose Your Experience"
-    },
-    registration: {
-      title: "Registration",
-      newTitle: "Registration",
-      formTitle: "Registration Form",
-      presentialFormTitle: "In-Person Registration Form",
-      onlineFormTitle: "Online Registration Form",
-      description: "Secure your spot at the most important educational event of the year",
-      urgent: "Limited Spots Available",
-      mostPopular: "Most Popular",
-      registerButton: "Register Now",
-      registerNow: "Register Now",
-      processing: "Processing...",
-      presentialTitle: "In-Person Registration",
-      presentialDescription: "Participate in-person at the event with direct networking, interactive workshops and full access to activities.",
-      onlineTitle: "Online Registration",
-      onlineDescription: "Participate in the event from anywhere in the world with live streaming and digital interaction.",
-      fullName: "Full Name",
-      email: "Email",
-      category: "Category",
-      selectCategory: "Select Category",
-      couponCode: "Coupon Code",
-      couponPlaceholder: "Enter coupon code",
-      free: "Free",
-      noBatchActive: "No active registration batch",
-      course: "Course",
-      selectCourse: "Select Course",
-      class: "Class",
-      selectClass: "Select Class",
-      currentBatch: "Current Batch",
-      daysRemaining: "Days Remaining",
-      validUntil: "Valid Until",
-      success: {
-        freeRegistration: "Registration completed successfully!"
-      },
-      errors: {
-        invalidCoupon: "Invalid or expired coupon code",
-        general: "Registration error. Please try again."
-      }
-    },
-    about: {
-      title: "About III CIVENI USA 2025",
-      description: "The III International Congress of Educational Innovation and New Technologies is the premier event bringing together educators, researchers, and technology professionals from around the world.",
-      highlight1Title: "3 Days of Innovation",
-      highlight1Desc: "Immersive experience with the latest educational trends",
-      highlight2Title: "International Speakers",
-      highlight2Desc: "Renowned experts sharing cutting-edge knowledge",
-      highlight3Title: "Hybrid Format",
-      highlight3Desc: "Participate in-person or online according to your preference",
-      highlight4Title: "Networking",
-      highlight4Desc: "Connect with professionals from around the world",
-      learnMore: "Learn More"
-    },
-    speakers: {
-      title: "Featured Speakers",
-      description: "Meet our renowned international speakers",
-      previous: "Previous",
-      next: "Next"
-    },
-    videos: {
-      title: "Videos from II Civeni 2024",
-      watchVideo: "Watch Video",
-      minimize: "Minimize",
-      maximize: "Maximize",
-      openYoutube: "Open in YouTube",
-      close: "Close",
-      registerButton: "Register Now"
-    },
-    hybrid: {
-      title: "Hybrid Format",
-      description: "Experience the best of both worlds with our innovative hybrid format",
-      choose: "Choose Your Experience",
-      exhibitionStands: "Exhibition Stands",
-      exhibitionDesc: "Explore innovative solutions from leading companies",
-      keynoteLectures: "Keynote Lectures",
-      keynoteDesc: "Inspiring presentations from world-renowned experts",
-      panelDiscussions: "Panel Discussions",
-      panelDesc: "Engaging debates on current educational topics",
-      oralCommunications: "Oral Communications",
-      oralDesc: "Share and discover the latest research findings",
-      whyChoose: "Why Choose Our Hybrid Format?",
-      inPersonBenefits: "In-Person Benefits",
-      onlineBenefits: "Online Benefits",
-      directNetworking: "Direct networking opportunities",
-      handsOnWorkshops: "Hands-on workshops",
-      accessExhibition: "Access to exhibition area",
-      faceToFaceInteractions: "Face-to-face interactions",
-      globalAccessibility: "Global accessibility",
-      costEffective: "Cost-effective participation",
-      recordedSessions: "Recorded sessions available",
-      interactiveQA: "Interactive Q&A sessions"
-    },
-    venue: {
-      title: "Venue & Location",
-      description: "Join us at our state-of-the-art venue in Celebration, Florida",
-      inPersonVenue: "In-Person Venue",
-      onlinePlatform: "Online Platform",
-      facilities: "Facilities",
-      features: "Features",
-      gettingTo: "Getting to the Venue",
-      byAir: "By Air",
-      byCar: "By Car",
-      accommodation: "Accommodation",
-      airportDesc: "Orlando International Airport is 30 minutes away",
-      carDesc: "Free parking available on-site",
-      hotelDesc: "Partner hotels with special rates available"
-    },
-    partners: {
-      title: "Our Partners",
-      organizedBy: "Organized By",
-      academicPartners: "Academic Partners",
-      sponsors: "Sponsors",
-      becomePartner: "Become a Partner",
-      partnerDesc: "Join us in shaping the future of education",
-      partnerButton: "Partner with Us"
-    },
-    footer: {
-      quickLinks: "Quick Links",
-      contactInfo: "Contact Information",
-      about: "About",
-      schedule: "Schedule",
-      speakers: "Speakers",
-      registration: "Registration",
-      contact: "Contact",
-      copyright: "© 2025 III CIVENI USA. All rights reserved.",
-      privacyPolicy: "Privacy Policy"
-    }
+import { header } from './en/header';
+import { contact } from './en/contact';
+import { countdown } from './en/countdown';
+import { schedule } from './en/schedule';
+import { registration } from './en/registration';
+import { content } from './en/content';
+import { footer } from './en/footer';
+
+export const en = {
+  ...header,
+  ...contact,
+  ...countdown,
+  ...schedule,
+  ...registration,
+  ...content,
+  ...footer,
+  common: {
+    loading: "Loading...",
+    error: "Error",
+    save: "Save",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    back: "Back",
+    next: "Next",
+    previous: "Previous",
+    close: "Close",
+    search: "Search",
+    filter: "Filter",
+    clear: "Clear",
+    apply: "Apply",
+    reset: "Reset",
+    submit: "Submit",
+    edit: "Edit",
+    delete: "Delete",
+    add: "Add",
+    remove: "Remove",
+    view: "View",
+    download: "Download",
+    upload: "Upload",
+    select: "Select",
+    selectAll: "Select All",
+    deselectAll: "Deselect All",
+    yes: "Yes",
+    no: "No",
+    ok: "OK",
+    backToHome: "Back to Home"
+  },
+  speakers: {
+    title: "Speakers",
+    description: "Meet our distinguished speakers who will share their knowledge and experience.",
+    noSpeakers: "Speakers will be announced soon."
+  },
+  videos: {
+    title: "Videos",
+    description: "Watch presentations and highlights from previous events.",
+    noVideos: "Videos will be available soon."
+  },
+  venue: {
+    title: "Event Venue",
+    description: "Information about the event location and facilities.",
+    address: "Address",
+    phone: "Phone",
+    email: "Email",
+    website: "Website",
+    parking: "Parking",
+    accommodation: "Accommodation",
+    nearbyAirport: "Nearby Airport",
+    facilities: "Facilities"
+  },
+  partners: {
+    title: "Partners",
+    description: "Our institutional partners and sponsors.",
+    organizers: "Organizers",
+    academic: "Academic Partners",
+    sponsors: "Sponsors"
+  },
+  about: {
+    title: "About the Congress",
+    description: "Learn more about our international multidisciplinary congress."
   }
 };
