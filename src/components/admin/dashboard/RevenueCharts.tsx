@@ -112,32 +112,44 @@ const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps)
           <CardTitle className="text-lg">Faturamento por Lote</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
-          <div className="w-full h-[280px] flex items-center justify-center">
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <Pie
-                    data={batchData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value, percent }) => 
-                      `${name}: ${formatCurrency(value)} (${(percent * 100).toFixed(0)}%)`
-                    }
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="faturamento"
-                  >
-                    {batchData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Faturamento']} />}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+          <div className="w-full space-y-4">
+            <div className="flex justify-center">
+              <div className="grid grid-cols-1 gap-2 text-sm">
+                {batchData.map((entry, index) => (
+                  <div key={entry.name} className="flex items-center justify-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span className="font-medium">{entry.name}:</span>
+                    <span>{formatCurrency(entry.faturamento)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="w-full h-[200px] flex items-center justify-center">
+              <ChartContainer config={chartConfig} className="w-full h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                    <Pie
+                      data={batchData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="faturamento"
+                    >
+                      {batchData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip 
+                      content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Faturamento']} />}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </div>
           </div>
         </CardContent>
       </Card>
