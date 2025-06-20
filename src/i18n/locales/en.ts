@@ -34,6 +34,33 @@ export const enTranslations = {
         viewRecording: "View Recording",
         live: "LIVE",
         moreInfo: "+ info"
+      },
+      countdown: {
+        title: "countdown.title"
+      },
+      scheduleSection: {
+        title: "schedule.title"
+      },
+      registration: {
+        title: "registration.new.title"
+      },
+      about: {
+        title: "about.title"
+      },
+      speakers: {
+        title: "speakers.title"
+      },
+      videos: {
+        title: "Videos from II Civeni 2024"
+      },
+      hybrid: {
+        title: "hybrid.title"
+      },
+      venue: {
+        title: "venue.title"
+      },
+      partners: {
+        title: "Our Partners"
       }
     }
   }

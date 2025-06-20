@@ -34,6 +34,33 @@ export const ptTranslations = {
         viewRecording: "Ver Gravação",
         live: "AO VIVO",
         moreInfo: "+ info"
+      },
+      countdown: {
+        title: "countdown.title"
+      },
+      scheduleSection: {
+        title: "schedule.title"
+      },
+      registration: {
+        title: "registration.new.title"
+      },
+      about: {
+        title: "about.title"
+      },
+      speakers: {
+        title: "speakers.title"
+      },
+      videos: {
+        title: "Vídeos do II Civeni 2024"
+      },
+      hybrid: {
+        title: "hybrid.title"
+      },
+      venue: {
+        title: "venue.title"
+      },
+      partners: {
+        title: "Nossos Parceiros"
       }
     }
   }
