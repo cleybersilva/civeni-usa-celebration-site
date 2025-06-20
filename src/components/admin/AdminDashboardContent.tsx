@@ -10,6 +10,7 @@ import EventConfigManager from '@/components/admin/EventConfigManager';
 import CopyrightManager from '@/components/admin/CopyrightManager';
 import ScheduleManager from '@/components/admin/ScheduleManager';
 import RegistrationManager from '@/components/admin/RegistrationManager';
+import CouponManager from '@/components/admin/CouponManager';
 import VenueConfigManager from '@/components/admin/VenueConfigManager';
 import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
 import SpeakersManager from '@/components/admin/SpeakersManager';
@@ -76,6 +77,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('cronograma') || isAdminRoot()) ? (
           <PermissionGuard resource="cronograma">
             <ScheduleManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'cupons':
+        return (hasPermission('inscricoes') || isAdminRoot()) ? (
+          <PermissionGuard resource="inscricoes">
+            <CouponManager />
           </PermissionGuard>
         ) : null;
       

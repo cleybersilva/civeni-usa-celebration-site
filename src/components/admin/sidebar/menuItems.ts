@@ -57,7 +57,7 @@ export const createMenuItems = (
       id: 'cupons',
       label: 'Cupons',
       icon: Tag,
-      show: hasPermission('inscricoes') || isAdminRoot(),
+      show: hasPermission('cupons') || hasPermission('inscricoes') || isAdminRoot(),
       order: 4
     },
     {

@@ -54,7 +54,7 @@ const AdminTabs = () => {
         {hasPermission('cronograma') && (
           <TabsTrigger value="cronograma">Cronograma</TabsTrigger>
         )}
-        {hasPermission('cupons') && (
+        {(hasPermission('cupons') || hasPermission('inscricoes')) && (
           <TabsTrigger value="cupons">Cupons</TabsTrigger>
         )}
         {hasPermission('inscricoes') && (
@@ -107,7 +107,7 @@ const AdminTabs = () => {
         </TabsContent>
       )}
 
-      {hasPermission('cupons') && (
+      {(hasPermission('cupons') || hasPermission('inscricoes')) && (
         <TabsContent value="cupons">
           <CouponManager />
         </TabsContent>
