@@ -155,12 +155,30 @@ const Header = () => {
             <div className="hidden lg:flex items-center space-x-8">
               {menuItems.map((item) => (
                 <div key={item.title} className="relative">
-                  <button
-                    onClick={() => setOpenDropdown(openDropdown === item.title ? null : item.title)}
-                    className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
-                  >
-                    {item.title}
-                  </button>
+                  {item.title === t('header.speakers') ? (
+                    <Link
+                      to="/palestrantes"
+                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
+                      onClick={() => setOpenDropdown(null)}
+                    >
+                      {item.title}
+                    </Link>
+                  ) : item.title === t('header.thematicAreas') ? (
+                    <Link
+                      to="/area-tematica"
+                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
+                      onClick={() => setOpenDropdown(null)}
+                    >
+                      {item.title}
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => setOpenDropdown(openDropdown === item.title ? null : item.title)}
+                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
+                    >
+                      {item.title}
+                    </button>
+                  )}
                   
                   {item.items.length > 0 && openDropdown === item.title && (
                     <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-lg border z-50">
@@ -199,12 +217,12 @@ const Header = () => {
             >
               {t('header.registration')}
             </a>
-            <a
-              href="#contact"
+            <Link
+              to="/contato"
               className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
             >
               {t('header.contact')}
-            </a>
+            </Link>
           </div>
         </div>
       </nav>

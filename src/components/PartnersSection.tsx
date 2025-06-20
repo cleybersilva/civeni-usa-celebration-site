@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
@@ -11,6 +10,13 @@ const PartnersSection = () => {
   const organizers = content.partners.filter(p => p.type === 'organizer' && !p.name.includes('Hope & Justice'));
   const academicPartners = content.partners.filter(p => p.type === 'academic' && !p.name.includes('Hope & Justice'));
   const sponsors = content.partners.filter(p => p.type === 'sponsor' && !p.name.includes('Hope & Justice'));
+
+  // Add VCCU as main organizer with the new logo
+  const mainOrganizer = {
+    name: 'VCCU',
+    logo: '/lovable-uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png',
+    type: 'organizer'
+  };
 
   return (
     <section className="py-20 bg-gray-50">
@@ -25,10 +31,32 @@ const PartnersSection = () => {
         </div>
         
         <div className="max-w-6xl mx-auto">
+          {/* Main Organizer - VCCU */}
+          <div className="mb-16">
+            <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
+              {t('partners.organizedBy')}
+            </h3>
+            <div className="flex justify-center items-center">
+              <div className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-110">
+                <div className="bg-white rounded-2xl shadow-lg p-8 w-64 h-40 flex flex-col items-center justify-center group-hover:shadow-2xl group-hover:bg-civeni-blue transition-all duration-300">
+                  <img 
+                    src={mainOrganizer.logo} 
+                    alt={mainOrganizer.name}
+                    className="max-w-full max-h-20 object-contain mb-4"
+                  />
+                  <h4 className="font-bold text-civeni-blue group-hover:text-white transition-colors duration-300 text-sm">
+                    Veni Creator Christian University
+                  </h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Other Organizers */}
           {organizers.length > 0 && (
             <div className="mb-16">
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-                {t('partners.organizedBy')}
+                Organizadores Parceiros
               </h3>
               <div className="flex justify-center items-center space-x-12">
                 {organizers.map((org, index) => (

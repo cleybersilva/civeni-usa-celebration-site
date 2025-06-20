@@ -17,6 +17,9 @@ import RegistrationCanceled from "./pages/RegistrationCanceled";
 import NotFound from "./pages/NotFound";
 import InscricaoPresencial from "./pages/InscricaoPresencial";
 import InscricaoOnline from "./pages/InscricaoOnline";
+import Palestrantes from "./pages/Palestrantes";
+import AreaTematica from "./pages/AreaTematica";
+import Contato from "./pages/Contato";
 
 import './App.css';
 
@@ -37,6 +40,9 @@ function App() {
                 <Route path="/cronograma-online" element={<ScheduleOnline />} />
                 <Route path="/inscricao-presencial" element={<InscricaoPresencial />} />
                 <Route path="/inscricao-online" element={<InscricaoOnline />} />
+                <Route path="/palestrantes" element={<Palestrantes />} />
+                <Route path="/area-tematica" element={<AreaTematica />} />
+                <Route path="/contato" element={<Contato />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="*" element={<NotFound />} />
