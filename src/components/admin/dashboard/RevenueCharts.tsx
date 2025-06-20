@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -113,14 +114,14 @@ const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps)
           <div className="w-full h-[280px] flex items-center justify-center">
             <ChartContainer config={chartConfig} className="w-full h-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                   <Pie
                     data={batchData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={false}
-                    outerRadius={70}
+                    label={({ name, value }) => `${name}: ${formatCurrency(value)}`}
+                    outerRadius={80}
                     fill="#8884d8"
                     dataKey="faturamento"
                   >
