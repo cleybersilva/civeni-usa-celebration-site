@@ -1,5 +1,5 @@
 
-export const footer = {
+export const footerTranslations = {
   footer: {
     quickLinks: "Quick Links",
     contactInfo: "Contact Information",

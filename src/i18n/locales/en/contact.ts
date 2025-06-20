@@ -1,5 +1,5 @@
 
-export const contact = {
+export const contactTranslations = {
   contact: {
     title: "Contact Us",
     description: "We're here to help. Contact us for questions, information, or suggestions.",

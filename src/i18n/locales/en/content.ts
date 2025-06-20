@@ -1,5 +1,5 @@
 
-export const content = {
+export const contentTranslations = {
   about: {
     title: "About III CIVENI USA 2025",
     description: "The III International Congress of Educational Innovation and New Technologies is the premier event bringing together educators, researchers, and technology professionals from around the world.",

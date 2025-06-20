@@ -1,5 +1,5 @@
 
-import { enTranslations } from './en';
+import { enTranslations } from './en/index';
 
 export const en = {
   ...enTranslations.translation,
@@ -68,3 +68,5 @@ export const en = {
     description: "Learn more about our international multidisciplinary congress."
   }
 };
+
+export { enTranslations };
