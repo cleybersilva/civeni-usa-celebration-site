@@ -1,25 +1,15 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCMS } from '@/contexts/CMSContext';
 import { Type, Save } from 'lucide-react';
+import { useSiteTextsForm } from './hooks/useSiteTextsForm';
+import BasicInfoFields from './site-texts/BasicInfoFields';
+import SectionTitlesFields from './site-texts/SectionTitlesFields';
+import SectionDescriptionsFields from './site-texts/SectionDescriptionsFields';
 
 const SiteTextsManager = () => {
-  const { content, updateSiteTexts } = useCMS();
-  const [formData, setFormData] = useState(content.siteTexts);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await updateSiteTexts(formData);
-    alert('Textos do site atualizados com sucesso!');
-  };
-
-  const handleChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const { formData, handleSubmit, handleChange } = useSiteTextsForm();
 
   return (
     <div className="space-y-6">
@@ -36,169 +26,14 @@ const SiteTextsManager = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Título do Site</label>
-                <Input
-                  value={formData.siteTitle}
-                  onChange={(e) => handleChange('siteTitle', e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Email de Contato</label>
-                <Input
-                  type="email"
-                  value={formData.contactEmail}
-                  onChange={(e) => handleChange('contactEmail', e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Telefone de Contato</label>
-                <Input
-                  value={formData.contactPhone}
-                  onChange={(e) => handleChange('contactPhone', e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Copyright do Rodapé</label>
-                <Input
-                  value={formData.footerCopyright}
-                  onChange={(e) => handleChange('footerCopyright', e.target.value)}
-                  required
-                />
-              </div>
-            </div>
+            <BasicInfoFields formData={formData} onChange={handleChange} />
 
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-civeni-red">Seções do Site</h3>
               
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Título - Sobre o Congresso</label>
-                  <Input
-                    value={formData.aboutTitle}
-                    onChange={(e) => handleChange('aboutTitle', e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Título - Programação</label>
-                  <Input
-                    value={formData.scheduleTitle}
-                    onChange={(e) => handleChange('scheduleTitle', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+              <SectionTitlesFields formData={formData} onChange={handleChange} />
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição - Sobre o Congresso</label>
-                <Textarea
-                  value={formData.aboutDescription}
-                  onChange={(e) => handleChange('aboutDescription', e.target.value)}
-                  rows={3}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição - Programação</label>
-                <Textarea
-                  value={formData.scheduleDescription}
-                  onChange={(e) => handleChange('scheduleDescription', e.target.value)}
-                  rows={2}
-                  required
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Título - Palestrantes</label>
-                  <Input
-                    value={formData.speakersTitle}
-                    onChange={(e) => handleChange('speakersTitle', e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Título - Inscrições</label>
-                  <Input
-                    value={formData.registrationTitle}
-                    onChange={(e) => handleChange('registrationTitle', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição - Palestrantes</label>
-                <Textarea
-                  value={formData.speakersDescription}
-                  onChange={(e) => handleChange('speakersDescription', e.target.value)}
-                  rows={2}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição - Inscrições</label>
-                <Textarea
-                  value={formData.registrationDescription}
-                  onChange={(e) => handleChange('registrationDescription', e.target.value)}
-                  rows={2}
-                  required
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Título - Local do Evento</label>
-                  <Input
-                    value={formData.venueTitle}
-                    onChange={(e) => handleChange('venueTitle', e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Título - Parceiros</label>
-                  <Input
-                    value={formData.partnersTitle}
-                    onChange={(e) => handleChange('partnersTitle', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição - Local do Evento</label>
-                <Textarea
-                  value={formData.venueDescription}
-                  onChange={(e) => handleChange('venueDescription', e.target.value)}
-                  rows={2}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Descrição - Parceiros</label>
-                <Textarea
-                  value={formData.partnersDescription}
-                  onChange={(e) => handleChange('partnersDescription', e.target.value)}
-                  rows={2}
-                  required
-                />
-              </div>
+              <SectionDescriptionsFields formData={formData} onChange={handleChange} />
             </div>
 
             <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
