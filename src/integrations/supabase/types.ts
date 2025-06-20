@@ -122,6 +122,27 @@ export type Database = {
           },
         ]
       }
+      cursos: {
+        Row: {
+          created_at: string
+          id: string
+          nome_curso: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_curso: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_curso?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_registrations: {
         Row: {
           amount_paid: number | null
@@ -131,14 +152,17 @@ export type Database = {
           coupon_code: string | null
           created_at: string
           currency: string | null
+          curso_id: string | null
           email: string
           full_name: string
           id: string
           installments: number | null
+          participant_type: string | null
           payment_method: string | null
           payment_status: string | null
           payment_type: string | null
           stripe_session_id: string | null
+          turma_id: string | null
           updated_at: string
         }
         Insert: {
@@ -149,14 +173,17 @@ export type Database = {
           coupon_code?: string | null
           created_at?: string
           currency?: string | null
+          curso_id?: string | null
           email: string
           full_name: string
           id?: string
           installments?: number | null
+          participant_type?: string | null
           payment_method?: string | null
           payment_status?: string | null
           payment_type?: string | null
           stripe_session_id?: string | null
+          turma_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -167,14 +194,17 @@ export type Database = {
           coupon_code?: string | null
           created_at?: string
           currency?: string | null
+          curso_id?: string | null
           email?: string
           full_name?: string
           id?: string
           installments?: number | null
+          participant_type?: string | null
           payment_method?: string | null
           payment_status?: string | null
           payment_type?: string | null
           stripe_session_id?: string | null
+          turma_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -190,6 +220,20 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "registration_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
             referencedColumns: ["id"]
           },
         ]
@@ -378,6 +422,38 @@ export type Database = {
           virtual_link?: string | null
         }
         Relationships: []
+      }
+      turmas: {
+        Row: {
+          created_at: string
+          id: string
+          id_curso: string
+          nome_turma: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          id_curso: string
+          nome_turma: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          id_curso?: string
+          nome_turma?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turmas_id_curso_fkey"
+            columns: ["id_curso"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

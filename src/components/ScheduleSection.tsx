@@ -1,9 +1,19 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const ScheduleSection = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handlePresentialClick = () => {
+    navigate('/inscricao-presencial');
+  };
+
+  const handleOnlineClick = () => {
+    navigate('/inscricao-online');
+  };
 
   return (
     <section className="py-20 bg-gray-50">
@@ -18,7 +28,7 @@ const ScheduleSection = () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div className="group cursor-pointer">
+          <div className="group cursor-pointer" onClick={handlePresentialClick}>
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
               <div className="h-64 bg-gradient-to-br from-civeni-blue to-blue-600 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-black bg-opacity-20"></div>
@@ -50,7 +60,7 @@ const ScheduleSection = () => {
             </div>
           </div>
           
-          <div className="group cursor-pointer">
+          <div className="group cursor-pointer" onClick={handleOnlineClick}>
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
               <div className="h-64 bg-gradient-to-br from-civeni-red to-red-600 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-black bg-opacity-20"></div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCursos, useTurmas } from '@/hooks/useCursos';
 
 interface Batch {
   id: string;
@@ -26,7 +26,11 @@ interface Category {
   is_exempt: boolean;
 }
 
-const NewRegistrationSection = () => {
+interface NewRegistrationSectionProps {
+  registrationType?: 'presencial' | 'online';
+}
+
+const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProps) => {
   const { t, i18n } = useTranslation();
   const [currentBatch, setCurrentBatch] = useState<Batch | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -37,9 +41,16 @@ const NewRegistrationSection = () => {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
+    participantType: '',
     categoryId: '',
+    cursoId: '',
+    turmaId: '',
     couponCode: ''
   });
+
+  // Hooks para cursos e turmas
+  const { cursos } = useCursos();
+  const { turmas } = useTurmas(formData.cursoId);
 
   const getCurrency = () => {
     switch (i18n.language) {
@@ -231,6 +242,12 @@ const NewRegistrationSection = () => {
     e.preventDefault();
     if (!currentBatch || !formData.categoryId) return;
     
+    // Validar campos obrigatórios para alunos VCCU
+    if (formData.participantType === 'vccu_student' && (!formData.cursoId || !formData.turmaId)) {
+      setError('Para alunos da VCCU, os campos Curso e Turma são obrigatórios.');
+      return;
+    }
+    
     setLoading(true);
     setError('');
     
@@ -251,6 +268,10 @@ const NewRegistrationSection = () => {
           categoryId: formData.categoryId,
           batchId: currentBatch.id,
           couponCode: formData.couponCode,
+          cursoId: formData.cursoId || null,
+          turmaId: formData.turmaId || null,
+          participantType: formData.participantType,
+          registrationType: registrationType || 'geral',
           currency: getCurrency()
         }
       });
@@ -260,7 +281,15 @@ const NewRegistrationSection = () => {
       if (data.payment_required === false) {
         // Free registration completed
         alert(t('registration.success.freeRegistration'));
-        setFormData({ email: '', fullName: '', categoryId: '', couponCode: '' });
+        setFormData({ 
+          email: '', 
+          fullName: '', 
+          participantType: '',
+          categoryId: '', 
+          cursoId: '',
+          turmaId: '',
+          couponCode: '' 
+        });
       } else if (data.url) {
         // Redirect to Stripe checkout
         window.open(data.url, '_blank');
@@ -290,6 +319,7 @@ const NewRegistrationSection = () => {
 
   const statusInfo = getBatchStatusInfo(currentBatch.days_remaining);
   const selectedCategory = categories.find(cat => cat.id === formData.categoryId);
+  const isVCCUStudent = formData.participantType === 'vccu_student';
 
   return (
     <section id="registration" className="py-20 bg-gray-50">
@@ -299,7 +329,12 @@ const NewRegistrationSection = () => {
             {t('registration.urgent')}
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            {t('registration.newTitle')}
+            {registrationType === 'presencial' 
+              ? t('registration.presentialFormTitle', 'Formulário de Inscrição Presencial')
+              : registrationType === 'online'
+              ? t('registration.onlineFormTitle', 'Formulário de Inscrição Online')
+              : t('registration.newTitle')
+            }
           </h2>
           
           {/* Batch Info with Status Light */}
@@ -368,6 +403,65 @@ const NewRegistrationSection = () => {
                   </div>
                 </div>
 
+                {/* Tipo de Participante */}
+                <div>
+                  <Label htmlFor="participantType">Tipo de Participante</Label>
+                  <Select value={formData.participantType} onValueChange={(value) => setFormData({...formData, participantType: value, cursoId: '', turmaId: ''})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo de participante" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="vccu_student">Aluno(a) VCCU</SelectItem>
+                      <SelectItem value="guest">Convidado(a)</SelectItem>
+                      <SelectItem value="external">Participante Externo</SelectItem>
+                      <SelectItem value="professor">Professor(a)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Campos condicionais para alunos VCCU */}
+                {isVCCUStudent && (
+                  <>
+                    <div>
+                      <Label htmlFor="curso">Curso *</Label>
+                      <Select value={formData.cursoId} onValueChange={(value) => setFormData({...formData, cursoId: value, turmaId: ''})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione seu curso" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cursos.map((curso) => (
+                            <SelectItem key={curso.id} value={curso.id}>
+                              {curso.nome_curso}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-sm text-gray-500 mt-1">Campo obrigatório para alunos da VCCU</p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="turma">Turma *</Label>
+                      <Select 
+                        value={formData.turmaId} 
+                        onValueChange={(value) => setFormData({...formData, turmaId: value})}
+                        disabled={!formData.cursoId}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={formData.cursoId ? "Selecione sua turma" : "Primeiro selecione um curso"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {turmas.map((turma) => (
+                            <SelectItem key={turma.id} value={turma.id}>
+                              {turma.nome_turma}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-sm text-gray-500 mt-1">Campo obrigatório para alunos da VCCU</p>
+                    </div>
+                  </>
+                )}
+
                 <div>
                   <Label htmlFor="category">{t('registration.category')}</Label>
                   <Select value={formData.categoryId} onValueChange={(value) => setFormData({...formData, categoryId: value})}>
@@ -423,7 +517,7 @@ const NewRegistrationSection = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
-                  disabled={loading || !formData.categoryId}
+                  disabled={loading || !formData.categoryId || !formData.participantType || (isVCCUStudent && (!formData.cursoId || !formData.turmaId))}
                 >
                   {loading ? t('registration.processing') : t('registration.registerNow')}
                 </Button>
