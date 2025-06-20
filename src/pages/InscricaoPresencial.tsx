@@ -1,21 +1,19 @@
+
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NewRegistrationSection from '@/components/NewRegistrationSection';
 import { useTranslation } from 'react-i18next';
-import { useCMS } from '@/contexts/CMSContext';
 
 const InscricaoPresencial = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      {/* Hero Section */}
       <section className="bg-gradient-to-r from-civeni-blue to-blue-700 text-white py-16">
-        <div className="w-full px-4 text-center">
+        <div className="w-full text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 font-poppins">
             {t('registration.presentialTitle', 'Inscrição Presencial')}
           </h1>
@@ -25,12 +23,10 @@ const InscricaoPresencial = () => {
         </div>
       </section>
 
-      {/* Registration Form */}
       <NewRegistrationSection registrationType="presencial" />
       
-      {/* In-Person Schedule */}
       <section className="py-20 bg-white">
-        <div className="w-full px-4">
+        <div className="w-full">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
               {t('schedule.inPersonSchedule', 'Cronograma Presencial')}

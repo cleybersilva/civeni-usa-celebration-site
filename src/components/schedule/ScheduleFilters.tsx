@@ -30,7 +30,7 @@ const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
   };
 
   return (
-    <div className="mb-8 flex flex-wrap gap-4 justify-center px-4">
+    <div className="mb-8 flex flex-wrap gap-4 justify-center">
       <div className="flex flex-wrap gap-2">
         <Button
           variant={selectedDate === '' ? 'default' : 'outline'}

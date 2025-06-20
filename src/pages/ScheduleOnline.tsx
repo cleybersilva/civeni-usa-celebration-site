@@ -7,10 +7,8 @@ import ScheduleOnlineDay from '@/components/schedule/ScheduleOnlineDay';
 import ScheduleEmpty from '@/components/schedule/ScheduleEmpty';
 import { useScheduleData } from '@/hooks/useScheduleData';
 import { downloadSchedule } from '@/utils/scheduleUtils';
-import { useTranslation } from 'react-i18next';
 
 const ScheduleOnline = () => {
-  const { t } = useTranslation();
   const {
     isLoading,
     selectedDate,
@@ -32,7 +30,7 @@ const ScheduleOnline = () => {
       
       <main className="pt-20">
         <div className="w-full">
-          <div className="text-center mb-8 px-4">
+          <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Cronograma - Online
             </h1>
@@ -57,7 +55,7 @@ const ScheduleOnline = () => {
               <p className="mt-4 text-gray-600">Carregando cronograma...</p>
             </div>
           ) : (
-            <div className="space-y-6 px-4">
+            <div className="space-y-6">
               {uniqueDates.map(date => {
                 const daySchedules = filteredSchedules?.filter(s => s.date === date);
                 if (!daySchedules?.length) return null;
