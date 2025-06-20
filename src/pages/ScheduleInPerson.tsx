@@ -25,12 +25,12 @@ const ScheduleInPerson = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white p-0 m-0">
       <Header />
       
-      <main className="pt-20 px-0">
-        <div className="w-full px-6">
-          <div className="text-center mb-8">
+      <main className="pt-20 p-0 m-0">
+        <div className="w-full p-0 m-0">
+          <div className="text-center mb-8 px-6">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Cronograma - Presencial
             </h1>
@@ -39,15 +39,17 @@ const ScheduleInPerson = () => {
             </p>
           </div>
 
-          <ScheduleFilters
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            uniqueDates={uniqueDates}
-            categories={categories}
-            onDownload={handleDownload}
-          />
+          <div className="px-6">
+            <ScheduleFilters
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              uniqueDates={uniqueDates}
+              categories={categories}
+              onDownload={handleDownload}
+            />
+          </div>
 
           {isLoading ? (
             <div className="text-center py-8">
@@ -55,7 +57,7 @@ const ScheduleInPerson = () => {
               <p className="mt-4 text-gray-600">Carregando cronograma...</p>
             </div>
           ) : (
-            <div className="space-y-6 px-0">
+            <div className="space-y-6 px-6">
               {uniqueDates.map(date => {
                 const daySchedules = filteredSchedules?.filter(s => s.date === date);
                 if (!daySchedules?.length) return null;

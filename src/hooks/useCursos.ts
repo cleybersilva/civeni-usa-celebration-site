@@ -66,7 +66,20 @@ export const useTurmas = (cursoId?: string) => {
         .order('nome_turma', { ascending: true });
 
       if (error) throw error;
-      setTurmas(data || []);
+      
+      // Ordenar turmas por número se o nome contém números
+      const sortedTurmas = (data || []).sort((a, b) => {
+        const aNum = parseInt(a.nome_turma.match(/\d+/)?.[0] || '0');
+        const bNum = parseInt(b.nome_turma.match(/\d+/)?.[0] || '0');
+        
+        if (aNum && bNum) {
+          return aNum - bNum;
+        }
+        
+        return a.nome_turma.localeCompare(b.nome_turma);
+      });
+      
+      setTurmas(sortedTurmas);
     } catch (error: any) {
       console.error('Error fetching turmas:', error);
       setError(error.message);

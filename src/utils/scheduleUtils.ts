@@ -26,8 +26,19 @@ export const formatDate = (dateString: string) => {
 };
 
 export const downloadSchedule = (schedules: Schedule[] | undefined, type: string) => {
+  if (!schedules || schedules.length === 0) {
+    alert('Nenhum cronograma disponível para download');
+    return;
+  }
+
+  let csvContent = '';
+  let filename = `cronograma_${type}_${new Date().toISOString().split('T')[0]}.csv`;
+  
   if (type === 'online') {
-    const scheduleData = schedules?.map(schedule => ({
+    csvContent = "data:text/csv;charset=utf-8," 
+      + "Data,Horário,Título,Categoria,Palestrante,Plataforma,Link,Descrição\n";
+    
+    const scheduleData = schedules.map(schedule => ({
       data: formatDate(schedule.date),
       horario: `${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}`,
       titulo: schedule.title,
@@ -38,19 +49,14 @@ export const downloadSchedule = (schedules: Schedule[] | undefined, type: string
       descricao: schedule.description || ''
     }));
 
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "Data,Horário,Título,Categoria,Palestrante,Plataforma,Link,Descrição\n"
-      + scheduleData?.map(row => Object.values(row).join(",")).join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `cronograma_${type}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    csvContent += scheduleData.map(row => 
+      `"${row.data}","${row.horario}","${row.titulo}","${row.categoria}","${row.palestrante}","${row.plataforma}","${row.link}","${row.descricao}"`
+    ).join("\n");
   } else {
-    const scheduleData = schedules?.map(schedule => ({
+    csvContent = "data:text/csv;charset=utf-8," 
+      + "Data,Horário,Título,Categoria,Palestrante,Local,Descrição\n";
+    
+    const scheduleData = schedules.map(schedule => ({
       data: formatDate(schedule.date),
       horario: `${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}`,
       titulo: schedule.title,
@@ -60,16 +66,16 @@ export const downloadSchedule = (schedules: Schedule[] | undefined, type: string
       descricao: schedule.description || ''
     }));
 
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "Data,Horário,Título,Categoria,Palestrante,Local,Descrição\n"
-      + scheduleData?.map(row => Object.values(row).join(",")).join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `cronograma_${type}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    csvContent += scheduleData.map(row => 
+      `"${row.data}","${row.horario}","${row.titulo}","${row.categoria}","${row.palestrante}","${row.local}","${row.descricao}"`
+    ).join("\n");
   }
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };

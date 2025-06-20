@@ -24,7 +24,7 @@ export const useScheduleData = (type: 'presencial' | 'online') => {
         throw error;
       }
       
-      console.log(`Fetched ${data?.length || 0} schedules for ${type}`);
+      console.log(`Fetched ${data?.length || 0} schedules for ${type}:`, data);
       return data || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -39,6 +39,8 @@ export const useScheduleData = (type: 'presencial' | 'online') => {
     const categoryMatch = !selectedCategory || schedule.category === selectedCategory;
     return dateMatch && categoryMatch;
   });
+
+  console.log(`Filtered schedules for ${type}:`, filteredSchedules);
 
   return {
     schedules,
