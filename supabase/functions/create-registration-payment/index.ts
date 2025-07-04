@@ -20,6 +20,10 @@ serve(async (req) => {
       categoryId,
       batchId,
       couponCode,
+      cursoId,
+      turmaId,
+      participantType,
+      registrationType,
       currency = "BRL"
     } = await req.json();
 
@@ -54,7 +58,7 @@ serve(async (req) => {
       const { data: couponValidation, error: couponError } = await supabaseClient
         .rpc('validate_coupon', { coupon_code: couponCode });
 
-      if (couponError || !couponValidation || couponValidation.length === 0 || !couponValidation[0].is_valid) {
+      if (couponError || !couponValidation || !couponValidation.is_valid) {
         throw new Error("Código de cupom inválido ou expirado");
       }
 
@@ -67,6 +71,9 @@ serve(async (req) => {
           category_id: categoryId,
           batch_id: batchId,
           coupon_code: couponCode,
+          curso_id: cursoId,
+          turma_id: turmaId,
+          participant_type: participantType,
           payment_status: "completed",
           amount_paid: 0,
           currency: currency
@@ -121,6 +128,9 @@ serve(async (req) => {
         category_id: categoryId,
         batch_id: batchId,
         coupon_code: couponCode,
+        curso_id: cursoId,
+        turma_id: turmaId,
+        participant_type: participantType,
         payment_status: "pending",
         amount_paid: price / 100,
         currency: currency
