@@ -120,6 +120,14 @@ export const esTranslations = {
       success: {
         freeRegistration: "¡Inscripción realizada con éxito!"
       },
+      totalAmount: "Monto Total",
+      proofRequired: "Comprobación Requerida",
+      categories: {
+        vccuStudentPresentation: "Estudiante VCCU - Presentación",
+        vccuStudentListener: "Estudiante VCCU - Oyente",
+        vccuProfessorPartner: "Profesor VCCU - Socio",
+        generalParticipant: "Participante General"
+      },
       errors: {
         invalidCoupon: "Código de cupón inválido o expirado",
         general: "Error en la inscripción. Inténtalo de nuevo."

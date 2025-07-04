@@ -120,6 +120,14 @@ export const enTranslations = {
       success: {
         freeRegistration: "Registration completed successfully!"
       },
+      totalAmount: "Total Amount",
+      proofRequired: "Proof Required",
+      categories: {
+        vccuStudentPresentation: "VCCU Student - Presentation",
+        vccuStudentListener: "VCCU Student - Listener",
+        vccuProfessorPartner: "VCCU Professor - Partner",
+        generalParticipant: "General Participant"
+      },
       errors: {
         invalidCoupon: "Invalid or expired coupon code",
         general: "Registration error. Please try again."
