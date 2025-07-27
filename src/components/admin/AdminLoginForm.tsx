@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, Eye, EyeOff } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Home, Eye, EyeOff, Shield, Clock } from 'lucide-react';
 import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { validateEmail, RateLimiter } from '@/utils/inputValidation';
 
 const AdminLoginForm = () => {
   const [email, setEmail] = useState('');
@@ -14,15 +16,58 @@ const AdminLoginForm = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
   const { login } = useAdminAuth();
   const navigate = useNavigate();
 
+  // Rate limiter for login attempts
+  const rateLimiter = RateLimiter.getInstance('admin-login', 5, 15 * 60 * 1000); // 5 attempts per 15 minutes
+
+  useEffect(() => {
+    if (isBlocked && blockTimeRemaining > 0) {
+      const timer = setInterval(() => {
+        setBlockTimeRemaining(prev => {
+          if (prev <= 1000) {
+            setIsBlocked(false);
+            return 0;
+          }
+          return prev - 1000;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [isBlocked, blockTimeRemaining]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
-    const result = await login(email, password);
+    // Validate inputs
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      setError(emailValidation.error || 'Email inválido');
+      return;
+    }
+
+    if (!password.trim()) {
+      setError('Senha é obrigatória');
+      return;
+    }
+
+    // Check rate limiting
+    if (!rateLimiter.isAllowed()) {
+      const timeUntilReset = rateLimiter.getTimeUntilReset();
+      setIsBlocked(true);
+      setBlockTimeRemaining(timeUntilReset);
+      setError(`Muitas tentativas de login. Tente novamente em ${Math.ceil(timeUntilReset / 60000)} minutos.`);
+      return;
+    }
+
+    setIsLoading(true);
+
+    const result = await login(email.trim(), password);
     
     if (!result.success) {
       setError(result.error || 'Erro ao fazer login');
@@ -97,7 +142,18 @@ const AdminLoginForm = () => {
               </div>
             </div>
             {error && (
-              <div className="text-red-600 text-sm bg-red-50 p-3 rounded">{error}</div>
+              <Alert variant={isBlocked ? "destructive" : "default"}>
+                {isBlocked && <Shield className="h-4 w-4" />}
+                <AlertDescription>
+                  {error}
+                  {isBlocked && blockTimeRemaining > 0 && (
+                    <div className="flex items-center mt-2 text-sm">
+                      <Clock className="h-3 w-3 mr-1" />
+                      Desbloqueio em: {Math.ceil(blockTimeRemaining / 60000)} minutos
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
             )}
             <Button 
               type="submit" 

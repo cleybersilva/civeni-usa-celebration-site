@@ -576,6 +576,10 @@ export type Database = {
           user_type: Database["public"]["Enums"]["admin_user_type"]
         }[]
       }
+      verify_admin_login_secure: {
+        Args: { user_email: string; user_password: string; user_ip?: string }
+        Returns: Json
+      }
     }
     Enums: {
       admin_user_type: "admin" | "editor" | "viewer" | "design" | "admin_root"

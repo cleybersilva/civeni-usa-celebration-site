@@ -9,6 +9,22 @@ interface AdminUser {
   is_admin_root?: boolean;
 }
 
+interface LoginResponse {
+  success: boolean;
+  user?: {
+    user_id: string;
+    email: string;
+    user_type: string;
+  };
+  error?: string;
+}
+
+interface SessionData {
+  user: AdminUser;
+  timestamp: number;
+  expires: number;
+}
+
 interface AdminAuthContextType {
   user: AdminUser | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -23,23 +39,40 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const [user, setUser] = useState<AdminUser | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('adminUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    // Check for valid session
+    const savedSession = localStorage.getItem('adminSession');
+    if (savedSession) {
+      try {
+        const sessionData: SessionData = JSON.parse(savedSession);
+        if (sessionData.expires > Date.now()) {
+          setUser(sessionData.user);
+        } else {
+          // Session expired, clear it
+          localStorage.removeItem('adminSession');
+          localStorage.removeItem('adminUser'); // Clean up old format too
+        }
+      } catch (error) {
+        console.error('Invalid session data:', error);
+        localStorage.removeItem('adminSession');
+        localStorage.removeItem('adminUser');
+      }
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.rpc('verify_admin_login', {
+      // Use the new secure login function with rate limiting
+      const { data, error } = await supabase.rpc('verify_admin_login_secure', {
         user_email: email,
-        user_password: password
+        user_password: password,
+        user_ip: null // Could be enhanced to get real IP
       });
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        const userData = data[0];
+      const loginResponse = data as unknown as LoginResponse;
+      if (loginResponse?.success && loginResponse.user) {
+        const userData = loginResponse.user;
         
         // Verificar se é admin root
         const { data: isRootData } = await supabase.rpc('is_admin_root_user', {
@@ -49,24 +82,34 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         const adminUser: AdminUser = {
           id: userData.user_id,
           email: userData.email,
-          user_type: userData.user_type,
+          user_type: userData.user_type as AdminUser['user_type'],
           is_admin_root: isRootData || false
         };
         
         setUser(adminUser);
-        localStorage.setItem('adminUser', JSON.stringify(adminUser));
+        
+        // Store session with expiration (24 hours)
+        const sessionData = {
+          user: adminUser,
+          timestamp: Date.now(),
+          expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+        };
+        
+        localStorage.setItem('adminSession', JSON.stringify(sessionData));
         return { success: true };
       } else {
-        return { success: false, error: 'Credenciais inválidas' };
+        return { success: false, error: loginResponse?.error || 'Credenciais inválidas' };
       }
     } catch (error) {
+      console.error('Login error:', error);
       return { success: false, error: 'Erro ao fazer login' };
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('adminUser');
+    localStorage.removeItem('adminSession');
+    localStorage.removeItem('adminUser'); // Clean up old format too
   };
 
   const hasPermission = (resource: string) => {
