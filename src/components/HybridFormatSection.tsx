@@ -5,29 +5,55 @@ import { useCMS } from '@/contexts/CMSContext';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
+  const { content, loading } = useCMS();
 
   // Debug: Verificar dados carregados
   console.log('HybridFormatSection - content:', content);
+  console.log('HybridFormatSection - loading:', loading);
   console.log('HybridFormatSection - content.hybridActivities:', content?.hybridActivities);
+
+  // Dados fallback se não houver dados do banco
+  const fallbackActivities = [
+    {
+      title: "Estandes de Exposição",
+      image: "/img/formato_hibrido/estandes-exposicao.png",
+      description: "Explore os estandes de tecnologia e inovação, interaja com expositores e descubra as últimas novidades do setor."
+    },
+    {
+      title: "Palestras Magistrais",
+      image: "/img/formato_hibrido/palestras-magistrais.png",
+      description: "Assista às apresentações principais de especialistas renomados, abordando tendências e visões futuras da área."
+    },
+    {
+      title: "Discussões em Painel",
+      image: "/img/formato_hibrido/painel.png",
+      description: "Participe de debates interativos com múltiplos especialistas, explorando diferentes perspectivas sobre temas relevantes."
+    },
+    {
+      title: "Comunicações Orais",
+      image: "/img/formato_hibrido/comunicacoes-orais.png",
+      description: "Acompanhe apresentações de pesquisas acadêmicas e projetos inovadores de profissionais e estudantes."
+    }
+  ];
 
   // Verificar se existe hybridActivities e se é um array
   const hybridActivities = content?.hybridActivities || [];
   
-  // Usar apenas dados do banco de dados
-  const activities = hybridActivities
-    .filter(activity => activity?.is_active)
-    .map(activity => ({
-      title: activity.title,
-      image: activity.image_url,
-      description: activity.description
-    }));
+  // Usar dados do banco se disponíveis, senão usar fallback
+  const activities = hybridActivities.length > 0 
+    ? hybridActivities
+        .filter(activity => activity?.is_active)
+        .map(activity => ({
+          title: activity.title,
+          image: activity.image_url,
+          description: activity.description
+        }))
+    : fallbackActivities;
 
-  console.log('HybridFormatSection - activities:', activities);
+  console.log('HybridFormatSection - final activities:', activities);
 
-  // Se não há atividades, mostrar fallback
-  if (activities.length === 0) {
-    console.log('HybridFormatSection - No activities found, showing fallback');
+  // Se ainda está carregando
+  if (loading) {
     return (
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -71,6 +97,14 @@ const HybridFormatSection = () => {
                     src={activity.image}
                     alt={activity.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                    onError={(e) => {
+                      console.log('Image load error for:', activity.image);
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=80';
+                    }}
+                    onLoad={() => {
+                      console.log('Image loaded successfully:', activity.image);
+                    }}
                   />
                   <div className="absolute inset-0 bg-civeni-blue bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                 </div>
