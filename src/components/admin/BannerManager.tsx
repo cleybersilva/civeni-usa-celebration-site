@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useCMS, BannerSlide } from '@/contexts/CMSContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import ImageGuide from './ImageGuide';
-import ImageUploadField from './ImageUploadField';
+import SimpleImageUpload from './SimpleImageUpload';
 
 const BannerManager = () => {
   const { content, updateBannerSlides } = useCMS();
@@ -147,9 +147,8 @@ const BannerManager = () => {
                     />
                   </div>
                   <div>
-                    <ImageUploadField
+                    <SimpleImageUpload
                       label="Imagem de Fundo (Upload)"
-                      type="banner"
                       value={formData.uploadedImage}
                       onChange={(value) => setFormData({...formData, uploadedImage: value})}
                     />
