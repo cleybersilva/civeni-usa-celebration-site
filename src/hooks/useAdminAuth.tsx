@@ -61,18 +61,16 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const login = async (email: string, password: string) => {
     try {
-      // Use the new secure login function with rate limiting
-      const { data, error } = await supabase.rpc('verify_admin_login_secure', {
+      // Use the old verify_admin_login function first
+      const { data, error } = await supabase.rpc('verify_admin_login', {
         user_email: email,
-        user_password: password,
-        user_ip: null // Could be enhanced to get real IP
+        user_password: password
       });
 
       if (error) throw error;
 
-      const loginResponse = data as unknown as LoginResponse;
-      if (loginResponse?.success && loginResponse.user) {
-        const userData = loginResponse.user;
+      if (data && data.length > 0) {
+        const userData = data[0];
         
         // Verificar se é admin root
         const { data: isRootData } = await supabase.rpc('is_admin_root_user', {
@@ -98,11 +96,11 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         localStorage.setItem('adminSession', JSON.stringify(sessionData));
         return { success: true };
       } else {
-        return { success: false, error: loginResponse?.error || 'Credenciais inválidas' };
+        return { success: false, error: 'Credenciais inválidas' };
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: 'Erro ao fazer login' };
+      return { success: false, error: 'Erro interno do servidor' };
     }
   };
 
