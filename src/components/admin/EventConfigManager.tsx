@@ -116,24 +116,26 @@ const EventConfigManager = () => {
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-2">Horário de Início</label>
-                <Input
-                  type="time"
-                  value={formData.startTime}
-                  onChange={(e) => setFormData({...formData, startTime: e.target.value})}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Horário de Término</label>
-                <Input
-                  type="time"
-                  value={formData.endTime}
-                  onChange={(e) => setFormData({...formData, endTime: e.target.value})}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Horário de Início</label>
+                  <Input
+                    type="time"
+                    value={formData.startTime}
+                    onChange={(e) => setFormData({...formData, startTime: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Horário de Término</label>
+                  <Input
+                    type="time"
+                    value={formData.endTime}
+                    onChange={(e) => setFormData({...formData, endTime: e.target.value})}
+                    required
+                  />
+                </div>
               </div>
 
               <Button type="submit" disabled={isLoading} className="w-full">

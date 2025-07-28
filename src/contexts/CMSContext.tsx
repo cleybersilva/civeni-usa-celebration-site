@@ -426,7 +426,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .from('event_config')
         .select('*')
         .limit(1)
-        .single();
+        .maybeSingle();
 
       let eventConfig = defaultContent.eventConfig;
       if (eventConfigData && !eventError) {
@@ -533,7 +533,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         .from('event_config')
         .select('id')
         .limit(1)
-        .single();
+        .maybeSingle();
 
       let result;
       if (existing) {
