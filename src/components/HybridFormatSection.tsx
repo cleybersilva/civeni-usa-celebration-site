@@ -1,32 +1,25 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCMS } from '@/contexts/CMSContext';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
-  const { content, loading } = useCMS();
 
-  // Debug: Verificar dados carregados
-  console.log('HybridFormatSection - content:', content);
-  console.log('HybridFormatSection - loading:', loading);
-  console.log('HybridFormatSection - content.hybridActivities:', content?.hybridActivities);
-
-  // Dados fallback se não houver dados do banco
-  const fallbackActivities = [
+  // Usar diretamente as imagens fixas que sabemos que funcionam
+  const activities = [
     {
       title: "Estandes de Exposição",
       image: "/img/formato_hibrido/estandes-exposicao.png",
       description: "Explore os estandes de tecnologia e inovação, interaja com expositores e descubra as últimas novidades do setor."
     },
     {
-      title: "Palestras Magistrais",
+      title: "Palestras Magistrais", 
       image: "/img/formato_hibrido/palestras-magistrais.png",
       description: "Assista às apresentações principais de especialistas renomados, abordando tendências e visões futuras da área."
     },
     {
       title: "Discussões em Painel",
-      image: "/img/formato_hibrido/painel.png",
+      image: "/img/formato_hibrido/painel.png", 
       description: "Participe de debates interativos com múltiplos especialistas, explorando diferentes perspectivas sobre temas relevantes."
     },
     {
@@ -36,52 +29,15 @@ const HybridFormatSection = () => {
     }
   ];
 
-  // Verificar se existe hybridActivities e se é um array
-  const hybridActivities = content?.hybridActivities || [];
-  
-  // Usar dados do banco se disponíveis, senão usar fallback
-  const activities = hybridActivities.length > 0 
-    ? hybridActivities
-        .filter(activity => activity?.is_active)
-        .map(activity => ({
-          title: activity.title,
-          image: activity.image_url,
-          description: activity.description
-        }))
-    : fallbackActivities;
-
-  console.log('HybridFormatSection - final activities:', activities);
-
-  // Se ainda está carregando
-  if (loading) {
-    return (
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-              {t('hybrid.title')}
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {t('hybrid.description')}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-gray-500">Carregando atividades...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            {t('hybrid.title')}
+            Formato Híbrido
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {t('hybrid.description')}
+            Experimente o melhor dos dois mundos com nosso formato híbrido inovador
           </p>
         </div>
         
@@ -97,14 +53,6 @@ const HybridFormatSection = () => {
                     src={activity.image}
                     alt={activity.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-                    onError={(e) => {
-                      console.log('Image load error for:', activity.image);
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=600&q=80';
-                    }}
-                    onLoad={() => {
-                      console.log('Image loaded successfully:', activity.image);
-                    }}
                   />
                   <div className="absolute inset-0 bg-civeni-blue bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                 </div>
@@ -124,25 +72,25 @@ const HybridFormatSection = () => {
         <div className="mt-16 text-center">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold text-civeni-blue mb-4 font-poppins">
-              {t('hybrid.whyChoose')}
+              Por que escolher nosso formato híbrido?
             </h3>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="text-left">
-                <h4 className="text-lg font-semibold text-civeni-red mb-3">{t('hybrid.inPersonBenefits')}</h4>
+                <h4 className="text-lg font-semibold text-civeni-red mb-3">Benefícios Presenciais</h4>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• {t('hybrid.directNetworking')}</li>
-                  <li>• {t('hybrid.handsOnWorkshops')}</li>
-                  <li>• {t('hybrid.accessExhibition')}</li>
-                  <li>• {t('hybrid.faceToFaceInteractions')}</li>
+                  <li>• Networking direto com participantes</li>
+                  <li>• Workshops práticos e interativos</li>
+                  <li>• Acesso aos estandes de exposição</li>
+                  <li>• Interações face a face</li>
                 </ul>
               </div>
               <div className="text-left">
-                <h4 className="text-lg font-semibold text-civeni-red mb-3">{t('hybrid.onlineBenefits')}</h4>
+                <h4 className="text-lg font-semibold text-civeni-red mb-3">Benefícios Online</h4>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• {t('hybrid.globalAccessibility')}</li>
-                  <li>• {t('hybrid.costEffective')}</li>
-                  <li>• {t('hybrid.recordedSessions')}</li>
-                  <li>• {t('hybrid.interactiveQA')}</li>
+                  <li>• Acessibilidade global</li>
+                  <li>• Custo-benefício otimizado</li>
+                  <li>• Sessões gravadas disponíveis</li>
+                  <li>• Q&A interativo</li>
                 </ul>
               </div>
             </div>
