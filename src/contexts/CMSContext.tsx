@@ -541,26 +541,25 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           .from('event_config')
           .update(configData)
           .eq('id', existing.id)
-          .select()
-          .single();
+          .select();
       } else {
         result = await supabase
           .from('event_config')
           .insert([configData])
-          .select()
-          .single();
+          .select();
       }
 
       if (result.error) throw result.error;
 
       // Atualizar o estado local com os dados retornados do banco
-      if (result.data) {
+      if (result.data && result.data.length > 0) {
+        const data = result.data[0];
         const updatedConfig = {
-          eventDate: result.data.event_date,
-          eventLocation: result.data.event_location,
-          eventCity: result.data.event_city,
-          startTime: result.data.start_time,
-          endTime: result.data.end_time
+          eventDate: data.event_date,
+          eventLocation: data.event_location,
+          eventCity: data.event_city,
+          startTime: data.start_time,
+          endTime: data.end_time
         };
         setContent(prev => ({ ...prev, eventConfig: updatedConfig }));
       }
