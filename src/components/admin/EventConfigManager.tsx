@@ -60,14 +60,16 @@ const EventConfigManager = () => {
       await updateEventConfig(formData);
       toast.success('Configurações do evento atualizadas com sucesso!');
       
-      // Atualizar formulário com dados do banco
-      setFormData({
-        eventDate: content.eventConfig.eventDate,
-        eventLocation: content.eventConfig.eventLocation,
-        eventCity: content.eventConfig.eventCity,
-        startTime: content.eventConfig.startTime || '09:00',
-        endTime: content.eventConfig.endTime || '18:00'
-      });
+      // Aguardar um pouco para os dados serem recarregados
+      setTimeout(() => {
+        setFormData({
+          eventDate: content.eventConfig.eventDate,
+          eventLocation: content.eventConfig.eventLocation,
+          eventCity: content.eventConfig.eventCity,
+          startTime: content.eventConfig.startTime || '09:00',
+          endTime: content.eventConfig.endTime || '18:00'
+        });
+      }, 200);
       
     } catch (error) {
       console.error('Erro ao salvar:', error);

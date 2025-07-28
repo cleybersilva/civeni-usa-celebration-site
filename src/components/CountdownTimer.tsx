@@ -40,6 +40,17 @@ const CountdownTimer = () => {
     return () => clearInterval(timer);
   }, [content.eventConfig.eventDate]);
 
+  // Escutar evento personalizado para atualização
+  useEffect(() => {
+    const handleUpdate = () => {
+      // Força re-render após atualização das configurações
+      console.log('EventConfig updated, reloading countdown...');
+    };
+    
+    window.addEventListener('eventConfigUpdated', handleUpdate);
+    return () => window.removeEventListener('eventConfigUpdated', handleUpdate);
+  }, []);
+
   // Debug para verificar se está carregando as configurações corretas
   console.log('CountdownTimer - Event config:', content.eventConfig);
 

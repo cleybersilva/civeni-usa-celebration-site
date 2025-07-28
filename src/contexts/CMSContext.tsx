@@ -564,6 +564,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         await loadContent();
       }
       
+      // Forçar recarregamento completo dos dados e notificar componentes
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('eventConfigUpdated'));
+      }, 100);
+      
     } catch (error) {
       console.error('Error updating event config:', error);
       throw error;
