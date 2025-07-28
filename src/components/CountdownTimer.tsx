@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
 
 const CountdownTimer = () => {
   const { t } = useTranslation();
+  const { content } = useCMS();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -12,7 +14,7 @@ const CountdownTimer = () => {
   });
 
   useEffect(() => {
-    const targetDate = new Date('2025-12-08T00:00:00').getTime();
+    const targetDate = new Date(content.eventConfig.eventDate + 'T00:00:00').getTime();
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
@@ -29,7 +31,7 @@ const CountdownTimer = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [content.eventConfig.eventDate]);
 
   const timeUnits = [
     { label: t('countdown.days'), value: timeLeft.days },
