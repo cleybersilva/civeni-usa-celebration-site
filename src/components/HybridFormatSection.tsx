@@ -7,12 +7,17 @@ const HybridFormatSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
 
+  // Debug: Verificar dados carregados
+  console.log('HybridFormatSection - content.hybridActivities:', content.hybridActivities);
+
   // Usar apenas dados do banco de dados
   const activities = content.hybridActivities.filter(activity => activity.is_active).map(activity => ({
     title: activity.title,
     image: activity.image_url,
     description: activity.description
   }));
+
+  console.log('HybridFormatSection - activities:', activities);
 
   return (
     <section className="py-20 bg-gray-50">
