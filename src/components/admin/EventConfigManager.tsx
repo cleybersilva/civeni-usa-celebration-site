@@ -60,10 +60,15 @@ const EventConfigManager = () => {
       await updateEventConfig(formData);
       toast.success('Configurações do evento atualizadas com sucesso!');
       
-      // Força recarregamento da página principal para atualizar o contador
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('eventConfigUpdated'));
-      }, 500);
+      // Atualizar formulário com dados do banco
+      setFormData({
+        eventDate: content.eventConfig.eventDate,
+        eventLocation: content.eventConfig.eventLocation,
+        eventCity: content.eventConfig.eventCity,
+        startTime: content.eventConfig.startTime || '09:00',
+        endTime: content.eventConfig.endTime || '18:00'
+      });
+      
     } catch (error) {
       console.error('Erro ao salvar:', error);
       toast.error('Erro ao atualizar configurações');

@@ -547,6 +547,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         if (error) throw error;
         console.log('Update successful:', data);
+        
+        // Recarregar dados atualizados do banco
+        await loadContent();
       } else {
         // Inserir novo registro se não existir
         const { data, error } = await supabase
@@ -556,10 +559,10 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         if (error) throw error;
         console.log('Insert successful:', data);
+        
+        // Recarregar dados atualizados do banco
+        await loadContent();
       }
-      
-      // Atualizar estado local imediatamente
-      setContent(prev => ({ ...prev, eventConfig }));
       
     } catch (error) {
       console.error('Error updating event config:', error);
