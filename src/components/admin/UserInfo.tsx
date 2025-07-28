@@ -1,11 +1,13 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Crown, User, Edit, Eye, Palette } from 'lucide-react';
 
 const UserInfo: React.FC = () => {
+  const { t } = useTranslation();
   const { user, isAdminRoot } = useAdminAuth();
 
   if (!user) return null;
@@ -14,45 +16,45 @@ const UserInfo: React.FC = () => {
     switch (userType) {
       case 'admin_root':
         return {
-          label: 'Admin Root',
+          label: t('admin.adminRoot', 'Admin Root'),
           icon: <Crown className="h-4 w-4" />,
           variant: 'default' as const,
-          description: 'Acesso total ao sistema'
+          description: t('admin.totalSystemAccess', 'Acesso total ao sistema')
         };
       case 'admin':
         return {
-          label: 'Administrador',
+          label: t('admin.administrator', 'Administrador'),
           icon: <User className="h-4 w-4" />,
           variant: 'secondary' as const,
-          description: 'Gerenciamento operacional'
+          description: t('admin.operationalManagement', 'Gerenciamento operacional')
         };
       case 'design':
         return {
-          label: 'Designer',
+          label: t('admin.designer', 'Designer'),
           icon: <Palette className="h-4 w-4" />,
           variant: 'outline' as const,
-          description: 'Elementos visuais'
+          description: t('admin.visualElements', 'Elementos visuais')
         };
       case 'editor':
         return {
-          label: 'Editor',
+          label: t('admin.editor', 'Editor'),
           icon: <Edit className="h-4 w-4" />,
           variant: 'outline' as const,
-          description: 'Conteúdo e configurações'
+          description: t('admin.contentAndSettings', 'Conteúdo e configurações')
         };
       case 'viewer':
         return {
-          label: 'Visualizador',
+          label: t('admin.viewer', 'Visualizador'),
           icon: <Eye className="h-4 w-4" />,
           variant: 'outline' as const,
-          description: 'Apenas visualização'
+          description: t('admin.viewOnly', 'Apenas visualização')
         };
       default:
         return {
-          label: 'Usuário',
+          label: t('admin.user', 'Usuário'),
           icon: <User className="h-4 w-4" />,
           variant: 'outline' as const,
-          description: 'Acesso básico'
+          description: t('admin.basicAccess', 'Acesso básico')
         };
     }
   };
@@ -64,7 +66,7 @@ const UserInfo: React.FC = () => {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           {userTypeInfo.icon}
-          Informações do Usuário
+          {t('admin.userInfo', 'Informações do Usuário')}
         </CardTitle>
       </CardHeader>
       <CardContent>

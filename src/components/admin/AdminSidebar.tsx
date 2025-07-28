@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from '@/components/ui/sidebar';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import AdminSidebarHeader from './sidebar/AdminSidebarHeader';
@@ -8,6 +9,7 @@ import AdminSidebarFooter from './sidebar/AdminSidebarFooter';
 import { createMenuItems } from './sidebar/menuItems';
 
 const AdminSidebar = () => {
+  const { t } = useTranslation();
   const { hasPermission, isAdminRoot, user } = useAdminAuth();
   const [activeTab, setActiveTab] = useState(() => {
     if (user?.user_type === 'editor') {
@@ -21,7 +23,7 @@ const AdminSidebar = () => {
   const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
   const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
 
-  const menuItems = createMenuItems(hasPermission, isAdminRoot, canViewFinanceiro, canViewUsuarios);
+  const menuItems = createMenuItems(hasPermission, isAdminRoot, canViewFinanceiro, canViewUsuarios, t);
 
   const visibleItems = menuItems
     .filter(item => item.show)

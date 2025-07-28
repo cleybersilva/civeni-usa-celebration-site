@@ -19,13 +19,14 @@ export const createMenuItems = (
   hasPermission: (resource: string) => boolean,
   isAdminRoot: () => boolean,
   canViewFinanceiro: boolean,
-  canViewUsuarios: boolean
+  canViewUsuarios: boolean,
+  t: (key: string, fallback: string) => string
 ): MenuItem[] => {
   return [
     // Financeiro sempre primeiro para Admin Root e Admin
     {
       id: 'financeiro',
-      label: 'Financeiro',
+      label: t('admin.menu.financial', 'Financeiro'),
       icon: BarChart3,
       show: canViewFinanceiro,
       order: 0
@@ -33,77 +34,77 @@ export const createMenuItems = (
     // Demais itens em ordem alfabética
     {
       id: 'banner',
-      label: 'Banner',
+      label: t('admin.menu.banner', 'Banner'),
       icon: Image,
       show: hasPermission('banner') || isAdminRoot(),
       order: 1
     },
     {
       id: 'contador',
-      label: 'Contador',
+      label: t('admin.menu.counter', 'Contador'),
       icon: Timer,
       show: hasPermission('contador') || isAdminRoot(),
       order: 2
     },
     {
       id: 'cronograma',
-      label: 'Cronograma',
+      label: t('admin.menu.schedule', 'Cronograma'),
       icon: Calendar,
       show: hasPermission('cronograma') || isAdminRoot(),
       order: 3
     },
     {
       id: 'inscricoes',
-      label: 'Inscrições',
+      label: t('admin.menu.registrations', 'Inscrições'),
       icon: UserPlus,
       show: hasPermission('inscricoes') || isAdminRoot(),
       order: 4
     },
     {
       id: 'local',
-      label: 'Local',
+      label: t('admin.menu.venue', 'Local'),
       icon: MapPin,
       show: hasPermission('local') || isAdminRoot(),
       order: 5
     },
     {
       id: 'online',
-      label: 'Online',
+      label: t('admin.menu.online', 'Online'),
       icon: Monitor,
       show: hasPermission('online') || isAdminRoot(),
       order: 6
     },
     {
       id: 'palestrantes',
-      label: 'Palestrantes',
+      label: t('admin.menu.speakers', 'Palestrantes'),
       icon: Users,
       show: hasPermission('palestrantes') || isAdminRoot(),
       order: 7
     },
     {
       id: 'parceiros',
-      label: 'Parceiros',
+      label: t('admin.menu.partners', 'Parceiros'),
       icon: Handshake,
       show: hasPermission('parceiros') || isAdminRoot(),
       order: 8
     },
     {
       id: 'textos',
-      label: 'Textos',
+      label: t('admin.menu.texts', 'Textos'),
       icon: Type,
       show: hasPermission('textos') || isAdminRoot(),
       order: 9
     },
     {
       id: 'usuarios',
-      label: 'Usuários',
+      label: t('admin.menu.users', 'Usuários'),
       icon: Settings,
       show: canViewUsuarios,
       order: 10
     },
     {
       id: 'videos',
-      label: 'Vídeos',
+      label: t('admin.menu.videos', 'Vídeos'),
       icon: Play,
       show: hasPermission('videos') || isAdminRoot(),
       order: 11

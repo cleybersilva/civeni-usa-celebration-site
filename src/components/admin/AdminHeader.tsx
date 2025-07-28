@@ -19,11 +19,11 @@ const AdminHeader = () => {
 
   const getUserTypeLabel = (userType: string) => {
     const labels = {
-      admin_root: 'Admin Root',
-      admin: 'Administrador',
-      design: 'Designer',
-      editor: 'Editor',
-      viewer: 'Visualizador'
+      admin_root: t('admin.adminRoot', 'Admin Root'),
+      admin: t('admin.administrator', 'Administrador'),
+      design: t('admin.designer', 'Designer'),
+      editor: t('admin.editor', 'Editor'),
+      viewer: t('admin.viewer', 'Visualizador')
     };
     return labels[userType as keyof typeof labels] || userType;
   };
