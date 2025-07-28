@@ -42,7 +42,7 @@ const LanguageSelector = () => {
           e.stopPropagation();
           setOpenDropdown(!openDropdown);
         }}
-        className="flex items-center space-x-2 text-white hover:text-white transition-colors bg-civeni-blue bg-opacity-20 px-3 py-2 rounded-md hover:bg-civeni-blue hover:bg-opacity-40 border border-white border-opacity-50"
+        className="flex items-center space-x-2 text-white hover:text-white transition-colors bg-civeni-blue bg-opacity-20 px-3 py-2 rounded-md hover:bg-civeni-blue hover:bg-opacity-60 border border-white border-opacity-50"
       >
         <span className="text-lg">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
         <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>
