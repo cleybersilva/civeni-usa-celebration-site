@@ -36,6 +36,8 @@ export interface EventConfig {
   eventDate: string;
   eventLocation: string;
   eventCity: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface VenueConfig {
@@ -254,7 +256,9 @@ const defaultContent: CMSContent = {
   eventConfig: {
     eventDate: "2025-12-08",
     eventLocation: "Celebration, Florida",
-    eventCity: "Celebration"
+    eventCity: "Celebration",
+    startTime: "09:00",
+    endTime: "18:00"
   },
   venueConfig: {
     venueName: "VCCU Conference Center",
@@ -429,7 +433,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         eventConfig = {
           eventDate: eventConfigData.event_date,
           eventLocation: eventConfigData.event_location,
-          eventCity: eventConfigData.event_city
+          eventCity: eventConfigData.event_city,
+          startTime: eventConfigData.start_time || '09:00',
+          endTime: eventConfigData.end_time || '18:00'
         };
       }
 
@@ -517,14 +523,31 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const configData = {
         event_date: eventConfig.eventDate,
         event_location: eventConfig.eventLocation,
-        event_city: eventConfig.eventCity
+        event_city: eventConfig.eventCity,
+        start_time: eventConfig.startTime,
+        end_time: eventConfig.endTime
       };
 
-      const { error } = await supabase
+      // Primeiro tenta atualizar, se não existir, insere
+      const { data: existing } = await supabase
         .from('event_config')
-        .upsert([configData]);
+        .select('id')
+        .limit(1)
+        .single();
 
-      if (error) throw error;
+      let result;
+      if (existing) {
+        result = await supabase
+          .from('event_config')
+          .update(configData)
+          .eq('id', existing.id);
+      } else {
+        result = await supabase
+          .from('event_config')
+          .insert([configData]);
+      }
+
+      if (result.error) throw result.error;
 
       setContent(prev => ({ ...prev, eventConfig }));
     } catch (error) {

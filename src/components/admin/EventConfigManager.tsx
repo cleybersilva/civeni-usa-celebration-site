@@ -12,7 +12,9 @@ const EventConfigManager = () => {
   const [formData, setFormData] = useState({
     eventDate: content.eventConfig.eventDate,
     eventLocation: content.eventConfig.eventLocation,
-    eventCity: content.eventConfig.eventCity
+    eventCity: content.eventConfig.eventCity,
+    startTime: content.eventConfig.startTime || '09:00',
+    endTime: content.eventConfig.endTime || '18:00'
   });
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -110,6 +112,26 @@ const EventConfigManager = () => {
                   value={formData.eventCity}
                   onChange={(e) => setFormData({...formData, eventCity: e.target.value})}
                   placeholder="Ex: Celebration"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Horário de Início</label>
+                <Input
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({...formData, startTime: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Horário de Término</label>
+                <Input
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                   required
                 />
               </div>
