@@ -1,32 +1,41 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
-  
-  const activities = [
-    {
-      title: t('hybrid.exhibitionStands'),
-      image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=600&q=80",
-      description: t('hybrid.exhibitionDesc')
-    },
-    {
-      title: t('hybrid.keynoteLectures'), 
-      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
-      description: t('hybrid.keynoteDesc')
-    },
-    {
-      title: t('hybrid.panelDiscussions'),
-      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-      description: t('hybrid.panelDesc')
-    },
-    {
-      title: t('hybrid.oralCommunications'),
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-      description: t('hybrid.oralDesc')
-    }
-  ];
+  const { content } = useCMS();
+
+  // Usar dados do banco ou fallback para valores padrão
+  const activities = content.hybridActivities.length > 0 
+    ? content.hybridActivities.map(activity => ({
+        title: activity.title,
+        image: activity.image_url,
+        description: activity.description
+      }))
+    : [
+        {
+          title: t('hybrid.exhibitionStands'),
+          image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=600&q=80",
+          description: t('hybrid.exhibitionDesc')
+        },
+        {
+          title: t('hybrid.keynoteLectures'), 
+          image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
+          description: t('hybrid.keynoteDesc')
+        },
+        {
+          title: t('hybrid.panelDiscussions'),
+          image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
+          description: t('hybrid.panelDesc')
+        },
+        {
+          title: t('hybrid.oralCommunications'),
+          image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+          description: t('hybrid.oralDesc')
+        }
+      ];
 
   return (
     <section className="py-20 bg-gray-50">

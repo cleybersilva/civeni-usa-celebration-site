@@ -20,6 +20,11 @@ export const IMAGE_CONFIGS = {
     width: 1200,
     height: 600,
     description: "Imagem do local do evento"
+  },
+  hybrid_activity: {
+    width: 600,
+    height: 400,
+    description: "Imagem da atividade do formato híbrido"
   }
 } as const;
 

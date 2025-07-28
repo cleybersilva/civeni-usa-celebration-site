@@ -107,6 +107,16 @@ export interface SiteTexts {
   copyrightEs?: string;
 }
 
+export interface HybridActivity {
+  id: string;
+  activity_type: string;
+  title: string;
+  description: string;
+  image_url: string;
+  order_index: number;
+  is_active: boolean;
+}
+
 export interface CMSContent {
   speakers: Speaker[];
   bannerSlides: BannerSlide[];
@@ -118,6 +128,7 @@ export interface CMSContent {
   partners: Partner[];
   videos: Video[];
   siteTexts: SiteTexts;
+  hybridActivities: HybridActivity[];
 }
 
 interface CMSContextType {
@@ -383,7 +394,8 @@ const defaultContent: CMSContent = {
     contactEmail: "contact@civeni.com",
     contactPhone: "+1 (555) 123-4567",
     organizedBy: "Veni Creator Christian University"
-  }
+  },
+  hybridActivities: []
 };
 
 const CMSContext = createContext<CMSContextType | undefined>(undefined);
@@ -440,7 +452,16 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.log('Event config loaded from DB:', eventConfig);
       }
 
-      setContent(prev => ({ ...prev, bannerSlides, eventConfig }));
+      // Carregar atividades do formato híbrido
+      const { data: hybridData } = await supabase
+        .from('hybrid_format_config')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index');
+
+      const hybridActivities = hybridData || [];
+
+      setContent(prev => ({ ...prev, bannerSlides, eventConfig, hybridActivities }));
     } catch (error) {
       console.error('Error loading content:', error);
       setContent(defaultContent);

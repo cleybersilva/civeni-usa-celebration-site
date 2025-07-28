@@ -12,6 +12,7 @@ import {
   Type,
   Play,
   Settings,
+  Network,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -108,6 +109,13 @@ export const createMenuItems = (
       icon: Play,
       show: hasPermission('videos') || isAdminRoot(),
       order: 11
+    },
+    {
+      id: 'formato-hibrido',
+      label: t('admin.menu.hybrid', 'Formato Híbrido'),
+      icon: Network,
+      show: hasPermission('banner') || isAdminRoot(),
+      order: 12
     }
   ];
 };
