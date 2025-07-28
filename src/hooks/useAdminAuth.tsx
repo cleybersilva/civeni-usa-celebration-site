@@ -71,8 +71,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const login = async (email: string, password: string) => {
     try {
-      // Use the secure admin login function from Supabase
-      const { data, error } = await supabase.rpc('simple_admin_login', {
+      // Use the temporary admin login function from Supabase
+      const { data, error } = await supabase.rpc('temp_admin_login', {
         user_email: email,
         user_password: password
       });
