@@ -1,33 +1,21 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
+  const { content } = useCMS();
 
-  // Usar diretamente as imagens fixas que sabemos que funcionam
-  const activities = [
-    {
-      title: "Estandes de Exposição",
-      image: "/img/formato_hibrido/estandes-exposicao.png",
-      description: "Explore os estandes de tecnologia e inovação, interaja com expositores e descubra as últimas novidades do setor."
-    },
-    {
-      title: "Palestras Magistrais", 
-      image: "/img/formato_hibrido/palestras-magistrais.png",
-      description: "Assista às apresentações principais de especialistas renomados, abordando tendências e visões futuras da área."
-    },
-    {
-      title: "Discussões em Painel",
-      image: "/img/formato_hibrido/painel.png", 
-      description: "Participe de debates interativos com múltiplos especialistas, explorando diferentes perspectivas sobre temas relevantes."
-    },
-    {
-      title: "Comunicações Orais",
-      image: "/img/formato_hibrido/comunicacoes-orais.png",
-      description: "Acompanhe apresentações de pesquisas acadêmicas e projetos inovadores de profissionais e estudantes."
-    }
-  ];
+  // Usar os dados do CMS, ordenados por order_index
+  const activities = content.hybridActivities
+    .filter(activity => activity.is_active)
+    .sort((a, b) => a.order_index - b.order_index)
+    .map(activity => ({
+      title: activity.title,
+      image: activity.image_url,
+      description: activity.description
+    }));
 
   return (
     <section className="py-20 bg-gray-50">
