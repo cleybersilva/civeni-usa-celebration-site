@@ -1,0 +1,5 @@
+-- Atualizar as URLs das imagens para usar as imagens geradas localmente
+UPDATE public.hybrid_format_config SET image_url = 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&h=300&q=80' WHERE activity_type = 'exhibition';
+UPDATE public.hybrid_format_config SET image_url = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=400&h=300&q=80' WHERE activity_type = 'keynote';
+UPDATE public.hybrid_format_config SET image_url = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=400&h=300&q=80' WHERE activity_type = 'panel';
+UPDATE public.hybrid_format_config SET image_url = 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=400&h=300&q=80' WHERE activity_type = 'oral';

@@ -13,25 +13,11 @@ const HybridFormatSection = () => {
 
   // Usar dados do banco ou fallback para valores padrão com imagens locais
   const activities = content.hybridActivities.length > 0 
-    ? content.hybridActivities.map(activity => {
-        // Mapear URLs do banco para imagens locais se necessário
-        let imageUrl = activity.image_url;
-        if (imageUrl.includes('/src/assets/hybrid-exhibition-stands.jpg')) {
-          imageUrl = exhibitionStandsImg;
-        } else if (imageUrl.includes('/src/assets/hybrid-keynote-lectures.jpg')) {
-          imageUrl = keynoteLecturesImg;
-        } else if (imageUrl.includes('/src/assets/hybrid-panel-discussions.jpg')) {
-          imageUrl = panelDiscussionsImg;
-        } else if (imageUrl.includes('/src/assets/hybrid-oral-communications.jpg')) {
-          imageUrl = oralCommunicationsImg;
-        }
-        
-        return {
-          title: activity.title,
-          image: imageUrl,
-          description: activity.description
-        };
-      })
+    ? content.hybridActivities.map(activity => ({
+        title: activity.title,
+        image: activity.image_url,
+        description: activity.description
+      }))
     : [
         {
           title: t('hybrid.exhibitionStands'),

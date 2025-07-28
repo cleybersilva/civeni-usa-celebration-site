@@ -108,7 +108,7 @@ const SimpleImageUpload: React.FC<SimpleImageUploadProps> = ({ value, onChange, 
       )}
       
       <p className="text-xs text-gray-500">
-        Recomendado: 1920x1080px para melhor qualidade
+        Recomendado: 400x300px para melhor qualidade
       </p>
     </div>
   );
