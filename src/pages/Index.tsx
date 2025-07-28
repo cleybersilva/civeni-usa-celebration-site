@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Header from '../components/Header';
+import HeroBanner from '../components/HeroBanner';
 import CountdownTimer from '../components/CountdownTimer';
 import ScheduleSection from '../components/ScheduleSection';
 import NewRegistrationSection from '../components/NewRegistrationSection';
@@ -16,6 +17,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white font-poppins p-0 m-0">
       <Header />
+      <HeroBanner />
       <CountdownTimer />
       <ScheduleSection />
       <NewRegistrationSection />

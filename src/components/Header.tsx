@@ -223,6 +223,13 @@ const Header = () => {
             >
               {t('header.contact')}
             </Link>
+            <Link
+              to="/admin"
+              className="flex items-center space-x-2 text-gray-600 hover:text-civeni-blue transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm">Admin</span>
+            </Link>
           </div>
         </div>
       </nav>
