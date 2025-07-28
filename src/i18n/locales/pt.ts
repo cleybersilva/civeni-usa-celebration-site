@@ -224,7 +224,16 @@ export const ptTranslations = {
       educationalInnovation: "Inovação Educacional",
       globalNetworking: "Networking Global",
       viewSite: "Ver Site",
-      logout: "Sair"
+      logout: "Sair",
+      backToSite: "Voltar ao Site",
+      welcome: "Bem-vindo!",
+      loginToAccount: "Faça login em sua conta",
+      email: "Email",
+      password: "Senha",
+      login: "Entrar",
+      loggingIn: "Entrando...",
+      noCredentials: "Não tem credenciais ainda?",
+      forgotPassword: "Esqueceu sua senha?"
     }
   }
 };

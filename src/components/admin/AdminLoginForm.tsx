@@ -142,29 +142,29 @@ const AdminLoginForm = () => {
               className="text-civeni-red border-civeni-red hover:bg-civeni-red hover:text-white transition-colors"
             >
               <Home className="w-4 h-4 mr-2" />
-              Voltar ao Site
+              {t('admin.backToSite', 'Voltar ao Site')}
             </Button>
           </div>
 
           <Card className="shadow-xl border-0">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-2xl font-bold text-civeni-blue mb-2">
-                Bem-vindo! 🎓
+                {t('admin.welcome', 'Bem-vindo!')} 🎓
               </CardTitle>
-              <p className="text-gray-600">Faça login em sua conta</p>
+              <p className="text-gray-600">{t('admin.loginToAccount', 'Faça login em sua conta')}</p>
             </CardHeader>
             <CardContent className="space-y-6">
               <form onSubmit={handleLogin} className="space-y-5">
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-gray-700">
-                    Email
+                    {t('admin.email', 'Email')}
                   </label>
                   <div className="relative">
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email"
+                      placeholder={t('admin.email', 'Email')}
                       required
                       className="pl-10 h-12 border-gray-300 focus:border-civeni-blue focus:ring-civeni-blue"
                     />
@@ -174,14 +174,14 @@ const AdminLoginForm = () => {
                 
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-gray-700">
-                    Password
+                    {t('admin.password', 'Password')}
                   </label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
+                      placeholder={t('admin.password', 'Password')}
                       required
                       className="pl-10 pr-10 h-12 border-gray-300 focus:border-civeni-blue focus:ring-civeni-blue"
                     />
@@ -211,15 +211,15 @@ const AdminLoginForm = () => {
                   className="w-full h-12 bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-red hover:to-civeni-blue text-white font-semibold text-lg transition-all duration-300"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Entrando...' : 'Login'}
+                  {isLoading ? t('admin.loggingIn', 'Entrando...') : t('admin.login', 'Login')}
                 </Button>
               </form>
               
               <div className="text-center">
-                <p className="text-gray-600 mb-2">Não tem credenciais ainda?</p>
+                <p className="text-gray-600 mb-2">{t('admin.noCredentials', 'Não tem credenciais ainda?')}</p>
                 <PasswordResetDialog>
                   <Button variant="link" className="text-civeni-blue hover:text-civeni-red font-semibold">
-                    Esqueceu sua senha?
+                    {t('admin.forgotPassword', 'Esqueceu sua senha?')}
                   </Button>
                 </PasswordResetDialog>
               </div>
