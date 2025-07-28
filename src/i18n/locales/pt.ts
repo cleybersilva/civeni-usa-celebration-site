@@ -234,7 +234,7 @@ export const ptTranslations = {
       loggingIn: "Entrando...",
       noCredentials: "Não tem credenciais ainda?",
       forgotPassword: "Esqueceu sua senha?",
-      panel: "Admin Panel",
+      panel: "Painel Administrativo",
       userInfo: "Informações do Usuário",
       adminRoot: "Admin Root",
       administrator: "Administrador",
