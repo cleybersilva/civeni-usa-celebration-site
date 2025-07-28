@@ -65,10 +65,9 @@ export default {
 				},
 				// Civeni custom colors
 				civeni: {
-					blue: '#0a194e',
-					red: '#c8102e',
-					green: '#32a852',
-					white: '#FFFFFF'
+					red: 'hsl(var(--civeni-red))',
+					blue: 'hsl(var(--civeni-blue))',
+					green: 'hsl(var(--civeni-green))'
 				}
 			},
 			borderRadius: {

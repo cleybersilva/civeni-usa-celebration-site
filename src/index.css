@@ -15,8 +15,12 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 200 100% 15%;  /* Civeni Blue */
+    --primary-foreground: 0 0% 100%;
+    
+    --civeni-red: 348 78% 47%;
+    --civeni-blue: 200 100% 15%;
+    --civeni-green: 135 60% 42%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
