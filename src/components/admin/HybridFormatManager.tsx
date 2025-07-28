@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Trash2, Plus, Save, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import ImageUploadField from './ImageUploadField';
+import SimpleImageUpload from './SimpleImageUpload';
 
 interface HybridActivity {
   id: string;
@@ -204,11 +204,10 @@ const HybridFormatManager = () => {
                 </div>
 
                 <div>
-                  <ImageUploadField
+                  <SimpleImageUpload
                     value={activity.image_url}
                     onChange={(value) => updateActivity(activity.id, 'image_url', value)}
                     label="Imagem da Atividade"
-                    type="hybrid_activity"
                   />
                 </div>
               </div>
