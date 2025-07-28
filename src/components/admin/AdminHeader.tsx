@@ -1,11 +1,14 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import LanguageSelector from './LanguageSelector';
 
 const AdminHeader = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, logout, isAdminRoot } = useAdminAuth();
 
@@ -40,14 +43,15 @@ const AdminHeader = () => {
             </p>
           </div>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex items-center space-x-3">
+          <LanguageSelector />
           <Button 
             variant="outline" 
             onClick={() => navigate('/')}
             size="sm"
             className="border-white text-white bg-white/10 hover:bg-white hover:text-civeni-blue transition-all duration-200"
           >
-            Ver Site
+            {t('admin.viewSite', 'Ver Site')}
           </Button>
           <Button 
             variant="destructive" 
@@ -55,7 +59,7 @@ const AdminHeader = () => {
             size="sm"
             className="bg-civeni-red hover:bg-civeni-red/90"
           >
-            Sair
+            {t('admin.logout', 'Sair')}
           </Button>
         </div>
       </div>

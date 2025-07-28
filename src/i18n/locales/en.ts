@@ -218,6 +218,13 @@ export const enTranslations = {
       contact: "Contact",
       copyright: "© 2025 III CIVENI USA. All rights reserved.",
       privacyPolicy: "Privacy Policy"
+    },
+    admin: {
+      eventDescription: "International Congress of Educational Innovation and New Technologies is the main event that brings together educators, researchers and technology professionals from around the world.",
+      educationalInnovation: "Educational Innovation",
+      globalNetworking: "Global Networking",
+      viewSite: "View Site",
+      logout: "Logout"
     }
   }
 };

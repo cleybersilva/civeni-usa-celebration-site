@@ -218,6 +218,13 @@ export const ptTranslations = {
       contact: "Contato",
       copyright: "© 2025 III CIVENI USA. Todos os direitos reservados.",
       privacyPolicy: "Política de Privacidade"
+    },
+    admin: {
+      eventDescription: "Congresso Internacional de Inovação Educacional e Novas Tecnologias é o principal evento que reúne educadores, pesquisadores e profissionais de tecnologia de todo o mundo.",
+      educationalInnovation: "Inovação Educacional",
+      globalNetworking: "Networking Global",
+      viewSite: "Ver Site",
+      logout: "Sair"
     }
   }
 };
