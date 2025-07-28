@@ -565,6 +565,10 @@ export type Database = {
         Args: { user_email: string }
         Returns: boolean
       }
+      set_current_user_email: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
       simple_admin_login: {
         Args: { user_email: string; user_password: string }
         Returns: Json

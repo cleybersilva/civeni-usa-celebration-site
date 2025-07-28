@@ -46,6 +46,16 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         const sessionData: SessionData = JSON.parse(savedSession);
         if (sessionData.expires > Date.now()) {
           setUser(sessionData.user);
+          // Set the current user email for RLS policies when restoring session
+          (async () => {
+            try {
+              await supabase.rpc('set_current_user_email', {
+                user_email: sessionData.user.email
+              });
+            } catch (error) {
+              console.error('Error setting user email for RLS:', error);
+            }
+          })();
         } else {
           // Session expired, clear it
           localStorage.removeItem('adminSession');
@@ -74,10 +84,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         setUser(adminUser);
         
         // Set the current user email for RLS policies
-        await supabase.rpc('set_config', {
-          setting_name: 'app.current_user_email',
-          setting_value: email,
-          is_local: false
+        await supabase.rpc('set_current_user_email', {
+          user_email: email
         });
         
         // Store session with expiration (24 hours)
