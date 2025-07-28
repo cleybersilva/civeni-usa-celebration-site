@@ -453,15 +453,28 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Carregar atividades do formato híbrido
-      const { data: hybridData } = await supabase
+      console.log('CMSContext - Loading hybrid activities...');
+      const { data: hybridData, error: hybridError } = await supabase
         .from('hybrid_format_config')
         .select('*')
         .eq('is_active', true)
         .order('order_index');
 
-      const hybridActivities = hybridData || [];
+      if (hybridError) {
+        console.error('Error loading hybrid activities:', hybridError);
+      }
 
-      setContent(prev => ({ ...prev, bannerSlides, eventConfig, hybridActivities }));
+      const hybridActivities = hybridData || [];
+      console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
+
+      setContent(prev => ({ 
+        ...prev, 
+        bannerSlides, 
+        eventConfig, 
+        hybridActivities 
+      }));
+      
+      console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
     } catch (error) {
       console.error('Error loading content:', error);
       setContent(defaultContent);
