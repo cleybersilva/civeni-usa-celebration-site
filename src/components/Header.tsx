@@ -59,15 +59,7 @@ const Header = () => {
       {/* Top Bar */}
       <div className="bg-civeni-blue py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <div>
-            <Link 
-              to="/admin" 
-              className="flex items-center gap-2 text-white hover:text-civeni-red transition-colors"
-            >
-              <Settings size={16} />
-              <span className="text-sm">{t('header.adminArea')}</span>
-            </Link>
-          </div>
+          <div></div>
           
           <div className="flex items-center space-x-6">
             <div className="flex space-x-4">
@@ -222,13 +214,6 @@ const Header = () => {
               className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
             >
               {t('header.contact')}
-            </Link>
-            <Link
-              to="/admin"
-              className="flex items-center space-x-2 text-gray-600 hover:text-civeni-blue transition-colors"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="text-sm">Admin</span>
             </Link>
           </div>
         </div>
