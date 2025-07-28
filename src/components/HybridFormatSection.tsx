@@ -8,16 +8,44 @@ const HybridFormatSection = () => {
   const { content } = useCMS();
 
   // Debug: Verificar dados carregados
-  console.log('HybridFormatSection - content.hybridActivities:', content.hybridActivities);
+  console.log('HybridFormatSection - content:', content);
+  console.log('HybridFormatSection - content.hybridActivities:', content?.hybridActivities);
 
+  // Verificar se existe hybridActivities e se é um array
+  const hybridActivities = content?.hybridActivities || [];
+  
   // Usar apenas dados do banco de dados
-  const activities = content.hybridActivities.filter(activity => activity.is_active).map(activity => ({
-    title: activity.title,
-    image: activity.image_url,
-    description: activity.description
-  }));
+  const activities = hybridActivities
+    .filter(activity => activity?.is_active)
+    .map(activity => ({
+      title: activity.title,
+      image: activity.image_url,
+      description: activity.description
+    }));
 
   console.log('HybridFormatSection - activities:', activities);
+
+  // Se não há atividades, mostrar fallback
+  if (activities.length === 0) {
+    console.log('HybridFormatSection - No activities found, showing fallback');
+    return (
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
+              {t('hybrid.title')}
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              {t('hybrid.description')}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-500">Carregando atividades...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-gray-50">
