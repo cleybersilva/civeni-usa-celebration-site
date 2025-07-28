@@ -42,9 +42,9 @@ const CountdownTimer = () => {
 
   // Escutar evento personalizado para atualização
   useEffect(() => {
-    const handleUpdate = () => {
-      // Força re-render após atualização das configurações
-      console.log('EventConfig updated, reloading countdown...');
+    const handleUpdate = (event: any) => {
+      console.log('EventConfig updated, reloading countdown...', event.detail);
+      // Força re-render depois que o contexto é atualizado
     };
     
     window.addEventListener('eventConfigUpdated', handleUpdate);

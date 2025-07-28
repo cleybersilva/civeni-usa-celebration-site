@@ -24,6 +24,17 @@ const EventConfigManager = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  // Sincronizar formulário com dados do contexto
+  useEffect(() => {
+    setFormData({
+      eventDate: content.eventConfig.eventDate,
+      eventLocation: content.eventConfig.eventLocation,
+      eventCity: content.eventConfig.eventCity,
+      startTime: content.eventConfig.startTime || '09:00',
+      endTime: content.eventConfig.endTime || '18:00'
+    });
+  }, [content.eventConfig]);
+
   // Atualizar contador em tempo real baseado na data selecionada
   useEffect(() => {
     if (!formData.eventDate) return;
@@ -59,17 +70,6 @@ const EventConfigManager = () => {
     try {
       await updateEventConfig(formData);
       toast.success('Configurações do evento atualizadas com sucesso!');
-      
-      // Aguardar um pouco para os dados serem recarregados
-      setTimeout(() => {
-        setFormData({
-          eventDate: content.eventConfig.eventDate,
-          eventLocation: content.eventConfig.eventLocation,
-          eventCity: content.eventConfig.eventCity,
-          startTime: content.eventConfig.startTime || '09:00',
-          endTime: content.eventConfig.endTime || '18:00'
-        });
-      }, 200);
       
     } catch (error) {
       console.error('Erro ao salvar:', error);

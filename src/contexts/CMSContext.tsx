@@ -434,9 +434,10 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           eventDate: eventConfigData.event_date,
           eventLocation: eventConfigData.event_location,
           eventCity: eventConfigData.event_city,
-          startTime: eventConfigData.start_time || '09:00',
-          endTime: eventConfigData.end_time || '18:00'
+          startTime: eventConfigData.start_time ? eventConfigData.start_time.substring(0, 5) : '09:00',
+          endTime: eventConfigData.end_time ? eventConfigData.end_time.substring(0, 5) : '18:00'
         };
+        console.log('Event config loaded from DB:', eventConfig);
       }
 
       setContent(prev => ({ ...prev, bannerSlides, eventConfig }));
@@ -526,8 +527,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         event_date: eventConfig.eventDate,
         event_location: eventConfig.eventLocation,
         event_city: eventConfig.eventCity,
-        start_time: eventConfig.startTime,
-        end_time: eventConfig.endTime
+        start_time: eventConfig.startTime ? eventConfig.startTime + ':00' : '09:00:00',
+        end_time: eventConfig.endTime ? eventConfig.endTime + ':00' : '18:00:00'
       };
 
       // Buscar o ID do primeiro registro
@@ -547,9 +548,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         if (error) throw error;
         console.log('Update successful:', data);
-        
-        // Recarregar dados atualizados do banco
-        await loadContent();
       } else {
         // Inserir novo registro se não existir
         const { data, error } = await supabase
@@ -559,15 +557,17 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         if (error) throw error;
         console.log('Insert successful:', data);
-        
-        // Recarregar dados atualizados do banco
-        await loadContent();
       }
       
-      // Forçar recarregamento completo dos dados e notificar componentes
+      // Recarregar dados para garantir consistência
+      await loadContent();
+      
+      // Notificar componentes da atualização
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('eventConfigUpdated'));
-      }, 100);
+        window.dispatchEvent(new CustomEvent('eventConfigUpdated', { 
+          detail: eventConfig 
+        }));
+      }, 200);
       
     } catch (error) {
       console.error('Error updating event config:', error);
