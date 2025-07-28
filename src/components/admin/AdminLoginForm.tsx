@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ const AdminLoginForm = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const { login } = useAdminAuth();
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const languages = [
     { code: 'en', flag: '🇺🇸', name: 'English' },
@@ -34,6 +35,20 @@ const AdminLoginForm = () => {
     setSelectedLanguage(langCode);
     setOpenDropdown(false);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,9 +81,14 @@ const AdminLoginForm = () => {
     <div className="min-h-screen flex">
       {/* Language Selector - Top Bar */}
       <div className="fixed top-0 right-0 z-50 p-4">
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setOpenDropdown(!openDropdown)}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpenDropdown(!openDropdown);
+            }}
             className="flex items-center space-x-2 text-white hover:text-civeni-red transition-colors bg-civeni-blue bg-opacity-80 px-3 py-2 rounded-md hover:bg-civeni-red hover:bg-opacity-90 border border-white border-opacity-30"
           >
             <span className="text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
@@ -83,7 +103,12 @@ const AdminLoginForm = () => {
               {languages.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => changeLanguage(lang.code)}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    changeLanguage(lang.code);
+                  }}
                   className={`w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
                     selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
                   }`}

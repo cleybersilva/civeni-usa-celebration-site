@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LanguageSelector = () => {
   const { i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
   const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const languages = [
     { code: 'en', flag: '🇺🇸', name: 'English' },
@@ -18,10 +19,29 @@ const LanguageSelector = () => {
     setOpenDropdown(false);
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setOpenDropdown(!openDropdown)}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpenDropdown(!openDropdown);
+        }}
         className="flex items-center space-x-2 text-white hover:text-white transition-colors bg-civeni-blue bg-opacity-20 px-3 py-2 rounded-md hover:bg-civeni-blue hover:bg-opacity-40 border border-white border-opacity-50"
       >
         <span className="text-lg">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
@@ -36,7 +56,12 @@ const LanguageSelector = () => {
           {languages.map((lang) => (
             <button
               key={lang.code}
-              onClick={() => changeLanguage(lang.code)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                changeLanguage(lang.code);
+              }}
               className={`w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
                 selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
               }`}
