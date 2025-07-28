@@ -73,6 +73,13 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         
         setUser(adminUser);
         
+        // Set the current user email for RLS policies
+        await supabase.rpc('set_config', {
+          setting_name: 'app.current_user_email',
+          setting_value: email,
+          is_local: false
+        });
+        
         // Store session with expiration (24 hours)
         const sessionData = {
           user: adminUser,

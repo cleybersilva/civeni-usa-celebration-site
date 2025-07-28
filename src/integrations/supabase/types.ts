@@ -539,8 +539,16 @@ export type Database = {
         Args: { report_date?: string }
         Returns: Json
       }
+      get_current_admin_user_email: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_admin_root_user: {
         Args: { user_email: string }
+        Returns: boolean
+      }
+      is_current_user_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       list_admin_users: {
