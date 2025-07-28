@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Home, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Home, Eye, EyeOff, Shield, Clock } from 'lucide-react';
+import PasswordResetDialog from '@/components/admin/PasswordResetDialog';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { validateEmail, RateLimiter } from '@/utils/inputValidation';
 
 const AdminLoginForm = () => {
   const [email, setEmail] = useState('');
@@ -13,20 +16,52 @@ const AdminLoginForm = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
   const { login } = useAdminAuth();
   const navigate = useNavigate();
+
+  // Rate limiter for login attempts
+  const rateLimiter = RateLimiter.getInstance('admin-login', 5, 15 * 60 * 1000); // 5 attempts per 15 minutes
+
+  useEffect(() => {
+    if (isBlocked && blockTimeRemaining > 0) {
+      const timer = setInterval(() => {
+        setBlockTimeRemaining(prev => {
+          if (prev <= 1000) {
+            setIsBlocked(false);
+            return 0;
+          }
+          return prev - 1000;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [isBlocked, blockTimeRemaining]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!email.trim()) {
-      setError('Email é obrigatório');
+    // Validate inputs
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      setError(emailValidation.error || 'Email inválido');
       return;
     }
 
     if (!password.trim()) {
       setError('Senha é obrigatória');
+      return;
+    }
+
+    // Check rate limiting
+    if (!rateLimiter.isAllowed()) {
+      const timeUntilReset = rateLimiter.getTimeUntilReset();
+      setIsBlocked(true);
+      setBlockTimeRemaining(timeUntilReset);
+      setError(`Muitas tentativas de login. Tente novamente em ${Math.ceil(timeUntilReset / 60000)} minutos.`);
       return;
     }
 
@@ -42,151 +77,102 @@ const AdminLoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Logo and Info */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-civeni-red to-civeni-orange p-12 flex-col justify-between text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-8">
-            <img 
-              src="/lovable-uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
-              alt="III Civeni 2025 Logo" 
-              className="h-12 w-auto"
-            />
-            <div>
-              <h1 className="text-2xl font-bold">CIVENI</h1>
-              <p className="text-sm opacity-90">Sistema Administrativo</p>
-            </div>
-          </div>
-          
-          <div className="max-w-md">
-            <h2 className="text-4xl font-bold mb-4">Gestão Completa do Evento</h2>
-            <p className="text-lg opacity-90 mb-8">
-              Gerencie inscrições, palestrantes, cronograma e muito mais em um só lugar com nossa plataforma integrada.
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-                <span className="text-sm font-medium">Dashboard em Tempo Real</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-                <span className="text-sm font-medium">Gestão de Inscrições</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-                <span className="text-sm font-medium">Relatórios Avançados</span>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-8">
+      {/* Logo and Header Section */}
+      <div className="mb-8 text-center">
+        <div className="flex justify-center mb-4">
+          <img 
+            src="/lovable-uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
+            alt="III Civeni 2025 Logo" 
+            className="h-20 w-auto"
+          />
         </div>
-        
         <Button
           variant="outline"
           onClick={() => navigate('/')}
-          className="relative z-10 w-fit bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
+          className="mb-4 text-white bg-civeni-red border-civeni-red hover:bg-civeni-blue hover:text-white transition-colors"
         >
           <Home className="w-4 h-4 mr-2" />
           Voltar ao Site
         </Button>
       </div>
 
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden text-center mb-8">
-            <img 
-              src="/lovable-uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
-              alt="III Civeni 2025 Logo" 
-              className="h-16 w-auto mx-auto mb-4"
-            />
-            <h1 className="text-2xl font-bold text-gray-900">CIVENI</h1>
-            <p className="text-gray-600">Sistema Administrativo</p>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Bem-vindo!</h2>
-              <p className="text-gray-600">Acesse sua conta ou crie uma nova para começar</p>
+      {/* Login Card */}
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center text-civeni-blue">
+            Painel Administrativo
+            <br />
+            III Civeni USA 2025
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Digite seu email"
+                required
+              />
             </div>
-
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Senha</label>
+              <div className="relative">
                 <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu@email.com"
-                  className="h-12 text-base border-gray-200 focus:border-civeni-red focus:ring-civeni-red"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Digite sua senha"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <Lock className="w-4 h-4" />
-                  Senha
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="h-12 text-base border-gray-200 focus:border-civeni-red focus:ring-civeni-red pr-12"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <Button 
-                type="submit" 
-                className="w-full h-12 bg-civeni-red hover:bg-civeni-red/90 text-white font-medium rounded-lg transition-colors"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Entrando...' : 'Entrar'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <button 
-                type="button"
-                className="text-sm text-civeni-red hover:text-civeni-red/80 font-medium"
-                onClick={() => {/* TODO: Implement password reset */}}
-              >
+            </div>
+            {error && (
+              <Alert variant={isBlocked ? "destructive" : "default"}>
+                {isBlocked && <Shield className="h-4 w-4" />}
+                <AlertDescription>
+                  {error}
+                  {isBlocked && blockTimeRemaining > 0 && (
+                    <div className="flex items-center mt-2 text-sm">
+                      <Clock className="h-3 w-3 mr-1" />
+                      Desbloqueio em: {Math.ceil(blockTimeRemaining / 60000)} minutos
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+            <Button 
+              type="submit" 
+              className="w-full bg-civeni-blue hover:bg-blue-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Entrando...' : 'Entrar'}
+            </Button>
+          </form>
+          
+          <div className="mt-4 text-center">
+            <PasswordResetDialog>
+              <Button variant="link" className="text-civeni-blue">
                 Esqueceu sua senha?
-              </button>
-            </div>
-
-            <div className="mt-8 text-center text-xs text-gray-500">
-              Ao continuar, você concorda com nossos termos de uso
-            </div>
-
-            <div className="mt-4 text-center text-xs text-gray-400">
-              © 2025 CIVENI. Transformando a gestão de eventos.
-            </div>
+              </Button>
+            </PasswordResetDialog>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
