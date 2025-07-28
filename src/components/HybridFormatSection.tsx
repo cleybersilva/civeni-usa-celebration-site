@@ -2,37 +2,55 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
+import exhibitionStandsImg from '@/assets/hybrid-exhibition-stands.jpg';
+import keynoteLecturesImg from '@/assets/hybrid-keynote-lectures.jpg';
+import panelDiscussionsImg from '@/assets/hybrid-panel-discussions.jpg';
+import oralCommunicationsImg from '@/assets/hybrid-oral-communications.jpg';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
 
-  // Usar dados do banco ou fallback para valores padrão
+  // Usar dados do banco ou fallback para valores padrão com imagens locais
   const activities = content.hybridActivities.length > 0 
-    ? content.hybridActivities.map(activity => ({
-        title: activity.title,
-        image: activity.image_url,
-        description: activity.description
-      }))
+    ? content.hybridActivities.map(activity => {
+        // Mapear URLs do banco para imagens locais se necessário
+        let imageUrl = activity.image_url;
+        if (imageUrl.includes('/src/assets/hybrid-exhibition-stands.jpg')) {
+          imageUrl = exhibitionStandsImg;
+        } else if (imageUrl.includes('/src/assets/hybrid-keynote-lectures.jpg')) {
+          imageUrl = keynoteLecturesImg;
+        } else if (imageUrl.includes('/src/assets/hybrid-panel-discussions.jpg')) {
+          imageUrl = panelDiscussionsImg;
+        } else if (imageUrl.includes('/src/assets/hybrid-oral-communications.jpg')) {
+          imageUrl = oralCommunicationsImg;
+        }
+        
+        return {
+          title: activity.title,
+          image: imageUrl,
+          description: activity.description
+        };
+      })
     : [
         {
           title: t('hybrid.exhibitionStands'),
-          image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=600&q=80",
+          image: exhibitionStandsImg,
           description: t('hybrid.exhibitionDesc')
         },
         {
           title: t('hybrid.keynoteLectures'), 
-          image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
+          image: keynoteLecturesImg,
           description: t('hybrid.keynoteDesc')
         },
         {
           title: t('hybrid.panelDiscussions'),
-          image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
+          image: panelDiscussionsImg,
           description: t('hybrid.panelDesc')
         },
         {
           title: t('hybrid.oralCommunications'),
-          image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+          image: oralCommunicationsImg,
           description: t('hybrid.oralDesc')
         }
       ];
