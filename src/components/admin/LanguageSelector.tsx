@@ -22,7 +22,7 @@ const LanguageSelector = () => {
     <div className="relative">
       <button
         onClick={() => setOpenDropdown(!openDropdown)}
-        className="flex items-center space-x-2 text-gray-600 hover:text-civeni-blue transition-colors bg-white bg-opacity-10 px-3 py-2 rounded-md hover:bg-opacity-20 border border-gray-200"
+        className="flex items-center space-x-2 text-white hover:text-white transition-colors bg-civeni-blue bg-opacity-20 px-3 py-2 rounded-md hover:bg-civeni-blue hover:bg-opacity-40 border border-white border-opacity-50"
       >
         <span className="text-lg">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
         <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>

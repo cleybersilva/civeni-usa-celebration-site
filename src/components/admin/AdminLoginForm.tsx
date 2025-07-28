@@ -69,7 +69,7 @@ const AdminLoginForm = () => {
         <div className="relative">
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
-            className="flex items-center space-x-2 text-white hover:text-civeni-red transition-colors bg-black bg-opacity-20 px-3 py-2 rounded-md hover:bg-opacity-30"
+            className="flex items-center space-x-2 text-white hover:text-civeni-red transition-colors bg-civeni-blue bg-opacity-80 px-3 py-2 rounded-md hover:bg-civeni-red hover:bg-opacity-90 border border-white border-opacity-30"
           >
             <span className="text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
             <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>
