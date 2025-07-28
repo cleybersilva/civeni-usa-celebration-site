@@ -417,7 +417,23 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         order: slide.order_index
       })) || defaultContent.bannerSlides;
 
-      setContent(prev => ({ ...prev, bannerSlides }));
+      // Carregar configurações do evento do Supabase
+      const { data: eventConfigData, error: eventError } = await supabase
+        .from('event_config')
+        .select('*')
+        .limit(1)
+        .single();
+
+      let eventConfig = defaultContent.eventConfig;
+      if (eventConfigData && !eventError) {
+        eventConfig = {
+          eventDate: eventConfigData.event_date,
+          eventLocation: eventConfigData.event_location,
+          eventCity: eventConfigData.event_city
+        };
+      }
+
+      setContent(prev => ({ ...prev, bannerSlides, eventConfig }));
     } catch (error) {
       console.error('Error loading content:', error);
       setContent(defaultContent);
@@ -498,9 +514,22 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateEventConfig = async (eventConfig: EventConfig) => {
     try {
+      const configData = {
+        event_date: eventConfig.eventDate,
+        event_location: eventConfig.eventLocation,
+        event_city: eventConfig.eventCity
+      };
+
+      const { error } = await supabase
+        .from('event_config')
+        .upsert([configData]);
+
+      if (error) throw error;
+
       setContent(prev => ({ ...prev, eventConfig }));
     } catch (error) {
       console.error('Error updating event config:', error);
+      throw error;
     }
   };
 

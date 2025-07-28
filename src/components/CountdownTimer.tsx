@@ -14,9 +14,11 @@ const CountdownTimer = () => {
   });
 
   useEffect(() => {
+    if (!content.eventConfig.eventDate) return;
+    
     const targetDate = new Date(content.eventConfig.eventDate + 'T00:00:00').getTime();
 
-    const timer = setInterval(() => {
+    const updateCountdown = () => {
       const now = new Date().getTime();
       const difference = targetDate - now;
 
@@ -27,8 +29,13 @@ const CountdownTimer = () => {
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((difference % (1000 * 60)) / 1000)
         });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
-    }, 1000);
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
   }, [content.eventConfig.eventDate]);

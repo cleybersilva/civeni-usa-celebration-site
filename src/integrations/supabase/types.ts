@@ -190,6 +190,39 @@ export type Database = {
         }
         Relationships: []
       }
+      event_config: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          event_city: string
+          event_date: string
+          event_location: string
+          id: string
+          start_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string | null
+          event_city: string
+          event_date: string
+          event_location: string
+          id?: string
+          start_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string | null
+          event_city?: string
+          event_date?: string
+          event_location?: string
+          id?: string
+          start_time?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_registrations: {
         Row: {
           amount_paid: number | null

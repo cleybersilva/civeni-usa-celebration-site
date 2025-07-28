@@ -22,13 +22,19 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminDashboardContent = () => {
   const { hasPermission, isAdminRoot, user } = useAdminAuth();
-  const [activeTab, setActiveTab] = useState(() => {
-    if (user?.user_type === 'editor') {
-      return 'contador';
+  const [activeTab, setActiveTab] = useState('financeiro');
+
+  // Definir aba inicial baseada no tipo de usuário
+  useEffect(() => {
+    if (user) {
+      if (user.user_type === 'editor') {
+        setActiveTab('contador');
+      } else {
+        const canViewFinanceiro = isAdminRoot() || user.user_type === 'admin';
+        setActiveTab(canViewFinanceiro ? 'financeiro' : 'banner');
+      }
     }
-    const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
-    return canViewFinanceiro ? 'financeiro' : 'banner';
-  });
+  }, [user, isAdminRoot]);
 
   // Escutar mudanças de aba vindas do sidebar
   useEffect(() => {
