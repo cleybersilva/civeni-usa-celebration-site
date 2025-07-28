@@ -85,27 +85,15 @@ const AdminLoginForm = () => {
       </div>
 
       {/* Right side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-gray-50">
         <div className="w-full max-w-md">
-          {/* Mobile logo and back button */}
-          <div className="lg:hidden mb-8 text-center">
+          {/* Logo above login area - always visible */}
+          <div className="mb-8 text-center">
             <img 
               src="/lovable-uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
               alt="III Civeni 2025 Logo" 
               className="h-16 w-auto mx-auto mb-4"
             />
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-              className="text-civeni-red border-civeni-red hover:bg-civeni-red hover:text-white transition-colors"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Voltar ao Site
-            </Button>
-          </div>
-
-          {/* Desktop back button */}
-          <div className="hidden lg:block mb-6">
             <Button
               variant="outline"
               onClick={() => navigate('/')}
