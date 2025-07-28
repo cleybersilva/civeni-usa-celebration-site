@@ -44,7 +44,7 @@ const AdminLoginForm = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Logo and Info */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-500 to-red-600 p-12 flex-col justify-between text-white relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-civeni-red to-civeni-orange p-12 flex-col justify-between text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
@@ -119,7 +119,7 @@ const AdminLoginForm = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                  className="h-12 text-base border-gray-200 focus:border-civeni-red focus:ring-civeni-red"
                   required
                 />
               </div>
@@ -135,7 +135,7 @@ const AdminLoginForm = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500 pr-12"
+                    className="h-12 text-base border-gray-200 focus:border-civeni-red focus:ring-civeni-red pr-12"
                     required
                   />
                   <button
@@ -160,7 +160,7 @@ const AdminLoginForm = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors"
+                className="w-full h-12 bg-civeni-red hover:bg-civeni-red/90 text-white font-medium rounded-lg transition-colors"
                 disabled={isLoading}
               >
                 {isLoading ? 'Entrando...' : 'Entrar'}
@@ -170,7 +170,7 @@ const AdminLoginForm = () => {
             <div className="mt-6 text-center">
               <button 
                 type="button"
-                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                className="text-sm text-civeni-red hover:text-civeni-red/80 font-medium"
                 onClick={() => {/* TODO: Implement password reset */}}
               >
                 Esqueceu sua senha?

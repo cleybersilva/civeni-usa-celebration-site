@@ -64,6 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				// Civeni custom colors
+				'civeni-blue': 'hsl(var(--civeni-blue))',
+				'civeni-red': 'hsl(var(--civeni-red))',
+				'civeni-green': 'hsl(var(--civeni-green))',
+				'civeni-orange': 'hsl(var(--civeni-orange))',
 				civeni: {
 					blue: '#0a194e',
 					red: '#c8102e',
