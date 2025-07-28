@@ -2,44 +2,17 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
-import exhibitionStandsImg from '@/assets/hybrid-exhibition-stands.jpg';
-import keynoteLecturesImg from '@/assets/hybrid-keynote-lectures.jpg';
-import panelDiscussionsImg from '@/assets/hybrid-panel-discussions.jpg';
-import oralCommunicationsImg from '@/assets/hybrid-oral-communications.jpg';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
 
-  // Usar dados do banco ou fallback para valores padrão com imagens locais
-  const activities = content.hybridActivities.length > 0 
-    ? content.hybridActivities.map(activity => ({
-        title: activity.title,
-        image: activity.image_url,
-        description: activity.description
-      }))
-    : [
-        {
-          title: t('hybrid.exhibitionStands'),
-          image: exhibitionStandsImg,
-          description: t('hybrid.exhibitionDesc')
-        },
-        {
-          title: t('hybrid.keynoteLectures'), 
-          image: keynoteLecturesImg,
-          description: t('hybrid.keynoteDesc')
-        },
-        {
-          title: t('hybrid.panelDiscussions'),
-          image: panelDiscussionsImg,
-          description: t('hybrid.panelDesc')
-        },
-        {
-          title: t('hybrid.oralCommunications'),
-          image: oralCommunicationsImg,
-          description: t('hybrid.oralDesc')
-        }
-      ];
+  // Usar apenas dados do banco de dados
+  const activities = content.hybridActivities.filter(activity => activity.is_active).map(activity => ({
+    title: activity.title,
+    image: activity.image_url,
+    description: activity.description
+  }));
 
   return (
     <section className="py-20 bg-gray-50">
