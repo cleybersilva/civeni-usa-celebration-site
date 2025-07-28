@@ -520,6 +520,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateEventConfig = async (eventConfig: EventConfig) => {
     try {
+      console.log('Updating event config:', eventConfig);
+      
       const configData = {
         event_date: eventConfig.eventDate,
         event_location: eventConfig.eventLocation,
@@ -528,41 +530,23 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         end_time: eventConfig.endTime
       };
 
-      // Primeiro tenta atualizar, se não existir, insere
-      const { data: existing } = await supabase
+      // Sempre atualiza o primeiro registro da tabela
+      const { data, error } = await supabase
         .from('event_config')
-        .select('id')
+        .update(configData)
         .limit(1)
-        .maybeSingle();
+        .select();
 
-      let result;
-      if (existing) {
-        result = await supabase
-          .from('event_config')
-          .update(configData)
-          .eq('id', existing.id)
-          .select();
-      } else {
-        result = await supabase
-          .from('event_config')
-          .insert([configData])
-          .select();
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
       }
 
-      if (result.error) throw result.error;
-
-      // Atualizar o estado local com os dados retornados do banco
-      if (result.data && result.data.length > 0) {
-        const data = result.data[0];
-        const updatedConfig = {
-          eventDate: data.event_date,
-          eventLocation: data.event_location,
-          eventCity: data.event_city,
-          startTime: data.start_time,
-          endTime: data.end_time
-        };
-        setContent(prev => ({ ...prev, eventConfig: updatedConfig }));
-      }
+      console.log('Update successful:', data);
+      
+      // Atualizar estado local imediatamente
+      setContent(prev => ({ ...prev, eventConfig }));
+      
     } catch (error) {
       console.error('Error updating event config:', error);
       throw error;
