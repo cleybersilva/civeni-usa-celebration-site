@@ -530,19 +530,33 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         end_time: eventConfig.endTime
       };
 
-      // Sempre atualiza o primeiro registro da tabela
-      const { data, error } = await supabase
+      // Buscar o ID do primeiro registro
+      const { data: existingData } = await supabase
         .from('event_config')
-        .update(configData)
-        .limit(1)
-        .select();
+        .select('id')
+        .order('created_at', { ascending: true })
+        .limit(1);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+      if (existingData && existingData.length > 0) {
+        // Atualizar registro existente
+        const { data, error } = await supabase
+          .from('event_config')
+          .update(configData)
+          .eq('id', existingData[0].id)
+          .select();
+
+        if (error) throw error;
+        console.log('Update successful:', data);
+      } else {
+        // Inserir novo registro se não existir
+        const { data, error } = await supabase
+          .from('event_config')
+          .insert([configData])
+          .select();
+
+        if (error) throw error;
+        console.log('Insert successful:', data);
       }
-
-      console.log('Update successful:', data);
       
       // Atualizar estado local imediatamente
       setContent(prev => ({ ...prev, eventConfig }));
