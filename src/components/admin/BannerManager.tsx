@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useCMS, BannerSlide } from '@/contexts/CMSContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import ImageGuide from './ImageGuide';
+import ImageUploadField from './ImageUploadField';
 
 const BannerManager = () => {
   const { content, updateBannerSlides } = useCMS();
@@ -19,6 +20,7 @@ const BannerManager = () => {
     subtitle: '',
     description: '',
     bgImage: '',
+    uploadedImage: '',
     buttonText: '',
     buttonLink: ''
   });
@@ -29,6 +31,7 @@ const BannerManager = () => {
       subtitle: '',
       description: '',
       bgImage: '',
+      uploadedImage: '',
       buttonText: '',
       buttonLink: ''
     });
@@ -38,18 +41,29 @@ const BannerManager = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Use uploaded image if available, otherwise use URL
+    const finalBgImage = formData.uploadedImage || formData.bgImage;
+    
+    // Validate that at least one image source is provided
+    if (!finalBgImage) {
+      alert('Por favor, faça upload de uma imagem ou forneça uma URL para a imagem de fundo.');
+      return;
+    }
+    
     const slides = [...content.bannerSlides];
     
     if (editingSlide) {
       const index = slides.findIndex(s => s.id === editingSlide.id);
       slides[index] = {
         ...editingSlide,
-        ...formData
+        ...formData,
+        bgImage: finalBgImage
       };
     } else {
       const newSlide: BannerSlide = {
         id: Date.now().toString(),
         ...formData,
+        bgImage: finalBgImage,
         order: slides.length + 1
       };
       slides.push(newSlide);
@@ -67,6 +81,7 @@ const BannerManager = () => {
       subtitle: slide.subtitle,
       description: slide.description,
       bgImage: slide.bgImage,
+      uploadedImage: '',
       buttonText: slide.buttonText,
       buttonLink: slide.buttonLink
     });
@@ -132,12 +147,20 @@ const BannerManager = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">URL da Imagem de Fundo</label>
+                    <ImageUploadField
+                      label="Imagem de Fundo (Upload)"
+                      type="banner"
+                      value={formData.uploadedImage}
+                      onChange={(value) => setFormData({...formData, uploadedImage: value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">URL da Imagem de Fundo (Opcional se fez upload)</label>
                     <Input
                       type="url"
                       value={formData.bgImage}
                       onChange={(e) => setFormData({...formData, bgImage: e.target.value})}
-                      required
+                      placeholder="Cole aqui a URL da imagem ou faça upload acima"
                     />
                   </div>
                   <div>
