@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Speaker {
   id: string;
@@ -393,9 +394,33 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loadContent = async () => {
     try {
-      setContent(defaultContent);
+      // Carregar banner slides do Supabase
+      const { data: bannerSlidesData, error: bannerError } = await supabase
+        .from('banner_slides')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (bannerError) {
+        console.error('Error loading banner slides:', bannerError);
+      }
+
+      // Converter dados do Supabase para o formato do contexto
+      const bannerSlides: BannerSlide[] = bannerSlidesData?.map(slide => ({
+        id: slide.id,
+        title: slide.title,
+        subtitle: slide.subtitle,
+        description: slide.description,
+        bgImage: slide.bg_image,
+        buttonText: slide.button_text,
+        buttonLink: slide.button_link,
+        order: slide.order_index
+      })) || defaultContent.bannerSlides;
+
+      setContent(prev => ({ ...prev, bannerSlides }));
     } catch (error) {
       console.error('Error loading content:', error);
+      setContent(defaultContent);
     } finally {
       setLoading(false);
     }
@@ -411,9 +436,47 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateBannerSlides = async (bannerSlides: BannerSlide[]) => {
     try {
+      // Primeiro, desativar todos os slides existentes
+      await supabase
+        .from('banner_slides')
+        .update({ is_active: false })
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Desativar todos
+
+      // Inserir/atualizar os slides
+      for (const slide of bannerSlides) {
+        const slideData = {
+          id: slide.id === 'new' ? undefined : slide.id, // Deixar undefined para gerar novo UUID
+          title: slide.title,
+          subtitle: slide.subtitle,
+          description: slide.description,
+          bg_image: slide.bgImage,
+          button_text: slide.buttonText,
+          button_link: slide.buttonLink,
+          order_index: slide.order,
+          is_active: true
+        };
+
+        if (slide.id && slide.id !== 'new') {
+          // Atualizar slide existente
+          await supabase
+            .from('banner_slides')
+            .upsert(slideData);
+        } else {
+          // Inserir novo slide
+          await supabase
+            .from('banner_slides')
+            .insert(slideData);
+        }
+      }
+
+      // Atualizar o estado local
       setContent(prev => ({ ...prev, bannerSlides }));
+      
+      // Recarregar dados do banco
+      await loadContent();
     } catch (error) {
       console.error('Error updating banner slides:', error);
+      throw error;
     }
   };
 

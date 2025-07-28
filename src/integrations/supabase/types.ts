@@ -77,6 +77,48 @@ export type Database = {
         }
         Relationships: []
       }
+      banner_slides: {
+        Row: {
+          bg_image: string
+          button_link: string
+          button_text: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          order_index: number
+          subtitle: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bg_image: string
+          button_link: string
+          button_text: string
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          subtitle: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bg_image?: string
+          button_link?: string
+          button_text?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coupon_codes: {
         Row: {
           category_id: string | null

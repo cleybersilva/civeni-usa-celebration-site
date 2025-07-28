@@ -61,7 +61,7 @@ const BannerManager = () => {
       };
     } else {
       const newSlide: BannerSlide = {
-        id: Date.now().toString(),
+        id: 'new', // Será tratado no contexto CMS para gerar UUID no Supabase
         ...formData,
         bgImage: finalBgImage,
         order: slides.length + 1
