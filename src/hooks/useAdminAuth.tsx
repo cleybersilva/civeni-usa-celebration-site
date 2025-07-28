@@ -71,14 +71,26 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const login = async (email: string, password: string) => {
     try {
-      // Temporary workaround: Use simple email/password check without encryption
-      // This is for debugging purposes only - in production, use proper password hashing
-      if (email === 'cleyber.silva@live.com' && password === '123456') {
+      // Use the secure admin login function from Supabase
+      const { data, error } = await supabase.rpc('simple_admin_login', {
+        user_email: email,
+        user_password: password
+      });
+
+      if (error) {
+        console.error('Login RPC error:', error);
+        return { success: false, error: 'Erro ao fazer login' };
+      }
+
+      // Type assertion for the response data
+      const loginResponse = data as unknown as LoginResponse;
+
+      if (loginResponse && loginResponse.success && loginResponse.user) {
         const adminUser: AdminUser = {
-          id: '6b111e3e-f8d3-4b5d-ad29-ce66c8f7cc8a',
-          email: 'cleyber.silva@live.com',
-          user_type: 'admin_root',
-          is_admin_root: true
+          id: loginResponse.user.user_id,
+          email: loginResponse.user.email,
+          user_type: loginResponse.user.user_type as AdminUser['user_type'],
+          is_admin_root: loginResponse.user.user_type === 'admin_root'
         };
         
         setUser(adminUser);
@@ -98,7 +110,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         localStorage.setItem('adminSession', JSON.stringify(sessionData));
         return { success: true };
       } else {
-        return { success: false, error: 'Credenciais inválidas' };
+        return { success: false, error: loginResponse?.error || 'Credenciais inválidas' };
       }
     } catch (error) {
       console.error('Login error:', error);
