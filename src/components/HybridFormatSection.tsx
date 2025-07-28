@@ -11,14 +11,16 @@ const HybridFormatSection = () => {
   console.log('HybridFormatSection - Raw hybridActivities:', content.hybridActivities);
 
   // Usar os dados do CMS, ordenados por order_index
-  const activities = content.hybridActivities
-    .filter(activity => activity.is_active)
-    .sort((a, b) => a.order_index - b.order_index)
-    .map(activity => ({
-      title: activity.title,
-      image: activity.image_url,
-      description: activity.description
-    }));
+  const activities = content.hybridActivities && content.hybridActivities.length > 0
+    ? content.hybridActivities
+        .filter(activity => activity.is_active)
+        .sort((a, b) => a.order_index - b.order_index)
+        .map(activity => ({
+          title: activity.title,
+          image: activity.image_url,
+          description: activity.description
+        }))
+    : [];
 
   console.log('HybridFormatSection - Processed activities:', activities);
 
@@ -151,6 +153,13 @@ const HybridFormatSection = () => {
                     src={activity.image}
                     alt={activity.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                    onError={(e) => {
+                      console.error('Database image failed to load:', activity.image);
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=600&q=80';
+                    }}
+                    onLoad={() => {
+                      console.log('Database image loaded successfully:', activity.image);
+                    }}
                   />
                   <div className="absolute inset-0 bg-civeni-blue bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
                 </div>
