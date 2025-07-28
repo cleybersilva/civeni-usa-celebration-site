@@ -59,21 +59,21 @@ const AdminLoginForm = () => {
         </div>
         <div className="relative z-10 flex flex-col justify-center items-center text-center p-12 text-white">
           <h1 className="text-4xl font-bold mb-8">
-            III Congresso Internacional de Veterinária de Ensino
+            III CIVENI USA 2025
           </h1>
-          <div className="space-y-6 mb-8">
+          <p className="text-xl mb-8 leading-relaxed">
+            Congresso Internacional de Inovação Educacional e Novas Tecnologias é o principal evento que reúne educadores, pesquisadores e profissionais de tecnologia de todo o mundo.
+          </p>
+          <div className="space-y-6">
             <div className="flex items-center justify-center space-x-3">
               <GraduationCap className="w-6 h-6" />
-              <span className="text-lg">Educação Veterinária de Excelência</span>
+              <span className="text-lg">Inovação Educacional</span>
             </div>
             <div className="flex items-center justify-center space-x-3">
               <Users className="w-6 h-6" />
-              <span className="text-lg">Networking Profissional</span>
+              <span className="text-lg">Networking Global</span>
             </div>
           </div>
-          <p className="text-lg opacity-90">
-            Conectando profissionais da educação veterinária de todo o mundo
-          </p>
         </div>
       </div>
 
