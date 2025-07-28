@@ -233,7 +233,27 @@ export const enTranslations = {
       login: "Login",
       loggingIn: "Logging in...",
       noCredentials: "Don't have credentials yet?",
-      forgotPassword: "Forgot your password?"
+      forgotPassword: "Forgot your password?",
+      dashboard: {
+        title: "Financial Dashboard",
+        subtitle: "Track registrations, payments and alerts in real time",
+        charts: "Charts",
+        reports: "Reports",
+        alerts: "Alerts",
+        actions: "Actions",
+        generateDailyReport: "Generate Daily Report",
+        refreshData: "Refresh Data",
+        totalRegistrations: "Total Registrations",
+        confirmedPayments: "Confirmed Payments",
+        totalRevenue: "Total Revenue",
+        conversionRate: "Conversion Rate",
+        today: "Today",
+        pending: "Pending",
+        paymentsRegistrations: "Payments/Registrations",
+        registrationCharts: "Registration Charts",
+        revenueCharts: "Revenue Charts",
+        loadingCharts: "Loading charts..."
+      }
     }
   }
 };

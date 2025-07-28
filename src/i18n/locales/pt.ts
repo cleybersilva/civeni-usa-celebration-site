@@ -233,7 +233,27 @@ export const ptTranslations = {
       login: "Entrar",
       loggingIn: "Entrando...",
       noCredentials: "Não tem credenciais ainda?",
-      forgotPassword: "Esqueceu sua senha?"
+      forgotPassword: "Esqueceu sua senha?",
+      dashboard: {
+        title: "Dashboard Financeiro",
+        subtitle: "Acompanhe inscrições, pagamentos e alertas em tempo real",
+        charts: "Gráficos",
+        reports: "Relatórios",
+        alerts: "Alertas",
+        actions: "Ações",
+        generateDailyReport: "Gerar Relatório Diário",
+        refreshData: "Atualizar Dados",
+        totalRegistrations: "Total de Inscrições",
+        confirmedPayments: "Pagamentos Confirmados",
+        totalRevenue: "Receita Total",
+        conversionRate: "Taxa de Conversão",
+        today: "Hoje",
+        pending: "Pendentes",
+        paymentsRegistrations: "Pagamentos/Inscrições",
+        registrationCharts: "Gráficos de Inscrições",
+        revenueCharts: "Gráficos de Faturamento",
+        loadingCharts: "Carregando gráficos..."
+      }
     }
   }
 };
