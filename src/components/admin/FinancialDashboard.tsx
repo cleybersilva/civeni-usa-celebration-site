@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import StatsCards from './dashboard/StatsCards';
@@ -12,6 +13,7 @@ import { useFinancialData } from './dashboard/hooks/useFinancialData';
 import { useChartData } from './dashboard/hooks/useChartData';
 
 const FinancialDashboard = () => {
+  const { t } = useTranslation();
   const {
     stats,
     alerts,
@@ -57,9 +59,9 @@ const FinancialDashboard = () => {
         <Tabs defaultValue="graficos" className="h-full flex flex-col">
           <div className="flex-shrink-0 px-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="graficos">Gráficos</TabsTrigger>
-              <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
-              <TabsTrigger value="alertas">Alertas</TabsTrigger>
+              <TabsTrigger value="graficos">{t('admin.dashboard.charts', 'Gráficos')}</TabsTrigger>
+              <TabsTrigger value="relatorios">{t('admin.dashboard.reports', 'Relatórios')}</TabsTrigger>
+              <TabsTrigger value="alertas">{t('admin.dashboard.alerts', 'Alertas')}</TabsTrigger>
             </TabsList>
           </div>
           
@@ -68,9 +70,9 @@ const FinancialDashboard = () => {
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-8">
                   <div className="w-full">
-                    <h3 className="text-xl font-semibold mb-6">Gráficos de Inscrições</h3>
+                    <h3 className="text-xl font-semibold mb-6">{t('admin.dashboard.registrationCharts', 'Gráficos de Inscrições')}</h3>
                     {chartsLoading ? (
-                      <div className="text-center py-8">Carregando gráficos...</div>
+                      <div className="text-center py-8">{t('admin.dashboard.loadingCharts', 'Carregando gráficos...')}</div>
                     ) : (
                       <div className="w-full">
                         <RegistrationCharts
@@ -83,9 +85,9 @@ const FinancialDashboard = () => {
                   </div>
                   
                   <div className="w-full">
-                    <h3 className="text-xl font-semibold mb-6">Gráficos de Faturamento</h3>
+                    <h3 className="text-xl font-semibold mb-6">{t('admin.dashboard.revenueCharts', 'Gráficos de Faturamento')}</h3>
                     {chartsLoading ? (
-                      <div className="text-center py-8">Carregando gráficos...</div>
+                      <div className="text-center py-8">{t('admin.dashboard.loadingCharts', 'Carregando gráficos...')}</div>
                     ) : (
                       <div className="w-full">
                         <RevenueCharts

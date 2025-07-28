@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
 
@@ -17,6 +18,8 @@ interface StatsCardsProps {
 }
 
 const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
+  const { t } = useTranslation();
+  
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -45,46 +48,46 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-blue-800">Total de Inscrições</CardTitle>
+          <CardTitle className="text-sm font-medium text-blue-800">{t('admin.dashboard.totalRegistrations', 'Total de Inscrições')}</CardTitle>
           <Users className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-blue-900">{stats.total_registrations}</div>
           <p className="text-xs text-blue-700 bg-blue-200 px-2 py-1 rounded-full inline-block mt-2">
-            Hoje: +{stats.today_registrations}
+            {t('admin.dashboard.today', 'Hoje')}: +{stats.today_registrations}
           </p>
         </CardContent>
       </Card>
 
       <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-green-800">Pagamentos Confirmados</CardTitle>
+          <CardTitle className="text-sm font-medium text-green-800">{t('admin.dashboard.confirmedPayments', 'Pagamentos Confirmados')}</CardTitle>
           <DollarSign className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-900">{stats.completed_payments}</div>
           <p className="text-xs text-orange-700 bg-orange-200 px-2 py-1 rounded-full inline-block mt-2">
-            Pendentes: {stats.pending_payments}
+            {t('admin.dashboard.pending', 'Pendentes')}: {stats.pending_payments}
           </p>
         </CardContent>
       </Card>
 
       <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-purple-800">Receita Total</CardTitle>
+          <CardTitle className="text-sm font-medium text-purple-800">{t('admin.dashboard.totalRevenue', 'Receita Total')}</CardTitle>
           <TrendingUp className="h-4 w-4 text-purple-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-purple-900">{formatCurrency(stats.total_revenue || 0)}</div>
           <p className="text-xs text-purple-700 bg-purple-200 px-2 py-1 rounded-full inline-block mt-2">
-            Hoje: {formatCurrency(stats.today_revenue || 0)}
+            {t('admin.dashboard.today', 'Hoje')}: {formatCurrency(stats.today_revenue || 0)}
           </p>
         </CardContent>
       </Card>
 
       <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-amber-800">Taxa de Conversão</CardTitle>
+          <CardTitle className="text-sm font-medium text-amber-800">{t('admin.dashboard.conversionRate', 'Taxa de Conversão')}</CardTitle>
           <AlertTriangle className="h-4 w-4 text-amber-600" />
         </CardHeader>
         <CardContent>
@@ -93,7 +96,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
               Math.round((stats.completed_payments / stats.total_registrations) * 100) : 0}%
           </div>
           <p className="text-xs text-amber-700 bg-amber-200 px-2 py-1 rounded-full inline-block mt-2">
-            Pagamentos/Inscrições
+            {t('admin.dashboard.paymentsRegistrations', 'Pagamentos/Inscrições')}
           </p>
         </CardContent>
       </Card>
