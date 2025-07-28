@@ -540,16 +540,30 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         result = await supabase
           .from('event_config')
           .update(configData)
-          .eq('id', existing.id);
+          .eq('id', existing.id)
+          .select()
+          .single();
       } else {
         result = await supabase
           .from('event_config')
-          .insert([configData]);
+          .insert([configData])
+          .select()
+          .single();
       }
 
       if (result.error) throw result.error;
 
-      setContent(prev => ({ ...prev, eventConfig }));
+      // Atualizar o estado local com os dados retornados do banco
+      if (result.data) {
+        const updatedConfig = {
+          eventDate: result.data.event_date,
+          eventLocation: result.data.event_location,
+          eventCity: result.data.event_city,
+          startTime: result.data.start_time,
+          endTime: result.data.end_time
+        };
+        setContent(prev => ({ ...prev, eventConfig: updatedConfig }));
+      }
     } catch (error) {
       console.error('Error updating event config:', error);
       throw error;

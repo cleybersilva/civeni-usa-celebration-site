@@ -40,6 +40,17 @@ const CountdownTimer = () => {
     return () => clearInterval(timer);
   }, [content.eventConfig.eventDate]);
 
+  // Escutar atualizações das configurações do evento
+  useEffect(() => {
+    const handleConfigUpdate = () => {
+      // Force re-render do componente quando configurações são atualizadas
+      window.location.reload();
+    };
+
+    window.addEventListener('eventConfigUpdated', handleConfigUpdate);
+    return () => window.removeEventListener('eventConfigUpdated', handleConfigUpdate);
+  }, [content.eventConfig.eventDate]);
+
   const timeUnits = [
     { label: t('countdown.days'), value: timeLeft.days },
     { label: t('countdown.hours'), value: timeLeft.hours },
