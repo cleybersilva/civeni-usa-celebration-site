@@ -57,28 +57,21 @@ const AdminLoginForm = () => {
             className="w-full h-full object-cover opacity-30"
           />
         </div>
-        <div className="relative z-10 flex flex-col justify-center p-12 text-white">
-          <div className="mb-8">
-            <img 
-              src="/lovable-uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
-              alt="III Civeni 2025 Logo" 
-              className="h-24 w-auto mb-6"
-            />
-          </div>
-          <h1 className="text-4xl font-bold mb-6">
+        <div className="relative z-10 flex flex-col justify-center items-center text-center p-12 text-white">
+          <h1 className="text-4xl font-bold mb-8">
             III Congresso Internacional de Veterinária de Ensino
           </h1>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
+          <div className="space-y-6 mb-8">
+            <div className="flex items-center justify-center space-x-3">
               <GraduationCap className="w-6 h-6" />
               <span className="text-lg">Educação Veterinária de Excelência</span>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center space-x-3">
               <Users className="w-6 h-6" />
               <span className="text-lg">Networking Profissional</span>
             </div>
           </div>
-          <p className="text-lg mt-6 opacity-90">
+          <p className="text-lg opacity-90">
             Conectando profissionais da educação veterinária de todo o mundo
           </p>
         </div>
@@ -115,14 +108,14 @@ const AdminLoginForm = () => {
               <form onSubmit={handleLogin} className="space-y-5">
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-gray-700">
-                    Email ou CPF
+                    Email
                   </label>
                   <div className="relative">
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email ou CPF"
+                      placeholder="Email"
                       required
                       className="pl-10 h-12 border-gray-300 focus:border-civeni-blue focus:ring-civeni-blue"
                     />
