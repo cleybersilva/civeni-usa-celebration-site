@@ -17,7 +17,7 @@ import PartnersManager from '@/components/admin/PartnersManager';
 import SiteTextsManager from '@/components/admin/SiteTextsManager';
 import VideosManager from '@/components/admin/VideosManager';
 import UsersManager from '@/components/admin/UsersManager';
-import HybridFormatManager from '@/components/admin/HybridFormatManager';
+
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -142,12 +142,6 @@ const AdminDashboardContent = () => {
           </PermissionGuard>
         ) : null;
       
-      case 'formato-hibrido':
-        return (hasPermission('banner') || isAdminRoot()) ? (
-          <PermissionGuard resource="banner">
-            <HybridFormatManager />
-          </PermissionGuard>
-        ) : null;
       
       default:
         return canViewFinanceiro ? <DashboardOverview /> : <BannerManager />;
