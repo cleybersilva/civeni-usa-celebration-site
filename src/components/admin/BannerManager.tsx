@@ -41,37 +41,47 @@ const BannerManager = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Use uploaded image if available, otherwise use URL
-    const finalBgImage = formData.uploadedImage || formData.bgImage;
-    
-    // Validate that at least one image source is provided
-    if (!finalBgImage) {
-      alert('Por favor, faça upload de uma imagem ou forneça uma URL para a imagem de fundo.');
-      return;
-    }
-    
-    const slides = [...content.bannerSlides];
-    
-    if (editingSlide) {
-      const index = slides.findIndex(s => s.id === editingSlide.id);
-      slides[index] = {
-        ...editingSlide,
-        ...formData,
-        bgImage: finalBgImage
-      };
-    } else {
-      const newSlide: BannerSlide = {
-        id: 'new', // Será tratado no contexto CMS para gerar UUID no Supabase
-        ...formData,
-        bgImage: finalBgImage,
-        order: slides.length + 1
-      };
-      slides.push(newSlide);
-    }
+    try {
+      // Use uploaded image if available, otherwise use URL
+      const finalBgImage = formData.uploadedImage || formData.bgImage;
+      
+      // Validate that at least one image source is provided
+      if (!finalBgImage) {
+        alert('Por favor, faça upload de uma imagem ou forneça uma URL para a imagem de fundo.');
+        return;
+      }
+      
+      const slides = [...content.bannerSlides];
+      
+      if (editingSlide) {
+        const index = slides.findIndex(s => s.id === editingSlide.id);
+        if (index !== -1) {
+          slides[index] = {
+            ...editingSlide,
+            ...formData,
+            bgImage: finalBgImage,
+            order: editingSlide.order // Manter ordem original
+          };
+        }
+      } else {
+        const newSlide: BannerSlide = {
+          id: 'new', // Será tratado no contexto CMS para gerar UUID no Supabase
+          ...formData,
+          bgImage: finalBgImage,
+          order: slides.length + 1
+        };
+        slides.push(newSlide);
+      }
 
-    await updateBannerSlides(slides);
-    setIsDialogOpen(false);
-    resetForm();
+      await updateBannerSlides(slides);
+      setIsDialogOpen(false);
+      resetForm();
+      
+      alert('Banner atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar banner:', error);
+      alert('Erro ao salvar banner. Tente novamente.');
+    }
   };
 
   const handleEdit = (slide: BannerSlide) => {
@@ -90,8 +100,14 @@ const BannerManager = () => {
 
   const handleDelete = async (slideId: string) => {
     if (confirm('Tem certeza que deseja excluir este slide?')) {
-      const slides = content.bannerSlides.filter(s => s.id !== slideId);
-      await updateBannerSlides(slides);
+      try {
+        const slides = content.bannerSlides.filter(s => s.id !== slideId);
+        await updateBannerSlides(slides);
+        alert('Banner excluído com sucesso!');
+      } catch (error) {
+        console.error('Erro ao excluir banner:', error);
+        alert('Erro ao excluir banner. Tente novamente.');
+      }
     }
   };
 

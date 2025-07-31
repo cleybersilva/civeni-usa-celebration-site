@@ -493,44 +493,62 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateBannerSlides = async (bannerSlides: BannerSlide[]) => {
     try {
+      console.log('Updating banner slides:', bannerSlides);
+      
       // Primeiro, desativar todos os slides existentes
-      await supabase
+      const { error: deactivateError } = await supabase
         .from('banner_slides')
         .update({ is_active: false })
         .neq('id', '00000000-0000-0000-0000-000000000000'); // Desativar todos
 
-      // Inserir/atualizar os slides
-      for (const slide of bannerSlides) {
+      if (deactivateError) {
+        console.error('Error deactivating slides:', deactivateError);
+        throw deactivateError;
+      }
+
+      // Processar cada slide
+      for (let i = 0; i < bannerSlides.length; i++) {
+        const slide = bannerSlides[i];
         const slideData = {
-          id: slide.id === 'new' ? undefined : slide.id, // Deixar undefined para gerar novo UUID
           title: slide.title,
           subtitle: slide.subtitle,
           description: slide.description,
           bg_image: slide.bgImage,
           button_text: slide.buttonText,
           button_link: slide.buttonLink,
-          order_index: slide.order,
+          order_index: i + 1, // Usar índice sequencial
           is_active: true
         };
 
         if (slide.id && slide.id !== 'new') {
           // Atualizar slide existente
-          await supabase
+          const { error: updateError } = await supabase
             .from('banner_slides')
-            .upsert(slideData);
+            .update(slideData)
+            .eq('id', slide.id);
+
+          if (updateError) {
+            console.error('Error updating slide:', updateError);
+            throw updateError;
+          }
         } else {
           // Inserir novo slide
-          await supabase
+          const { error: insertError } = await supabase
             .from('banner_slides')
-            .insert(slideData);
+            .insert([slideData]);
+
+          if (insertError) {
+            console.error('Error inserting slide:', insertError);
+            throw insertError;
+          }
         }
       }
 
-      // Atualizar o estado local
-      setContent(prev => ({ ...prev, bannerSlides }));
+      console.log('Banner slides updated successfully');
       
-      // Recarregar dados do banco
+      // Recarregar dados do banco para sincronizar
       await loadContent();
+      
     } catch (error) {
       console.error('Error updating banner slides:', error);
       throw error;
