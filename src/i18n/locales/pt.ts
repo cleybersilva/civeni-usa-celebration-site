@@ -88,6 +88,7 @@ export const ptTranslations = {
     },
     registration: {
       title: "Inscrições",
+      subtitle: "Garanta sua vaga no evento educacional mais importante do ano",
       newTitle: "Inscrições",
       formTitle: "Formulário de Inscrição",
       presentialFormTitle: "Formulário de Inscrição Presencial",

@@ -88,6 +88,7 @@ export const enTranslations = {
     },
     registration: {
       title: "Registration",
+      subtitle: "Secure your spot at the most important educational event of the year",
       newTitle: "Registration",
       formTitle: "Registration Form",
       presentialFormTitle: "In-Person Registration Form",

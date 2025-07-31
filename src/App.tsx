@@ -20,6 +20,7 @@ import InscricaoOnline from "./pages/InscricaoOnline";
 import Palestrantes from "./pages/Palestrantes";
 import AreaTematica from "./pages/AreaTematica";
 import Contato from "./pages/Contato";
+import Inscricoes from "./pages/Inscricoes";
 
 import './App.css';
 
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/palestrantes" element={<Palestrantes />} />
                 <Route path="/area-tematica" element={<AreaTematica />} />
                 <Route path="/contato" element={<Contato />} />
+                <Route path="/inscricoes" element={<Inscricoes />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="*" element={<NotFound />} />

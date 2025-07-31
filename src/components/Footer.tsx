@@ -2,6 +2,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Instagram, Facebook, Youtube, Lock, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useCMS } from '@/contexts/CMSContext';
 
 const Footer = () => {
@@ -63,13 +64,13 @@ const Footer = () => {
               </a>
             </div>
             <div className="mt-4">
-              <a 
-                href="/admin" 
+              <Link 
+                to="/admin" 
                 className="inline-flex items-center space-x-2 bg-civeni-red text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors transform hover:scale-105"
               >
                 <Lock size={16} />
                 <span className="text-sm font-medium">{t('header.adminArea')}</span>
-              </a>
+              </Link>
             </div>
           </div>
           
@@ -121,12 +122,17 @@ const Footer = () => {
                   href={content.siteTexts.institutionalLink} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-civeni-red transition-colors"
+                  className="hover:text-civeni-red transition-colors underline"
                 >
                   {t('footer.privacyPolicy')}
                 </a>
               ) : (
-                t('footer.privacyPolicy')
+                <a 
+                  href="#privacy" 
+                  className="hover:text-civeni-red transition-colors underline"
+                >
+                  {t('footer.privacyPolicy')}
+                </a>
               )}
             </div>
           </div>

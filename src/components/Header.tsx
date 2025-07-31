@@ -211,12 +211,12 @@ const Header = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <a
-              href="#registration"
+            <Link
+              to="/inscricoes"
               className="bg-civeni-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition-colors font-poppins"
             >
               {t('header.registration')}
-            </a>
+            </Link>
             <Link
               to="/contato"
               className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
