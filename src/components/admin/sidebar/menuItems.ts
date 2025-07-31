@@ -109,5 +109,12 @@ export const createMenuItems = (
       show: hasPermission('videos') || isAdminRoot(),
       order: 11
     },
+    {
+      id: 'sincronizacao',
+      label: t('admin.menu.sync', 'Sincronização'),
+      icon: Settings,
+      show: hasPermission('admin') || isAdminRoot(),
+      order: 12
+    }
   ];
 };

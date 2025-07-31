@@ -17,6 +17,7 @@ import PartnersManager from '@/components/admin/PartnersManager';
 import SiteTextsManager from '@/components/admin/SiteTextsManager';
 import VideosManager from '@/components/admin/VideosManager';
 import UsersManager from '@/components/admin/UsersManager';
+import SyncManager from '@/components/admin/SyncManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -142,6 +143,10 @@ const AdminDashboardContent = () => {
           </PermissionGuard>
         ) : null;
       
+      case 'sincronizacao':
+        return (hasPermission('admin') || isAdminRoot()) ? (
+          <SyncManager />
+        ) : null;
       
       default:
         return canViewFinanceiro ? <DashboardOverview /> : <BannerManager />;
