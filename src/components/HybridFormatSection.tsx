@@ -14,6 +14,14 @@ const HybridFormatSection = () => {
   console.log('HybridFormatSection - Content loaded:', !loading);
   console.log('HybridFormatSection - Raw hybridActivities:', content.hybridActivities);
 
+  // Criar um mapeamento das imagens locais
+  const imageMapping = {
+    'estandes_exposicao': hybridExhibitionStands,
+    'palestras_magistrais': hybridKeynoteLectures, 
+    'discussoes_painel': hybridPanelDiscussions,
+    'comunicacoes_orais': hybridOralCommunications
+  };
+
   // Usar os dados do CMS, ordenados por order_index
   const activities = content.hybridActivities && content.hybridActivities.length > 0
     ? content.hybridActivities
@@ -21,7 +29,7 @@ const HybridFormatSection = () => {
         .sort((a, b) => a.order_index - b.order_index)
         .map(activity => ({
           title: activity.title,
-          image: activity.image_url,
+          image: imageMapping[activity.activity_type] || activity.image_url,
           description: activity.description
         }))
     : [];
