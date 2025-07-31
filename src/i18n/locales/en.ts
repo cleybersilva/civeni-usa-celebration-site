@@ -334,7 +334,21 @@ export const enTranslations = {
         partners: "Partners",
         texts: "Texts",
         users: "Users",
-        videos: "Videos"
+        videos: "Videos",
+        digitalMedia: "Digital Media"
+      },
+      digitalMedia: {
+        title: "Digital Media",
+        description: "Manage all visual and audiovisual content for the event",
+        videos2024: "Videos 2024",
+        images2024: "II CIVENI 2024 - Images",
+        banners: "Banners",
+        videosTitle: "Manage Videos",
+        videosDesc: "Official videos from II CIVENI 2024 and future events",
+        imagesTitle: "Image Gallery",
+        imagesDesc: "Official images from II CIVENI 2024",
+        bannersTitle: "Manage Banners",
+        bannersDesc: "Banners used on the website and promotional materials"
       },
       dashboard: {
         title: "Financial Dashboard",

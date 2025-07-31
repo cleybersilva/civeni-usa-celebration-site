@@ -335,7 +335,21 @@ export const ptTranslations = {
         partners: "Parceiros",
         texts: "Textos",
         users: "Usuários",
-        videos: "Vídeos"
+        videos: "Vídeos",
+        digitalMedia: "Mídia Digital"
+      },
+      digitalMedia: {
+        title: "Mídia Digital",
+        description: "Gerencie todos os conteúdos visuais e audiovisuais do evento",
+        videos2024: "Vídeos 2024",
+        images2024: "II CIVENI 2024 - Imagens",
+        banners: "Banners",
+        videosTitle: "Gerenciar Vídeos",
+        videosDesc: "Vídeos oficiais do II CIVENI 2024 e futuros eventos",
+        imagesTitle: "Galeria de Imagens",
+        imagesDesc: "Imagens oficiais do II CIVENI 2024",
+        bannersTitle: "Gerenciar Banners",
+        bannersDesc: "Banners utilizados no site e materiais de divulgação"
       },
       dashboard: {
         title: "Dashboard Financeiro",

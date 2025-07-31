@@ -34,10 +34,10 @@ export const createMenuItems = (
     },
     // Demais itens em ordem alfabética
     {
-      id: 'banner',
-      label: t('admin.menu.banner', 'Banner'),
+      id: 'midia-digital',
+      label: t('admin.menu.digitalMedia', 'Mídia Digital'),
       icon: Image,
-      show: hasPermission('banner') || isAdminRoot(),
+      show: hasPermission('banner') || hasPermission('videos') || hasPermission('palestrantes') || isAdminRoot(),
       order: 1
     },
     {
@@ -102,20 +102,6 @@ export const createMenuItems = (
       icon: Settings,
       show: canViewUsuarios,
       order: 10
-    },
-    {
-      id: 'videos',
-      label: t('admin.menu.videos', 'Vídeos'),
-      icon: Play,
-      show: hasPermission('videos') || isAdminRoot(),
-      order: 11
-    },
-    {
-      id: 'civeni-2024-images',
-      label: 'II CIVENI 2024 - Imagens',
-      icon: Image,
-      show: hasPermission('palestrantes') || isAdminRoot(),
-      order: 11.5
     },
     {
       id: 'submissao-trabalhos',

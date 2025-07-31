@@ -22,6 +22,7 @@ import CiveniII2024ImagesManager from '@/components/admin/CiveniII2024ImagesMana
 import TransmissaoLiveManager from '@/components/admin/TransmissaoLiveManager';
 import WorkSubmissionsManager from '@/components/admin/WorkSubmissionsManager';
 import WorksManager from '@/components/admin/WorksManager';
+import MidiaDigitalManager from '@/components/admin/MidiaDigitalManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -66,11 +67,9 @@ const AdminDashboardContent = () => {
       case 'financeiro':
         return canViewFinanceiro ? <DashboardOverview /> : null;
       
-      case 'banner':
-        return (hasPermission('banner') || isAdminRoot()) ? (
-          <PermissionGuard resource="banner">
-            <BannerManager />
-          </PermissionGuard>
+      case 'midia-digital':
+        return (hasPermission('banner') || hasPermission('videos') || hasPermission('palestrantes') || isAdminRoot()) ? (
+          <MidiaDigitalManager />
         ) : null;
       
       case 'contador':
@@ -140,19 +139,6 @@ const AdminDashboardContent = () => {
       case 'usuarios':
         return canViewUsuarios ? <UsersManager /> : null;
       
-      case 'videos':
-        return (hasPermission('videos') || isAdminRoot()) ? (
-          <PermissionGuard resource="videos">
-            <VideosManager />
-          </PermissionGuard>
-        ) : null;
-      
-      case 'civeni-2024-images':
-        return (hasPermission('palestrantes') || isAdminRoot()) ? (
-          <PermissionGuard resource="palestrantes">
-            <CiveniII2024ImagesManager />
-          </PermissionGuard>
-        ) : null;
       
       case 'submissao-trabalhos':
         return (hasPermission('palestrantes') || isAdminRoot()) ? (
@@ -181,7 +167,7 @@ const AdminDashboardContent = () => {
         ) : null;
       
       default:
-        return canViewFinanceiro ? <DashboardOverview /> : <BannerManager />;
+        return canViewFinanceiro ? <DashboardOverview /> : <MidiaDigitalManager />;
     }
   };
 
