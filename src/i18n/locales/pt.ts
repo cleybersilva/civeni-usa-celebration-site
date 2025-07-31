@@ -156,6 +156,7 @@ export const ptTranslations = {
     },
     videos: {
       title: "Vídeos do II Civeni 2024",
+      description: "Reviva os melhores momentos e apresentações do II Congresso Internacional",
       watchVideo: "Assistir Vídeo",
       minimize: "Minimizar",
       maximize: "Maximizar",
