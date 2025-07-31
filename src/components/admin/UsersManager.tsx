@@ -44,8 +44,13 @@ const UsersManager = () => {
 
   // Edit form state
   const [editFormData, setEditFormData] = useState({
-    user_type: 'viewer' as const
+    user_type: 'viewer' as const,
+    newPassword: '',
+    confirmNewPassword: ''
   });
+  
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -108,8 +113,12 @@ const UsersManager = () => {
   const handleEditUser = (adminUser: AdminUser) => {
     setEditingUser(adminUser);
     setEditFormData({
-      user_type: adminUser.user_type as any
+      user_type: adminUser.user_type as any,
+      newPassword: '',
+      confirmNewPassword: ''
     });
+    setShowNewPassword(false);
+    setShowConfirmNewPassword(false);
     setIsEditDialogOpen(true);
   };
 
@@ -120,19 +129,50 @@ const UsersManager = () => {
 
     if (!editingUser) return;
 
+    // Validar senha se fornecida
+    if (editFormData.newPassword) {
+      if (editFormData.newPassword.length < 6) {
+        setError('A nova senha deve ter pelo menos 6 caracteres');
+        return;
+      }
+      if (editFormData.newPassword !== editFormData.confirmNewPassword) {
+        setError('As senhas não coincidem');
+        return;
+      }
+    }
+
     try {
-      const { data, error } = await supabase.rpc('update_admin_user_type', {
+      // Atualizar tipo de usuário
+      const { data: userTypeData, error: userTypeError } = await supabase.rpc('update_admin_user_type', {
         user_id: editingUser.user_id,
         new_user_type: editFormData.user_type
       });
 
-      if (error) throw error;
+      if (userTypeError) throw userTypeError;
 
-      const result = data as any;
+      // Se uma nova senha foi fornecida, atualizar a senha
+      if (editFormData.newPassword) {
+        const { data: passwordData, error: passwordError } = await supabase.rpc('update_admin_user_password', {
+          user_id: editingUser.user_id,
+          new_password: editFormData.newPassword
+        });
+
+        if (passwordError) throw passwordError;
+      }
+
+      const result = userTypeData as any;
       if (result.success) {
-        setSuccess(result.message);
+        setSuccess(editFormData.newPassword ? 
+          'Usuário e senha atualizados com sucesso' : 
+          result.message
+        );
         setIsEditDialogOpen(false);
         setEditingUser(null);
+        setEditFormData({
+          user_type: 'viewer' as const,
+          newPassword: '',
+          confirmNewPassword: ''
+        });
         fetchUsers();
       } else {
         setError(result.error);
@@ -455,6 +495,62 @@ const UsersManager = () => {
                     )}
                   </SelectContent>
                 </Select>
+              </div>
+              
+              <div className="space-y-4 border-t pt-4">
+                <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                  💡 <strong>Alteração de Senha:</strong> Deixe os campos em branco se não quiser alterar a senha atual.
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Nova Senha (opcional)</label>
+                  <div className="relative">
+                    <Input
+                      type={showNewPassword ? "text" : "password"}
+                      value={editFormData.newPassword}
+                      onChange={(e) => setEditFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                      placeholder="Digite a nova senha (mínimo 6 caracteres)"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Confirmar Nova Senha</label>
+                  <div className="relative">
+                    <Input
+                      type={showConfirmNewPassword ? "text" : "password"}
+                      value={editFormData.confirmNewPassword}
+                      onChange={(e) => setEditFormData(prev => ({ ...prev, confirmNewPassword: e.target.value }))}
+                      placeholder="Confirme a nova senha"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                    >
+                      {showConfirmNewPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>

@@ -25,9 +25,7 @@ const AdminSidebar = () => {
 
   const menuItems = createMenuItems(hasPermission, isAdminRoot, canViewFinanceiro, canViewUsuarios, t);
 
-  const visibleItems = menuItems
-    .filter(item => item.show)
-    .sort((a, b) => a.order - b.order);
+  const visibleItems = menuItems.filter(item => item.show);
 
   // Comunicar mudança de aba para o componente pai
   React.useEffect(() => {
