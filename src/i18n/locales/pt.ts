@@ -8,6 +8,7 @@ export const ptTranslations = {
       inPerson: "Presencial",
       online: "Online",
       papers: "Trabalhos",
+      submission: "Submissão",
       oralPresentation: "Apresentação Oral",
       posterSessions: "Sessões de Pôster",
       manuscripts: "Manuscritos",
