@@ -117,6 +117,13 @@ export const createMenuItems = (
       order: 11.5
     },
     {
+      id: 'transmissao-live',
+      label: t('admin.menu.liveStream', 'Transmissão Ao Vivo'),
+      icon: Play,
+      show: hasPermission('transmissao') || isAdminRoot(),
+      order: 11.7
+    },
+    {
       id: 'sincronizacao',
       label: t('admin.menu.sync', 'Sincronização'),
       icon: Settings,

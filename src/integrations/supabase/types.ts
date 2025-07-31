@@ -629,6 +629,39 @@ export type Database = {
         }
         Relationships: []
       }
+      transmissoes_live: {
+        Row: {
+          created_at: string
+          data_hora_inicio: string | null
+          descricao: string | null
+          id: string
+          status: string
+          titulo: string
+          updated_at: string
+          url_embed: string
+        }
+        Insert: {
+          created_at?: string
+          data_hora_inicio?: string | null
+          descricao?: string | null
+          id?: string
+          status?: string
+          titulo: string
+          updated_at?: string
+          url_embed: string
+        }
+        Update: {
+          created_at?: string
+          data_hora_inicio?: string | null
+          descricao?: string | null
+          id?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+          url_embed?: string
+        }
+        Relationships: []
+      }
       turmas: {
         Row: {
           created_at: string
