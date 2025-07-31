@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useCMS } from '@/contexts/CMSContext';
 
 const PartnersSection = () => {
@@ -141,9 +142,12 @@ const PartnersSection = () => {
             <p className="text-lg opacity-90 mb-6">
               {t('partners.partnerDesc')}
             </p>
-            <button className="bg-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins">
+            <Link 
+              to="/seja-nosso-parceiro"
+              className="bg-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins inline-block"
+            >
               {t('partners.partnerButton')}
-            </button>
+            </Link>
           </div>
         </div>
       </div>
