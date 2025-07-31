@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
+import conferenceEventImage from '@/assets/conference-event.jpg';
 
 const HeroBanner = () => {
   const { t } = useTranslation();

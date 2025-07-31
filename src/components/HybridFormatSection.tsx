@@ -2,6 +2,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
+import hybridExhibitionStands from '@/assets/hybrid-exhibition-stands.jpg';
+import hybridKeynoteLectures from '@/assets/hybrid-keynote-lectures.jpg';
+import hybridPanelDiscussions from '@/assets/hybrid-panel-discussions.jpg';
+import hybridOralCommunications from '@/assets/hybrid-oral-communications.jpg';
 
 const HybridFormatSection = () => {
   const { t } = useTranslation();
@@ -30,22 +34,22 @@ const HybridFormatSection = () => {
     const fallbackActivities = [
       {
         title: "Estandes de Exposição",
-        image: "/img/formato_hibrido/estandes-exposicao.png",
+        image: hybridExhibitionStands,
         description: "Explore os estandes de tecnologia e inovação, interaja com expositores e descubra as últimas novidades do setor."
       },
       {
         title: "Palestras Magistrais", 
-        image: "/img/formato_hibrido/palestras-magistrais.png",
+        image: hybridKeynoteLectures,
         description: "Assista às apresentações principais de especialistas renomados, abordando tendências e visões futuras da área."
       },
       {
         title: "Discussões em Painel",
-        image: "/img/formato_hibrido/painel.png", 
+        image: hybridPanelDiscussions, 
         description: "Participe de debates interativos com múltiplos especialistas, explorando diferentes perspectivas sobre temas relevantes."
       },
       {
         title: "Comunicações Orais",
-        image: "/img/formato_hibrido/comunicacoes-orais.png",
+        image: hybridOralCommunications,
         description: "Acompanhe apresentações de pesquisas acadêmicas e projetos inovadores de profissionais e estudantes."
       }
     ];
