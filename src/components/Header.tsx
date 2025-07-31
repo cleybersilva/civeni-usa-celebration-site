@@ -25,8 +25,8 @@ const Header = () => {
     {
       title: t('header.congress'),
       items: [
-        { name: t('header.presentation'), href: '#presentation' },
-        { name: t('header.committee'), href: '#committee' }
+        { name: t('header.presentation'), href: '/congresso/apresentacao' },
+        { name: t('header.committee'), href: '/congresso/comite' }
       ]
     },
     {

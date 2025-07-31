@@ -8,6 +8,7 @@ export const enTranslations = {
       inPerson: "In Person",
       online: "Online",
       papers: "Papers",
+      submission: "Submission",
       oralPresentation: "Oral Presentation",
       posterSessions: "Poster Sessions",
       manuscripts: "Manuscripts",
