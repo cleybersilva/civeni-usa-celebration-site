@@ -13,22 +13,22 @@ const ActionsCard: React.FC<ActionsCardProps> = ({ onGenerateReport, onRefreshDa
   const { t } = useTranslation();
 
   return (
-    <Card className="bg-gradient-to-r from-civeni-blue/10 to-civeni-blue/20 border-civeni-blue/30 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-civeni-blue to-civeni-blue/90 text-white rounded-t-lg">
-        <CardTitle className="text-white">{t('admin.dashboard.actions', 'Ações')}</CardTitle>
+    <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/30 shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-t-lg">
+        <CardTitle className="text-primary-foreground">{t('admin.dashboard.actions', 'Ações')}</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
         <div className="flex gap-4">
           <Button 
             onClick={onGenerateReport} 
-            className="bg-gradient-to-r from-civeni-red to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-gradient-to-r from-accent to-accent/90 hover:from-accent/90 hover:to-accent text-accent-foreground shadow-lg hover:shadow-xl transition-all duration-300"
           >
             {t('admin.dashboard.generateDailyReport', 'Gerar Relatório Diário')}
           </Button>
           <Button 
             variant="outline" 
             onClick={onRefreshData} 
-            className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
           >
             {t('admin.dashboard.refreshData', 'Atualizar Dados')}
           </Button>
