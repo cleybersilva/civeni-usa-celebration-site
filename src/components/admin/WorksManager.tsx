@@ -13,7 +13,7 @@ const WorksManager = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BookOpen className="h-5 w-5" />
-          {t('admin.menu.works', 'Gestão de Trabalhos')}
+          {t('admin.works.title')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -21,15 +21,15 @@ const WorksManager = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="apresentacao-oral" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {t('admin.menu.oralPresentation', 'Apresentação Oral')}
+              {t('admin.works.oralPresentation')}
             </TabsTrigger>
             <TabsTrigger value="sessoes-poster" className="flex items-center gap-2">
               <Presentation className="h-4 w-4" />
-              {t('admin.menu.posterSessions', 'Sessões de Pôster')}
+              {t('admin.works.posterSessions')}
             </TabsTrigger>
             <TabsTrigger value="manuscritos" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              {t('admin.menu.manuscripts', 'Manuscritos')}
+              {t('admin.works.manuscripts')}
             </TabsTrigger>
           </TabsList>
           

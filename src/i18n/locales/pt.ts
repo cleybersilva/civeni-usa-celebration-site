@@ -370,6 +370,41 @@ export const ptTranslations = {
         registrationCharts: "Gráficos de Inscrições",
         revenueCharts: "Gráficos de Faturamento",
         loadingCharts: "Carregando gráficos..."
+      },
+      users: {
+        title: "Gerenciamento de Usuários",
+        description: "Gerencie usuários administrativos do sistema",
+        newUser: "Novo Usuário",
+        createNewUser: "Criar Novo Usuário",
+        editUser: "Editar Usuário",
+        email: "Email",
+        password: "Senha",
+        confirmPassword: "Confirmar Senha",
+        userType: "Tipo de Usuário",
+        newPassword: "Nova Senha (opcional)",
+        confirmNewPassword: "Confirmar Nova Senha",
+        enterEmail: "Digite o email do usuário",
+        enterPassword: "Digite a senha",
+        confirmPasswordPlaceholder: "Confirme a senha",
+        enterNewPassword: "Digite a nova senha (mínimo 6 caracteres)",
+        confirmNewPasswordPlaceholder: "Confirme a nova senha",
+        cancel: "Cancelar",
+        createUser: "Criar Usuário",
+        updateUser: "Atualizar Usuário",
+        created: "Criado em",
+        actions: "Ações",
+        you: "Você",
+        protected: "Protegido",
+        noUsersFound: "Nenhum usuário encontrado",
+        passwordChangeInfo: "Deixe o campo em branco se não quiser alterar a senha.",
+        passwordChangeTitle: "Alteração de Senha:"
+      },
+      works: {
+        title: "Trabalhos",
+        description: "Gerencie conteúdos de trabalhos acadêmicos",
+        oralPresentation: "Apresentação Oral",
+        posterSessions: "Sessões de Pôster",
+        manuscripts: "Manuscritos"
       }
     }
   }

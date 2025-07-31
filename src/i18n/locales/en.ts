@@ -369,6 +369,41 @@ export const enTranslations = {
         registrationCharts: "Registration Charts",
         revenueCharts: "Revenue Charts",
         loadingCharts: "Loading charts..."
+      },
+      users: {
+        title: "User Management",
+        description: "Manage system administrative users",
+        newUser: "New User",
+        createNewUser: "Create New User",
+        editUser: "Edit User",
+        email: "Email",
+        password: "Password",
+        confirmPassword: "Confirm Password",
+        userType: "User Type",
+        newPassword: "New Password (optional)",
+        confirmNewPassword: "Confirm New Password",
+        enterEmail: "Enter user email",
+        enterPassword: "Enter password",
+        confirmPasswordPlaceholder: "Confirm password",
+        enterNewPassword: "Enter new password (minimum 6 characters)",
+        confirmNewPasswordPlaceholder: "Confirm new password",
+        cancel: "Cancel",
+        createUser: "Create User",
+        updateUser: "Update User",
+        created: "Created on",
+        actions: "Actions",
+        you: "You",
+        protected: "Protected",
+        noUsersFound: "No users found",
+        passwordChangeInfo: "Leave blank if you don't want to change the password.",
+        passwordChangeTitle: "Password Change:"
+      },
+      works: {
+        title: "Works",
+        description: "Manage academic works content",
+        oralPresentation: "Oral Presentation",
+        posterSessions: "Poster Sessions",
+        manuscripts: "Manuscripts"
       }
     }
   }

@@ -369,6 +369,41 @@ export const esTranslations = {
         registrationCharts: "Gráficos de Inscripciones",
         revenueCharts: "Gráficos de Ingresos",
         loadingCharts: "Cargando gráficos..."
+      },
+      users: {
+        title: "Gestión de Usuarios",
+        description: "Gestiona usuarios administrativos del sistema",
+        newUser: "Nuevo Usuario",
+        createNewUser: "Crear Nuevo Usuario",
+        editUser: "Editar Usuario",
+        email: "Email",
+        password: "Contraseña",
+        confirmPassword: "Confirmar Contraseña",
+        userType: "Tipo de Usuario",
+        newPassword: "Nueva Contraseña (opcional)",
+        confirmNewPassword: "Confirmar Nueva Contraseña",
+        enterEmail: "Ingresa el email del usuario",
+        enterPassword: "Ingresa la contraseña",
+        confirmPasswordPlaceholder: "Confirma la contraseña",
+        enterNewPassword: "Ingresa la nueva contraseña (mínimo 6 caracteres)",
+        confirmNewPasswordPlaceholder: "Confirma la nueva contraseña",
+        cancel: "Cancelar",
+        createUser: "Crear Usuario",
+        updateUser: "Actualizar Usuario",
+        created: "Creado en",
+        actions: "Acciones",
+        you: "Tú",
+        protected: "Protegido",
+        noUsersFound: "No se encontraron usuarios",
+        passwordChangeInfo: "Deja en blanco si no quieres cambiar la contraseña.",
+        passwordChangeTitle: "Cambio de Contraseña:"
+      },
+      works: {
+        title: "Trabajos",
+        description: "Gestiona contenidos de trabajos académicos",
+        oralPresentation: "Presentación Oral",
+        posterSessions: "Sesiones de Póster",
+        manuscripts: "Manuscritos"
       }
     }
   }

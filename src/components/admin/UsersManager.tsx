@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trash2, Plus, Users, Shield, Eye, EyeOff, UserPlus, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useTranslation } from 'react-i18next';
 
 interface AdminUser {
   user_id: string;
@@ -19,6 +20,7 @@ interface AdminUser {
 }
 
 const UsersManager = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -253,8 +255,8 @@ const UsersManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-civeni-blue">Gerenciamento de Usuários</h2>
-          <p className="text-gray-600">Gerencie usuários administrativos do sistema</p>
+          <h2 className="text-2xl font-bold text-civeni-blue">{t('admin.users.title')}</h2>
+          <p className="text-gray-600">{t('admin.users.description')}</p>
         </div>
         
         {canManageUsers && (
@@ -262,32 +264,32 @@ const UsersManager = () => {
             <DialogTrigger asChild>
               <Button className="bg-civeni-blue hover:bg-blue-700">
                 <UserPlus className="w-4 h-4 mr-2" />
-                Novo Usuário
+                {t('admin.users.newUser')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Criar Novo Usuário</DialogTitle>
+                <DialogTitle>{t('admin.users.createNewUser')}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleCreateUser} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.users.email')}</label>
                   <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="Digite o email do usuário"
+                    placeholder={t('admin.users.enterEmail')}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Senha</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.users.password')}</label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Digite a senha"
+                      placeholder={t('admin.users.enterPassword')}
                       required
                     />
                     <Button
@@ -306,13 +308,13 @@ const UsersManager = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Confirmar Senha</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.users.confirmPassword')}</label>
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      placeholder="Confirme a senha"
+                      placeholder={t('admin.users.confirmPasswordPlaceholder')}
                       required
                     />
                     <Button
@@ -331,7 +333,7 @@ const UsersManager = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.users.userType')}</label>
                   <Select 
                     value={formData.user_type}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, user_type: value as any }))}
@@ -352,10 +354,10 @@ const UsersManager = () => {
                 </div>
                 <div className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancelar
+                    {t('admin.users.cancel')}
                   </Button>
                   <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                    Criar Usuário
+                    {t('admin.users.createUser')}
                   </Button>
                 </div>
               </form>
@@ -388,10 +390,10 @@ const UsersManager = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-3 font-semibold">Email</th>
-                  <th className="text-left p-3 font-semibold">Tipo</th>
-                  <th className="text-left p-3 font-semibold">Criado em</th>
-                  <th className="text-left p-3 font-semibold">Ações</th>
+                  <th className="text-left p-3 font-semibold">{t('admin.users.email')}</th>
+                  <th className="text-left p-3 font-semibold">{t('admin.users.userType')}</th>
+                  <th className="text-left p-3 font-semibold">{t('admin.users.created')}</th>
+                  <th className="text-left p-3 font-semibold">{t('admin.users.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -401,7 +403,7 @@ const UsersManager = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{adminUser.email}</span>
                         {adminUser.email === user?.email && (
-                          <Badge variant="outline" className="text-xs">Você</Badge>
+                          <Badge variant="outline" className="text-xs">{t('admin.users.you')}</Badge>
                         )}
                       </div>
                     </td>
@@ -440,7 +442,7 @@ const UsersManager = () => {
                         )}
                         {adminUser.email === 'cleyber.silva@live.com' && (
                           <Badge variant="outline" className="text-xs">
-                            Protegido
+                            {t('admin.users.protected')}
                           </Badge>
                         )}
                       </div>
@@ -453,7 +455,7 @@ const UsersManager = () => {
           
           {users.length === 0 && (
             <div className="text-center py-8 text-gray-500">
-              Nenhum usuário encontrado
+              {t('admin.users.noUsersFound')}
             </div>
           )}
         </CardContent>
@@ -464,11 +466,11 @@ const UsersManager = () => {
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Editar Usuário</DialogTitle>
+              <DialogTitle>{t('admin.users.editUser')}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleUpdateUser} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
+                <label className="block text-sm font-medium mb-2">{t('admin.users.email')}</label>
                 <Input
                   type="email"
                   value={editingUser?.email || ''}
@@ -477,7 +479,7 @@ const UsersManager = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Tipo de Usuário</label>
+                <label className="block text-sm font-medium mb-2">{t('admin.users.userType')}</label>
                 <Select 
                   value={editFormData.user_type}
                   onValueChange={(value) => setEditFormData(prev => ({ ...prev, user_type: value as any }))}
@@ -499,17 +501,17 @@ const UsersManager = () => {
               
               <div className="space-y-4 border-t pt-4">
                 <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-                  💡 <strong>Alteração de Senha:</strong> Deixe os campos em branco se não quiser alterar a senha atual.
+                  💡 <strong>{t('admin.users.passwordChangeTitle')}</strong> {t('admin.users.passwordChangeInfo')}
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Nova Senha (opcional)</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.users.newPassword')}</label>
                   <div className="relative">
                     <Input
                       type={showNewPassword ? "text" : "password"}
                       value={editFormData.newPassword}
                       onChange={(e) => setEditFormData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      placeholder="Digite a nova senha (mínimo 6 caracteres)"
+                      placeholder={t('admin.users.enterNewPassword')}
                     />
                     <Button
                       type="button"
@@ -528,13 +530,13 @@ const UsersManager = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Confirmar Nova Senha</label>
+                  <label className="block text-sm font-medium mb-2">{t('admin.users.confirmNewPassword')}</label>
                   <div className="relative">
                     <Input
                       type={showConfirmNewPassword ? "text" : "password"}
                       value={editFormData.confirmNewPassword}
                       onChange={(e) => setEditFormData(prev => ({ ...prev, confirmNewPassword: e.target.value }))}
-                      placeholder="Confirme a nova senha"
+                      placeholder={t('admin.users.confirmNewPasswordPlaceholder')}
                     />
                     <Button
                       type="button"
@@ -554,10 +556,10 @@ const UsersManager = () => {
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  Cancelar
+                  {t('admin.users.cancel')}
                 </Button>
                 <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-                  Atualizar Usuário
+                  {t('admin.users.updateUser')}
                 </Button>
               </div>
             </form>
