@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Download, FileText, FileSpreadsheet, TrendingUp, Calendar, Users, DollarSign } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,18 +28,31 @@ interface RegistrationReport {
   updated_at: string;
 }
 
+interface ReportSummary {
+  totalRegistrations: number;
+  completedPayments: number;
+  pendingPayments: number;
+  totalRevenue: number;
+  averageTicket: number;
+  conversionRate: number;
+}
+
 const RegistrationReports = () => {
+  const { t } = useTranslation();
   const [reports, setReports] = useState<RegistrationReport[]>([]);
+  const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
   const { toast } = useToast();
 
   useEffect(() => {
     fetchReports();
-  }, []);
+  }, [selectedPeriod]);
 
   const fetchReports = async () => {
+    setLoading(true);
     try {
-      const { data: registrations, error } = await supabase
+      let query = supabase
         .from('event_registrations')
         .select(`
           *,
@@ -45,6 +60,30 @@ const RegistrationReports = () => {
           registration_batches(batch_number)
         `)
         .order('created_at', { ascending: false });
+
+      // Aplicar filtro de período
+      if (selectedPeriod !== 'all') {
+        const now = new Date();
+        let startDate: Date;
+        
+        switch (selectedPeriod) {
+          case 'today':
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            break;
+          case 'week':
+            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            break;
+          case 'month':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+          default:
+            startDate = new Date(0);
+        }
+        
+        query = query.gte('created_at', startDate.toISOString());
+      }
+
+      const { data: registrations, error } = await query;
 
       if (error) throw error;
 
@@ -67,6 +106,26 @@ const RegistrationReports = () => {
       })) || [];
 
       setReports(formattedReports);
+      
+      // Calcular resumo
+      const totalRegistrations = formattedReports.length;
+      const completedPayments = formattedReports.filter(r => r.payment_status === 'completed').length;
+      const pendingPayments = formattedReports.filter(r => r.payment_status === 'pending').length;
+      const totalRevenue = formattedReports
+        .filter(r => r.payment_status === 'completed')
+        .reduce((sum, r) => sum + r.amount_paid, 0);
+      const averageTicket = completedPayments > 0 ? totalRevenue / completedPayments : 0;
+      const conversionRate = totalRegistrations > 0 ? (completedPayments / totalRegistrations) * 100 : 0;
+
+      setSummary({
+        totalRegistrations,
+        completedPayments,
+        pendingPayments,
+        totalRevenue,
+        averageTicket,
+        conversionRate
+      });
+
     } catch (error) {
       console.error('Erro ao buscar relatórios:', error);
       toast({
@@ -204,81 +263,198 @@ const RegistrationReports = () => {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">Carregando relatórios...</div>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">Carregando relatórios...</div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-blue-600 font-medium">Total de Inscrições</p>
+                  <p className="text-2xl font-bold text-blue-900">{summary.totalRegistrations}</p>
+                </div>
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-green-100">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-green-600 font-medium">Receita Total</p>
+                  <p className="text-2xl font-bold text-green-900">R$ {summary.totalRevenue.toFixed(2)}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-purple-600 font-medium">Ticket Médio</p>
+                  <p className="text-2xl font-bold text-purple-900">R$ {summary.averageTicket.toFixed(2)}</p>
+                </div>
+                <TrendingUp className="h-8 w-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-orange-600 font-medium">Taxa de Conversão</p>
+                  <p className="text-2xl font-bold text-orange-900">{summary.conversionRate.toFixed(1)}%</p>
+                </div>
+                <Calendar className="h-8 w-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <Tabs defaultValue="detailed" className="space-y-4">
         <div className="flex justify-between items-center">
-          <CardTitle>Relatório Detalhado de Inscrições</CardTitle>
-          <div className="flex gap-2">
+          <TabsList>
+            <TabsTrigger value="detailed">Relatório Detalhado</TabsTrigger>
+            <TabsTrigger value="analytics">Análise de Performance</TabsTrigger>
+          </TabsList>
+          
+          <div className="flex gap-2 items-center">
+            <select 
+              value={selectedPeriod} 
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="px-3 py-1 border rounded-md text-sm"
+            >
+              <option value="all">Todos os períodos</option>
+              <option value="today">Hoje</option>
+              <option value="week">Última semana</option>
+              <option value="month">Este mês</option>
+            </select>
+            
             <Button onClick={exportToCSV} variant="outline" size="sm">
               <FileSpreadsheet className="w-4 h-4 mr-2" />
-              Exportar CSV
+              CSV
             </Button>
             <Button onClick={exportToPDF} variant="outline" size="sm">
               <FileText className="w-4 h-4 mr-2" />
-              Exportar PDF
+              PDF
             </Button>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Lote</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Pagamento</TableHead>
-                <TableHead>Cupom</TableHead>
-                <TableHead>Data</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell className="font-medium">{report.full_name}</TableCell>
-                  <TableCell>{report.email}</TableCell>
-                  <TableCell>{report.category_name}</TableCell>
-                  <TableCell>Lote {report.batch_number}</TableCell>
-                  <TableCell>{getStatusBadge(report.payment_status)}</TableCell>
-                  <TableCell>R$ {report.amount_paid.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div>{report.payment_method}</div>
-                      {report.card_brand !== 'N/A' && (
-                        <div className="text-gray-500">
-                          {report.card_brand} - {report.installments}x
-                        </div>
-                      )}
+
+        <TabsContent value="detailed">
+          <Card>
+            <CardHeader>
+              <CardTitle>Inscrições Detalhadas ({reports.length} registros)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Categoria</TableHead>
+                      <TableHead>Lote</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Pagamento</TableHead>
+                      <TableHead>Cupom</TableHead>
+                      <TableHead>Data</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reports.map((report) => (
+                      <TableRow key={report.id}>
+                        <TableCell className="font-medium">{report.full_name}</TableCell>
+                        <TableCell>{report.email}</TableCell>
+                        <TableCell>{report.category_name}</TableCell>
+                        <TableCell>Lote {report.batch_number}</TableCell>
+                        <TableCell>{getStatusBadge(report.payment_status)}</TableCell>
+                        <TableCell>R$ {report.amount_paid.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <div>{report.payment_method}</div>
+                            {report.card_brand !== 'N/A' && (
+                              <div className="text-gray-500">
+                                {report.card_brand} - {report.installments}x
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{report.coupon_code}</TableCell>
+                        <TableCell>{new Date(report.created_at).toLocaleDateString('pt-BR')}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {reports.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  Nenhuma inscrição encontrada para o período selecionado
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise de Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Distribuição por Status</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                      <span>Pagamentos Confirmados</span>
+                      <span className="font-bold text-green-700">{summary?.completedPayments || 0}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>{report.coupon_code}</TableCell>
-                  <TableCell>{new Date(report.created_at).toLocaleDateString('pt-BR')}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        
-        {reports.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            Nenhuma inscrição encontrada
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                    <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                      <span>Pagamentos Pendentes</span>
+                      <span className="font-bold text-yellow-700">{summary?.pendingPayments || 0}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Métricas de Conversão</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <span>Taxa de Conversão</span>
+                      <span className="font-bold text-blue-700">{summary?.conversionRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                      <span>Ticket Médio</span>
+                      <span className="font-bold text-purple-700">R$ {summary?.averageTicket.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

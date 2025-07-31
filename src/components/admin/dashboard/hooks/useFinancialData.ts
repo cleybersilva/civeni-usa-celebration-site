@@ -103,29 +103,46 @@ export const useFinancialData = () => {
 
   const generateDailyReport = useCallback(async () => {
     try {
+      console.log('Gerando relatório diário...');
+      
       const { data, error } = await supabase.rpc('generate_daily_report');
       
       if (error) {
         console.error('Erro ao gerar relatório:', error);
         toast({
           title: "Erro",
-          description: "Erro ao gerar relatório diário",
+          description: `Erro ao gerar relatório diário: ${error.message}`,
           variant: "destructive"
         });
         return;
       }
       
-      toast({
-        title: "Relatório Gerado",
-        description: "Relatório diário enviado com sucesso!"
-      });
+      console.log('Relatório gerado:', data);
       
-      fetchAlerts();
+      // Verificar se data é um objeto válido
+      if (data && typeof data === 'object') {
+        const reportData = data as any;
+        toast({
+          title: "Relatório Gerado com Sucesso!",
+          description: `Relatório do dia ${reportData.date || 'hoje'} criado. Total: ${reportData.total_registrations || 0} inscrições, R$ ${reportData.total_revenue || 0}`,
+        });
+      } else {
+        toast({
+          title: "Relatório Gerado!",
+          description: "Relatório diário criado e enviado com sucesso!",
+        });
+      }
+      
+      // Atualizar alertas para mostrar o novo relatório
+      setTimeout(() => {
+        fetchAlerts();
+      }, 1000);
+      
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
       toast({
         title: "Erro",
-        description: "Erro ao gerar relatório diário",
+        description: "Erro interno ao gerar relatório diário",
         variant: "destructive"
       });
     }
