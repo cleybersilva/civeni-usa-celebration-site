@@ -919,6 +919,10 @@ export type Database = {
         Args: { user_email: string; user_password: string }
         Returns: Json
       }
+      update_admin_user_password: {
+        Args: { user_id: string; new_password: string }
+        Returns: Json
+      }
       update_admin_user_type: {
         Args: {
           user_id: string
