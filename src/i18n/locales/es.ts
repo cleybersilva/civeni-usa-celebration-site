@@ -162,6 +162,59 @@ export const esTranslations = {
       close: "Cerrar",
       registerButton: "Inscribirse Ahora"
     },
+    civeni2024Images: {
+      title: "Momentos del II CIVENI 2024",
+      description: "Revive los mejores momentos del II Congreso Internacional Multidisciplinario de VCCU",
+      registerButton: "Participa en III CIVENI 2025"
+    },
+    privacy: {
+      title: "Política de Privacidad",
+      lastUpdated: "Última actualización:",
+      introduction: {
+        title: "1. Introducción",
+        content: "Esta Política de Privacidad describe cómo III CIVENI 2025 recopila, usa y protege su información personal cuando se registra en nuestro evento o utiliza nuestros servicios."
+      },
+      dataCollection: {
+        title: "2. Recopilación de Datos",
+        content: "Recopilamos la siguiente información durante su registro:",
+        personalInfo: "Información personal (nombre, apellido, documento de identidad)",
+        contactInfo: "Información de contacto (correo electrónico, teléfono, dirección)",
+        academicInfo: "Información académica y profesional",
+        paymentInfo: "Información de pago (procesada a través de socios seguros)"
+      },
+      dataUse: {
+        title: "3. Uso de Datos",
+        content: "Utilizamos su información para:",
+        registration: "Procesar su registro en el evento",
+        communication: "Enviar comunicaciones del evento",
+        certificates: "Emitir certificados de participación",
+        statistics: "Generar estadísticas anónimas del evento"
+      },
+      dataProtection: {
+        title: "4. Protección de Datos",
+        content: "Implementamos medidas de seguridad técnicas y organizacionales para proteger su información contra acceso no autorizado, alteración, divulgación o destrucción."
+      },
+      userRights: {
+        title: "5. Sus Derechos",
+        content: "Usted tiene derecho a:",
+        access: "Acceder a sus datos personales",
+        correction: "Corregir información incorrecta",
+        deletion: "Solicitar la eliminación de sus datos",
+        portability: "Solicitar la portabilidad de datos"
+      },
+      cookies: {
+        title: "6. Cookies",
+        content: "Utilizamos cookies esenciales para la funcionalidad del sitio y cookies analíticas para mejorar su experiencia. Puede administrar sus preferencias de cookies en la configuración de su navegador."
+      },
+      contact: {
+        title: "7. Contacto",
+        content: "Para preguntas relacionadas con la privacidad de datos, contáctenos:"
+      },
+      changes: {
+        title: "8. Cambios",
+        content: "Esta política puede actualizarse periódicamente. Notificaremos sobre cambios significativos a través de nuestro sitio web o correo electrónico."
+      }
+    },
     hybrid: {
       title: "Formato Híbrido",
       description: "Experimenta lo mejor de ambos mundos con nuestro formato híbrido innovador",

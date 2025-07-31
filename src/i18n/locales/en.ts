@@ -162,6 +162,59 @@ export const enTranslations = {
       close: "Close",
       registerButton: "Register Now"
     },
+    civeni2024Images: {
+      title: "II CIVENI 2024 Highlights",
+      description: "Relive the best moments of the II International Multidisciplinary Congress of VCCU",
+      registerButton: "Join III CIVENI 2025"
+    },
+    privacy: {
+      title: "Privacy Policy",
+      lastUpdated: "Last updated:",
+      introduction: {
+        title: "1. Introduction",
+        content: "This Privacy Policy describes how III CIVENI 2025 collects, uses, and protects your personal information when you register for our event or use our services."
+      },
+      dataCollection: {
+        title: "2. Data Collection",
+        content: "We collect the following information during your registration:",
+        personalInfo: "Personal information (name, surname, identity document)",
+        contactInfo: "Contact information (email, phone, address)",
+        academicInfo: "Academic and professional information",
+        paymentInfo: "Payment information (processed through secure partners)"
+      },
+      dataUse: {
+        title: "3. Data Use",
+        content: "We use your information to:",
+        registration: "Process your event registration",
+        communication: "Send event communications",
+        certificates: "Issue participation certificates",
+        statistics: "Generate anonymous event statistics"
+      },
+      dataProtection: {
+        title: "4. Data Protection",
+        content: "We implement technical and organizational security measures to protect your information against unauthorized access, alteration, disclosure, or destruction."
+      },
+      userRights: {
+        title: "5. Your Rights",
+        content: "You have the right to:",
+        access: "Access your personal data",
+        correction: "Correct incorrect information",
+        deletion: "Request deletion of your data",
+        portability: "Request data portability"
+      },
+      cookies: {
+        title: "6. Cookies",
+        content: "We use essential cookies for site functionality and analytical cookies to improve your experience. You can manage your cookie preferences in your browser settings."
+      },
+      contact: {
+        title: "7. Contact",
+        content: "For data privacy questions, contact us:"
+      },
+      changes: {
+        title: "8. Changes",
+        content: "This policy may be updated periodically. We will notify about significant changes through our website or email."
+      }
+    },
     hybrid: {
       title: "Hybrid Format",
       description: "Experience the best of both worlds with our innovative hybrid format",

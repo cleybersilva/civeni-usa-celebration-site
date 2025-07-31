@@ -110,6 +110,13 @@ export const createMenuItems = (
       order: 11
     },
     {
+      id: 'civeni-2024-images',
+      label: 'II CIVENI 2024 - Imagens',
+      icon: Image,
+      show: hasPermission('palestrantes') || isAdminRoot(),
+      order: 11.5
+    },
+    {
       id: 'sincronizacao',
       label: t('admin.menu.sync', 'Sincronização'),
       icon: Settings,

@@ -18,6 +18,7 @@ import SiteTextsManager from '@/components/admin/SiteTextsManager';
 import VideosManager from '@/components/admin/VideosManager';
 import UsersManager from '@/components/admin/UsersManager';
 import SyncManager from '@/components/admin/SyncManager';
+import CiveniII2024ImagesManager from '@/components/admin/CiveniII2024ImagesManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -140,6 +141,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('videos') || isAdminRoot()) ? (
           <PermissionGuard resource="videos">
             <VideosManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'civeni-2024-images':
+        return (hasPermission('palestrantes') || isAdminRoot()) ? (
+          <PermissionGuard resource="palestrantes">
+            <CiveniII2024ImagesManager />
           </PermissionGuard>
         ) : null;
       

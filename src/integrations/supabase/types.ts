@@ -119,6 +119,42 @@ export type Database = {
         }
         Relationships: []
       }
+      civeni_ii_2024_images: {
+        Row: {
+          alt_text_en: string
+          alt_text_es: string
+          alt_text_pt: string
+          created_at: string
+          id: string
+          is_active: boolean
+          order_index: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          alt_text_en: string
+          alt_text_es: string
+          alt_text_pt: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          alt_text_en?: string
+          alt_text_es?: string
+          alt_text_pt?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       coupon_codes: {
         Row: {
           category_id: string | null

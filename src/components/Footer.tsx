@@ -117,23 +117,12 @@ const Footer = () => {
               Organized by VCCU: Veni Creator Christian University
             </div>
             <div className="text-sm opacity-75">
-              {content.siteTexts.institutionalLink ? (
-                <a 
-                  href={content.siteTexts.institutionalLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-civeni-red transition-colors underline"
-                >
-                  {t('footer.privacyPolicy')}
-                </a>
-              ) : (
-                <a 
-                  href="#privacy" 
-                  className="hover:text-civeni-red transition-colors underline"
-                >
-                  {t('footer.privacyPolicy')}
-                </a>
-              )}
+              <Link 
+                to="/politicas-de-privacidade" 
+                className="hover:text-civeni-red transition-colors underline"
+              >
+                {t('footer.privacyPolicy')}
+              </Link>
             </div>
           </div>
         </div>
