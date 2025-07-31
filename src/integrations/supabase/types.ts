@@ -736,6 +736,69 @@ export type Database = {
           },
         ]
       }
+      work_content: {
+        Row: {
+          content_en: string | null
+          content_es: string | null
+          content_pt: string | null
+          content_type: string
+          created_at: string
+          created_by: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          is_active: boolean
+          link_url: string | null
+          order_index: number
+          title_en: string | null
+          title_es: string | null
+          title_pt: string | null
+          updated_at: string
+          updated_by: string | null
+          work_type: string
+        }
+        Insert: {
+          content_en?: string | null
+          content_es?: string | null
+          content_pt?: string | null
+          content_type: string
+          created_at?: string
+          created_by?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          order_index?: number
+          title_en?: string | null
+          title_es?: string | null
+          title_pt?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          work_type: string
+        }
+        Update: {
+          content_en?: string | null
+          content_es?: string | null
+          content_pt?: string | null
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          order_index?: number
+          title_en?: string | null
+          title_es?: string | null
+          title_pt?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          work_type?: string
+        }
+        Relationships: []
+      }
       work_submissions: {
         Row: {
           abstract: string

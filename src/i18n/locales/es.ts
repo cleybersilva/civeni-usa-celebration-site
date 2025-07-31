@@ -193,7 +193,27 @@ export const esTranslations = {
       dataProtection: {
         title: "4. Protección de Datos",
         content: "Implementamos medidas de seguridad técnicas y organizacionales para proteger su información contra acceso no autorizado, alteración, divulgación o destrucción."
-      },
+  },
+  works: {
+    oral: {
+      title: 'Presentación Oral',
+      subtitle: 'Modalidad de presentación de trabajos académicos para III CIVENI 2025',
+      noContent: 'Contenido próximamente',
+      noContentDescription: 'La información sobre presentaciones orales se publicará pronto.',
+    },
+    poster: {
+      title: 'Sesiones de Póster',
+      subtitle: 'Modalidad de presentación en póster para III CIVENI 2025',
+      noContent: 'Contenido próximamente',
+      noContentDescription: 'La información sobre sesiones de póster se publicará pronto.',
+    },
+    manuscripts: {
+      title: 'Manuscritos',
+      subtitle: 'Modalidad de envío de manuscritos para III CIVENI 2025',
+      noContent: 'Contenido próximamente',
+      noContentDescription: 'La información sobre manuscritos se publicará pronto.',
+    },
+  },
       userRights: {
         title: "5. Sus Derechos",
         content: "Usted tiene derecho a:",

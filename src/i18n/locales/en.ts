@@ -193,7 +193,27 @@ export const enTranslations = {
       dataProtection: {
         title: "4. Data Protection",
         content: "We implement technical and organizational security measures to protect your information against unauthorized access, alteration, disclosure, or destruction."
-      },
+  },
+  works: {
+    oral: {
+      title: 'Oral Presentation',
+      subtitle: 'Academic papers oral presentation modality for III CIVENI 2025',
+      noContent: 'Content coming soon',
+      noContentDescription: 'Information about oral presentations will be published soon.',
+    },
+    poster: {
+      title: 'Poster Sessions',
+      subtitle: 'Poster presentation modality for III CIVENI 2025',
+      noContent: 'Content coming soon',
+      noContentDescription: 'Information about poster sessions will be published soon.',
+    },
+    manuscripts: {
+      title: 'Manuscripts',
+      subtitle: 'Manuscript submission modality for III CIVENI 2025',
+      noContent: 'Content coming soon',
+      noContentDescription: 'Information about manuscripts will be published soon.',
+    },
+  },
       userRights: {
         title: "5. Your Rights",
         content: "You have the right to:",
