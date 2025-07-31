@@ -20,6 +20,7 @@ import UsersManager from '@/components/admin/UsersManager';
 import SyncManager from '@/components/admin/SyncManager';
 import CiveniII2024ImagesManager from '@/components/admin/CiveniII2024ImagesManager';
 import TransmissaoLiveManager from '@/components/admin/TransmissaoLiveManager';
+import WorkSubmissionsManager from '@/components/admin/WorkSubmissionsManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -149,6 +150,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('palestrantes') || isAdminRoot()) ? (
           <PermissionGuard resource="palestrantes">
             <CiveniII2024ImagesManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'submissao-trabalhos':
+        return (hasPermission('palestrantes') || isAdminRoot()) ? (
+          <PermissionGuard resource="palestrantes">
+            <WorkSubmissionsManager />
           </PermissionGuard>
         ) : null;
       

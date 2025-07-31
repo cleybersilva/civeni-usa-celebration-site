@@ -24,6 +24,7 @@ import Inscricoes from "./pages/Inscricoes";
 import PoliticasPrivacidade from "./pages/PoliticasPrivacidade";
 import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
 import SejaNossoParceiro from "./pages/SejaNossoParceiro";
+import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 
 import './App.css';
 
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/politicas-de-privacidade" element={<PoliticasPrivacidade />} />
                 <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />
                 <Route path="/seja-nosso-parceiro" element={<SejaNossoParceiro />} />
+                <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="*" element={<NotFound />} />

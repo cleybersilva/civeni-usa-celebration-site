@@ -736,6 +736,63 @@ export type Database = {
           },
         ]
       }
+      work_submissions: {
+        Row: {
+          abstract: string
+          author_name: string
+          created_at: string
+          email: string
+          file_name: string | null
+          file_path: string | null
+          id: string
+          institution: string
+          internal_notes: string | null
+          keywords: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          thematic_area: string
+          updated_at: string
+          work_title: string
+        }
+        Insert: {
+          abstract: string
+          author_name: string
+          created_at?: string
+          email: string
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          institution: string
+          internal_notes?: string | null
+          keywords: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          thematic_area: string
+          updated_at?: string
+          work_title: string
+        }
+        Update: {
+          abstract?: string
+          author_name?: string
+          created_at?: string
+          email?: string
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          institution?: string
+          internal_notes?: string | null
+          keywords?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          thematic_area?: string
+          updated_at?: string
+          work_title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

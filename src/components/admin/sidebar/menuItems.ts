@@ -12,6 +12,7 @@ import {
   Type,
   Play,
   Settings,
+  FileText,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -115,6 +116,13 @@ export const createMenuItems = (
       icon: Image,
       show: hasPermission('palestrantes') || isAdminRoot(),
       order: 11.5
+    },
+    {
+      id: 'submissao-trabalhos',
+      label: t('admin.menu.workSubmissions', 'Submissão de Trabalhos'),
+      icon: FileText,
+      show: hasPermission('palestrantes') || isAdminRoot(),
+      order: 11.6
     },
     {
       id: 'transmissao-live',

@@ -89,9 +89,12 @@ const AreaTematica = () => {
               <p className="text-lg opacity-90 mb-6">
                 Apresente suas pesquisas e experiências em uma dessas áreas temáticas
               </p>
-              <button className="bg-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins">
-                Saiba Mais sobre Submissões
-              </button>
+              <a 
+                href="/submissao-trabalhos"
+                className="inline-block bg-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
+              >
+                📎 Saiba Mais sobre Submissões
+              </a>
             </div>
           </div>
         </div>
