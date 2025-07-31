@@ -21,7 +21,7 @@ import SyncManager from '@/components/admin/SyncManager';
 import CiveniII2024ImagesManager from '@/components/admin/CiveniII2024ImagesManager';
 import TransmissaoLiveManager from '@/components/admin/TransmissaoLiveManager';
 import WorkSubmissionsManager from '@/components/admin/WorkSubmissionsManager';
-import WorkContentManager from '@/components/admin/WorkContentManager';
+import WorksManager from '@/components/admin/WorksManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -168,24 +168,10 @@ const AdminDashboardContent = () => {
           </PermissionGuard>
         ) : null;
       
-      case 'trabalhos-apresentacao-oral':
+      case 'trabalhos':
         return (hasPermission('palestrantes') || isAdminRoot()) ? (
           <PermissionGuard resource="palestrantes">
-            <WorkContentManager workType="apresentacao-oral" title="Gestão de Conteúdo - Apresentação Oral" />
-          </PermissionGuard>
-        ) : null;
-      
-      case 'trabalhos-sessoes-poster':
-        return (hasPermission('palestrantes') || isAdminRoot()) ? (
-          <PermissionGuard resource="palestrantes">
-            <WorkContentManager workType="sessoes-poster" title="Gestão de Conteúdo - Sessões de Pôster" />
-          </PermissionGuard>
-        ) : null;
-      
-      case 'trabalhos-manuscritos':
-        return (hasPermission('palestrantes') || isAdminRoot()) ? (
-          <PermissionGuard resource="palestrantes">
-            <WorkContentManager workType="manuscritos" title="Gestão de Conteúdo - Manuscritos" />
+            <WorksManager />
           </PermissionGuard>
         ) : null;
       

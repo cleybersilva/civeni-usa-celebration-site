@@ -132,25 +132,11 @@ export const createMenuItems = (
       order: 11.7
     },
     {
-      id: 'trabalhos-apresentacao-oral',
-      label: t('admin.menu.oralPresentation', 'Apresentação Oral'),
-      icon: Users,
-      show: hasPermission('palestrantes') || isAdminRoot(),
-      order: 11.8
-    },
-    {
-      id: 'trabalhos-sessoes-poster',
-      label: t('admin.menu.posterSessions', 'Sessões de Pôster'),
-      icon: Image,
-      show: hasPermission('palestrantes') || isAdminRoot(),
-      order: 11.9
-    },
-    {
-      id: 'trabalhos-manuscritos',
-      label: t('admin.menu.manuscripts', 'Manuscritos'),
+      id: 'trabalhos',
+      label: t('admin.menu.works', 'Trabalhos'),
       icon: FileText,
       show: hasPermission('palestrantes') || isAdminRoot(),
-      order: 11.95
+      order: 11.8
     },
     {
       id: 'sincronizacao',
