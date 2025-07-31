@@ -155,6 +155,105 @@ export type Database = {
         }
         Relationships: []
       }
+      congresso_apresentacao: {
+        Row: {
+          created_at: string
+          descricao_en: string | null
+          descricao_es: string | null
+          descricao_pt: string
+          id: string
+          imagem_destaque: string | null
+          is_active: boolean
+          tema_en: string | null
+          tema_es: string | null
+          tema_pt: string | null
+          titulo_en: string | null
+          titulo_es: string | null
+          titulo_pt: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          descricao_en?: string | null
+          descricao_es?: string | null
+          descricao_pt: string
+          id?: string
+          imagem_destaque?: string | null
+          is_active?: boolean
+          tema_en?: string | null
+          tema_es?: string | null
+          tema_pt?: string | null
+          titulo_en?: string | null
+          titulo_es?: string | null
+          titulo_pt: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          descricao_en?: string | null
+          descricao_es?: string | null
+          descricao_pt?: string
+          id?: string
+          imagem_destaque?: string | null
+          is_active?: boolean
+          tema_en?: string | null
+          tema_es?: string | null
+          tema_pt?: string | null
+          titulo_en?: string | null
+          titulo_es?: string | null
+          titulo_pt?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      congresso_comite: {
+        Row: {
+          cargo_en: string | null
+          cargo_es: string | null
+          cargo_pt: string
+          categoria: string
+          created_at: string
+          foto_url: string | null
+          id: string
+          instituicao: string
+          is_active: boolean
+          nome: string
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          cargo_en?: string | null
+          cargo_es?: string | null
+          cargo_pt: string
+          categoria: string
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          instituicao: string
+          is_active?: boolean
+          nome: string
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          cargo_en?: string | null
+          cargo_es?: string | null
+          cargo_pt?: string
+          categoria?: string
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          instituicao?: string
+          is_active?: boolean
+          nome?: string
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coupon_codes: {
         Row: {
           category_id: string | null
