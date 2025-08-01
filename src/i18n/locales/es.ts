@@ -156,7 +156,6 @@ export const esTranslations = {
     },
     videos: {
       title: "Videos del II Civeni 2024",
-      description: "Revive los mejores momentos y presentaciones del II Congreso Internacional",
       watchVideo: "Ver Video",
       minimize: "Minimizar",
       maximize: "Maximizar",
@@ -408,11 +407,5 @@ export const esTranslations = {
         manuscripts: "Manuscritos"
       }
     }
-  },
-  common: {
-    loading: "Cargando",
-    previous: "Anterior",
-    next: "Siguiente",
-    goToImage: "Ir a la imagen"
   }
 };

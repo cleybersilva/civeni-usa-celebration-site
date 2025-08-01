@@ -77,7 +77,7 @@ const CiveniII2024ImagesSection = () => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-civeni-blue mx-auto"></div>
-            <p className="mt-4 text-gray-600">{t('common.loading')}...</p>
+            <p className="mt-4 text-gray-600">Carregando imagens...</p>
           </div>
         </div>
       </section>
@@ -129,7 +129,7 @@ const CiveniII2024ImagesSection = () => {
             <button
               onClick={prevSlide}
               className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-3 shadow-lg transition-all duration-300"
-              aria-label={t('common.previous')}
+              aria-label="Imagem anterior"
             >
               <ChevronLeft size={24} className="text-civeni-blue" />
             </button>
@@ -137,7 +137,7 @@ const CiveniII2024ImagesSection = () => {
             <button
               onClick={nextSlide}
               className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-3 shadow-lg transition-all duration-300"
-              aria-label={t('common.next')}
+              aria-label="Próxima imagem"
             >
               <ChevronRight size={24} className="text-civeni-blue" />
             </button>
@@ -154,7 +154,7 @@ const CiveniII2024ImagesSection = () => {
                     ? 'bg-civeni-blue scale-125'
                     : 'bg-gray-300 hover:bg-gray-400'
                 }`}
-                aria-label={`${t('common.goToImage')} ${index + 1}`}
+                aria-label={`Ir para imagem ${index + 1}`}
               />
             ))}
           </div>

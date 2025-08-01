@@ -103,57 +103,33 @@ export const useFinancialData = () => {
 
   const generateDailyReport = useCallback(async () => {
     try {
-      console.log('Gerando relatório diário...');
-      
-      // Mostrar loading imediato
-      toast({
-        title: "Processando...",
-        description: "Gerando relatório diário, aguarde...",
-      });
-      
       const { data, error } = await supabase.rpc('generate_daily_report');
       
       if (error) {
         console.error('Erro ao gerar relatório:', error);
         toast({
           title: "Erro",
-          description: `Erro ao gerar relatório diário: ${error.message}`,
+          description: "Erro ao gerar relatório diário",
           variant: "destructive"
         });
         return;
       }
       
-      console.log('Relatório gerado:', data);
+      toast({
+        title: "Relatório Gerado",
+        description: "Relatório diário enviado com sucesso!"
+      });
       
-      // Verificar se data é um objeto válido
-      if (data && typeof data === 'object') {
-        const reportData = data as any;
-        toast({
-          title: "✅ Relatório Gerado com Sucesso!",
-          description: `📊 Relatório do dia ${reportData.date || 'hoje'} criado.\n📈 Total: ${reportData.total_registrations || 0} inscrições\n💰 Receita: R$ ${reportData.total_revenue || 0}\n📧 Alertas enviados por email e SMS`,
-        });
-      } else {
-        toast({
-          title: "✅ Relatório Gerado!",
-          description: "📊 Relatório diário criado e alertas enviados com sucesso!",
-        });
-      }
-      
-      // Atualizar alertas para mostrar o novo relatório
-      setTimeout(() => {
-        fetchAlerts();
-        fetchStats(); // Também atualizar as estatísticas
-      }, 1500);
-      
+      fetchAlerts();
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
       toast({
-        title: "❌ Erro",
-        description: "Erro interno ao gerar relatório diário. Verifique o console para mais detalhes.",
+        title: "Erro",
+        description: "Erro ao gerar relatório diário",
         variant: "destructive"
       });
     }
-  }, [toast, fetchAlerts, fetchStats]);
+  }, [toast, fetchAlerts]);
 
   const refreshData = useCallback(async () => {
     setLoading(true);

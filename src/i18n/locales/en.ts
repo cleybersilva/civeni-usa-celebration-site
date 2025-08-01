@@ -156,7 +156,6 @@ export const enTranslations = {
     },
     videos: {
       title: "Videos from II Civeni 2024",
-      description: "Relive the best moments and presentations from the II International Congress",
       watchVideo: "Watch Video",
       minimize: "Minimize",
       maximize: "Maximize",
@@ -408,11 +407,5 @@ export const enTranslations = {
         manuscripts: "Manuscripts"
       }
     }
-  },
-  common: {
-    loading: "Loading",
-    previous: "Previous",
-    next: "Next",
-    goToImage: "Go to image"
   }
 };
