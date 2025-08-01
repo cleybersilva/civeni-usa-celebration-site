@@ -55,10 +55,10 @@ const VideosSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            {content.siteTexts.videosTitle}
+            {t('videos.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {content.siteTexts.videosDescription}
+            {t('videos.description')}
           </p>
         </div>
 
