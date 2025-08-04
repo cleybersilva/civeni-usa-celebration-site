@@ -471,7 +471,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ...prev, 
         bannerSlides, 
         eventConfig, 
-        hybridActivities
+        hybridActivities 
       }));
       
       console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
@@ -653,11 +653,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateVideos = async (videos: Video[]) => {
     try {
-      console.log('Updating videos:', videos);
       setContent(prev => ({ ...prev, videos }));
     } catch (error) {
       console.error('Error updating videos:', error);
-      throw error;
     }
   };
 
