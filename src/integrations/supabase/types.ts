@@ -835,6 +835,48 @@ export type Database = {
           },
         ]
       }
+      videos: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          order_index: number
+          thumbnail: string
+          title: string
+          updated_at: string
+          uploaded_video_url: string | null
+          video_type: string
+          youtube_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          thumbnail: string
+          title: string
+          updated_at?: string
+          uploaded_video_url?: string | null
+          video_type: string
+          youtube_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          order_index?: number
+          thumbnail?: string
+          title?: string
+          updated_at?: string
+          uploaded_video_url?: string | null
+          video_type?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       work_content: {
         Row: {
           content_en: string | null
