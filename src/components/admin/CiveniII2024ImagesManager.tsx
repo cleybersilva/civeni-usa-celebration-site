@@ -62,12 +62,33 @@ const CiveniII2024ImagesManager = () => {
   const handleSave = async (imageData: Omit<CiveniImage, 'id'> & { id?: string }) => {
     console.log('handleSave chamado com:', imageData);
     try {
-      // Garantir que o contexto do usuário está definido
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
-        await supabase.rpc('set_current_user_email', { user_email: user.email });
-        console.log('Contexto de usuário definido para:', user.email);
+      // Garantir que o contexto do usuário está definido SEMPRE
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) {
+        console.error('Erro de autenticação:', authError);
+        toast.error('Erro de autenticação');
+        return;
       }
+      
+      if (!user || !user.email) {
+        console.error('Usuário não autenticado');
+        toast.error('Usuário não autenticado');
+        return;
+      }
+      
+      // Definir contexto do usuário
+      const { error: contextError } = await supabase.rpc('set_current_user_email', { 
+        user_email: user.email 
+      });
+      
+      if (contextError) {
+        console.error('Erro ao definir contexto:', contextError);
+        toast.error('Erro ao configurar usuário');
+        return;
+      }
+      
+      console.log('Contexto de usuário definido para:', user.email);
 
       if (imageData.id) {
         // Atualizar
