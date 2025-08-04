@@ -467,38 +467,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
 
-      // Carregar vídeos do Supabase
-      console.log('CMSContext - Loading videos...');
-      const { data: videosData, error: videosError } = await supabase
-        .from('videos')
-        .select('*')
-        .eq('is_active', true)
-        .order('order_index', { ascending: true });
-
-      if (videosError) {
-        console.error('Error loading videos:', videosError);
-      }
-
-      // Converter dados do Supabase para o formato do contexto
-      const videos: Video[] = videosData?.map(video => ({
-        id: video.id,
-        title: video.title,
-        description: video.description || '',
-        videoType: video.video_type as 'youtube' | 'upload',
-        youtubeUrl: video.youtube_url,
-        uploadedVideoUrl: video.uploaded_video_url,
-        thumbnail: video.thumbnail,
-        order: video.order_index
-      })) || defaultContent.videos;
-
-      console.log('CMSContext - Loaded videos:', videos);
-
       setContent(prev => ({ 
         ...prev, 
         bannerSlides, 
         eventConfig, 
-        hybridActivities,
-        videos
+        hybridActivities 
       }));
       
       console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
@@ -680,66 +653,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateVideos = async (videos: Video[]) => {
     try {
-      console.log('Updating videos:', videos);
-      
-      // Primeiro, desativar todos os vídeos existentes
-      const { error: deactivateError } = await supabase
-        .from('videos')
-        .update({ is_active: false })
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-
-      if (deactivateError) {
-        console.error('Error deactivating videos:', deactivateError);
-        throw deactivateError;
-      }
-
-      // Processar cada vídeo
-      for (let i = 0; i < videos.length; i++) {
-        const video = videos[i];
-        const videoData = {
-          title: video.title,
-          description: video.description,
-          video_type: video.videoType,
-          youtube_url: video.youtubeUrl,
-          uploaded_video_url: video.uploadedVideoUrl,
-          thumbnail: video.thumbnail,
-          order_index: i + 1,
-          is_active: true
-        };
-
-        if (video.id && video.id !== 'new' && !video.id.startsWith('video-')) {
-          // Atualizar vídeo existente
-          const { error: updateError } = await supabase
-            .from('videos')
-            .update(videoData)
-            .eq('id', video.id);
-
-          if (updateError) {
-            console.error('Error updating video:', updateError);
-            throw updateError;
-          }
-        } else {
-          // Inserir novo vídeo
-          const { error: insertError } = await supabase
-            .from('videos')
-            .insert([videoData]);
-
-          if (insertError) {
-            console.error('Error inserting video:', insertError);
-            throw insertError;
-          }
-        }
-      }
-
-      console.log('Videos updated successfully');
-      
-      // Recarregar dados do banco para sincronizar
-      await loadContent();
-      
       setContent(prev => ({ ...prev, videos }));
     } catch (error) {
       console.error('Error updating videos:', error);
-      throw error;
     }
   };
 

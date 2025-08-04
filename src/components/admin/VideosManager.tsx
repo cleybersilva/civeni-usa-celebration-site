@@ -6,10 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, Youtube, Upload, Save, X, Link, ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Youtube, Upload, Save, X } from 'lucide-react';
 import { useCMS, Video } from '@/contexts/CMSContext';
 import { useToast } from '@/hooks/use-toast';
-import SimpleImageUpload from './SimpleImageUpload';
 
 const VideosManager = () => {
   const { content, updateVideos } = useCMS();
@@ -236,41 +235,15 @@ const VideosManager = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Thumbnail</label>
-              <Tabs defaultValue="url" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="url">
-                    <Link className="w-4 h-4 mr-2" />
-                    URL
-                  </TabsTrigger>
-                  <TabsTrigger value="upload">
-                    <ImageIcon className="w-4 h-4 mr-2" />
-                    Upload
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="url" className="space-y-2">
-                  <Input
-                    value={videoForm.thumbnail}
-                    onChange={(e) => setVideoForm(prev => ({ ...prev, thumbnail: e.target.value }))}
-                    placeholder="URL da imagem de capa (opcional)"
-                  />
-                  <p className="text-sm text-gray-500">
-                    Para vídeos do YouTube, a thumbnail será preenchida automaticamente
-                  </p>
-                </TabsContent>
-                
-                <TabsContent value="upload" className="space-y-2">
-                  <SimpleImageUpload
-                    value={videoForm.thumbnail}
-                    onChange={(value) => setVideoForm(prev => ({ ...prev, thumbnail: value }))}
-                    label="Thumbnail do Vídeo"
-                  />
-                  <p className="text-sm text-gray-500">
-                    Recomendado: 1280x720 pixels (16:9), máximo 2MB
-                  </p>
-                </TabsContent>
-              </Tabs>
+              <label className="block text-sm font-medium mb-2">URL da Thumbnail</label>
+              <Input
+                value={videoForm.thumbnail}
+                onChange={(e) => setVideoForm(prev => ({ ...prev, thumbnail: e.target.value }))}
+                placeholder="URL da imagem de capa (opcional)"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Para vídeos do YouTube, a thumbnail será preenchida automaticamente
+              </p>
             </div>
 
             <div>
