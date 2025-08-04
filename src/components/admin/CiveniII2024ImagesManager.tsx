@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, GripVertical, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import ImageUploadField from './ImageUploadField';
 import SimpleImageUpload from './SimpleImageUpload';
 import ImageGuide from './ImageGuide';
@@ -23,6 +24,7 @@ interface CiveniImage {
 }
 
 const CiveniII2024ImagesManager = () => {
+  const { user } = useAdminAuth();
   const [images, setImages] = useState<CiveniImage[]>([]);
   const [editingImage, setEditingImage] = useState<CiveniImage | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -61,23 +63,15 @@ const CiveniII2024ImagesManager = () => {
 
   const handleSave = async (imageData: Omit<CiveniImage, 'id'> & { id?: string }) => {
     console.log('handleSave chamado com:', imageData);
+    
+    if (!user || !user.email) {
+      console.error('Usuário admin não autenticado');
+      toast.error('Usuário não autenticado. Faça login novamente.');
+      return;
+    }
+    
     try {
-      // Garantir que o contexto do usuário está definido SEMPRE
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError) {
-        console.error('Erro de autenticação:', authError);
-        toast.error('Erro de autenticação');
-        return;
-      }
-      
-      if (!user || !user.email) {
-        console.error('Usuário não autenticado');
-        toast.error('Usuário não autenticado');
-        return;
-      }
-      
-      // Definir contexto do usuário
+      // Definir contexto do usuário usando o email do admin autenticado
       const { error: contextError } = await supabase.rpc('set_current_user_email', { 
         user_email: user.email 
       });

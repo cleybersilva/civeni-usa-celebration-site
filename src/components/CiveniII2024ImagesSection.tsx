@@ -113,7 +113,7 @@ const CiveniII2024ImagesSection = () => {
                     <img
                       src={image.url}
                       alt={getAltText(image)}
-                      className="w-full h-64 md:h-96 lg:h-[500px] object-cover"
+                      className="w-full h-64 md:h-96 lg:h-[500px] object-contain bg-gray-100"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
                       <p className="text-white text-lg md:text-xl font-semibold">
