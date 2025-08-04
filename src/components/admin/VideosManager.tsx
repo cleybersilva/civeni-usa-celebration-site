@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, Youtube, Upload, Save, X } from 'lucide-react';
 import { useCMS, Video } from '@/contexts/CMSContext';
 import { useToast } from '@/hooks/use-toast';
+import ThumbnailUpload from './ThumbnailUpload';
 
 const VideosManager = () => {
   const { content, updateVideos } = useCMS();
@@ -234,17 +235,11 @@ const VideosManager = () => {
               </Tabs>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">URL da Thumbnail</label>
-              <Input
-                value={videoForm.thumbnail}
-                onChange={(e) => setVideoForm(prev => ({ ...prev, thumbnail: e.target.value }))}
-                placeholder="URL da imagem de capa (opcional)"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Para vídeos do YouTube, a thumbnail será preenchida automaticamente
-              </p>
-            </div>
+            <ThumbnailUpload
+              value={videoForm.thumbnail}
+              onChange={(value) => setVideoForm(prev => ({ ...prev, thumbnail: value }))}
+              label="Upload da Thumbnail"
+            />
 
             <div>
               <label className="block text-sm font-medium mb-2">Ordem</label>
