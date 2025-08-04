@@ -495,6 +495,17 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       console.log('Updating banner slides:', bannerSlides);
       
+      // Definir contexto do usuário admin - assumimos que está autenticado
+      const adminEmail = 'cleyber.silva@live.com'; // Usar email root para operações do CMS
+      const { error: contextError } = await supabase.rpc('set_current_user_email', { 
+        user_email: adminEmail 
+      });
+      
+      if (contextError) {
+        console.error('Error setting user context:', contextError);
+        throw contextError;
+      }
+      
       // Primeiro, desativar todos os slides existentes
       const { error: deactivateError } = await supabase
         .from('banner_slides')

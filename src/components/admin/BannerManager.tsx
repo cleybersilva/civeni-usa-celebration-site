@@ -6,12 +6,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCMS, BannerSlide } from '@/contexts/CMSContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import ImageGuide from './ImageGuide';
 import SimpleImageUpload from './SimpleImageUpload';
 
 const BannerManager = () => {
   const { content, updateBannerSlides } = useCMS();
+  const { user } = useAdminAuth();
   const [editingSlide, setEditingSlide] = useState<BannerSlide | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -41,13 +44,24 @@ const BannerManager = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user || !user.email) {
+      toast.error('Usuário não autenticado. Faça login novamente.');
+      return;
+    }
+    
     try {
       // Use uploaded image if available, otherwise use URL
       const finalBgImage = formData.uploadedImage || formData.bgImage;
       
+      // Validate required fields
+      if (!formData.title || !formData.subtitle || !formData.description) {
+        toast.error('Por favor, preencha todos os campos obrigatórios (título, subtítulo e descrição).');
+        return;
+      }
+      
       // Validate that at least one image source is provided
       if (!finalBgImage) {
-        alert('Por favor, faça upload de uma imagem ou forneça uma URL para a imagem de fundo.');
+        toast.error('Por favor, faça upload de uma imagem ou forneça uma URL para a imagem de fundo.');
         return;
       }
       
@@ -77,10 +91,10 @@ const BannerManager = () => {
       setIsDialogOpen(false);
       resetForm();
       
-      alert('Banner atualizado com sucesso!');
+      toast.success('Banner atualizado com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar banner:', error);
-      alert('Erro ao salvar banner. Tente novamente.');
+      toast.error('Erro ao salvar banner. Tente novamente.');
     }
   };
 
@@ -179,19 +193,19 @@ const BannerManager = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Texto do Botão</label>
+                    <label className="block text-sm font-medium mb-2">Texto do Botão (Opcional)</label>
                     <Input
                       value={formData.buttonText}
                       onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
-                      required
+                      placeholder="Texto do botão de ação"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Link do Botão</label>
+                    <label className="block text-sm font-medium mb-2">Link do Botão (Opcional)</label>
                     <Input
                       value={formData.buttonLink}
                       onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
-                      required
+                      placeholder="URL de destino do botão"
                     />
                   </div>
                   <div className="flex justify-end space-x-2">
