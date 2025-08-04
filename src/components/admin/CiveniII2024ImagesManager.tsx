@@ -60,9 +60,11 @@ const CiveniII2024ImagesManager = () => {
   };
 
   const handleSave = async (imageData: Omit<CiveniImage, 'id'> & { id?: string }) => {
+    console.log('handleSave chamado com:', imageData);
     try {
       if (imageData.id) {
         // Atualizar
+        console.log('Atualizando imagem existente:', imageData.id);
         const { error } = await supabase
           .from('civeni_ii_2024_images')
           .update({
@@ -75,10 +77,15 @@ const CiveniII2024ImagesManager = () => {
           })
           .eq('id', imageData.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao atualizar:', error);
+          throw error;
+        }
+        console.log('Imagem atualizada com sucesso');
         toast.success('Imagem atualizada com sucesso!');
       } else {
         // Criar
+        console.log('Criando nova imagem');
         const { error } = await supabase
           .from('civeni_ii_2024_images')
           .insert({
@@ -90,12 +97,17 @@ const CiveniII2024ImagesManager = () => {
             is_active: imageData.is_active
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao inserir:', error);
+          throw error;
+        }
+        console.log('Imagem criada com sucesso');
         toast.success('Imagem criada com sucesso!');
       }
 
       setEditingImage(null);
       setIsCreating(false);
+      console.log('Recarregando lista de imagens...');
       await fetchImages();
     } catch (error) {
       console.error('Erro ao salvar imagem:', error);
@@ -246,19 +258,24 @@ const ImageForm: React.FC<ImageFormProps> = ({ image, onSave, onCancel }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('handleSubmit chamado com formData:', formData);
     
     // Usar imagem uploadada se disponível, senão usar URL
     const finalImageUrl = formData.uploadedImage || formData.url;
+    console.log('finalImageUrl:', finalImageUrl);
     
     if (!finalImageUrl || !formData.alt_text_pt) {
+      console.log('Validação falhou:', { finalImageUrl, alt_text_pt: formData.alt_text_pt });
       toast.error('Preencha todos os campos obrigatórios');
       return;
     }
     
-    onSave({
+    const dataToSave = {
       ...formData,
       url: finalImageUrl
-    });
+    };
+    console.log('Chamando onSave com:', dataToSave);
+    onSave(dataToSave);
   };
 
   return (
