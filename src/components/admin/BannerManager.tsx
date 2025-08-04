@@ -25,7 +25,8 @@ const BannerManager = () => {
     bgImage: '',
     uploadedImage: '',
     buttonText: '',
-    buttonLink: ''
+    buttonLink: '',
+    order: 1
   });
 
   const resetForm = () => {
@@ -36,7 +37,8 @@ const BannerManager = () => {
       bgImage: '',
       uploadedImage: '',
       buttonText: '',
-      buttonLink: ''
+      buttonLink: '',
+      order: content.bannerSlides.length + 1
     });
     setEditingSlide(null);
   };
@@ -82,7 +84,7 @@ const BannerManager = () => {
           id: 'new', // Será tratado no contexto CMS para gerar UUID no Supabase
           ...formData,
           bgImage: finalBgImage,
-          order: slides.length + 1
+          order: formData.order
         };
         slides.push(newSlide);
       }
@@ -107,7 +109,8 @@ const BannerManager = () => {
       bgImage: slide.bgImage,
       uploadedImage: '',
       buttonText: slide.buttonText,
-      buttonLink: slide.buttonLink
+      buttonLink: slide.buttonLink,
+      order: slide.order
     });
     setIsDialogOpen(true);
   };
@@ -192,13 +195,24 @@ const BannerManager = () => {
                       placeholder="Cole aqui a URL da imagem ou faça upload acima"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Texto do Botão (Opcional)</label>
-                    <Input
-                      value={formData.buttonText}
-                      onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
-                      placeholder="Texto do botão de ação"
-                    />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Texto do Botão (Opcional)</label>
+                      <Input
+                        value={formData.buttonText}
+                        onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
+                        placeholder="Texto do botão de ação"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Ordem de Exibição</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={formData.order}
+                        onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 1})}
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">Link do Botão (Opcional)</label>
@@ -228,7 +242,7 @@ const BannerManager = () => {
       </div>
 
       <div className="grid gap-6">
-        {content.bannerSlides.map((slide) => (
+        {content.bannerSlides.sort((a, b) => a.order - b.order).map((slide) => (
           <Card key={slide.id}>
             <CardHeader>
               <div className="relative h-48 rounded-lg overflow-hidden">
@@ -247,8 +261,9 @@ const BannerManager = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
+                <p><strong>Ordem:</strong> {slide.order}</p>
                 <p><strong>Descrição:</strong> {slide.description}</p>
-                <p><strong>Botão:</strong> {slide.buttonText} → {slide.buttonLink}</p>
+                <p><strong>Botão:</strong> {slide.buttonText ? `${slide.buttonText} → ${slide.buttonLink}` : 'Sem botão'}</p>
               </div>
               <div className="flex justify-end space-x-2 mt-4">
                 <Button

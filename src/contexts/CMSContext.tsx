@@ -495,8 +495,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       console.log('Updating banner slides:', bannerSlides);
       
-      // Definir contexto do usuário admin - assumimos que está autenticado
-      const adminEmail = 'cleyber.silva@live.com'; // Usar email root para operações do CMS
+      // Definir contexto do usuário admin
+      const adminEmail = 'cleyber.silva@live.com';
       const { error: contextError } = await supabase.rpc('set_current_user_email', { 
         user_email: adminEmail 
       });
@@ -505,34 +505,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.error('Error setting user context:', contextError);
         throw contextError;
       }
-      
-      // Primeiro, desativar todos os slides existentes
-      const { error: deactivateError } = await supabase
-        .from('banner_slides')
-        .update({ is_active: false })
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Desativar todos
 
-      if (deactivateError) {
-        console.error('Error deactivating slides:', deactivateError);
-        throw deactivateError;
-      }
-
-      // Processar cada slide
+      // Processar cada slide individualmente
       for (let i = 0; i < bannerSlides.length; i++) {
         const slide = bannerSlides[i];
         const slideData = {
-          title: slide.title,
-          subtitle: slide.subtitle,
-          description: slide.description,
-          bg_image: slide.bgImage,
-          button_text: slide.buttonText,
-          button_link: slide.buttonLink,
-          order_index: i + 1, // Usar índice sequencial
+          title: slide.title || '',
+          subtitle: slide.subtitle || '',
+          description: slide.description || '',
+          bg_image: slide.bgImage || '',
+          button_text: slide.buttonText || '',
+          button_link: slide.buttonLink || '',
+          order_index: slide.order || (i + 1),
           is_active: true
         };
 
         if (slide.id && slide.id !== 'new') {
           // Atualizar slide existente
+          console.log('Updating existing slide:', slide.id);
           const { error: updateError } = await supabase
             .from('banner_slides')
             .update(slideData)
@@ -544,6 +534,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         } else {
           // Inserir novo slide
+          console.log('Inserting new slide');
           const { error: insertError } = await supabase
             .from('banner_slides')
             .insert([slideData]);
@@ -552,6 +543,23 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             console.error('Error inserting slide:', insertError);
             throw insertError;
           }
+        }
+      }
+
+      // Desativar slides que não estão na lista atual
+      const activeSlideIds = bannerSlides
+        .filter(slide => slide.id && slide.id !== 'new')
+        .map(slide => slide.id);
+      
+      if (activeSlideIds.length > 0) {
+        const { error: deactivateError } = await supabase
+          .from('banner_slides')
+          .update({ is_active: false })
+          .not('id', 'in', `(${activeSlideIds.map(id => `'${id}'`).join(',')})`);
+
+        if (deactivateError) {
+          console.error('Error deactivating unused slides:', deactivateError);
+          // Não throw aqui, só log
         }
       }
 
