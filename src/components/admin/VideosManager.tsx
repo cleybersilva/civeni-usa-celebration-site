@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,15 +7,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, Youtube, Upload, Save, X } from 'lucide-react';
-import { useCMS, Video } from '@/contexts/CMSContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import ThumbnailUpload from './ThumbnailUpload';
 
+interface Video {
+  id: string;
+  title: string;
+  description: string;
+  video_type: 'youtube' | 'upload';
+  youtube_url?: string;
+  uploaded_video_url?: string;
+  thumbnail: string;
+  order_index: number;
+  is_active: boolean;
+}
+
 const VideosManager = () => {
-  const { content, updateVideos } = useCMS();
   const { toast } = useToast();
+  const [videos, setVideos] = useState<Video[]>([]);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [videoForm, setVideoForm] = useState({
     title: '',
     description: '',
@@ -26,7 +39,45 @@ const VideosManager = () => {
     order: 1
   });
 
-  const videos = content.videos.sort((a, b) => a.order - b.order);
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('videos')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index');
+
+      if (error) throw error;
+      
+      // Converter os dados para o tipo correto
+      const videosData: Video[] = (data || []).map(video => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        video_type: video.video_type as 'youtube' | 'upload',
+        youtube_url: video.youtube_url,
+        uploaded_video_url: video.uploaded_video_url,
+        thumbnail: video.thumbnail,
+        order_index: video.order_index,
+        is_active: video.is_active
+      }));
+      
+      setVideos(videosData);
+    } catch (error) {
+      console.error('Erro ao carregar vídeos:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar vídeos",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const resetForm = () => {
     setVideoForm({
@@ -36,7 +87,7 @@ const VideosManager = () => {
       youtubeUrl: '',
       uploadedVideoUrl: '',
       thumbnail: '',
-      order: Math.max(...videos.map(v => v.order), 0) + 1
+      order: Math.max(...videos.map(v => v.order_index), 0) + 1
     });
   };
 
@@ -52,11 +103,11 @@ const VideosManager = () => {
     setVideoForm({
       title: video.title,
       description: video.description,
-      videoType: video.videoType,
-      youtubeUrl: video.youtubeUrl || '',
-      uploadedVideoUrl: video.uploadedVideoUrl || '',
+      videoType: video.video_type,
+      youtubeUrl: video.youtube_url || '',
+      uploadedVideoUrl: video.uploaded_video_url || '',
       thumbnail: video.thumbnail,
-      order: video.order
+      order: video.order_index
     });
   };
 
@@ -88,43 +139,89 @@ const VideosManager = () => {
       return;
     }
 
-    const newVideo: Video = {
-      id: editingVideo?.id || `video-${Date.now()}`,
-      title: videoForm.title,
-      description: videoForm.description,
-      videoType: videoForm.videoType,
-      youtubeUrl: videoForm.videoType === 'youtube' ? videoForm.youtubeUrl : undefined,
-      uploadedVideoUrl: videoForm.videoType === 'upload' ? videoForm.uploadedVideoUrl : undefined,
-      thumbnail: videoForm.thumbnail || 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=300&q=80',
-      order: videoForm.order
-    };
-
-    let updatedVideos;
-    if (editingVideo) {
-      updatedVideos = videos.map(v => v.id === editingVideo.id ? newVideo : v);
-    } else {
-      updatedVideos = [...videos, newVideo];
+    if (!videoForm.thumbnail.trim()) {
+      toast({
+        title: "Erro",
+        description: "Thumbnail é obrigatória",
+        variant: "destructive"
+      });
+      return;
     }
 
-    await updateVideos(updatedVideos);
-    setEditingVideo(null);
-    setIsCreating(false);
-    resetForm();
+    try {
+      const videoData = {
+        title: videoForm.title,
+        description: videoForm.description,
+        video_type: videoForm.videoType,
+        youtube_url: videoForm.videoType === 'youtube' ? videoForm.youtubeUrl : null,
+        uploaded_video_url: videoForm.videoType === 'upload' ? videoForm.uploadedVideoUrl : null,
+        thumbnail: videoForm.thumbnail,
+        order_index: videoForm.order,
+        is_active: true
+      };
 
-    toast({
-      title: "Sucesso",
-      description: editingVideo ? "Vídeo atualizado com sucesso!" : "Vídeo criado com sucesso!"
-    });
+      if (editingVideo) {
+        // Atualizar vídeo existente
+        const { error } = await supabase
+          .from('videos')
+          .update(videoData)
+          .eq('id', editingVideo.id);
+
+        if (error) throw error;
+        toast({
+          title: "Sucesso",
+          description: "Vídeo atualizado com sucesso!"
+        });
+      } else {
+        // Criar novo vídeo
+        const { error } = await supabase
+          .from('videos')
+          .insert(videoData);
+
+        if (error) throw error;
+        toast({
+          title: "Sucesso", 
+          description: "Vídeo criado com sucesso!"
+        });
+      }
+
+      setEditingVideo(null);
+      setIsCreating(false);
+      resetForm();
+      await fetchVideos();
+    } catch (error) {
+      console.error('Erro ao salvar vídeo:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar vídeo",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleDelete = async (videoId: string) => {
     if (confirm('Tem certeza que deseja excluir este vídeo?')) {
-      const updatedVideos = videos.filter(v => v.id !== videoId);
-      await updateVideos(updatedVideos);
-      toast({
-        title: "Sucesso",
-        description: "Vídeo excluído com sucesso!"
-      });
+      try {
+        const { error } = await supabase
+          .from('videos')
+          .delete()
+          .eq('id', videoId);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Vídeo excluído com sucesso!"
+        });
+        await fetchVideos();
+      } catch (error) {
+        console.error('Erro ao excluir vídeo:', error);
+        toast({
+          title: "Erro",
+          description: "Erro ao excluir vídeo",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -154,6 +251,14 @@ const VideosManager = () => {
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-civeni-blue"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -279,8 +384,8 @@ const VideosManager = () => {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <h3 className="text-lg font-semibold text-civeni-blue">{video.title}</h3>
-                      <Badge variant={video.videoType === 'youtube' ? 'destructive' : 'secondary'}>
-                        {video.videoType === 'youtube' ? (
+                      <Badge variant={video.video_type === 'youtube' ? 'destructive' : 'secondary'}>
+                        {video.video_type === 'youtube' ? (
                           <>
                             <Youtube className="w-3 h-3 mr-1" />
                             YouTube
@@ -292,11 +397,11 @@ const VideosManager = () => {
                           </>
                         )}
                       </Badge>
-                      <Badge variant="outline">Ordem: {video.order}</Badge>
+                      <Badge variant="outline">Ordem: {video.order_index}</Badge>
                     </div>
                     <p className="text-gray-600 text-sm mb-2">{video.description}</p>
                     <p className="text-xs text-gray-500">
-                      {video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl}
+                      {video.video_type === 'youtube' ? video.youtube_url : video.uploaded_video_url}
                     </p>
                   </div>
                 </div>

@@ -1,16 +1,61 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Play, Youtube, Maximize2, ExternalLink, X } from 'lucide-react';
-import { useCMS } from '@/contexts/CMSContext';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Video {
+  id: string;
+  title: string;
+  description: string;
+  video_type: 'youtube' | 'upload';
+  youtube_url?: string;
+  uploaded_video_url?: string;
+  thumbnail: string;
+  order_index: number;
+  is_active: boolean;
+}
 
 const VideosSection = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
-  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isMaximized, setIsMaximized] = useState(false);
-  
-  const videos = content.videos.sort((a, b) => a.order - b.order);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('videos')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index');
+
+      if (error) throw error;
+      
+      const videosData: Video[] = (data || []).map(video => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        video_type: video.video_type as 'youtube' | 'upload',
+        youtube_url: video.youtube_url,
+        uploaded_video_url: video.uploaded_video_url,
+        thumbnail: video.thumbnail,
+        order_index: video.order_index,
+        is_active: video.is_active
+      }));
+      
+      setVideos(videosData);
+    } catch (error) {
+      console.error('Erro ao carregar vídeos:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getVideoEmbedUrl = (url: string) => {
     if (url.includes('youtube.com/watch?v=')) {
@@ -24,7 +69,7 @@ const VideosSection = () => {
     return url;
   };
 
-  const handleVideoClick = (video: any) => {
+  const handleVideoClick = (video: Video) => {
     setSelectedVideo(video);
     setIsMaximized(false);
   };
@@ -34,10 +79,10 @@ const VideosSection = () => {
   };
 
   const handleOpenYoutube = () => {
-    if (selectedVideo?.videoType === 'youtube' && selectedVideo?.youtubeUrl) {
-      window.open(selectedVideo.youtubeUrl, '_blank');
-    } else if (selectedVideo?.videoType === 'upload' && selectedVideo?.uploadedVideoUrl) {
-      window.open(selectedVideo.uploadedVideoUrl, '_blank');
+    if (selectedVideo?.video_type === 'youtube' && selectedVideo?.youtube_url) {
+      window.open(selectedVideo.youtube_url, '_blank');
+    } else if (selectedVideo?.video_type === 'upload' && selectedVideo?.uploaded_video_url) {
+      window.open(selectedVideo.uploaded_video_url, '_blank');
     }
   };
 
@@ -45,6 +90,18 @@ const VideosSection = () => {
     setSelectedVideo(null);
     setIsMaximized(false);
   };
+
+  if (isLoading) {
+    return (
+      <section id="videos" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-civeni-blue"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (videos.length === 0) {
     return null;
@@ -77,7 +134,7 @@ const VideosSection = () => {
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                   <div className="text-center text-white">
-                    {video.videoType === 'youtube' ? (
+                    {video.video_type === 'youtube' ? (
                       <Youtube size={48} className="mx-auto mb-2 text-red-500" />
                     ) : (
                       <Play size={48} className="mx-auto mb-2" />
@@ -129,9 +186,9 @@ const VideosSection = () => {
                 </div>
               </div>
               <div className={`${isMaximized ? 'h-full' : 'aspect-video'}`}>
-                {selectedVideo.videoType === 'youtube' ? (
+                {selectedVideo.video_type === 'youtube' ? (
                   <iframe
-                    src={getVideoEmbedUrl(selectedVideo.youtubeUrl)}
+                    src={getVideoEmbedUrl(selectedVideo.youtube_url || '')}
                     className="w-full h-full"
                     frameBorder="0"
                     allowFullScreen
@@ -139,7 +196,7 @@ const VideosSection = () => {
                   />
                 ) : (
                   <video
-                    src={selectedVideo.uploadedVideoUrl}
+                    src={selectedVideo.uploaded_video_url}
                     className="w-full h-full"
                     controls
                     title={selectedVideo.title}
