@@ -62,6 +62,13 @@ const CiveniII2024ImagesManager = () => {
   const handleSave = async (imageData: Omit<CiveniImage, 'id'> & { id?: string }) => {
     console.log('handleSave chamado com:', imageData);
     try {
+      // Garantir que o contexto do usuário está definido
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        await supabase.rpc('set_current_user_email', { user_email: user.email });
+        console.log('Contexto de usuário definido para:', user.email);
+      }
+
       if (imageData.id) {
         // Atualizar
         console.log('Atualizando imagem existente:', imageData.id);
