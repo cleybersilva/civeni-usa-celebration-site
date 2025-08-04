@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, Youtube, Upload, Save, X } from 'lucide-react';
 import { useCMS, Video } from '@/contexts/CMSContext';
 import { useToast } from '@/hooks/use-toast';
+import SimpleImageUpload from './SimpleImageUpload';
 
 const VideosManager = () => {
   const { content, updateVideos } = useCMS();
@@ -235,14 +236,16 @@ const VideosManager = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">URL da Thumbnail</label>
-              <Input
+              <SimpleImageUpload
                 value={videoForm.thumbnail}
-                onChange={(e) => setVideoForm(prev => ({ ...prev, thumbnail: e.target.value }))}
-                placeholder="URL da imagem de capa (opcional)"
+                onChange={(value) => setVideoForm(prev => ({ ...prev, thumbnail: value }))}
+                label="Thumbnail (Miniatura)"
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Para vídeos do YouTube, a thumbnail será preenchida automaticamente
+              <p className="text-sm text-gray-500 mt-2">
+                📐 <strong>Tamanho recomendado:</strong> 1280 x 720 pixels (proporção 16:9), máximo 2MB
+              </p>
+              <p className="text-sm text-gray-400 mt-1">
+                Para vídeos do YouTube, você pode deixar em branco que a thumbnail será preenchida automaticamente
               </p>
             </div>
 
