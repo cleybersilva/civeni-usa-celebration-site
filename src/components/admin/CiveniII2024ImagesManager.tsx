@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { Plus, Edit, Trash2, GripVertical, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import ImageUploadField from './ImageUploadField';
+import SimpleImageUpload from './SimpleImageUpload';
+import ImageGuide from './ImageGuide';
 
 interface CiveniImage {
   id: string;
@@ -237,97 +239,128 @@ interface ImageFormProps {
 }
 
 const ImageForm: React.FC<ImageFormProps> = ({ image, onSave, onCancel }) => {
-  const [formData, setFormData] = useState(image);
+  const [formData, setFormData] = useState({
+    ...image,
+    uploadedImage: ''
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.url || !formData.alt_text_pt) {
+    
+    // Usar imagem uploadada se disponível, senão usar URL
+    const finalImageUrl = formData.uploadedImage || formData.url;
+    
+    if (!finalImageUrl || !formData.alt_text_pt) {
       toast.error('Preencha todos os campos obrigatórios');
       return;
     }
-    onSave(formData);
+    
+    onSave({
+      ...formData,
+      url: finalImageUrl
+    });
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          {image.id ? 'Editar Imagem' : 'Nova Imagem'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <ImageUploadField
-            value={formData.url}
-            onChange={(url) => setFormData({ ...formData, url })}
-            label="Imagem"
-            type="hybrid_activity"
-          />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {image.id ? 'Editar Imagem' : 'Nova Imagem'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <SimpleImageUpload
+                  label="Imagem (Upload)"
+                  value={formData.uploadedImage}
+                  onChange={(value) => setFormData({...formData, uploadedImage: value})}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="url">URL da Imagem (Opcional se fez upload)</Label>
+                <Input
+                  id="url"
+                  type="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  placeholder="Cole aqui a URL da imagem ou faça upload acima"
+                />
+              </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="alt_text_pt">Descrição (Português) *</Label>
-              <Textarea
-                id="alt_text_pt"
-                value={formData.alt_text_pt}
-                onChange={(e) => setFormData({ ...formData, alt_text_pt: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="alt_text_en">Descrição (Inglês) *</Label>
-              <Textarea
-                id="alt_text_en"
-                value={formData.alt_text_en}
-                onChange={(e) => setFormData({ ...formData, alt_text_en: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="alt_text_es">Descrição (Espanhol) *</Label>
-              <Textarea
-                id="alt_text_es"
-                value={formData.alt_text_es}
-                onChange={(e) => setFormData({ ...formData, alt_text_es: e.target.value })}
-                required
-              />
-            </div>
-          </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="alt_text_pt">Descrição (Português) *</Label>
+                  <Textarea
+                    id="alt_text_pt"
+                    value={formData.alt_text_pt}
+                    onChange={(e) => setFormData({ ...formData, alt_text_pt: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="alt_text_en">Descrição (Inglês) *</Label>
+                  <Textarea
+                    id="alt_text_en"
+                    value={formData.alt_text_en}
+                    onChange={(e) => setFormData({ ...formData, alt_text_en: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="alt_text_es">Descrição (Espanhol) *</Label>
+                  <Textarea
+                    id="alt_text_es"
+                    value={formData.alt_text_es}
+                    onChange={(e) => setFormData({ ...formData, alt_text_es: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="order_index">Ordem de Exibição</Label>
-              <Input
-                id="order_index"
-                type="number"
-                value={formData.order_index}
-                onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) })}
-                min="1"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-              />
-              <Label htmlFor="is_active">Ativo</Label>
-            </div>
-          </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="order_index">Ordem de Exibição</Label>
+                  <Input
+                    id="order_index"
+                    type="number"
+                    value={formData.order_index}
+                    onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) })}
+                    min="1"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label htmlFor="is_active">Ativo</Label>
+                </div>
+              </div>
 
-          <div className="flex space-x-4">
-            <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
-              <Save className="w-4 h-4 mr-2" />
-              Salvar
-            </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
-              <X className="w-4 h-4 mr-2" />
-              Cancelar
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+              <div className="flex space-x-4">
+                <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar
+                </Button>
+                <Button type="button" variant="outline" onClick={onCancel}>
+                  <X className="w-4 h-4 mr-2" />
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div>
+        <ImageGuide type="banner" title="Imagens do II CIVENI 2024" />
+      </div>
+    </div>
   );
 };
 
