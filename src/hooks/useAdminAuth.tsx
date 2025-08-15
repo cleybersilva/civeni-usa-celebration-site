@@ -23,6 +23,7 @@ interface SessionData {
   user: AdminUser;
   timestamp: number;
   expires: number;
+  session_token?: string;
 }
 
 interface AdminAuthContextType {
@@ -47,15 +48,28 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         if (sessionData.expires > Date.now()) {
           setUser(sessionData.user);
           // Set the current user email for RLS policies when restoring session
-          (async () => {
-            try {
-              await supabase.rpc('set_current_user_email', {
-                user_email: sessionData.user.email
-              });
-            } catch (error) {
-              console.error('Error setting user email for RLS:', error);
-            }
-          })();
+          if (sessionData.session_token) {
+            (async () => {
+              try {
+                const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
+                  user_email: sessionData.user.email,
+                  session_token: sessionData.session_token
+                });
+                if (!setEmailResult.data) {
+                  console.error('Failed to restore secure session, clearing storage');
+                  localStorage.removeItem('adminSession');
+                  setUser(null);
+                }
+              } catch (error) {
+                console.error('Error setting user email for RLS:', error);
+                localStorage.removeItem('adminSession');
+                setUser(null);
+              }
+            })();
+          } else {
+            // Legacy session without token, clear it
+            localStorage.removeItem('adminSession');
+          }
         } else {
           // Session expired, clear it
           localStorage.removeItem('adminSession');
@@ -71,8 +85,8 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const login = async (email: string, password: string) => {
     try {
-      // Use the temporary admin login function from Supabase
-      const { data, error } = await supabase.rpc('temp_admin_login', {
+      // Use the secure admin login function from Supabase
+      const { data, error } = await supabase.rpc('temp_admin_login_secure', {
         user_email: email,
         user_password: password
       });
@@ -83,9 +97,9 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
       }
 
       // Type assertion for the response data
-      const loginResponse = data as unknown as LoginResponse;
+      const loginResponse = data as unknown as LoginResponse & { session_token?: string };
 
-      if (loginResponse && loginResponse.success && loginResponse.user) {
+      if (loginResponse && loginResponse.success && loginResponse.user && loginResponse.session_token) {
         const adminUser: AdminUser = {
           id: loginResponse.user.user_id,
           email: loginResponse.user.email,
@@ -95,16 +109,23 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         
         setUser(adminUser);
         
-        // Set the current user email for RLS policies
-        await supabase.rpc('set_current_user_email', {
-          user_email: email
+        // Set the current user email for RLS policies using secure method
+        const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
+          user_email: email,
+          session_token: loginResponse.session_token
         });
+
+        if (!setEmailResult.data) {
+          console.error('Failed to set secure user email');
+          return { success: false, error: 'Erro de autenticação' };
+        }
         
-        // Store session with expiration (24 hours)
+        // Store session with expiration (24 hours) and token
         const sessionData = {
           user: adminUser,
           timestamp: Date.now(),
-          expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+          expires: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+          session_token: loginResponse.session_token
         };
         
         localStorage.setItem('adminSession', JSON.stringify(sessionData));
