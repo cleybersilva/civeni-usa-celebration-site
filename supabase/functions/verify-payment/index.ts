@@ -4,7 +4,7 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://wdkeqxfglmritghmakma.lovableproject.com",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -56,12 +56,12 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Payment verification error:", error);
     return new Response(JSON.stringify({ 
-      error: error.message || "Erro ao verificar pagamento" 
+      error: "Erro ao verificar pagamento" 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: 400,
     });
   }
 });

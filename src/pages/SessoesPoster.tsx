@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Download, ExternalLink, Calendar, Presentation } from 'lucide-react';
+import { createSafeHtml } from '@/utils/sanitizeHtml';
 
 interface WorkContent {
   id: string;
@@ -73,7 +74,7 @@ const SessoesPoster = () => {
             )}
             {content && (
               <CardContent>
-                <div dangerouslySetInnerHTML={{ __html: content }} />
+                <div dangerouslySetInnerHTML={createSafeHtml(content)} />
               </CardContent>
             )}
           </Card>
@@ -146,7 +147,7 @@ const SessoesPoster = () => {
                 />
               )}
               {content && (
-                <div className="mt-4" dangerouslySetInnerHTML={{ __html: content }} />
+                <div className="mt-4" dangerouslySetInnerHTML={createSafeHtml(content)} />
               )}
             </CardContent>
           </Card>
