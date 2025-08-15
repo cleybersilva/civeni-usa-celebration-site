@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_sessions: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+        }
+        Relationships: []
+      }
       admin_users: {
         Row: {
           created_at: string
@@ -1006,6 +1030,10 @@ export type Database = {
         Args: { permission_type: string; resource: string; user_email: string }
         Returns: boolean
       }
+      cleanup_expired_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_admin_user: {
         Args: {
           user_email: string
@@ -1052,11 +1080,19 @@ export type Database = {
         Args: { user_email: string }
         Returns: undefined
       }
+      set_current_user_email_secure: {
+        Args: { session_token: string; user_email: string }
+        Returns: boolean
+      }
       simple_admin_login: {
         Args: { user_email: string; user_password: string }
         Returns: Json
       }
       temp_admin_login: {
+        Args: { user_email: string; user_password: string }
+        Returns: Json
+      }
+      temp_admin_login_secure: {
         Args: { user_email: string; user_password: string }
         Returns: Json
       }
