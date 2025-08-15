@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1003,7 +1003,7 @@ export type Database = {
     }
     Functions: {
       check_user_permission: {
-        Args: { user_email: string; permission_type: string; resource: string }
+        Args: { permission_type: string; resource: string; user_email: string }
         Returns: boolean
       }
       create_admin_user: {
@@ -1037,11 +1037,11 @@ export type Database = {
       list_admin_users: {
         Args: Record<PropertyKey, never>
         Returns: {
-          user_id: string
-          email: string
-          user_type: Database["public"]["Enums"]["admin_user_type"]
-          is_admin_root: boolean
           created_at: string
+          email: string
+          is_admin_root: boolean
+          user_id: string
+          user_type: Database["public"]["Enums"]["admin_user_type"]
         }[]
       }
       request_password_reset: {
@@ -1061,13 +1061,13 @@ export type Database = {
         Returns: Json
       }
       update_admin_user_password: {
-        Args: { user_id: string; new_password: string }
+        Args: { new_password: string; user_id: string }
         Returns: Json
       }
       update_admin_user_type: {
         Args: {
-          user_id: string
           new_user_type: Database["public"]["Enums"]["admin_user_type"]
+          user_id: string
         }
         Returns: Json
       }
@@ -1078,13 +1078,13 @@ export type Database = {
       verify_admin_login: {
         Args: { user_email: string; user_password: string }
         Returns: {
-          user_id: string
           email: string
+          user_id: string
           user_type: Database["public"]["Enums"]["admin_user_type"]
         }[]
       }
       verify_admin_login_secure: {
-        Args: { user_email: string; user_password: string; user_ip?: string }
+        Args: { user_email: string; user_ip?: string; user_password: string }
         Returns: Json
       }
     }
