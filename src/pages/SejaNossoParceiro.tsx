@@ -41,14 +41,12 @@ const SejaNossoParceiro = () => {
   });
 
   const partnershipTypes = [
-    { value: 'patrocinio-ouro', label: 'Patrocínio Ouro' },
-    { value: 'patrocinio-prata', label: 'Patrocínio Prata' },
-    { value: 'patrocinio-bronze', label: 'Patrocínio Bronze' },
-    { value: 'apoio-institucional', label: 'Apoio Institucional' },
-    { value: 'midia-partner', label: 'Mídia Partner' },
-    { value: 'fornecedor-servicos', label: 'Fornecedor de Serviços' },
-    { value: 'parceiro-academico', label: 'Parceiro Acadêmico' },
-    { value: 'outro', label: 'Outro' }
+    { value: 'sponsor', label: 'Patrocinador' },
+    { value: 'exhibitor', label: 'Expositor' },
+    { value: 'media', label: 'Mídia Partner' },
+    { value: 'academic', label: 'Parceiro Acadêmico' },
+    { value: 'vendor', label: 'Fornecedor de Serviços' },
+    { value: 'other', label: 'Outros' }
   ];
 
   const benefits = [
@@ -91,7 +89,7 @@ const SejaNossoParceiro = () => {
     try {
       const { error } = await supabase
         .from('partner_applications')
-        .insert([formData]);
+        .insert([{ ...formData, status: 'pending' }]);
 
       if (error) throw error;
 

@@ -1023,39 +1023,7 @@ export type Database = {
       }
     }
     Views: {
-      partner_applications_summary: {
-        Row: {
-          company_name: string | null
-          contact_name_masked: string | null
-          created_at: string | null
-          email_masked: string | null
-          id: string | null
-          partnership_type: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          company_name?: string | null
-          contact_name_masked?: never
-          created_at?: string | null
-          email_masked?: never
-          id?: string | null
-          partnership_type?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          company_name?: string | null
-          contact_name_masked?: never
-          created_at?: string | null
-          email_masked?: never
-          id?: string | null
-          partnership_type?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       check_user_permission: {
@@ -1085,6 +1053,19 @@ export type Database = {
       get_current_admin_user_email: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_partner_applications_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          company_name: string
+          contact_name_masked: string
+          created_at: string
+          email_masked: string
+          id: string
+          partnership_type: string
+          status: string
+          updated_at: string
+        }[]
       }
       is_admin_root_user: {
         Args: { user_email: string }
