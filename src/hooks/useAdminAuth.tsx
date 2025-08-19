@@ -139,10 +139,32 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('adminSession');
-    localStorage.removeItem('adminUser'); // Clean up old format too
+  const logout = async () => {
+    try {
+      // Get current session data to check for token
+      const savedSession = localStorage.getItem('adminSession');
+      if (savedSession && user) {
+        try {
+          const sessionData: SessionData = JSON.parse(savedSession);
+          if (sessionData.session_token) {
+            // Revoke session server-side
+            await supabase.rpc('revoke_admin_session', {
+              user_email: user.email,
+              session_token: sessionData.session_token
+            });
+          }
+        } catch (error) {
+          console.error('Failed to revoke session server-side:', error);
+          // Continue with logout even if server-side revocation fails
+        }
+      }
+      
+      setUser(null);
+      localStorage.removeItem('adminSession');
+      localStorage.removeItem('adminUser'); // Clean up old format too
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const hasPermission = (resource: string) => {

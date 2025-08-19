@@ -71,16 +71,6 @@ const CiveniII2024ImagesManager = () => {
     }
     
     try {
-      // Definir contexto do usuário usando o email do admin autenticado
-      const { error: contextError } = await supabase.rpc('set_current_user_email', { 
-        user_email: user.email 
-      });
-      
-      if (contextError) {
-        console.error('Erro ao definir contexto:', contextError);
-        toast.error('Erro ao configurar usuário');
-        return;
-      }
       
       console.log('Contexto de usuário definido para:', user.email);
 

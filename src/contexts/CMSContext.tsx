@@ -495,16 +495,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       console.log('Updating banner slides:', bannerSlides);
       
-      // Definir contexto do usuário admin
-      const adminEmail = 'cleyber.silva@live.com';
-      const { error: contextError } = await supabase.rpc('set_current_user_email', { 
-        user_email: adminEmail 
-      });
-      
-      if (contextError) {
-        console.error('Error setting user context:', contextError);
-        throw contextError;
-      }
 
       // Processar cada slide individualmente
       for (let i = 0; i < bannerSlides.length; i++) {

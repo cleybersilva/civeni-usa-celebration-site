@@ -54,13 +54,34 @@ serve(async (req) => {
   }
 
   try {
-    const { session_id } = await req.json();
+    const { session_id, registration_id } = await req.json();
+    
+    if (!session_id) {
+      return new Response(
+        JSON.stringify({ error: 'Missing session_id' }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
 
     const session = await stripe.checkout.sessions.retrieve(session_id);
+    
+    // Verify registration_id matches if provided
+    if (registration_id && session.metadata?.registration_id !== registration_id) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Registration ID mismatch', 
+          payment_status: session.payment_status 
+        }),
+        { 
+          status: 403, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -70,13 +91,27 @@ serve(async (req) => {
 
     if (session.payment_status === 'paid') {
       // Update registration status in event_registrations table
-      await supabaseClient
+      const { error } = await supabaseClient
         .from('event_registrations')
         .update({ 
           payment_status: 'completed',
           updated_at: new Date().toISOString()
         })
         .eq('stripe_session_id', session_id);
+
+      if (error) {
+        console.error('Database update error:', error);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Failed to update payment status', 
+            payment_status: session.payment_status 
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          }
+        );
+      }
 
       return new Response(JSON.stringify({ 
         success: true, 
