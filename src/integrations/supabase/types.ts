@@ -1023,7 +1023,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      partner_applications_summary: {
+        Row: {
+          company_name: string | null
+          contact_name_masked: string | null
+          created_at: string | null
+          email_masked: string | null
+          id: string | null
+          partnership_type: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          contact_name_masked?: never
+          created_at?: string | null
+          email_masked?: never
+          id?: string | null
+          partnership_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          contact_name_masked?: never
+          created_at?: string | null
+          email_masked?: never
+          id?: string | null
+          partnership_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_user_permission: {
