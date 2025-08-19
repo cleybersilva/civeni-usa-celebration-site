@@ -1076,9 +1076,9 @@ export type Database = {
         Args: { user_email: string }
         Returns: boolean
       }
-      set_current_user_email: {
-        Args: { user_email: string }
-        Returns: undefined
+      revoke_admin_session: {
+        Args: { session_token: string; user_email: string }
+        Returns: Json
       }
       set_current_user_email_secure: {
         Args: { session_token: string; user_email: string }
