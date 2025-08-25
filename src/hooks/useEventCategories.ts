@@ -37,6 +37,20 @@ export const useEventCategories = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
+      
+      // Get session data for admin context
+      const savedSession = localStorage.getItem('adminSession');
+      if (savedSession) {
+        const sessionData = JSON.parse(savedSession);
+        if (sessionData.session_token && sessionData.expires > Date.now()) {
+          // Set admin context for this query
+          await supabase.rpc('set_current_user_email_secure', {
+            user_email: sessionData.user.email,
+            session_token: sessionData.session_token
+          });
+        }
+      }
+
       const { data, error } = await supabase
         .from('event_category')
         .select('*')
