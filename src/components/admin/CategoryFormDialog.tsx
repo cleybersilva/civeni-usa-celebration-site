@@ -18,7 +18,6 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useEventCategories } from '@/hooks/useEventCategories';
-import { useBatches } from '@/hooks/useBatches';
 import { useCursos } from '@/hooks/useCursos';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -35,7 +34,6 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
   category
 }) => {
   const { createCategory, updateCategory } = useEventCategories();
-  const { currentBatch } = useBatches();
   const { cursos } = useCursos();
   const [loading, setLoading] = useState(false);
   const [activeLanguage, setActiveLanguage] = useState('pt');
@@ -206,13 +204,27 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
       }
 
       const categoryData = {
-        ...formData,
-        event_id: category?.event_id || 'a1b2c3d4-e5f6-7890-1234-567890abcdef', // Default event ID
+        event_id: category?.event_id || 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+        slug: formData.slug,
+        order_index: formData.order_index,
+        is_active: formData.is_active,
+        is_free: formData.is_free,
+        currency: formData.currency,
+        price_cents: formData.is_free ? 0 : formData.price_cents,
+        quota_total: null,
         available_from: formData.available_from?.toISOString() || null,
         available_until: formData.available_until?.toISOString() || null,
+        lot_id: formData.lot_id || null,
+        title_pt: formData.title_pt,
+        title_en: formData.title_en || null,
+        title_es: formData.title_es || null,
+        title_tr: formData.title_tr || null,
+        description_pt: formData.description_pt || null,
+        description_en: formData.description_en || null,
+        description_es: formData.description_es || null,
+        description_tr: formData.description_tr || null,
         stripe_product_id: category?.stripe_product_id || null,
         stripe_price_id: category?.stripe_price_id || null,
-        quota_total: null, // Remove quota_total field as requested
       };
 
       let result;
@@ -410,13 +422,18 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                 </Select>
               </div>
                 <div>
-                  <Label htmlFor="price_cents">Preço (centavos)</Label>
+                  <Label htmlFor="price_display">Preço</Label>
                   <Input
-                    id="price_cents"
+                    id="price_display"
                     type="number"
                     min="0"
-                    value={formData.price_cents}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price_cents: parseInt(e.target.value) || 0 }))}
+                    step="0.01"
+                    value={Math.max(0, (formData.price_cents || 0) / 100)}
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value);
+                      const cents = isNaN(v) ? 0 : Math.round(v * 100);
+                      setFormData(prev => ({ ...prev, price_cents: cents }));
+                    }}
                   />
                 </div>
                 <div>
