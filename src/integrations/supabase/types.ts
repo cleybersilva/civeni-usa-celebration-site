@@ -349,6 +349,137 @@ export type Database = {
         }
         Relationships: []
       }
+      event_category: {
+        Row: {
+          available_from: string | null
+          available_until: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description_en: string | null
+          description_es: string | null
+          description_pt: string | null
+          description_tr: string | null
+          event_id: string
+          id: string
+          is_active: boolean
+          is_free: boolean
+          lot_id: string | null
+          order_index: number
+          price_cents: number | null
+          quota_total: number | null
+          slug: string
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          sync_error: string | null
+          sync_status: string | null
+          title_en: string | null
+          title_es: string | null
+          title_pt: string
+          title_tr: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          available_from?: string | null
+          available_until?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description_en?: string | null
+          description_es?: string | null
+          description_pt?: string | null
+          description_tr?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean
+          is_free?: boolean
+          lot_id?: string | null
+          order_index?: number
+          price_cents?: number | null
+          quota_total?: number | null
+          slug: string
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          sync_error?: string | null
+          sync_status?: string | null
+          title_en?: string | null
+          title_es?: string | null
+          title_pt: string
+          title_tr?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          available_from?: string | null
+          available_until?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description_en?: string | null
+          description_es?: string | null
+          description_pt?: string | null
+          description_tr?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          is_free?: boolean
+          lot_id?: string | null
+          order_index?: number
+          price_cents?: number | null
+          quota_total?: number | null
+          slug?: string
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          sync_error?: string | null
+          sync_status?: string | null
+          title_en?: string | null
+          title_es?: string | null
+          title_pt?: string
+          title_tr?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      event_category_audit: {
+        Row: {
+          action: string
+          category_id: string
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+        }
+        Insert: {
+          action: string
+          category_id: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+        }
+        Update: {
+          action?: string
+          category_id?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_category_audit_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "event_category"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_config: {
         Row: {
           created_at: string
