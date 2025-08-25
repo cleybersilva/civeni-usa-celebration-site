@@ -187,6 +187,8 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
     setLoading(true);
 
     try {
+      console.log('Submitting form data:', formData);
+
       // Validation
       if (!formData.title_pt.trim()) {
         toast.error('Título em português é obrigatório');
@@ -204,14 +206,12 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
       }
 
       const categoryData = {
-        event_id: category?.event_id || 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
         slug: formData.slug,
         order_index: formData.order_index,
         is_active: formData.is_active,
         is_free: formData.is_free,
         currency: formData.currency,
         price_cents: formData.is_free ? 0 : formData.price_cents,
-        quota_total: null,
         available_from: formData.available_from?.toISOString() || null,
         available_until: formData.available_until?.toISOString() || null,
         lot_id: formData.lot_id || null,
@@ -223,9 +223,9 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         description_en: formData.description_en || null,
         description_es: formData.description_es || null,
         description_tr: formData.description_tr || null,
-        stripe_product_id: category?.stripe_product_id || null,
-        stripe_price_id: category?.stripe_price_id || null,
       };
+
+      console.log('Category data to be saved:', categoryData);
 
       let result;
       if (category) {
@@ -234,14 +234,18 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         result = await createCategory(categoryData);
       }
 
+      console.log('Save result:', result);
+
       if (result.success) {
         toast.success(category ? 'Categoria atualizada' : 'Categoria criada');
         onClose();
       } else {
-        toast.error('Erro ao salvar categoria');
+        console.error('Save error:', result.error);
+        toast.error('Erro ao salvar categoria: ' + (result.error?.message || 'Erro desconhecido'));
       }
     } catch (error) {
-      toast.error('Erro ao salvar categoria');
+      console.error('Exception during save:', error);
+      toast.error('Erro ao salvar categoria: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
