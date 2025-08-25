@@ -609,6 +609,36 @@ export type Database = {
         }
         Relationships: []
       }
+      registration_access_logs: {
+        Row: {
+          access_type: string
+          accessed_by: string
+          accessed_columns: string[] | null
+          admin_user_type: string
+          created_at: string
+          id: string
+          registration_id: string
+        }
+        Insert: {
+          access_type: string
+          accessed_by: string
+          accessed_columns?: string[] | null
+          admin_user_type: string
+          created_at?: string
+          id?: string
+          registration_id: string
+        }
+        Update: {
+          access_type?: string
+          accessed_by?: string
+          accessed_columns?: string[] | null
+          admin_user_type?: string
+          created_at?: string
+          id?: string
+          registration_id?: string
+        }
+        Relationships: []
+      }
       registration_batches: {
         Row: {
           batch_number: number
@@ -1071,6 +1101,14 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_registration_details_secure: {
+        Args: { registration_id: string }
+        Returns: Json
+      }
+      get_registration_stats_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       is_admin_root_user: {
         Args: { user_email: string }
         Returns: boolean
@@ -1114,6 +1152,10 @@ export type Database = {
           new_user_type: Database["public"]["Enums"]["admin_user_type"]
           user_id: string
         }
+        Returns: Json
+      }
+      update_registration_secure: {
+        Args: { registration_id: string; updates: Json }
         Returns: Json
       }
       validate_coupon: {
