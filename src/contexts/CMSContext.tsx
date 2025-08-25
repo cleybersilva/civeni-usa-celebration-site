@@ -422,16 +422,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Converter dados do Supabase para o formato do contexto
-      const bannerSlides: BannerSlide[] = bannerSlidesData?.map(slide => ({
-        id: slide.id,
-        title: slide.title,
-        subtitle: slide.subtitle,
-        description: slide.description,
-        bgImage: slide.bg_image,
-        buttonText: slide.button_text,
-        buttonLink: slide.button_link,
-        order: slide.order_index
-      })) || defaultContent.bannerSlides;
+      const bannerSlides: BannerSlide[] = bannerSlidesData?.map(slide => {
+        // Converter caminhos de assets locais para URLs públicas
+        let bgImage = slide.bg_image;
+        if (bgImage.startsWith('src/assets/')) {
+          bgImage = bgImage.replace('src/assets/', '/assets/');
+        }
+        
+        return {
+          id: slide.id,
+          title: slide.title,
+          subtitle: slide.subtitle,
+          description: slide.description,
+          bgImage: bgImage,
+          buttonText: slide.button_text,
+          buttonLink: slide.button_link,
+          order: slide.order_index
+        };
+      }) || defaultContent.bannerSlides;
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
