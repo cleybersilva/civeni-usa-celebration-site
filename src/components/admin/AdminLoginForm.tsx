@@ -27,7 +27,8 @@ const AdminLoginForm = () => {
   const languages = [
     { code: 'en', flag: '🇺🇸', name: 'English' },
     { code: 'pt', flag: '🇧🇷', name: 'Português' },
-    { code: 'es', flag: '🇪🇸', name: 'Español' }
+    { code: 'es', flag: '🇪🇸', name: 'Español' },
+    { code: 'tr', flag: '🇹🇷', name: 'Türkçe' }
   ];
 
   const changeLanguage = (langCode: string) => {
