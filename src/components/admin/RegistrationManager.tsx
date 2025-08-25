@@ -11,6 +11,7 @@ import { useRegistrationCategories, RegistrationCategory } from '@/hooks/useRegi
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CouponManager from './CouponManager';
+import FormConfigManager from './FormConfigManager';
 
 const RegistrationManager = () => {
   const { categories, loading, createCategory, updateCategory, deleteCategory } = useRegistrationCategories();
@@ -264,6 +265,10 @@ const RegistrationManager = () => {
         
         <TabsContent value="coupons">
           <CouponManager />
+        </TabsContent>
+
+        <TabsContent value="form-config">
+          <FormConfigManager />
         </TabsContent>
       </Tabs>
     </div>
