@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
 }) => {
   const { createCategory, updateCategory } = useEventCategories();
   const [loading, setLoading] = useState(false);
+  const [activeLanguage, setActiveLanguage] = useState('pt');
   const [formData, setFormData] = useState({
     title_pt: '',
     title_en: '',
@@ -51,6 +53,19 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
     available_from: null as Date | null,
     available_until: null as Date | null,
   });
+
+  const currencyRates = {
+    BRL: 1,
+    USD: 0.18,
+    EUR: 0.17,
+    TRY: 6.12
+  };
+
+  const convertPrice = (amount: number, fromCurrency: string, toCurrency: string) => {
+    if (fromCurrency === toCurrency) return amount;
+    const usdAmount = amount / currencyRates[fromCurrency as keyof typeof currencyRates];
+    return Math.round(usdAmount * currencyRates[toCurrency as keyof typeof currencyRates]);
+  };
 
   useEffect(() => {
     if (category) {
@@ -134,7 +149,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
 
       const categoryData = {
         ...formData,
-        event_id: category?.event_id || 'default-event-id', // You may want to get this from context
+        event_id: category?.event_id || 'a1b2c3d4-e5f6-7890-1234-567890abcdef', // Default event ID
         available_from: formData.available_from?.toISOString() || null,
         available_until: formData.available_until?.toISOString() || null,
         stripe_product_id: category?.stripe_product_id || null,
@@ -172,7 +187,24 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Tabs defaultValue="pt" className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <Label>Idioma Principal para Criação</Label>
+              <Select value={activeLanguage} onValueChange={setActiveLanguage}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pt">Português</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="tr">Türkçe</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Tabs value={activeLanguage} onValueChange={setActiveLanguage} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="pt">Português</TabsTrigger>
               <TabsTrigger value="en">English</TabsTrigger>
@@ -300,7 +332,25 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
           </div>
 
           {!formData.is_free && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="currency">Moeda</Label>
+                <Select value={formData.currency} onValueChange={(value) => {
+                  const oldPrice = formData.price_cents;
+                  const newPrice = convertPrice(oldPrice, formData.currency, value);
+                  setFormData(prev => ({ ...prev, currency: value, price_cents: newPrice }));
+                }}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="BRL">BRL (Real)</SelectItem>
+                    <SelectItem value="USD">USD (Dólar)</SelectItem>
+                    <SelectItem value="EUR">EUR (Euro)</SelectItem>
+                    <SelectItem value="TRY">TRY (Lira)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <Label htmlFor="price_cents">Preço (centavos)</Label>
                 <Input
@@ -311,7 +361,10 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                   onChange={(e) => setFormData(prev => ({ ...prev, price_cents: parseInt(e.target.value) || 0 }))}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Valor em centavos (ex: 10000 = R$ 100,00)
+                  {formData.currency === 'BRL' && `R$ ${(formData.price_cents / 100).toFixed(2)}`}
+                  {formData.currency === 'USD' && `$ ${(formData.price_cents / 100).toFixed(2)}`}
+                  {formData.currency === 'EUR' && `€ ${(formData.price_cents / 100).toFixed(2)}`}
+                  {formData.currency === 'TRY' && `₺ ${(formData.price_cents / 100).toFixed(2)}`}
                 </p>
               </div>
               <div>
