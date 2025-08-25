@@ -78,10 +78,27 @@ export const useEventCategories = () => {
         throw new Error('Sessão inválida. Faça login novamente.');
       }
 
+      // Ensure we use the correct event_id from existing categories if needed
+      let finalCategory = { ...categoryData } as typeof categoryData;
+      const placeholderId = 'a1b2c3d4-e5f6-7890-1234-567890abcdef';
+      if (!finalCategory.event_id || finalCategory.event_id === placeholderId) {
+        const { data: existing, error: fetchErr } = await supabase
+          .from('event_category')
+          .select('event_id')
+          .limit(1);
+        if (fetchErr) throw fetchErr;
+        const existingEventId = existing && existing.length > 0 ? existing[0].event_id : null;
+        if (existingEventId) {
+          finalCategory.event_id = existingEventId;
+        } else {
+          throw new Error('ID do evento não configurado. Crie ao menos uma categoria padrão ou configure o evento.');
+        }
+      }
+
       // Use secure function that handles RLS properly
       const { data, error } = await supabase.rpc('create_event_category_secure', {
         category: {
-          ...categoryData,
+          ...finalCategory,
           sync_status: 'pending'
         },
         user_email: sessionData.user.email,
