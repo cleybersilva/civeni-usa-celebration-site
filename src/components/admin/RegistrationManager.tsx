@@ -106,12 +106,18 @@ const RegistrationManager = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Inscrições</h2>
-      
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Gerenciamento de Inscrições</h2>
+        <p className="text-muted-foreground">
+          Configure categorias de inscrição, cupons de desconto e formulários
+        </p>
+      </div>
+
       <Tabs defaultValue="categories" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="categories">Categorias</TabsTrigger>
           <TabsTrigger value="coupons">Cupons</TabsTrigger>
+          <TabsTrigger value="form-config">Configurações do Formulário</TabsTrigger>
         </TabsList>
         
         <TabsContent value="categories" className="space-y-6">

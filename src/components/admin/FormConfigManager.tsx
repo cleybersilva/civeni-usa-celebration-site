@@ -3,11 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import BatchManager from './form-config/BatchManager';
-import ParticipantTypesManager from './form-config/ParticipantTypesManager';
 import CategoriesManager from './form-config/CategoriesManager';
 import CoursesManager from './form-config/CoursesManager';
 import ClassesManager from './form-config/ClassesManager';
-import PricingManager from './form-config/PricingManager';
 
 const FormConfigManager = () => {
   const { t } = useTranslation();
@@ -24,12 +22,9 @@ const FormConfigManager = () => {
       </div>
 
       <Tabs defaultValue="batches" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="batches">
             {t('admin.formConfig.batches', 'Lotes')}
-          </TabsTrigger>
-          <TabsTrigger value="participant-types">
-            {t('admin.formConfig.participantTypes', 'Tipos de Participantes')}
           </TabsTrigger>
           <TabsTrigger value="categories">
             {t('admin.formConfig.categories', 'Categorias')}
@@ -40,9 +35,6 @@ const FormConfigManager = () => {
           <TabsTrigger value="classes">
             {t('admin.formConfig.classes', 'Turmas')}
           </TabsTrigger>
-          <TabsTrigger value="pricing">
-            {t('admin.formConfig.pricing', 'Valores')}
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="batches" className="space-y-4">
@@ -52,17 +44,6 @@ const FormConfigManager = () => {
             </CardHeader>
             <CardContent>
               <BatchManager />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="participant-types" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('admin.formConfig.participantTypesTitle', 'Tipos de Participantes')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ParticipantTypesManager />
             </CardContent>
           </Card>
         </TabsContent>
@@ -96,17 +77,6 @@ const FormConfigManager = () => {
             </CardHeader>
             <CardContent>
               <ClassesManager />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pricing" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('admin.formConfig.pricingTitle', 'Valores por Categoria')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PricingManager />
             </CardContent>
           </Card>
         </TabsContent>
