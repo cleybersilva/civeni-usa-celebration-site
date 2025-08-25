@@ -18,6 +18,9 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useEventCategories } from '@/hooks/useEventCategories';
+import { useBatches } from '@/hooks/useBatches';
+import { useCursos } from '@/hooks/useCursos';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface CategoryFormDialogProps {
@@ -32,8 +35,13 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
   category
 }) => {
   const { createCategory, updateCategory } = useEventCategories();
+  const { currentBatch } = useBatches();
+  const { cursos } = useCursos();
   const [loading, setLoading] = useState(false);
   const [activeLanguage, setActiveLanguage] = useState('pt');
+  const [allBatches, setAllBatches] = useState<any[]>([]);
+  const [selectedCurso, setSelectedCurso] = useState<string>('');
+  const [turmasForCurso, setTurmasForCurso] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     title_pt: '',
     title_en: '',
@@ -49,7 +57,9 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
     is_free: false,
     currency: 'BRL',
     price_cents: 0,
-    quota_total: null as number | null,
+    lot_id: null as string | null,
+    curso_id: null as string | null,
+    turma_id: null as string | null,
     available_from: null as Date | null,
     available_until: null as Date | null,
   });
@@ -84,7 +94,9 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         is_free: category.is_free ?? false,
         currency: category.currency || 'BRL',
         price_cents: category.price_cents || 0,
-        quota_total: category.quota_total,
+        lot_id: category.lot_id || null,
+        curso_id: category.curso_id || null,
+        turma_id: category.turma_id || null,
         available_from: category.available_from ? new Date(category.available_from) : null,
         available_until: category.available_until ? new Date(category.available_until) : null,
       });
@@ -104,7 +116,9 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         is_free: false,
         currency: 'BRL',
         price_cents: 0,
-        quota_total: null,
+        lot_id: null,
+        curso_id: null,
+        turma_id: null,
         available_from: null,
         available_until: null,
       });
@@ -125,6 +139,50 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
       setFormData(prev => ({ ...prev, slug }));
     }
   }, [formData.title_pt, category]);
+
+  // Load all batches
+  useEffect(() => {
+    const loadBatches = async () => {
+      try {
+        const { data } = await supabase
+          .from('registration_batches')
+          .select('*')
+          .order('batch_number');
+        setAllBatches(data || []);
+      } catch (error) {
+        console.error('Error loading batches:', error);
+      }
+    };
+    if (isOpen) loadBatches();
+  }, [isOpen]);
+
+  // Load turmas when curso changes
+  useEffect(() => {
+    const loadTurmas = async () => {
+      if (!selectedCurso) {
+        setTurmasForCurso([]);
+        return;
+      }
+      try {
+        const { data } = await supabase
+          .from('turmas')
+          .select('*')
+          .eq('id_curso', selectedCurso)
+          .order('nome_turma');
+        setTurmasForCurso(data || []);
+      } catch (error) {
+        console.error('Error loading turmas:', error);
+      }
+    };
+    loadTurmas();
+  }, [selectedCurso]);
+
+  // Update selectedCurso when form data changes
+  useEffect(() => {
+    if (formData.curso_id) {
+      setSelectedCurso(formData.curso_id);
+    }
+  }, [formData.curso_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,7 +212,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         available_until: formData.available_until?.toISOString() || null,
         stripe_product_id: category?.stripe_product_id || null,
         stripe_price_id: category?.stripe_price_id || null,
-        lot_id: category?.lot_id || null,
+        quota_total: null, // Remove quota_total field as requested
       };
 
       let result;
@@ -351,34 +409,73 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="price_cents">Preço (centavos)</Label>
-                <Input
-                  id="price_cents"
-                  type="number"
-                  min="0"
-                  value={formData.price_cents}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price_cents: parseInt(e.target.value) || 0 }))}
-                />
-                <p className="text-sm text-muted-foreground mt-1">
-                  {formData.currency === 'BRL' && `R$ ${(formData.price_cents / 100).toFixed(2)}`}
-                  {formData.currency === 'USD' && `$ ${(formData.price_cents / 100).toFixed(2)}`}
-                  {formData.currency === 'EUR' && `€ ${(formData.price_cents / 100).toFixed(2)}`}
-                  {formData.currency === 'TRY' && `₺ ${(formData.price_cents / 100).toFixed(2)}`}
-                </p>
-              </div>
-              <div>
-                <Label htmlFor="quota_total">Cota Total (opcional)</Label>
-                <Input
-                  id="quota_total"
-                  type="number"
-                  min="1"
-                  value={formData.quota_total || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, quota_total: e.target.value ? parseInt(e.target.value) : null }))}
-                />
-              </div>
+                <div>
+                  <Label htmlFor="price_cents">Preço (centavos)</Label>
+                  <Input
+                    id="price_cents"
+                    type="number"
+                    min="0"
+                    value={formData.price_cents}
+                    onChange={(e) => setFormData(prev => ({ ...prev, price_cents: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lot_id">Lote</Label>
+                  <Select value={formData.lot_id || ''} onValueChange={(value) => setFormData(prev => ({ ...prev, lot_id: value || null }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar lote" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allBatches.map((batch) => (
+                        <SelectItem key={batch.id} value={batch.id}>
+                          Lote {batch.batch_number} ({batch.start_date} - {batch.end_date})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
             </div>
           )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="curso_id">Curso</Label>
+              <Select value={formData.curso_id || ''} onValueChange={(value) => {
+                setFormData(prev => ({ ...prev, curso_id: value || null, turma_id: null }));
+                setSelectedCurso(value);
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar curso" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cursos.map((curso) => (
+                    <SelectItem key={curso.id} value={curso.id}>
+                      {curso.nome_curso}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="turma_id">Turma</Label>
+              <Select 
+                value={formData.turma_id || ''} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, turma_id: value || null }))}
+                disabled={!selectedCurso}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecionar turma" />
+                </SelectTrigger>
+                <SelectContent>
+                  {turmasForCurso.map((turma) => (
+                    <SelectItem key={turma.id} value={turma.id}>
+                      {turma.nome_turma}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
