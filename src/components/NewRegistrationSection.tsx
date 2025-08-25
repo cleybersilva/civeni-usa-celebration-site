@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NewRegistrationSectionProps } from '@/types/registration';
 import { useBatches } from '@/hooks/useBatches';
-import { useCategories } from '@/hooks/useCategories';
+import { usePublicEventCategories } from '@/hooks/usePublicEventCategories';
 import { useRegistrationForm } from '@/hooks/useRegistrationForm';
 import { getCategoryName } from '@/utils/registrationUtils';
 import BatchInfo from './registration/BatchInfo';
@@ -20,7 +20,7 @@ import PriceSummary from './registration/PriceSummary';
 const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProps) => {
   const { t, i18n } = useTranslation();
   const { currentBatch, loading: batchLoading } = useBatches();
-  const { categories } = useCategories(currentBatch);
+  const { categories } = usePublicEventCategories();
   const { formData, setFormData, loading, error, handleSubmit } = useRegistrationForm(registrationType);
 
   if (batchLoading || !currentBatch) {
@@ -133,9 +133,9 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           <div className="flex justify-between w-full">
-                            <span>{getCategoryName(category.category_name, t)}</span>
+                            <span>{category.title_pt}</span>
                             <span className="ml-4 font-semibold">
-                              {category.is_exempt ? t('registration.free') : `R$ ${category.price_brl}`}
+                              {category.is_free ? t('registration.free') : `R$ ${(category.price_cents / 100).toFixed(2)}`}
                             </span>
                           </div>
                         </SelectItem>
@@ -144,7 +144,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                   </Select>
                 </div>
 
-                {selectedCategory?.is_exempt && (
+                {selectedCategory && !selectedCategory.is_free && (
                   <div>
                     <Label htmlFor="couponCode">{t('registration.couponCode')}</Label>
                     <Input

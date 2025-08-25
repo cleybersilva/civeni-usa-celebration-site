@@ -2,11 +2,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DollarSign } from 'lucide-react';
-import { Category } from '@/types/registration';
+import { EventCategory } from '@/hooks/useEventCategories';
 import { formatPrice } from '@/utils/registrationUtils';
 
 interface PriceSummaryProps {
-  selectedCategory: Category;
+  selectedCategory: EventCategory;
 }
 
 const PriceSummary = ({ selectedCategory }: PriceSummaryProps) => {
@@ -19,11 +19,11 @@ const PriceSummary = ({ selectedCategory }: PriceSummaryProps) => {
         <span className="font-semibold">{t('registration.totalAmount')}</span>
       </div>
       <div className="text-2xl font-bold text-civeni-blue">
-        {selectedCategory.is_exempt ? t('registration.free') : formatPrice(selectedCategory.price_brl, i18n.language)}
+        {selectedCategory.is_free ? t('registration.free') : `R$ ${((selectedCategory.price_cents || 0) / 100).toFixed(2)}`}
       </div>
-      {selectedCategory.requires_proof && (
-        <p className="text-sm text-amber-600 mt-2">
-          {t('registration.proofRequired')}
+      {selectedCategory.is_free && (
+        <p className="text-sm text-green-600 mt-2">
+          {t('registration.freeCategory')}
         </p>
       )}
     </div>
