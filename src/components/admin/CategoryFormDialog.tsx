@@ -206,12 +206,16 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
       }
 
       const categoryData = {
+        event_id: category?.event_id || 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
         slug: formData.slug,
         order_index: formData.order_index,
         is_active: formData.is_active,
         is_free: formData.is_free,
         currency: formData.currency,
         price_cents: formData.is_free ? 0 : formData.price_cents,
+        stripe_product_id: category?.stripe_product_id || null,
+        stripe_price_id: category?.stripe_price_id || null,
+        quota_total: null,
         available_from: formData.available_from?.toISOString() || null,
         available_until: formData.available_until?.toISOString() || null,
         lot_id: formData.lot_id || null,
