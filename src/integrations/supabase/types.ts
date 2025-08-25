@@ -1237,6 +1237,10 @@ export type Database = {
         }
         Returns: Json
       }
+      create_event_category_secure: {
+        Args: { category: Json; session_token: string; user_email: string }
+        Returns: Json
+      }
       delete_admin_user: {
         Args: { user_id: string }
         Returns: Json

@@ -53,24 +53,38 @@ export const useEventCategories = () => {
 
   const createCategory = async (categoryData: Omit<EventCategory, 'id' | 'created_at' | 'updated_at' | 'sync_status' | 'sync_error'>) => {
     try {
-      const { data, error } = await supabase
-        .from('event_category')
-        .insert([{
+      // Get session data for secure RLS context
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão expirada. Faça login novamente.');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || sessionData.expires <= Date.now()) {
+        throw new Error('Sessão inválida. Faça login novamente.');
+      }
+
+      // Use secure function that handles RLS properly
+      const { data, error } = await supabase.rpc('create_event_category_secure', {
+        category: {
           ...categoryData,
           sync_status: 'pending'
-        }])
-        .select()
-        .single();
+        },
+        user_email: sessionData.user.email,
+        session_token: sessionData.session_token
+      });
 
       if (error) throw error;
       
+      const newCategory = typeof data === 'string' ? JSON.parse(data) : data;
+      
       // Trigger Stripe sync
-      if (!categoryData.is_free) {
-        await syncWithStripe(data.id);
+      if (!categoryData.is_free && newCategory.id) {
+        await syncWithStripe(newCategory.id);
       }
       
       await loadCategories();
-      return { success: true, data };
+      return { success: true, data: newCategory };
     } catch (error) {
       console.error('Error creating category:', error);
       return { success: false, error };
