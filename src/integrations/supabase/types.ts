@@ -1034,6 +1034,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      cleanup_old_login_attempts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_admin_user: {
         Args: {
           user_email: string
@@ -1097,14 +1101,6 @@ export type Database = {
         Args: { session_token: string; user_email: string }
         Returns: boolean
       }
-      simple_admin_login: {
-        Args: { user_email: string; user_password: string }
-        Returns: Json
-      }
-      temp_admin_login: {
-        Args: { user_email: string; user_password: string }
-        Returns: Json
-      }
       temp_admin_login_secure: {
         Args: { user_email: string; user_password: string }
         Returns: Json
@@ -1123,14 +1119,6 @@ export type Database = {
       validate_coupon: {
         Args: { coupon_code: string }
         Returns: Json
-      }
-      verify_admin_login: {
-        Args: { user_email: string; user_password: string }
-        Returns: {
-          email: string
-          user_id: string
-          user_type: Database["public"]["Enums"]["admin_user_type"]
-        }[]
       }
       verify_admin_login_secure: {
         Args: { user_email: string; user_ip?: string; user_password: string }
