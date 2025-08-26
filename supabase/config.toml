@@ -1,1 +1,13 @@
 project_id = "wdkeqxfglmritghmakma"
+
+[functions.create-registration-payment]
+verify_jwt = false
+
+[functions.get-categories-public]
+verify_jwt = false
+
+[functions.sync-category-stripe]
+verify_jwt = false
+
+[functions.verify-payment]
+verify_jwt = false

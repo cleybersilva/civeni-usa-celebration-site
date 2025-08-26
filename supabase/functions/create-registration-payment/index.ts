@@ -3,184 +3,114 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 serve(async (req) => {
-  console.log("=== FUNCTION STARTED ===");
-  console.log("Method:", req.method);
-  
-  if (req.method === "OPTIONS") {
-    console.log("Handling CORS preflight");
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("=== PARSING REQUEST ===");
-    const body = await req.json();
-    console.log("Request body:", body);
-
-    const {
-      email,
-      fullName,
-      categoryId,
-      batchId,
-      couponCode,
-      cursoId,
-      turmaId,
-      participantType,
-      currency = "BRL"
-    } = body;
-
-    console.log("=== CHECKING ENVIRONMENT ===");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    console.log("Function called");
     
-    console.log("Environment check:", {
-      supabaseUrl: !!supabaseUrl,
-      supabaseKey: !!supabaseKey,
-      stripeKey: !!stripeKey
-    });
+    const body = await req.json();
+    console.log("Body:", body);
 
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error("Configuração do Supabase inválida");
-    }
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
-    console.log("=== INITIALIZING SUPABASE ===");
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    console.log("=== FETCHING CATEGORY ===");
-    const { data: category, error: categoryError } = await supabase
-      .from("event_category")
-      .select("*")
-      .eq("id", categoryId)
+    // Get category
+    const { data: category } = await supabase
+      .from('event_category')
+      .select('*')
+      .eq('id', body.categoryId)
       .single();
 
-    if (categoryError) {
-      console.error("Category error:", categoryError);
-      throw new Error("Categoria não encontrada: " + categoryError.message);
-    }
+    console.log("Category:", category);
 
-    console.log("Category found:", category);
-
-    // Create registration first
-    console.log("=== CREATING REGISTRATION ===");
-    const registrationData = {
-      email,
-      full_name: fullName,
-      category_id: categoryId,
-      batch_id: batchId,
-      coupon_code: couponCode || null,
-      curso_id: cursoId || null,
-      turma_id: turmaId || null,
-      participant_type: participantType,
-      currency: currency,
-      payment_status: category.is_free ? "completed" : "pending",
-      amount_paid: category.is_free ? 0 : (category.price_cents / 100)
-    };
-
-    console.log("Registration data:", registrationData);
-
-    const { data: registration, error: regError } = await supabase
-      .from("event_registrations")
-      .insert(registrationData)
+    // Create registration
+    const { data: registration } = await supabase
+      .from('event_registrations')
+      .insert({
+        email: body.email,
+        full_name: body.fullName,
+        category_id: body.categoryId,
+        batch_id: body.batchId,
+        coupon_code: body.couponCode || null,
+        curso_id: body.cursoId || null,
+        turma_id: body.turmaId || null,
+        participant_type: body.participantType,
+        currency: body.currency || 'BRL',
+        payment_status: category?.is_free ? 'completed' : 'pending',
+        amount_paid: category?.is_free ? 0 : (category?.price_cents / 100)
+      })
       .select()
       .single();
 
-    if (regError) {
-      console.error("Registration error:", regError);
-      throw new Error("Erro ao criar inscrição: " + regError.message);
-    }
+    console.log("Registration created:", registration?.id);
 
-    console.log("Registration created:", registration.id);
-
-    // If free category, return success
-    if (category.is_free) {
-      console.log("=== FREE REGISTRATION COMPLETED ===");
+    if (category?.is_free) {
       return new Response(JSON.stringify({
         success: true,
         payment_required: false,
-        registration_id: registration.id
+        registration_id: registration?.id
       }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // For paid categories, create Stripe session
-    console.log("=== CREATING STRIPE SESSION ===");
-    
-    if (!stripeKey) {
-      throw new Error("Stripe não configurado");
-    }
-
-    const stripe = new Stripe(stripeKey, {
-      apiVersion: "2023-10-16",
+    // Create Stripe session
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
     });
 
-    console.log("Stripe initialized, creating session...");
-
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: currency.toLowerCase(),
-            product_data: {
-              name: `Inscrição - ${category.title_pt}`,
-              description: "Inscrição para o evento CIVENI 2025",
-            },
-            unit_amount: category.price_cents,
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'brl',
+          product_data: {
+            name: `Inscrição - ${category?.title_pt}`,
           },
-          quantity: 1,
+          unit_amount: category?.price_cents || 1000,
         },
-      ],
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/registration-canceled`,
-      customer_email: email,
-      metadata: {
-        registration_id: registration.id,
-        category_id: categoryId,
-      },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      success_url: `${req.headers.get('origin')}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get('origin')}/registration-canceled`,
+      customer_email: body.email,
     });
 
     console.log("Stripe session created:", session.id);
 
     // Update registration with session ID
     await supabase
-      .from("event_registrations")
+      .from('event_registrations')
       .update({ stripe_session_id: session.id })
-      .eq("id", registration.id);
-
-    console.log("=== SUCCESS - RETURNING URL ===");
-    console.log("Stripe URL:", session.url);
+      .eq('id', registration?.id);
 
     return new Response(JSON.stringify({
       success: true,
       payment_required: true,
       url: session.url,
       session_id: session.id,
-      registration_id: registration.id
+      registration_id: registration?.id
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error("=== ERROR ===");
-    console.error("Error details:", error);
-    console.error("Error message:", error.message);
-    console.error("Error stack:", error.stack);
-
+    console.error('Error:', error);
     return new Response(JSON.stringify({
-      error: error.message || "Erro interno do servidor",
-      details: error.stack
+      error: error.message
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
   }
