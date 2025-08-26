@@ -70,24 +70,17 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
       console.log("Current batch:", currentBatch);
 
       try {
-        console.log("=== CALLING EDGE FUNCTION ===");
+        console.log("=== TESTING BASIC FUNCTION CALL ===");
         
         const { data, error } = await supabase.functions.invoke('create-registration-payment', {
-          body: {
+          body: { 
+            test: true, 
             email: formData.email,
-            fullName: formData.fullName,
-            categoryId: formData.categoryId,
-            batchId: currentBatch.id,
-            couponCode: formData.couponCode || '',
-            cursoId: formData.cursoId || null,
-            turmaId: formData.turmaId || null,
-            participantType: formData.participantType,
-            registrationType: registrationType || 'geral',
-            currency: getCurrency(i18n.language)
+            message: "Testing function call"
           }
         });
 
-        console.log("=== EDGE FUNCTION RESPONSE ===");
+        console.log("=== FUNCTION RESPONSE ===");
         console.log("Data:", data);
         console.log("Error:", error);
 
