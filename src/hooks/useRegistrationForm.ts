@@ -65,64 +65,77 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
       }
 
-      console.log("Calling create-registration-payment with:", {
-        email: formData.email,
-        fullName: formData.fullName,
-        categoryId: formData.categoryId,
-        batchId: currentBatch.id,
-        couponCode: formData.couponCode,
-        cursoId: formData.cursoId || null,
-        turmaId: formData.turmaId || null,
-        participantType: formData.participantType,
-        registrationType: registrationType || 'geral',
-        currency: getCurrency(i18n.language)
-      });
+      console.log("=== STARTING REGISTRATION ===");
+      console.log("Form data:", formData);
+      console.log("Current batch:", currentBatch);
 
-      const { data, error } = await supabase.functions.invoke('create-registration-payment', {
-        body: {
-          email: formData.email,
-          fullName: formData.fullName,
-          categoryId: formData.categoryId,
-          batchId: currentBatch.id,
-          couponCode: formData.couponCode,
-          cursoId: formData.cursoId || null,
-          turmaId: formData.turmaId || null,
-          participantType: formData.participantType,
-          registrationType: registrationType || 'geral',
-          currency: getCurrency(i18n.language)
-        }
-      });
-
-      console.log("Edge function response:", { data, error });
-
-      if (error) {
-        console.error("Edge function error details:", error);
-        throw new Error(error.message || 'Erro ao processar inscrição');
-      }
-
-      if (!data) {
-        throw new Error('Resposta inválida do servidor');
-      }
-
-      if (data.payment_required === false) {
-        alert(t('registration.success.freeRegistration'));
-        setFormData({ 
-          email: '', 
-          fullName: '', 
-          participantType: '',
-          categoryId: '', 
-          cursoId: '',
-          turmaId: '',
-          couponCode: '' 
+      try {
+        console.log("=== CALLING EDGE FUNCTION ===");
+        
+        const { data, error } = await supabase.functions.invoke('create-registration-payment', {
+          body: {
+            email: formData.email,
+            fullName: formData.fullName,
+            categoryId: formData.categoryId,
+            batchId: currentBatch.id,
+            couponCode: formData.couponCode || '',
+            cursoId: formData.cursoId || null,
+            turmaId: formData.turmaId || null,
+            participantType: formData.participantType,
+            registrationType: registrationType || 'geral',
+            currency: getCurrency(i18n.language)
+          }
         });
-      } else if (data.url) {
-        console.log("Redirecting to Stripe:", data.url);
-        window.open(data.url, '_blank');
-      } else {
-        throw new Error('URL de pagamento não recebida');
+
+        console.log("=== EDGE FUNCTION RESPONSE ===");
+        console.log("Data:", data);
+        console.log("Error:", error);
+
+        if (error) {
+          console.error("Edge function error:", error);
+          throw new Error(`Erro na função: ${error.message || JSON.stringify(error)}`);
+        }
+
+        if (!data) {
+          throw new Error('Nenhuma resposta recebida do servidor');
+        }
+
+        if (!data.success) {
+          throw new Error(data.error || 'Erro desconhecido no servidor');
+        }
+
+        console.log("=== PROCESSING RESPONSE ===");
+        
+        if (data.payment_required === false) {
+          console.log("Free registration completed");
+          alert('Inscrição gratuita realizada com sucesso!');
+          setFormData({ 
+            email: '', 
+            fullName: '', 
+            participantType: '',
+            categoryId: '', 
+            cursoId: '',
+            turmaId: '',
+            couponCode: '' 
+          });
+        } else if (data.url) {
+          console.log("Redirecting to Stripe URL:", data.url);
+          // Redirect immediately to Stripe
+          window.location.href = data.url;
+        } else {
+          throw new Error('URL de pagamento não foi fornecida pelo servidor');
+        }
+
+      } catch (functionError: any) {
+        console.error("Function error:", functionError);
+        throw functionError;
       }
     } catch (error: any) {
-      console.error('Registration error details:', error);
+      console.error('=== REGISTRATION ERROR ===');
+      console.error('Error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
       let errorMessage = 'Erro ao processar inscrição';
       
       if (error.message) {
