@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.get-categories-public]
 verify_jwt = false
 
+[functions.submit-partner-application]
+verify_jwt = false
+
 [functions.sync-category-stripe]
 verify_jwt = false
 

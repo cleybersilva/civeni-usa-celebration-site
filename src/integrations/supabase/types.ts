@@ -698,6 +698,36 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_application_attempts: {
+        Row: {
+          attempt_count: number
+          blocked_until: string | null
+          email: string | null
+          first_attempt_at: string
+          id: string
+          ip_address: unknown | null
+          last_attempt_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          blocked_until?: string | null
+          email?: string | null
+          first_attempt_at?: string
+          id?: string
+          ip_address?: unknown | null
+          last_attempt_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          blocked_until?: string | null
+          email?: string | null
+          first_attempt_at?: string
+          id?: string
+          ip_address?: unknown | null
+          last_attempt_at?: string
+        }
+        Relationships: []
+      }
       partner_applications: {
         Row: {
           company_name: string
@@ -1217,6 +1247,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_partner_application_rate_limit: {
+        Args: { user_email: string; user_ip: unknown }
+        Returns: boolean
+      }
       check_user_permission: {
         Args: { permission_type: string; resource: string; user_email: string }
         Returns: boolean
@@ -1303,6 +1337,10 @@ export type Database = {
       set_current_user_email_secure: {
         Args: { session_token: string; user_email: string }
         Returns: boolean
+      }
+      submit_partner_application_secure: {
+        Args: { application_data: Json; user_ip?: string }
+        Returns: Json
       }
       temp_admin_login_secure: {
         Args: { user_email: string; user_password: string }

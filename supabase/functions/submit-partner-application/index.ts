@@ -5,30 +5,63 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+interface PartnerApplicationData {
+  company_name: string;
+  contact_name: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  partnership_type: string;
+  message?: string;
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  if (req.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ error: 'Method not allowed' }),
+      { 
+        status: 405, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
   try {
+    // Initialize Supabase client with service role
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     );
 
-    if (req.method !== 'POST') {
+    // Get request data
+    const { applicationData } = await req.json() as { applicationData: PartnerApplicationData };
+    
+    if (!applicationData) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Method not allowed' }),
-        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          success: false, 
+          error: 'Application data is required' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
-    const applicationData = await req.json();
-    
     // Get client IP for rate limiting
-    const clientIP = req.headers.get('cf-connecting-ip') || 
-                    req.headers.get('x-forwarded-for') || 
+    const clientIP = req.headers.get('x-forwarded-for') || 
                     req.headers.get('x-real-ip') || 
                     'unknown';
 
@@ -45,27 +78,47 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Unable to process application. Please try again.' 
+          error: 'Failed to process application' 
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
       );
     }
 
-    console.log('Application processed successfully:', data);
+    // Check if the function returned an error
+    if (!data.success) {
+      return new Response(
+        JSON.stringify(data),
+        { 
+          status: 429, // Too Many Requests for rate limiting
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    console.log('Partnership application submitted successfully:', data.application_id);
 
     return new Response(
       JSON.stringify(data),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
 
   } catch (error) {
-    console.error('Edge function error:', error);
+    console.error('Unexpected error:', error);
     return new Response(
       JSON.stringify({ 
         success: false, 
         error: 'Internal server error' 
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   }
 });

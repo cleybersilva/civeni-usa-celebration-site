@@ -88,7 +88,7 @@ const SejaNossoParceiro = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('submit-partner-application', {
-        body: formData
+        body: { applicationData: formData }
       });
 
       if (error) throw error;
