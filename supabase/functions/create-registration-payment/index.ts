@@ -28,7 +28,7 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
 
-    // Load category to get stripe_price_id or price_cents
+    // Load category to get price_cents
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -45,7 +45,7 @@ serve(async (req) => {
 
     const { data: category, error: catErr } = await supabase
       .from('event_category')
-      .select('title_pt, price_cents, currency, is_free, stripe_price_id')
+      .select('title_pt, price_cents, currency, is_free')
       .eq('id', categoryId)
       .single();
 
@@ -63,22 +63,21 @@ serve(async (req) => {
       });
     }
 
-    // Build line item
-    let lineItem: any;
-    if (category.stripe_price_id) {
-      lineItem = { price: category.stripe_price_id, quantity: 1 };
-    } else {
-      const unitAmount = category.price_cents && category.price_cents > 0 ? category.price_cents : 1000;
-      const currency = (category.currency || 'BRL').toLowerCase();
-      lineItem = {
-        price_data: {
-          currency,
-          product_data: { name: category.title_pt || 'Inscrição' },
-          unit_amount: unitAmount,
+    // Always use price_data - never stripe_price_id to avoid test/live conflicts
+    const unitAmount = category.price_cents && category.price_cents > 0 ? category.price_cents : 7000; // Default R$ 70.00
+    const currency = (category.currency || 'BRL').toLowerCase();
+    
+    const lineItem = {
+      price_data: {
+        currency,
+        product_data: { 
+          name: category.title_pt || 'Inscrição CIVENI 2025',
+          description: 'Inscrição para o III CIVENI 2025'
         },
-        quantity: 1,
-      };
-    }
+        unit_amount: unitAmount,
+      },
+      quantity: 1,
+    };
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -87,6 +86,10 @@ serve(async (req) => {
       success_url: `${origin}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/registration-canceled`,
       customer_email: email,
+      metadata: {
+        category_id: categoryId,
+        email: email || 'no-email'
+      }
     });
 
     if (!session?.url) {
