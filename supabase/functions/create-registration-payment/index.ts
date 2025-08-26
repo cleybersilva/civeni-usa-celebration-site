@@ -4,7 +4,7 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://wdkeqxfglmritghmakma.lovableproject.com",
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
@@ -54,6 +54,13 @@ serve(async (req) => {
   }
 
   try {
+    console.log("=== CREATE REGISTRATION PAYMENT START ===");
+    console.log("Request method:", req.method);
+    console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+    
+    const requestBody = await req.json();
+    console.log("Request body:", requestBody);
+    
     const {
       email,
       fullName,
@@ -65,43 +72,47 @@ serve(async (req) => {
       participantType,
       registrationType,
       currency = "BRL"
-    } = await req.json();
+    } = requestBody;
 
-    console.log("Creating registration for:", { email, fullName, categoryId, batchId, couponCode, currency });
+    console.log("Parsed data:", { email, fullName, categoryId, batchId, couponCode, currency });
+
+    // Check required environment variables
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    
+    console.log("Environment check:", {
+      supabaseUrl: !!supabaseUrl,
+      supabaseServiceKey: !!supabaseServiceKey,
+      stripeKey: !!stripeKey
+    });
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Configuração do Supabase inválida");
+    }
 
     const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      supabaseUrl,
+      supabaseServiceKey,
       { auth: { persistSession: false } }
     );
 
-    // Get category details
+    // Get category details from event_category table
     const { data: category, error: categoryError } = await supabaseClient
-      .from("registration_categories")
+      .from("event_category")
       .select("*")
       .eq("id", categoryId)
       .single();
 
     if (categoryError || !category) {
+      console.error("Category error:", categoryError);
       throw new Error("Categoria não encontrada");
     }
 
     console.log("Category found:", category);
 
-    // Check if registration is free (exempt category)
-    if (category.is_exempt) {
-      // Validate coupon for exempt categories
-      if (!couponCode) {
-        throw new Error("Código de cupom é obrigatório para esta categoria");
-      }
-
-      const { data: couponValidation, error: couponError } = await supabaseClient
-        .rpc('validate_coupon', { coupon_code: couponCode });
-
-      if (couponError || !couponValidation || !couponValidation.is_valid) {
-        throw new Error("Código de cupom inválido ou expirado");
-      }
-
+    // Check if registration is free
+    if (category.is_free) {
       // Create free registration directly in event_registrations table
       const { data: registration, error: regError } = await supabaseClient
         .from("event_registrations")
@@ -110,9 +121,9 @@ serve(async (req) => {
           full_name: fullName,
           category_id: categoryId,
           batch_id: batchId,
-          coupon_code: couponCode,
-          curso_id: cursoId,
-          turma_id: turmaId,
+          coupon_code: couponCode || null,
+          curso_id: cursoId || null,
+          turma_id: turmaId || null,
           participant_type: participantType,
           payment_status: "completed",
           amount_paid: 0,
@@ -123,14 +134,20 @@ serve(async (req) => {
 
       if (regError) {
         console.error("Registration error:", regError);
-        throw new Error("Erro ao criar inscrição");
+        throw new Error("Erro ao criar inscrição: " + regError.message);
       }
 
-      // Update coupon usage
-      await supabaseClient
-        .from("coupon_codes")
-        .update({ used_count: supabaseClient.raw('used_count + 1') })
-        .eq("code", couponCode);
+      // Update coupon usage if coupon was provided
+      if (couponCode) {
+        const { error: couponUpdateError } = await supabaseClient
+          .from("coupon_codes")
+          .update({ used_count: supabaseClient.raw('used_count + 1') })
+          .eq("code", couponCode);
+        
+        if (couponUpdateError) {
+          console.error("Coupon update error:", couponUpdateError);
+        }
+      }
 
       console.log("Free registration created:", registration);
 
@@ -149,12 +166,10 @@ serve(async (req) => {
       apiVersion: "2023-10-16",
     });
 
-    // Convert price based on currency
-    let price = category.price_brl;
-    if (currency === "USD") {
-      price = Math.round(price / 5.5 * 100); // Convert BRL to USD cents
-    } else {
-      price = Math.round(price * 100); // Convert BRL to cents
+    // Use price from category (already in cents)
+    let price = category.price_cents;
+    if (!price || price <= 0) {
+      throw new Error("Preço da categoria inválido");
     }
 
     console.log("Creating Stripe session with price:", price, currency);
@@ -167,12 +182,12 @@ serve(async (req) => {
         full_name: fullName,
         category_id: categoryId,
         batch_id: batchId,
-        coupon_code: couponCode,
-        curso_id: cursoId,
-        turma_id: turmaId,
+        coupon_code: couponCode || null,
+        curso_id: cursoId || null,
+        turma_id: turmaId || null,
         participant_type: participantType,
         payment_status: "pending",
-        amount_paid: price / 100,
+        amount_paid: price / 100, // Convert back to original amount
         currency: currency
       })
       .select()
@@ -190,7 +205,7 @@ serve(async (req) => {
           price_data: {
             currency: currency.toLowerCase(),
             product_data: {
-              name: `Inscrição VCCU - ${category.category_name}`,
+              name: `Inscrição VCCU - ${category.title_pt || 'Evento'}`,
               description: `Inscrição para o evento VCCU/Civeni USA`,
             },
             unit_amount: price,

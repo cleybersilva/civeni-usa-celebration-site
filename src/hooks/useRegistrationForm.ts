@@ -65,6 +65,19 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
       }
 
+      console.log("Calling create-registration-payment with:", {
+        email: formData.email,
+        fullName: formData.fullName,
+        categoryId: formData.categoryId,
+        batchId: currentBatch.id,
+        couponCode: formData.couponCode,
+        cursoId: formData.cursoId || null,
+        turmaId: formData.turmaId || null,
+        participantType: formData.participantType,
+        registrationType: registrationType || 'geral',
+        currency: getCurrency(i18n.language)
+      });
+
       const { data, error } = await supabase.functions.invoke('create-registration-payment', {
         body: {
           email: formData.email,
@@ -80,7 +93,16 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
       });
 
-      if (error) throw error;
+      console.log("Edge function response:", { data, error });
+
+      if (error) {
+        console.error("Edge function error details:", error);
+        throw new Error(error.message || 'Erro ao processar inscrição');
+      }
+
+      if (!data) {
+        throw new Error('Resposta inválida do servidor');
+      }
 
       if (data.payment_required === false) {
         alert(t('registration.success.freeRegistration'));
@@ -94,11 +116,22 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
           couponCode: '' 
         });
       } else if (data.url) {
+        console.log("Redirecting to Stripe:", data.url);
         window.open(data.url, '_blank');
+      } else {
+        throw new Error('URL de pagamento não recebida');
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
-      setError(error.message || t('registration.errors.general'));
+      console.error('Registration error details:', error);
+      let errorMessage = 'Erro ao processar inscrição';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
