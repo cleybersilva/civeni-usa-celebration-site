@@ -87,11 +87,15 @@ const SejaNossoParceiro = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('partner_applications')
-        .insert([{ ...formData, status: 'pending' }]);
+      const { data, error } = await supabase.functions.invoke('submit-partner-application', {
+        body: formData
+      });
 
       if (error) throw error;
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to submit application');
+      }
 
       toast({
         title: "Solicitação Enviada!",
@@ -111,9 +115,10 @@ const SejaNossoParceiro = () => {
 
     } catch (error) {
       console.error('Error submitting partnership application:', error);
+      const errorMessage = error instanceof Error ? error.message : "Erro ao enviar solicitação. Tente novamente.";
       toast({
         title: "Erro",
-        description: "Erro ao enviar solicitação. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
