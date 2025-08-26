@@ -121,11 +121,9 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         } else if (data.url) {
           console.log("=== REDIRECTING TO STRIPE ===");
           console.log("URL received:", data.url);
-          console.log("About to redirect...");
           
-          // Force immediate redirect
-          alert(`Redirecionando para Stripe: ${data.url}`);
-          window.location.href = data.url;
+          // Abra em uma nova aba para evitar bloqueios do iframe
+          window.open(data.url, '_blank');
           
         } else {
           console.log("=== NO URL PROVIDED ===");
