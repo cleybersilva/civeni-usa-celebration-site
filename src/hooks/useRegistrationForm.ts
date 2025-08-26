@@ -119,10 +119,17 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
             couponCode: '' 
           });
         } else if (data.url) {
-          console.log("Redirecting to Stripe URL:", data.url);
-          // Redirect immediately to Stripe
+          console.log("=== REDIRECTING TO STRIPE ===");
+          console.log("URL received:", data.url);
+          console.log("About to redirect...");
+          
+          // Force immediate redirect
+          alert(`Redirecionando para Stripe: ${data.url}`);
           window.location.href = data.url;
+          
         } else {
+          console.log("=== NO URL PROVIDED ===");
+          console.log("Full data object:", JSON.stringify(data, null, 2));
           throw new Error('URL de pagamento não foi fornecida pelo servidor');
         }
 
