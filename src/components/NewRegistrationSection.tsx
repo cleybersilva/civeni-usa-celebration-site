@@ -153,7 +153,6 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       value={formData.couponCode}
                       onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
                       placeholder={t('registration.couponPlaceholder')}
-                      required
                     />
                   </div>
                 )}
