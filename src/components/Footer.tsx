@@ -114,7 +114,7 @@ const Footer = () => {
               {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
-              Organized by VCCU: Veni Creator Christian University
+              Powered by CIVENI • Veni Creator Christian University
             </div>
             <div className="text-sm opacity-75">
               <Link 

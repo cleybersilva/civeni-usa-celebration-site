@@ -11,10 +11,10 @@ const AdminSidebarHeader = () => {
       <div className="flex items-center justify-center h-full">
         <div>
           <h2 className="text-xl font-bold text-white">
-            {t('admin.panel', 'Admin Panel')}
+            CIVENI SaaS
           </h2>
           <p className="text-xs text-white/80">
-            VCCU/Civeni USA
+            Veni Creator Christian University
           </p>
         </div>
       </div>

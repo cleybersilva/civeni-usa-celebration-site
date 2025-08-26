@@ -4,23 +4,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>III Civeni USA 2025 - International Multidisciplinary Congress</title>
+    <title>CIVENI — Congresso Internacional Veni Creator</title>
     <meta name="description" content="III International Multidisciplinary Congress of VCCU - December 8-10, 2025, Celebration, Florida" />
     <meta name="author" content="VCCU" />
+    <meta name="theme-color" content="#0D3B66" />
 
-    <meta property="og:title" content="III Civeni USA 2025 - International Multidisciplinary Congress" />
+    <!-- Favicon Package -->
+    <link rel="icon" href="/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png" type="image/png">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="msapplication-TileColor" content="#0D3B66">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CIVENI">
+
+    <meta property="og:title" content="CIVENI — Congresso Internacional Veni Creator" />
     <meta property="og:description" content="III International Multidisciplinary Congress of VCCU - December 8-10, 2025, Celebration, Florida" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@civeni_usa" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:image" content="/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png" />
     
     <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </head>
 
   <body>
