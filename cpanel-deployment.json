@@ -1,0 +1,71 @@
+{
+  "deployment": {
+    "type": "cpanel_static",
+    "platform": "Apache",
+    "environment": "production"
+  },
+  "requirements": {
+    "php_version": "8.0+",
+    "apache_modules": [
+      "mod_rewrite",
+      "mod_expires", 
+      "mod_deflate",
+      "mod_headers",
+      "mod_mime"
+    ],
+    "ssl_certificate": "required",
+    "file_permissions": {
+      "files": "644",
+      "directories": "755",
+      "htaccess": "644"
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "output_directory": "dist",
+    "assets_path": "assets"
+  },
+  "routing": {
+    "spa_mode": true,
+    "fallback": "index.html",
+    "htaccess_required": true
+  },
+  "caching": {
+    "static_assets": "1 year",
+    "html_files": "no-cache",
+    "service_worker": "no-cache",
+    "manifest": "1 week"
+  },
+  "security": {
+    "force_https": true,
+    "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "1; mode=block",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload"
+    },
+    "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://wdkeqxfglmritghmakma.supabase.co"
+  },
+  "supabase": {
+    "project_id": "wdkeqxfglmritghmakma",
+    "url": "https://wdkeqxfglmritghmakma.supabase.co",
+    "required_settings": [
+      "Site URL configuration",
+      "CORS settings",
+      "Auth providers",
+      "Storage buckets",
+      "RLS policies"
+    ]
+  },
+  "pwa": {
+    "service_worker": "service-worker.js",
+    "manifest": "manifest.webmanifest",
+    "offline_fallback": "offline.html"
+  },
+  "optimization": {
+    "gzip_compression": true,
+    "browser_caching": true,
+    "image_optimization": true,
+    "minification": true
+  }
+}
