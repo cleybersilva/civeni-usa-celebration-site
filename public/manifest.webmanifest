@@ -13,19 +13,19 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png",
+      "src": "/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png",
+      "src": "/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png",
+      "src": "/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png",
       "sizes": "192x192",
       "type": "image/png"
     }
@@ -38,7 +38,7 @@
       "url": "/inscricoes",
       "icons": [
         {
-          "src": "/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png",
+          "src": "/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png",
           "sizes": "96x96"
         }
       ]
@@ -50,7 +50,7 @@
       "url": "/cronograma",
       "icons": [
         {
-          "src": "/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png",
+          "src": "/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png",
           "sizes": "96x96"
         }
       ]
@@ -62,7 +62,7 @@
       "url": "/submissoes",
       "icons": [
         {
-          "src": "/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png",
+          "src": "/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png",
           "sizes": "96x96"
         }
       ]

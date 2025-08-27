@@ -7,7 +7,7 @@ const AdminSidebarFooter = () => {
     <SidebarFooter className="border-t p-4 bg-gray-50/50">
       <div className="flex justify-center items-center">
         <img 
-          src="/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png" 
+          src="/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png" 
           alt="CIVENI" 
           className="h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-200"
         />

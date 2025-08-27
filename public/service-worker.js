@@ -3,7 +3,7 @@ const STATIC_CACHE_URLS = [
   '/',
   '/offline.html',
   '/manifest.webmanifest',
-  '/lovable-uploads/18e671d0-0426-486d-977d-88d336f3c0de.png'
+  '/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png'
 ];
 
 // Install event
