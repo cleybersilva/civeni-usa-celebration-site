@@ -2,6 +2,7 @@
 
 # Build Script para Deploy no cPanel - CIVENI SaaS
 # =================================================
+# CORREÇÃO: Script otimizado para evitar erros de ZIP no cPanel
 
 echo "🚀 Iniciando build para deploy no cPanel..."
 
@@ -102,16 +103,45 @@ echo "   5. Testar o site em seu domínio"
 echo ""
 echo "📚 Consulte deploy-instructions.md para detalhes completos"
 
-# Criar arquivo ZIP para facilitar o upload
+# Criar arquivo ZIP compatível com cPanel
 if command -v zip &> /dev/null; then
-    echo "📦 Criando arquivo ZIP para upload..."
+    echo "📦 Criando arquivo ZIP compatível com cPanel..."
     cd dist
-    zip -r ../civeni-saas-cpanel.zip .
+    
+    # Criar ZIP com parâmetros compatíveis com cPanel
+    # -r: recursivo, -9: máxima compressão, -X: sem atributos extras
+    zip -r9X ../civeni-saas-cpanel.zip . -x "*.DS_Store" "*__MACOSX*" "*.git*"
+    
     cd ..
-    echo "✅ Arquivo criado: civeni-saas-cpanel.zip"
-    echo "💡 Upload este arquivo para o cPanel e extraia na pasta public_html/"
+    
+    # Verificar se o arquivo foi criado corretamente
+    if [ -f "civeni-saas-cpanel.zip" ]; then
+        echo "✅ Arquivo ZIP criado: civeni-saas-cpanel.zip"
+        echo "📊 Tamanho do ZIP: $(du -sh civeni-saas-cpanel.zip | cut -f1)"
+        
+        # Testar integridade do ZIP
+        if zip -T civeni-saas-cpanel.zip > /dev/null 2>&1; then
+            echo "✅ ZIP verificado - integridade OK"
+        else
+            echo "⚠️ Aviso: Possível problema na integridade do ZIP"
+        fi
+    else
+        echo "❌ Erro: Falha ao criar o arquivo ZIP"
+    fi
+    
+    echo ""
+    echo "📋 Instruções de upload para cPanel:"
+    echo "   1. Acesse o File Manager no cPanel"
+    echo "   2. Navegue até public_html/"
+    echo "   3. Faça upload do arquivo civeni-saas-cpanel.zip"
+    echo "   4. Clique com o botão direito no arquivo e selecione 'Extract'"
+    echo "   5. Se der erro, tente upload manual dos arquivos da pasta dist/"
 else
-    echo "💡 Compacte manualmente a pasta dist/ para fazer upload no cPanel"
+    echo "💡 Comando zip não encontrado - upload manual necessário"
+    echo "📋 Para upload manual:"
+    echo "   1. Selecione todos os arquivos dentro da pasta dist/"
+    echo "   2. Faça upload diretamente para public_html/ via File Manager"
+    echo "   3. Mantenha a estrutura de pastas original"
 fi
 
 echo ""

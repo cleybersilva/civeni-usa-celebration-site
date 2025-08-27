@@ -118,6 +118,49 @@ Para funcionalidades de email (recuperação de senha, notificações):
 
 ## Solução de Problemas Comuns
 
+### ❌ Erro: "The File Manager does not support extracting this type of archive"
+
+**Problema**: cPanel não consegue extrair o arquivo ZIP
+
+**Soluções Alternativas**:
+
+#### Solução 1: Script Python (Recomendado)
+```bash
+# Execute o script Python alternativo
+python3 create-cpanel-zip.py
+```
+
+#### Solução 2: Upload Manual (Mais Confiável)
+1. **Não use ZIP** - faça upload direto dos arquivos
+2. Abra a pasta `dist/` no seu computador
+3. Selecione **todos** os arquivos e pastas dentro de `dist/`
+4. No cPanel File Manager, navegue até `public_html/`
+5. Arraste e solte todos os arquivos selecionados
+6. Aguarde o upload completar
+
+#### Solução 3: Use .tar.gz (Linux/Mac)
+```bash
+# Na pasta do projeto, execute:
+cd dist
+tar -czf ../civeni-saas-cpanel.tar.gz .
+cd ..
+```
+Depois faça upload do arquivo `.tar.gz` que é mais compatível.
+
+#### Solução 4: FTP/SFTP
+Se o File Manager continuar com problemas:
+1. Use um cliente FTP como FileZilla
+2. Conecte via FTP/SFTP no seu hosting
+3. Navegue até `public_html/`
+4. Upload todos os arquivos da pasta `dist/`
+
+**Verificação Pós-Upload**: Confirme que estes arquivos estão em `public_html/`:
+- `index.html` ✅
+- `.htaccess` ✅  
+- `assets/` (pasta) ✅
+- `service-worker.js` ✅
+- `manifest.webmanifest` ✅
+
 ### ❌ Erro 404 nas rotas internas
 
 **Problema**: Rotas como `/admin`, `/inscricoes` retornam 404
