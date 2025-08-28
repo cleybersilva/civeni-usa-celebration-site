@@ -114,6 +114,20 @@ const CiveniII2024ImagesSection = () => {
                       src={image.url}
                       alt={getAltText(image)}
                       className="w-full h-64 md:h-96 lg:h-[500px] object-contain bg-gray-100"
+                      loading="lazy"
+                      onError={(e) => {
+                        console.warn('Failed to load CIVENI image:', image.url);
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-blue-600 text-white';
+                        fallback.innerHTML = `
+                          <div class="text-center p-8">
+                            <div class="text-6xl mb-4">📷</div>
+                            <h3 class="text-xl font-semibold mb-2">II CIVENI 2024</h3>
+                            <p class="text-sm opacity-90">${getAltText(image)}</p>
+                          </div>
+                        `;
+                        e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget.parentNode);
+                      }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
                       <p className="text-white text-lg md:text-xl font-semibold">
@@ -175,6 +189,10 @@ const CiveniII2024ImagesSection = () => {
                   src={image.url}
                   alt={getAltText(image)}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
                 />
               </button>
             ))}

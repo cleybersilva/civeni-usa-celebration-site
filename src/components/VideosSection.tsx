@@ -15,11 +15,11 @@ const VideosSection = () => {
   const getVideoEmbedUrl = (url: string) => {
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1].split('&')[0];
-      return `https://www.youtube.com/embed/${videoId}`;
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&fs=1&cc_load_policy=1&iv_load_policy=3&autoplay=0`;
     }
     if (url.includes('youtu.be/')) {
-      const videoId = url.split('youtu.be/')[1];
-      return `https://www.youtube.com/embed/${videoId}`;
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&fs=1&cc_load_policy=1&iv_load_policy=3&autoplay=0`;
     }
     return url;
   };
@@ -74,6 +74,11 @@ const VideosSection = () => {
                   src={video.thumbnail} 
                   alt={video.title}
                   className="w-full h-48 object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    console.warn('Failed to load video thumbnail:', video.thumbnail);
+                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTUwIDEwMFYyMDBMMjUwIDE1MEwxNTAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                   <div className="text-center text-white">
@@ -135,14 +140,23 @@ const VideosSection = () => {
                     className="w-full h-full"
                     frameBorder="0"
                     allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
                     title={selectedVideo.title}
+                    onError={(e) => {
+                      console.error('Failed to load YouTube video:', selectedVideo.youtubeUrl);
+                    }}
                   />
                 ) : (
                   <video
                     src={selectedVideo.uploadedVideoUrl}
                     className="w-full h-full"
                     controls
+                    preload="metadata"
                     title={selectedVideo.title}
+                    onError={(e) => {
+                      console.error('Failed to load uploaded video:', selectedVideo.uploadedVideoUrl);
+                    }}
                   />
                 )}
               </div>

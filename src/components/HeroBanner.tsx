@@ -35,7 +35,16 @@ const HeroBanner = () => {
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${slide.bgImage})` }}
+            style={{ 
+              backgroundImage: `url(${slide.bgImage})`,
+              backgroundPosition: 'center',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat'
+            }}
+            onError={(e) => {
+              console.warn('Failed to load banner image:', slide.bgImage);
+              e.currentTarget.style.backgroundImage = 'linear-gradient(135deg, #0D3B66 0%, #1E88E5 100%)';
+            }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
           

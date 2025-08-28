@@ -68,16 +68,33 @@ const VenueSection = () => {
           </div>
           
           <div className="h-96 lg:h-full min-h-[400px]">
-            <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center">
+            <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center relative overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3509.123456789!2d-81.234567!3d28.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCelebration%2C%20FL!5e0!3m2!1sen!2sus!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d111945.8!2d-81.3974!3d28.3595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88dd7ee634caa5f7%3A0xa71e391fd1e08fc!2sCelebration%2C%20FL%2C%20USA!5e0!3m2!1sen!2sus!4v1635000000000"
                 width="100%"
                 height="100%"
                 style={{ border: 0, borderRadius: '1rem' }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Venue Location"
+                title="Venue Location - Celebration, Florida"
+                onError={(e) => {
+                  console.warn('Google Maps iframe failed to load');
+                  const fallback = document.createElement('div');
+                  fallback.className = 'w-full h-full flex flex-col items-center justify-center text-gray-600 bg-gray-100 rounded-2xl';
+                  fallback.innerHTML = `
+                    <div class="text-center p-8">
+                      <div class="text-4xl mb-4">📍</div>
+                      <h3 class="text-xl font-semibold mb-2">Celebration, Florida</h3>
+                      <p class="text-sm">123 Innovation Drive<br>Celebration, FL 34747<br>United States</p>
+                      <a href="https://maps.google.com/?q=Celebration,FL" target="_blank" rel="noopener noreferrer" 
+                         class="inline-block mt-4 px-4 py-2 bg-civeni-blue text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Ver no Google Maps
+                      </a>
+                    </div>
+                  `;
+                  e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
+                }}
               ></iframe>
             </div>
           </div>
