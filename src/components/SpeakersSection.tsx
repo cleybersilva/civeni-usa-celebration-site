@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const SpeakersSection = () => {
   const { t } = useTranslation();

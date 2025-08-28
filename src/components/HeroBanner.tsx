@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
 import conferenceEventImage from '@/assets/conference-event.jpg';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const HeroBanner = () => {
   const { t } = useTranslation();
@@ -36,14 +36,14 @@ const HeroBanner = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ 
-              backgroundImage: `url(${slide.bgImage})`,
+              backgroundImage: `url(${resolveAssetUrl(slide.bgImage)})`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat'
             }}
             onError={(e) => {
               console.warn('Failed to load banner image:', slide.bgImage);
-              e.currentTarget.style.backgroundImage = 'linear-gradient(135deg, #0D3B66 0%, #1E88E5 100%)';
+              (e.currentTarget as HTMLDivElement).style.backgroundImage = 'linear-gradient(135deg, #0D3B66 0%, #1E88E5 100%)';
             }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
