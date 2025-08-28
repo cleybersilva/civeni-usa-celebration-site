@@ -120,11 +120,11 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           return { success: false, error: 'Erro de autenticação' };
         }
         
-        // Store session with expiration (24 hours) and token
+        // Store session with expiration (4 hours) and token - aligned with server-side TTL
         const sessionData = {
           user: adminUser,
           timestamp: Date.now(),
-          expires: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+          expires: Date.now() + (4 * 60 * 60 * 1000), // 4 hours - matches server session
           session_token: loginResponse.session_token
         };
         

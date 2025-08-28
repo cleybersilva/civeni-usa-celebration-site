@@ -95,7 +95,7 @@ const CiveniII2024ImagesManager = () => {
         }
       }
       
-      console.log('Contexto de usuário definido para:', user.email);
+      console.log('Contexto de usuário definido para:', user.user_type);
 
       if (imageData.id) {
         // Atualizar
