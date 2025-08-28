@@ -179,31 +179,10 @@ export const securityValidator = {
   }
 };
 
-// Hook para headers de segurança
-export const setSecurityHeaders = () => {
-  // Definir Content Security Policy
-  const csp = [
-    "default-src 'self'",
-    "img-src 'self' data: https: blob:",
-    "media-src 'self' data: https: blob:",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "frame-src 'self' https://www.youtube.com https://www.google.com https://maps.google.com https://youtube.com",
-    "connect-src 'self' https://wdkeqxfglmritghmakma.supabase.co https://www.google-analytics.com",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'"
-  ].join('; ');
-
-  // Tentar definir via meta tag se possível
-  const metaCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-  if (!metaCSP) {
-    const meta = document.createElement('meta');
-    meta.httpEquiv = 'Content-Security-Policy';
-    meta.content = csp;
-    document.head.appendChild(meta);
-  }
+// Security headers setup - No longer needed as CSP is handled by server headers
+export const setSecurityHeaders = (): void => {
+  // CSP is now handled by server headers in public/_headers and .htaccess
+  // This prevents conflicts and ensures consistent security policy
 };
 
 // Middleware de segurança para formulários
