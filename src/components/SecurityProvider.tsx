@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSecurityHeaders } from '@/hooks/useSecurityHeaders';
 import { securityValidator } from '@/utils/securityValidation';
+import { SecurityMonitor } from './SecurityMonitor';
 
 interface SecurityContextType {
   csrfToken: string;
@@ -70,6 +71,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 
   return (
     <SecurityContext.Provider value={securityContextValue}>
+      <SecurityMonitor />
       {children}
     </SecurityContext.Provider>
   );

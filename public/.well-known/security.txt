@@ -1,0 +1,23 @@
+Contact: mailto:security@civeni.com
+Contact: mailto:cleyber.silva@live.com
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://civeni.com/.well-known/pgp-key.txt
+Preferred-Languages: pt, en, es
+Canonical: https://civeni.com/.well-known/security.txt
+Policy: https://civeni.com/security-policy
+
+# Security Policy
+# 
+# We take security seriously. If you discover a security vulnerability, 
+# please report it to us responsibly.
+#
+# What to include in your report:
+# - Description of the vulnerability
+# - Steps to reproduce
+# - Potential impact
+# - Suggested fix (if available)
+#
+# We will acknowledge receipt within 24 hours and provide regular updates
+# on our progress. We may offer rewards for valid reports.
+#
+# Thank you for helping keep CIVENI secure!

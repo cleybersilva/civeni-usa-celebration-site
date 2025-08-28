@@ -1,5 +1,38 @@
+# Robots.txt - Configuração de segurança
 User-agent: *
-Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /.well-known/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /tmp/
+Disallow: /backup/
+Disallow: /logs/
+Disallow: /config/
+Disallow: /database/
+Disallow: /.env
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /*.log
+Disallow: /*.config.js
+Disallow: /*.config.ts
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /yarn.lock
+
+# Permitir apenas recursos públicos necessários
+Allow: /assets/
+Allow: /lovable-uploads/
+Allow: /favicon.ico
+Allow: /manifest.webmanifest
+Allow: /sitemap.xml
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Rate limiting hint for crawlers
+Crawl-delay: 1
 Disallow: /admin/
 Disallow: /api/
 
