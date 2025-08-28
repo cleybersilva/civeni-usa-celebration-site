@@ -668,45 +668,6 @@ export type Database = {
         }
         Relationships: []
       }
-      media_assets: {
-        Row: {
-          alt_text_en: string | null
-          alt_text_es: string | null
-          alt_text_pt: string | null
-          created_at: string | null
-          height: number | null
-          id: string
-          path: string
-          section: string
-          updated_at: string | null
-          width: number | null
-        }
-        Insert: {
-          alt_text_en?: string | null
-          alt_text_es?: string | null
-          alt_text_pt?: string | null
-          created_at?: string | null
-          height?: number | null
-          id?: string
-          path: string
-          section: string
-          updated_at?: string | null
-          width?: number | null
-        }
-        Update: {
-          alt_text_en?: string | null
-          alt_text_es?: string | null
-          alt_text_pt?: string | null
-          created_at?: string | null
-          height?: number | null
-          id?: string
-          path?: string
-          section?: string
-          updated_at?: string | null
-          width?: number | null
-        }
-        Relationships: []
-      }
       participant_types: {
         Row: {
           created_at: string
@@ -1377,10 +1338,6 @@ export type Database = {
       get_registration_stats_secure: {
         Args: Record<PropertyKey, never>
         Returns: Json
-      }
-      get_stable_asset_url: {
-        Args: { bucket_name: string; file_path: string }
-        Returns: string
       }
       is_admin_root_user: {
         Args: { user_email: string }

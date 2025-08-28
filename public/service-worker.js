@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civeni-static-v1.1.0';
+const CACHE_NAME = 'civeni-static-v1.0.0';
 const STATIC_CACHE_URLS = [
   '/',
   '/offline.html',
@@ -56,43 +56,6 @@ self.addEventListener('fetch', (event) => {
       caches.match(event.request)
         .then((response) => {
           return response || fetch(event.request);
-        })
-    );
-    return;
-  }
-
-  // Runtime caching for external images (Supabase Storage)
-  if (event.request.url.match(/^https:\/\/.*\.supabase\.co.*\.(png|jpg|jpeg|gif|webp|svg|avif)(\?.*)?$/i) ||
-      event.request.url.match(/^https:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg|avif)(\?.*)?$/i)) {
-    event.respondWith(
-      caches.open('images-cache-v1')
-        .then(cache => {
-          return cache.match(event.request)
-            .then(response => {
-              if (response) {
-                // Cache hit - return cached version and update in background
-                fetch(event.request)
-                  .then(fetchResponse => {
-                    if (fetchResponse.ok) {
-                      cache.put(event.request, fetchResponse.clone());
-                    }
-                  })
-                  .catch(() => {}); // Ignore background update errors
-                return response;
-              }
-              // Cache miss - fetch and cache
-              return fetch(event.request)
-                .then(fetchResponse => {
-                  if (fetchResponse.ok) {
-                    cache.put(event.request, fetchResponse.clone());
-                  }
-                  return fetchResponse;
-                })
-                .catch(() => {
-                  // Return placeholder or cached fallback
-                  return new Response('', { status: 204 });
-                });
-            });
         })
     );
     return;

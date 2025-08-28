@@ -3,7 +3,7 @@
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https: blob: https://*.supabase.co; media-src 'self' data: https: blob: https://*.supabase.co; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.google.com https://maps.google.com https://youtube.com; connect-src 'self' https://wdkeqxfglmritghmakma.supabase.co https://www.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'self';
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https: blob:; media-src 'self' data: https: blob:; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.google.com https://maps.google.com https://youtube.com; connect-src 'self' https://wdkeqxfglmritghmakma.supabase.co https://www.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'self';
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
