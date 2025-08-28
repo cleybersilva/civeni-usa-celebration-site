@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { resolveAssetUrl } from '@/utils/assetUrl';
+import { resolveProductionAssetUrl } from '@/utils/imageAssetManager';
 
 interface CiveniImage {
   id: string;
@@ -112,62 +112,14 @@ const CiveniII2024ImagesSection = () => {
                 <div key={image.id} className="w-full flex-shrink-0">
                   <div className="relative">
                     <img
-                      src={resolveAssetUrl(image.url)}
+                      src={resolveProductionAssetUrl(image.url)}
                       alt={getAltText(image)}
                       className="w-full h-64 md:h-96 lg:h-[500px] object-contain bg-gray-100"
                       loading="lazy"
                       onError={(e) => {
                         console.warn('Failed to load CIVENI image:', image.url);
-                        // Try alternative paths for cPanel
-                        const fallbackPaths = [
-                          `./public/${image.url.replace(/^\/+/, '')}`,
-                          `public/${image.url.replace(/^\/+/, '')}`,
-                          image.url
-                        ];
-                        
-                        let pathIndex = 0;
-                        const tryNextPath = () => {
-                          if (pathIndex < fallbackPaths.length) {
-                            const testImg = new Image();
-                            testImg.onload = () => {
-                              (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
-                            };
-                            testImg.onerror = () => {
-                              pathIndex++;
-                              if (pathIndex < fallbackPaths.length) {
-                                tryNextPath();
-                              } else {
-                                // Create fallback using safe DOM methods
-                                const fallback = document.createElement('div');
-                                fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-blue-600 text-white';
-                                
-                                const container = document.createElement('div');
-                                container.className = 'text-center p-8';
-                                
-                                const icon = document.createElement('div');
-                                icon.className = 'text-6xl mb-4';
-                                icon.textContent = '📷';
-                                
-                                const title = document.createElement('h3');
-                                title.className = 'text-xl font-semibold mb-2';
-                                title.textContent = 'II CIVENI 2024';
-                                
-                                const description = document.createElement('p');
-                                description.className = 'text-sm opacity-90';
-                                description.textContent = getAltText(image);
-                                
-                                container.appendChild(icon);
-                                container.appendChild(title);
-                                container.appendChild(description);
-                                fallback.appendChild(container);
-                                
-                                e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
-                              }
-                            };
-                            testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
-                          }
-                        };
-                        tryNextPath();
+                        // Fallback simples para placeholder
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="800" height="500" fill="%23f3f4f6"/><text x="400" y="250" text-anchor="middle" dy=".3em" fill="%23666" font-size="20">Imagem CIVENI não disponível</text></svg>';
                       }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
@@ -227,7 +179,7 @@ const CiveniII2024ImagesSection = () => {
                 }`}
               >
                 <img
-                  src={resolveAssetUrl(image.url)}
+                  src={resolveProductionAssetUrl(image.url)}
                   alt={getAltText(image)}
                   className="w-full h-full object-cover"
                   loading="lazy"

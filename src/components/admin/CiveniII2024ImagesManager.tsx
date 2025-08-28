@@ -12,6 +12,7 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 import ImageUploadField from './ImageUploadField';
 import SimpleImageUpload from './SimpleImageUpload';
 import ImageGuide from './ImageGuide';
+import { resolveProductionAssetUrl, uploadImageToStorage } from '@/utils/imageAssetManager';
 
 interface CiveniImage {
   id: string;
@@ -75,20 +76,15 @@ const CiveniII2024ImagesManager = () => {
       let finalUrl = imageData.url || '';
       if (finalUrl.startsWith('data:')) {
         try {
-          const parts = finalUrl.split(',');
-          const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
-          const bstr = atob(parts[1] || '');
-          let n = bstr.length;
-          const u8arr = new Uint8Array(n);
-          while (n--) u8arr[n] = bstr.charCodeAt(n);
-          const blob = new Blob([u8arr], { type: mime });
-          const extension = (mime.split('/')[1] || 'jpg').replace('+xml','');
-          const filePath = `gallery/${Date.now()}_${Math.random().toString(36).slice(2)}.${extension}`;
-          const { error: uploadError } = await supabase.storage
-            .from('site-civeni')
-            .upload(filePath, blob, { upsert: true, contentType: mime });
-          if (uploadError) throw uploadError;
-          finalUrl = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
+          // Converter data URL para blob
+          const response = await fetch(finalUrl);
+          const blob = await response.blob();
+          const file = new File([blob], 'civeni-image.jpg', { type: blob.type });
+          
+          const uploadResult = await uploadImageToStorage(file, 'gallery');
+          if (uploadResult) {
+            finalUrl = uploadResult.url;
+          }
         } catch (e) {
           console.error('Erro ao enviar imagem para Storage:', e);
           // Mantém data URL como fallback
@@ -240,9 +236,13 @@ const CiveniII2024ImagesManager = () => {
                 </div>
                 
                 <img
-                  src={image.url}
+                  src={resolveProductionAssetUrl(image.url)}
                   alt={image.alt_text_pt}
                   className="w-16 h-16 object-cover rounded"
+                  onError={(e) => {
+                    // Fallback para imagem padrão
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="%23f3f4f6"/><text x="32" y="32" text-anchor="middle" dy=".3em" fill="%23666" font-size="8">Erro</text></svg>';
+                  }}
                 />
                 
                 <div className="flex-1">
