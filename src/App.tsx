@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from 'react';
 import './i18n/config';
 import { CMSProvider } from './contexts/CMSContext';
+import { SecurityProvider } from './components/SecurityProvider';
 
 // Pages
 import Index from "./pages/Index";
@@ -39,10 +40,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <CMSProvider>
-          <Toaster />
-          <Router>
-            <Suspense fallback={<div>Loading...</div>}>
+        <SecurityProvider>
+          <CMSProvider>
+            <Toaster />
+            <Router>
+              <Suspense fallback={<div>Loading...</div>}>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<AdminDashboard />} />
@@ -70,8 +72,9 @@ function App() {
             </Suspense>
           </Router>
         </CMSProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+      </SecurityProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
   );
 }
 
