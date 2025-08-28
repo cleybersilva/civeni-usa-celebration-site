@@ -502,16 +502,45 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateBannerSlides = async (bannerSlides: BannerSlide[]) => {
     try {
       console.log('Updating banner slides:', bannerSlides);
-      
+
+      const dataUrlToBlob = (dataUrl: string): { blob: Blob; mime: string; extension: string } => {
+        const parts = dataUrl.split(',');
+        const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+        const bstr = atob(parts[1] || '');
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const blob = new Blob([u8arr], { type: mime });
+        const extension = (mime.split('/')[1] || 'jpg').replace('+xml','');
+        return { blob, mime, extension };
+      };
 
       // Processar cada slide individualmente
       for (let i = 0; i < bannerSlides.length; i++) {
         const slide = bannerSlides[i];
+
+        // Se a imagem for um data URL (upload local), enviar para o bucket público e usar URL pública estável
+        let finalBgImage = slide.bgImage || '';
+        if (finalBgImage.startsWith('data:')) {
+          try {
+            const { blob, mime, extension } = dataUrlToBlob(finalBgImage);
+            const filePath = `banners/${Date.now()}_${i}.${extension}`;
+            const { error: uploadError } = await supabase.storage
+              .from('site-civeni')
+              .upload(filePath, blob, { upsert: true, contentType: mime });
+            if (uploadError) throw uploadError;
+            finalBgImage = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
+          } catch (e) {
+            console.error('Erro ao enviar imagem do banner para o Storage:', e);
+            // mantém o data URL como fallback (funciona em dev), mas idealmente não deve ficar no banco
+          }
+        }
+
         const slideData = {
           title: slide.title || '',
           subtitle: slide.subtitle || '',
           description: slide.description || '',
-          bg_image: slide.bgImage || '',
+          bg_image: finalBgImage || '',
           button_text: slide.buttonText || '',
           button_link: slide.buttonLink || '',
           order_index: slide.order || (i + 1),
@@ -571,7 +600,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       throw error;
     }
   };
-
   const updateRegistrationTiers = async (registrationTiers: RegistrationTier[]) => {
     try {
       setContent(prev => ({ ...prev, registrationTiers }));

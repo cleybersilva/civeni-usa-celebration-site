@@ -71,6 +71,29 @@ const CiveniII2024ImagesManager = () => {
     }
     
     try {
+      // Converter data URL para upload no Storage público (site-civeni)
+      let finalUrl = imageData.url || '';
+      if (finalUrl.startsWith('data:')) {
+        try {
+          const parts = finalUrl.split(',');
+          const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+          const bstr = atob(parts[1] || '');
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          while (n--) u8arr[n] = bstr.charCodeAt(n);
+          const blob = new Blob([u8arr], { type: mime });
+          const extension = (mime.split('/')[1] || 'jpg').replace('+xml','');
+          const filePath = `gallery/${Date.now()}_${Math.random().toString(36).slice(2)}.${extension}`;
+          const { error: uploadError } = await supabase.storage
+            .from('site-civeni')
+            .upload(filePath, blob, { upsert: true, contentType: mime });
+          if (uploadError) throw uploadError;
+          finalUrl = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
+        } catch (e) {
+          console.error('Erro ao enviar imagem para Storage:', e);
+          // Mantém data URL como fallback
+        }
+      }
       
       console.log('Contexto de usuário definido para:', user.email);
 
@@ -80,7 +103,7 @@ const CiveniII2024ImagesManager = () => {
         const { error } = await supabase
           .from('civeni_ii_2024_images')
           .update({
-            url: imageData.url,
+            url: finalUrl,
             alt_text_pt: imageData.alt_text_pt,
             alt_text_en: imageData.alt_text_en,
             alt_text_es: imageData.alt_text_es,
@@ -101,7 +124,7 @@ const CiveniII2024ImagesManager = () => {
         const { error } = await supabase
           .from('civeni_ii_2024_images')
           .insert({
-            url: imageData.url,
+            url: finalUrl,
             alt_text_pt: imageData.alt_text_pt,
             alt_text_en: imageData.alt_text_en,
             alt_text_es: imageData.alt_text_es,
@@ -126,7 +149,6 @@ const CiveniII2024ImagesManager = () => {
       toast.error('Erro ao salvar imagem');
     }
   };
-
   const handleDelete = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir esta imagem?')) return;
 
