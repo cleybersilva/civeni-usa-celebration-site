@@ -43,7 +43,34 @@ const HeroBanner = () => {
             }}
             onError={(e) => {
               console.warn('Failed to load banner image:', slide.bgImage);
-              (e.currentTarget as HTMLDivElement).style.backgroundImage = 'linear-gradient(135deg, #0D3B66 0%, #1E88E5 100%)';
+              // Try alternative paths for cPanel
+              const fallbackPaths = [
+                `./public/${slide.bgImage.replace(/^\/+/, '')}`,
+                `public/${slide.bgImage.replace(/^\/+/, '')}`,
+                slide.bgImage
+              ];
+              
+              let pathIndex = 0;
+              const tryNextPath = () => {
+                if (pathIndex < fallbackPaths.length) {
+                  const testImg = new Image();
+                  testImg.onload = () => {
+                    (e.currentTarget as HTMLDivElement).style.backgroundImage = `url(${resolveAssetUrl(fallbackPaths[pathIndex])})`;
+                  };
+                  testImg.onerror = () => {
+                    pathIndex++;
+                    if (pathIndex < fallbackPaths.length) {
+                      tryNextPath();
+                    } else {
+                      (e.currentTarget as HTMLDivElement).style.backgroundImage = 'linear-gradient(135deg, #0D3B66 0%, #1E88E5 100%)';
+                    }
+                  };
+                  testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                } else {
+                  (e.currentTarget as HTMLDivElement).style.backgroundImage = 'linear-gradient(135deg, #0D3B66 0%, #1E88E5 100%)';
+                }
+              };
+              tryNextPath();
             }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />

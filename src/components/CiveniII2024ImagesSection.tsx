@@ -118,16 +118,41 @@ const CiveniII2024ImagesSection = () => {
                       loading="lazy"
                       onError={(e) => {
                         console.warn('Failed to load CIVENI image:', image.url);
-                        const fallback = document.createElement('div');
-                        fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-blue-600 text-white';
-                        fallback.innerHTML = `
-                          <div class="text-center p-8">
-                            <div class="text-6xl mb-4">📷</div>
-                            <h3 class="text-xl font-semibold mb-2">II CIVENI 2024</h3>
-                            <p class="text-sm opacity-90">${getAltText(image)}</p>
-                          </div>
-                        `;
-                        e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget.parentNode);
+                        // Try alternative paths for cPanel
+                        const fallbackPaths = [
+                          `./public/${image.url.replace(/^\/+/, '')}`,
+                          `public/${image.url.replace(/^\/+/, '')}`,
+                          image.url
+                        ];
+                        
+                        let pathIndex = 0;
+                        const tryNextPath = () => {
+                          if (pathIndex < fallbackPaths.length) {
+                            const testImg = new Image();
+                            testImg.onload = () => {
+                              (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                            };
+                            testImg.onerror = () => {
+                              pathIndex++;
+                              if (pathIndex < fallbackPaths.length) {
+                                tryNextPath();
+                              } else {
+                                const fallback = document.createElement('div');
+                                fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-blue-600 text-white';
+                                fallback.innerHTML = `
+                                  <div class="text-center p-8">
+                                    <div class="text-6xl mb-4">📷</div>
+                                    <h3 class="text-xl font-semibold mb-2">II CIVENI 2024</h3>
+                                    <p class="text-sm opacity-90">${getAltText(image)}</p>
+                                  </div>
+                                `;
+                                e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget.parentNode);
+                              }
+                            };
+                            testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                          }
+                        };
+                        tryNextPath();
                       }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">

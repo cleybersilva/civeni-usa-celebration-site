@@ -78,7 +78,32 @@ const VideosSection = () => {
                   loading="lazy"
                   onError={(e) => {
                     console.warn('Failed to load video thumbnail:', video.thumbnail);
-                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTUwIDEwMFYyMDBMMjUwIDE1MEwxNTAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                    // Try alternative paths for cPanel
+                    const fallbackPaths = [
+                      `./public/${video.thumbnail.replace(/^\/+/, '')}`,
+                      `public/${video.thumbnail.replace(/^\/+/, '')}`,
+                      video.thumbnail
+                    ];
+                    
+                    let pathIndex = 0;
+                    const tryNextPath = () => {
+                      if (pathIndex < fallbackPaths.length) {
+                        const testImg = new Image();
+                        testImg.onload = () => {
+                          (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                        };
+                        testImg.onerror = () => {
+                          pathIndex++;
+                          if (pathIndex < fallbackPaths.length) {
+                            tryNextPath();
+                          } else {
+                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTUwIDEwMFYyMDBMMjUwIDE1MEwxNTAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                          }
+                        };
+                        testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                      }
+                    };
+                    tryNextPath();
                   }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">

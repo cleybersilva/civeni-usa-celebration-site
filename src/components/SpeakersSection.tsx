@@ -45,7 +45,32 @@ const SpeakersSection = () => {
                   className="w-full h-64 md:h-full object-cover"
                   onError={(e) => {
                     console.warn('Failed to load speaker image:', speakers[currentSpeaker].image);
-                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE2MCIgcj0iNjAiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA1MCAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBIMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                    // Try alternative paths for cPanel
+                    const fallbackPaths = [
+                      `./public/${speakers[currentSpeaker].image.replace(/^\/+/, '')}`,
+                      `public/${speakers[currentSpeaker].image.replace(/^\/+/, '')}`,
+                      speakers[currentSpeaker].image
+                    ];
+                    
+                    let pathIndex = 0;
+                    const tryNextPath = () => {
+                      if (pathIndex < fallbackPaths.length) {
+                        const testImg = new Image();
+                        testImg.onload = () => {
+                          (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                        };
+                        testImg.onerror = () => {
+                          pathIndex++;
+                          if (pathIndex < fallbackPaths.length) {
+                            tryNextPath();
+                          } else {
+                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE2MCIgcj0iNjAiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA1MCAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBIMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                          }
+                        };
+                        testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                      }
+                    };
+                    tryNextPath();
                   }}
                 />
               </div>
