@@ -1314,6 +1314,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_current_user_from_jwt: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_partner_applications_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
