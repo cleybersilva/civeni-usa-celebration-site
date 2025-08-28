@@ -137,16 +137,31 @@ const CiveniII2024ImagesSection = () => {
                               if (pathIndex < fallbackPaths.length) {
                                 tryNextPath();
                               } else {
+                                // Create fallback using safe DOM methods
                                 const fallback = document.createElement('div');
                                 fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-blue-600 text-white';
-                                fallback.innerHTML = `
-                                  <div class="text-center p-8">
-                                    <div class="text-6xl mb-4">📷</div>
-                                    <h3 class="text-xl font-semibold mb-2">II CIVENI 2024</h3>
-                                    <p class="text-sm opacity-90">${getAltText(image)}</p>
-                                  </div>
-                                `;
-                                e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget.parentNode);
+                                
+                                const container = document.createElement('div');
+                                container.className = 'text-center p-8';
+                                
+                                const icon = document.createElement('div');
+                                icon.className = 'text-6xl mb-4';
+                                icon.textContent = '📷';
+                                
+                                const title = document.createElement('h3');
+                                title.className = 'text-xl font-semibold mb-2';
+                                title.textContent = 'II CIVENI 2024';
+                                
+                                const description = document.createElement('p');
+                                description.className = 'text-sm opacity-90';
+                                description.textContent = getAltText(image);
+                                
+                                container.appendChild(icon);
+                                container.appendChild(title);
+                                container.appendChild(description);
+                                fallback.appendChild(container);
+                                
+                                e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
                               }
                             };
                             testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
