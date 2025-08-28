@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const Palestrantes = () => {
   const { t } = useTranslation();
@@ -32,9 +33,13 @@ const Palestrantes = () => {
               >
                 <div className="aspect-square overflow-hidden">
                   <img 
-                    src={speaker.image} 
+                    src={resolveAssetUrl(speaker.image)} 
                     alt={speaker.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.warn('Failed to load speaker image:', speaker.image);
+                      e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE2MCIgcj0iNjAiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA1MCAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBIMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                    }}
                   />
                 </div>
                 <div className="p-6">

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Play, Youtube, Maximize2, ExternalLink, X } from 'lucide-react';
 import { useCMS } from '@/contexts/CMSContext';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const VideosSection = () => {
   const { t } = useTranslation();
@@ -71,7 +72,7 @@ const VideosSection = () => {
             >
               <div className="relative">
                 <img 
-                  src={video.thumbnail} 
+                  src={resolveAssetUrl(video.thumbnail)} 
                   alt={video.title}
                   className="w-full h-48 object-cover"
                   loading="lazy"
@@ -142,6 +143,7 @@ const VideosSection = () => {
                     allowFullScreen
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
+                    sandbox="allow-scripts allow-same-origin allow-presentation"
                     title={selectedVideo.title}
                     onError={(e) => {
                       console.error('Failed to load YouTube video:', selectedVideo.youtubeUrl);

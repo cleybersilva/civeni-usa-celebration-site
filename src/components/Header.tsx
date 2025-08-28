@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Instagram, Facebook, Youtube, Settings, Linkedin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
@@ -147,9 +148,13 @@ const Header = () => {
             <div className="flex items-center">
               <Link to="/">
                 <img 
-                  src="/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png" 
+                  src={resolveAssetUrl("/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png")} 
                   alt="III Civeni 2025 Logo" 
                   className="h-14 w-auto"
+                  onError={(e) => {
+                    console.warn('Failed to load header logo');
+                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjU2IiB2aWV3Qm94PSIwIDAgMTAwIDU2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjU2IiBmaWxsPSIjMEQzQjY2Ii8+Cjx0ZXh0IHg9IjUwIiB5PSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSI+Q0lWRU5JPC90ZXh0Pgo8L3N2Zz4K';
+                  }}
                 />
               </Link>
             </div>

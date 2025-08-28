@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCMS } from '@/contexts/CMSContext';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const PartnersSection = () => {
   const { t } = useTranslation();
@@ -41,9 +42,13 @@ const PartnersSection = () => {
               <div className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-110">
                 <div className="bg-white rounded-2xl shadow-lg p-8 w-64 h-40 flex flex-col items-center justify-center group-hover:shadow-2xl group-hover:bg-civeni-blue transition-all duration-300">
                   <img 
-                    src={mainOrganizer.logo} 
+                    src={resolveAssetUrl(mainOrganizer.logo)} 
                     alt={mainOrganizer.name}
                     className="max-w-full max-h-20 object-contain mb-4"
+                    onError={(e) => {
+                      console.warn('Failed to load partner logo:', mainOrganizer.logo);
+                      e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOUNBM0FGIj5MT0dPPC90ZXh0Pgo8L3N2Zz4K';
+                    }}
                   />
                   <h4 className="font-bold text-civeni-blue group-hover:text-white transition-colors duration-300 text-sm">
                     Veni Creator Christian University

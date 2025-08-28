@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { resolveAssetUrl } from '@/utils/assetUrl';
 
 interface CiveniImage {
   id: string;
@@ -111,7 +112,7 @@ const CiveniII2024ImagesSection = () => {
                 <div key={image.id} className="w-full flex-shrink-0">
                   <div className="relative">
                     <img
-                      src={image.url}
+                      src={resolveAssetUrl(image.url)}
                       alt={getAltText(image)}
                       className="w-full h-64 md:h-96 lg:h-[500px] object-contain bg-gray-100"
                       loading="lazy"
@@ -186,7 +187,7 @@ const CiveniII2024ImagesSection = () => {
                 }`}
               >
                 <img
-                  src={image.url}
+                  src={resolveAssetUrl(image.url)}
                   alt={getAltText(image)}
                   className="w-full h-full object-cover"
                   loading="lazy"

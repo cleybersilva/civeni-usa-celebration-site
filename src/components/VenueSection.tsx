@@ -43,28 +43,28 @@ const VenueSection = () => {
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-civeni-red to-red-600 text-white rounded-2xl p-8">
-              <h3 className="text-2xl font-bold mb-6 font-poppins">💻 {t('venue.onlinePlatform')}</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">YouTube Live Channel:</h4>
-                  <p className="opacity-90">
-                    @CiveniUSA2025<br/>
-                    Live streaming of keynote sessions<br/>
-                    Interactive chat and Q&A
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-2">{t('venue.features')}:</h4>
-                  <ul className="space-y-1 opacity-90">
-                    <li>• HD video streaming</li>
-                    <li>• Real-time interaction</li>
-                    <li>• Session recordings</li>
-                    <li>• Digital certificates</li>
-                  </ul>
-                </div>
+          <div className="bg-gradient-to-br from-civeni-blue to-blue-600 text-white rounded-2xl p-8">
+            <h3 className="text-2xl font-bold mb-6 font-poppins">💻 {t('venue.onlinePlatform')}</h3>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">YouTube Live Channel:</h4>
+                <p className="opacity-90">
+                  @CiveniUSA2025<br/>
+                  Live streaming of keynote sessions<br/>
+                  Interactive chat and Q&A
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">{t('venue.features')}:</h4>
+                <ul className="space-y-1 opacity-90">
+                  <li>• HD video streaming</li>
+                  <li>• Real-time interaction</li>
+                  <li>• Session recordings</li>
+                  <li>• Digital certificates</li>
+                </ul>
               </div>
             </div>
+          </div>
           </div>
           
           <div className="h-96 lg:h-full min-h-[400px]">
@@ -78,6 +78,7 @@ const VenueSection = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Venue Location - Celebration, Florida"
+                sandbox="allow-scripts allow-same-origin allow-popups"
                 onError={(e) => {
                   console.warn('Google Maps iframe failed to load');
                   const fallback = document.createElement('div');

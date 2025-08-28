@@ -40,9 +40,13 @@ const SpeakersSection = () => {
             <div className="md:flex">
               <div className="md:w-1/3">
                 <img
-                  src={speakers[currentSpeaker].image}
+                  src={resolveAssetUrl(speakers[currentSpeaker].image)}
                   alt={speakers[currentSpeaker].name}
                   className="w-full h-64 md:h-full object-cover"
+                  onError={(e) => {
+                    console.warn('Failed to load speaker image:', speakers[currentSpeaker].image);
+                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE2MCIgcj0iNjAiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA1MCAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBIMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                  }}
                 />
               </div>
               <div className="md:w-2/3 p-8">
