@@ -135,15 +135,17 @@ const BannerManager = () => {
   };
 
   const handleDelete = async (slideId: string) => {
-    if (confirm('Tem certeza que deseja excluir este slide?')) {
-      try {
-        const slides = content.bannerSlides.filter(s => s.id !== slideId);
-        await updateBannerSlides(slides);
-        alert('Banner excluído com sucesso!');
-      } catch (error) {
-        console.error('Erro ao excluir banner:', error);
-        alert('Erro ao excluir banner. Tente novamente.');
-      }
+    if (!confirm('Tem certeza que deseja excluir este slide?')) {
+      return;
+    }
+    
+    try {
+      const slides = content.bannerSlides.filter(s => s.id !== slideId);
+      await updateBannerSlides(slides);
+      toast.success('Banner excluído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir banner:', error);
+      toast.error('Erro ao excluir banner. Tente novamente.');
     }
   };
 
