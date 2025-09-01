@@ -8,6 +8,7 @@ export interface EventCategory {
   order_index: number;
   is_active: boolean;
   is_free: boolean;
+  is_promotional: boolean;
   currency: string;
   price_cents: number | null;
   stripe_product_id: string | null;

@@ -76,6 +76,7 @@ const EventCategoriesManager = () => {
               <TableHead>Moeda</TableHead>
               <TableHead>Disponibilidade</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Promocional</TableHead>
               <TableHead>Sync</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
@@ -122,6 +123,11 @@ const EventCategoriesManager = () => {
                 <TableCell>
                   <Badge variant={category.is_active ? 'default' : 'secondary'}>
                     {category.is_active ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={category.is_promotional ? 'destructive' : 'outline'}>
+                    {category.is_promotional ? 'Promocional' : 'Normal'}
                   </Badge>
                 </TableCell>
                 <TableCell>

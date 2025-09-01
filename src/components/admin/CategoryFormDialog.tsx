@@ -53,6 +53,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
     order_index: 1,
     is_active: true,
     is_free: false,
+    is_promotional: false,
     currency: 'BRL',
     price_cents: 0,
     lot_id: null as string | null,
@@ -90,6 +91,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         order_index: category.order_index || 1,
         is_active: category.is_active ?? true,
         is_free: category.is_free ?? false,
+        is_promotional: category.is_promotional ?? false,
         currency: category.currency || 'BRL',
         price_cents: category.price_cents || 0,
         lot_id: category.lot_id || null,
@@ -112,6 +114,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         order_index: 1,
         is_active: true,
         is_free: false,
+        is_promotional: false,
         currency: 'BRL',
         price_cents: 0,
         lot_id: null,
@@ -211,6 +214,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
         order_index: formData.order_index,
         is_active: formData.is_active,
         is_free: formData.is_free,
+        is_promotional: formData.is_promotional,
         currency: formData.currency,
         price_cents: formData.is_free ? 0 : formData.price_cents,
         stripe_product_id: category?.stripe_product_id || null,
@@ -390,7 +394,7 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="flex items-center space-x-2">
               <Switch
                 id="is_active"
@@ -406,6 +410,14 @@ export const CategoryFormDialog: React.FC<CategoryFormDialogProps> = ({
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_free: checked, price_cents: checked ? 0 : prev.price_cents }))}
               />
               <Label htmlFor="is_free">Gratuito</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_promotional"
+                checked={formData.is_promotional}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_promotional: checked }))}
+              />
+              <Label htmlFor="is_promotional">Promocional</Label>
             </div>
           </div>
 

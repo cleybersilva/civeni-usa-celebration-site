@@ -13,6 +13,7 @@ export const usePublicEventCategories = () => {
         .from('event_category')
         .select('*')
         .eq('is_active', true)
+        .eq('is_promotional', false)
         .order('order_index');
 
       if (error) throw error;
