@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCMS, BannerSlide } from '@/contexts/CMSContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageGuide from './ImageGuide';
@@ -17,6 +18,24 @@ const BannerManager = () => {
   const { user } = useAdminAuth();
   const [editingSlide, setEditingSlide] = useState<BannerSlide | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Forçar recarga dos dados em modo admin quando o componente carrega
+  useEffect(() => {
+    const loadAdminContent = async () => {
+      try {
+        // Força recarregamento dos banners incluindo inativos
+        const { data: allBanners } = await supabase
+          .from('banner_slides')
+          .select('*')
+          .order('order_index', { ascending: true });
+        
+        console.log('Loaded banners for admin:', allBanners);
+      } catch (error) {
+        console.error('Erro ao carregar dados do admin:', error);
+      }
+    };
+    loadAdminContent();
+  }, []);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -243,13 +262,18 @@ const BannerManager = () => {
 
       <div className="grid gap-6">
         {content.bannerSlides.sort((a, b) => a.order - b.order).map((slide) => (
-          <Card key={slide.id}>
+          <Card key={slide.id} className={`${!slide.id || slide.id === 'new' ? 'opacity-50' : ''}`}>
             <CardHeader>
               <div className="relative h-48 rounded-lg overflow-hidden">
                 <img
                   src={slide.bgImage}
                   alt={slide.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback para erro de imagem
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                   <div className="text-white text-center">

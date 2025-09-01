@@ -9,7 +9,10 @@ const HeroBanner = () => {
   const { content } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  const slides = content.bannerSlides.sort((a, b) => a.order - b.order);
+  // Filtrar apenas slides ativos para exibição pública
+  const slides = content.bannerSlides
+    .filter(slide => slide.id && slide.id !== 'new') // Filtrar slides válidos
+    .sort((a, b) => a.order - b.order);
 
   useEffect(() => {
     if (slides.length === 0) return;
