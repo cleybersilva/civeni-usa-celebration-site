@@ -405,17 +405,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadContent();
+    // Detectar se estamos em contexto admin (URL contém /admin)
+    const isAdminContext = window.location.pathname.includes('/admin');
+    loadContent(isAdminContext);
   }, []);
 
-  const loadContent = async () => {
+  const loadContent = async (adminMode = false) => {
     try {
-      // Carregar banner slides do Supabase
-      const { data: bannerSlidesData, error: bannerError } = await supabase
+      // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
+      let bannerQuery = supabase
         .from('banner_slides')
         .select('*')
-        .eq('is_active', true)
         .order('order_index', { ascending: true });
+      
+      if (!adminMode) {
+        bannerQuery = bannerQuery.eq('is_active', true);
+      }
+      
+      const { data: bannerSlidesData, error: bannerError } = await bannerQuery;
 
       if (bannerError) {
         console.error('Error loading banner slides:', bannerError);
@@ -592,8 +599,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       console.log('Banner slides updated successfully');
       
-      // Recarregar dados do banco para sincronizar
-      await loadContent();
+      // Recarregar dados do banco para sincronizar (admin mode para mostrar todos)
+      await loadContent(true);
       
     } catch (error) {
       console.error('Error updating banner slides:', error);
@@ -656,8 +663,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.log('Insert successful:', data);
       }
       
-      // Recarregar dados para garantir consistência
-      await loadContent();
+      // Recarregar dados para garantir consistência (admin mode se na URL admin)
+      const isAdminContext = window.location.pathname.includes('/admin');
+      await loadContent(isAdminContext);
       
       // Notificar componentes da atualização
       setTimeout(() => {
