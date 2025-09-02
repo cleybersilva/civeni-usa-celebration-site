@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, Building, ExternalLink } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 interface Committee {
   id: string;
@@ -100,23 +102,29 @@ const CongressoComite = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-32 bg-muted rounded-lg"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-80 bg-muted rounded-lg"></div>
-              ))}
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse space-y-8">
+              <div className="h-32 bg-muted rounded-lg"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="h-80 bg-muted rounded-lg"></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
@@ -271,8 +279,10 @@ const CongressoComite = () => {
             </p>
           </div>
         </div>
-      </section>
-    </div>
+        </section>
+      </div>
+      <Footer />
+    </>
   );
 };
 

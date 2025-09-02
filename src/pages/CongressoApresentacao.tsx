@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Play, Users, Calendar, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 interface CMSPageData {
   id: string;
@@ -70,36 +72,42 @@ const CongressoApresentacao = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-32 bg-muted rounded-lg"></div>
-            <div className="h-64 bg-muted rounded-lg"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-48 bg-muted rounded-lg"></div>
-              ))}
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse space-y-8">
+              <div className="h-32 bg-muted rounded-lg"></div>
+              <div className="h-64 bg-muted rounded-lg"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-48 bg-muted rounded-lg"></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
         <div className="container relative mx-auto px-4 py-16 lg:py-24">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-fade-in">
-              {pageData?.hero_title || 'III CIVENI 2025'}
+            <h1 className="text-5xl lg:text-7xl font-bold text-foreground mb-6 animate-fade-in">
+              III CIVENI - Congresso Internacional Multidisciplinar da VCCU
             </h1>
             
             <div className="max-w-4xl mx-auto">
               <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed">
-                {pageData?.hero_subtitle || 'Congresso Internacional Multidisciplinar da VCCU'}
+                {pageData?.hero_subtitle || 'TEMA e CONTEXTO do congresso serão apresentados aqui com mais detalhes sobre o evento, sua importância e objetivos principais.'}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -111,7 +119,7 @@ const CongressoApresentacao = () => {
                 </Button>
                 
                 <Button asChild variant="outline" size="lg">
-                  <Link to="/cronograma">
+                  <Link to="/cronograma-presencial">
                     <Calendar className="w-5 h-5 mr-2" />
                     {t('congress.presentation.schedule', 'Ver Cronograma')}
                   </Link>
@@ -215,8 +223,10 @@ const CongressoApresentacao = () => {
             </Link>
           </Button>
         </div>
-      </section>
-    </div>
+        </section>
+      </div>
+      <Footer />
+    </>
   );
 };
 
