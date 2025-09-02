@@ -74,6 +74,9 @@ const BannerManager = () => {
       // Use uploaded image if available, otherwise use URL
       const finalBgImage = formData.uploadedImage || formData.bgImage;
       
+      console.log('Dados do formulário:', formData);
+      console.log('Imagem final selecionada:', finalBgImage);
+      
       // Validate required fields
       if (!formData.title || !formData.subtitle || !formData.description) {
         toast.error('Por favor, preencha todos os campos obrigatórios (título, subtítulo e descrição).');
@@ -126,12 +129,14 @@ const BannerManager = () => {
       subtitle: slide.subtitle,
       description: slide.description,
       bgImage: slide.bgImage,
-      uploadedImage: '',
+      uploadedImage: '', // Limpar upload quando editar
       buttonText: slide.buttonText,
       buttonLink: slide.buttonLink,
       order: slide.order
     });
     setIsDialogOpen(true);
+    
+    console.log('Iniciando edição do slide:', slide);
   };
 
   const handleDelete = async (slideId: string) => {
@@ -201,10 +206,10 @@ const BannerManager = () => {
                     />
                   </div>
                   <div>
-                    <SimpleImageUpload
+                     <SimpleImageUpload
                       label="Imagem de Fundo (Upload)"
                       value={formData.uploadedImage}
-                      onChange={(value) => setFormData({...formData, uploadedImage: value})}
+                      onChange={(value) => setFormData({...formData, uploadedImage: value, bgImage: ''})}
                     />
                   </div>
                   <div>

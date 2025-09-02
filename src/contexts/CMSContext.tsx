@@ -556,16 +556,19 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         if (slide.id && slide.id !== 'new') {
           // Atualizar slide existente
-          console.log('Updating existing slide:', slide.id);
-          const { error: updateError } = await supabase
+          console.log('Updating existing slide:', slide.id, 'com dados:', slideData);
+          const { data: updatedData, error: updateError } = await supabase
             .from('banner_slides')
             .update(slideData)
-            .eq('id', slide.id);
+            .eq('id', slide.id)
+            .select();
 
           if (updateError) {
             console.error('Error updating slide:', updateError);
             throw updateError;
           }
+          
+          console.log('Slide atualizado com sucesso:', updatedData);
         } else {
           // Inserir novo slide
           console.log('Inserting new slide');
