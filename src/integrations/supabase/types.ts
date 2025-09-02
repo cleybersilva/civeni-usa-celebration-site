@@ -313,6 +313,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_speakers: {
+        Row: {
+          bio: string
+          created_at: string
+          id: string
+          image_url: string | null
+          institution: string
+          is_active: boolean
+          name: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bio: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          institution: string
+          is_active?: boolean
+          name: string
+          order_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          institution?: string
+          is_active?: boolean
+          name?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       congresso_apresentacao: {
         Row: {
           created_at: string
@@ -1503,8 +1542,16 @@ export type Database = {
         }
         Returns: number
       }
+      admin_delete_speaker: {
+        Args: { session_token: string; speaker_id: string; user_email: string }
+        Returns: Json
+      }
       admin_upsert_banner_slide: {
         Args: { session_token: string; slide: Json; user_email: string }
+        Returns: Json
+      }
+      admin_upsert_speaker: {
+        Args: { session_token: string; speaker_data: Json; user_email: string }
         Returns: Json
       }
       check_partner_application_rate_limit: {
