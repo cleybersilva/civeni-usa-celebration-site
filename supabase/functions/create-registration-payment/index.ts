@@ -126,27 +126,11 @@ serve(async (req) => {
       logStep("Coupon applied", { discountType: coupon.discount_type, finalPrice });
     }
 
-    // Try to map to legacy registration_categories (FK) using category title and batch
-    let regCategoryId = null as string | null;
-    try {
-      const { data: regCat } = await supabase
-        .from('registration_categories')
-        .select('id')
-        .eq('category_name', category.title_pt)
-        .eq('batch_id', batchId)
-        .maybeSingle();
-      regCategoryId = regCat?.id ?? null;
-      logStep("Mapped to registration_categories", { regCategoryId });
-    } catch (_) {
-      // ignore mapping errors, fallback to null
-      logStep("Mapping to registration_categories failed, proceeding with null");
-    }
-
-    // Create registration record
+    // Create registration record - now without FK constraint issues
     const registrationData = {
       email: email.toLowerCase(),
       full_name: fullName,
-      category_id: regCategoryId, // use legacy table FK if present (nullable)
+      category_id: categoryId, // Store the event_category ID directly (no FK constraint now)
       batch_id: batchId,
       curso_id: cursoId,
       turma_id: turmaId,

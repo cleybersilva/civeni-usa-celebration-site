@@ -585,14 +585,14 @@ export type Database = {
             foreignKeyName: "event_registrations_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: "registration_batches"
+            referencedRelation: "lotes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "event_registrations_category_id_fkey"
-            columns: ["category_id"]
+            foreignKeyName: "event_registrations_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: "registration_categories"
+            referencedRelation: "v_lote_atual"
             referencedColumns: ["id"]
           },
           {
