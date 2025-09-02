@@ -671,6 +671,39 @@ export type Database = {
         }
         Relationships: []
       }
+      lotes: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          dt_fim: string
+          dt_inicio: string
+          id: string
+          nome: string
+          price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          dt_fim: string
+          dt_inicio: string
+          id?: string
+          nome: string
+          price_cents: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          dt_fim?: string
+          dt_inicio?: string
+          id?: string
+          nome?: string
+          price_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text_en: string | null
@@ -1313,7 +1346,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_lote_atual: {
+        Row: {
+          ativo: boolean | null
+          created_at: string | null
+          dt_fim: string | null
+          dt_inicio: string | null
+          id: string | null
+          nome: string | null
+          price_cents: number | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_partner_application_rate_limit: {
