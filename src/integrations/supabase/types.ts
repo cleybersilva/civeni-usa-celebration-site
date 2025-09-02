@@ -179,6 +179,140 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_committee_members: {
+        Row: {
+          affiliation: string | null
+          committee_id: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          lattes_url: string | null
+          linkedin_url: string | null
+          locale: string
+          name: string
+          photo_url: string | null
+          role: string | null
+          sort_order: number
+          updated_at: string | null
+          visible: boolean
+        }
+        Insert: {
+          affiliation?: string | null
+          committee_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          lattes_url?: string | null
+          linkedin_url?: string | null
+          locale?: string
+          name: string
+          photo_url?: string | null
+          role?: string | null
+          sort_order?: number
+          updated_at?: string | null
+          visible?: boolean
+        }
+        Update: {
+          affiliation?: string | null
+          committee_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          lattes_url?: string | null
+          linkedin_url?: string | null
+          locale?: string
+          name?: string
+          photo_url?: string | null
+          role?: string | null
+          sort_order?: number
+          updated_at?: string | null
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_committee_members_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "cms_committees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_committees: {
+        Row: {
+          created_at: string | null
+          id: string
+          locale: string
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          locale?: string
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          locale?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cms_pages: {
+        Row: {
+          content_md: string | null
+          created_at: string | null
+          hero_image_url: string | null
+          hero_subtitle: string | null
+          hero_title: string | null
+          id: string
+          locale: string
+          slug: string
+          status: string
+          title: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          content_md?: string | null
+          created_at?: string | null
+          hero_image_url?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
+          id?: string
+          locale?: string
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          content_md?: string | null
+          created_at?: string | null
+          hero_image_url?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
+          id?: string
+          locale?: string
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       congresso_apresentacao: {
         Row: {
           created_at: string

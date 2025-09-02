@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Presentation, Users } from 'lucide-react';
-import CongressoApresentacaoManager from './CongressoApresentacaoManager';
-import CongressoComiteManager from './CongressoComiteManager';
+import { Card } from '@/components/ui/card';
+import CMSPagesManager from './cms/CMSPagesManager';
+import CMSCommitteesManager from './cms/CMSCommitteesManager';
 
 const CongressoManager = () => {
   const { t } = useTranslation();
@@ -12,54 +11,34 @@ const CongressoManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            {t('admin.congress.title', 'Gerenciar Congresso')}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {t('admin.congress.description', 'Gerencie o conteúdo das páginas de apresentação e comitê do congresso')}
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">
+          {t('admin.congress.title', 'Gerenciar Congresso')}
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          {t('admin.congress.description', 'Configure o conteúdo das páginas do congresso através do CMS')}
+        </p>
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="apresentacao" className="flex items-center gap-2">
-            <Presentation className="w-4 h-4" />
-            {t('admin.congress.presentation.title', 'Apresentação')}
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="apresentacao">
+            {t('admin.congress.tabs.presentation', 'Apresentação')}
           </TabsTrigger>
-          <TabsTrigger value="comite" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            {t('admin.congress.committee.title', 'Comitê')}
+          <TabsTrigger value="comite">
+            {t('admin.congress.tabs.committee', 'Comitê')}
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="apresentacao" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Presentation className="w-5 h-5" />
-                {t('admin.congress.presentation.manage', 'Gerenciar Apresentação')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CongressoApresentacaoManager />
-            </CardContent>
+        
+        <TabsContent value="apresentacao">
+          <Card className="p-6">
+            <CMSPagesManager />
           </Card>
         </TabsContent>
-
-        <TabsContent value="comite" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                {t('admin.congress.committee.manage', 'Gerenciar Comitê')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CongressoComiteManager />
-            </CardContent>
+        
+        <TabsContent value="comite">
+          <Card className="p-6">
+            <CMSCommitteesManager />
           </Card>
         </TabsContent>
       </Tabs>
