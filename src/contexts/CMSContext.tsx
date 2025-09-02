@@ -507,11 +507,14 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Carregar vídeos (admin mode mostra todos, público apenas ativos)
-      const { data: videos, error: videosError } = await supabase
+      let videosQuery = supabase
         .from('videos')
         .select('*')
-        .eq(adminMode ? undefined : 'is_active', adminMode ? undefined : true)
         .order('order_index', { ascending: true });
+      if (!adminMode) {
+        videosQuery = videosQuery.eq('is_active', true);
+      }
+      const { data: videos, error: videosError } = await videosQuery;
 
       if (videosError) {
         console.error('Error loading videos:', videosError);
@@ -527,7 +530,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         uploadedVideoUrl: video.uploaded_video_url || undefined,
         thumbnail: video.thumbnail,
         order: video.order_index
-      })) || defaultContent.videos;
+      })) || (adminMode ? [] : defaultContent.videos);
 
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
@@ -916,8 +919,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }
 
-        const videoPayload = {
-          id: video.id !== 'new' ? video.id : null,
+        // Garantir que o ID seja UUID válido; caso contrário, tratar como novo registro
+        const isValidUuid = (val: string | undefined) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+        const payloadBase = {
           title: video.title,
           description: video.description || '',
           video_type: video.videoType,
@@ -926,7 +930,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           thumbnail: finalThumbnail,
           order_index: video.order || 1,
           is_active: true,
-        };
+        } as any;
+        const videoPayload = isValidUuid(video.id) ? { id: video.id, ...payloadBase } : payloadBase;
 
         // Upsert via função segura (garante RLS correta no mesmo request)
         const { data: upsertData, error: upsertError } = await supabase.rpc('admin_upsert_video', {
@@ -943,9 +948,10 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Desativar vídeos que não estão na lista atual
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       const activeVideoIds = videos
-        .filter(video => video.id && video.id !== 'new')
-        .map(video => video.id);
+        .map(v => v.id)
+        .filter((id): id is string => !!id && id !== 'new' && uuidRegex.test(id));
 
       if (activeVideoIds.length > 0) {
         const { data: deactCount, error: deactivateError } = await supabase.rpc('admin_deactivate_missing_videos', {
