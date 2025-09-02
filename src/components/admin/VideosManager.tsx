@@ -165,10 +165,48 @@ const VideosManager = () => {
       return;
     }
     
+    if (!user || !user.email) {
+      toast.error('Usuário não autenticado. Faça login novamente.');
+      return;
+    }
+    
     try {
-      const videos = content.videos.filter(v => v.id !== videoId);
-      await updateVideos(videos);
+      // Recuperar sessão admin
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '' as string;
+      let sessionToken: string | undefined;
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Falha ao ler a sessão admin do localStorage');
+        }
+      }
+      
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Usuário não autenticado. Faça login novamente.');
+      }
+
+      // Usar função segura do Supabase para exclusão
+      const { data: deleteResult, error: deleteError } = await supabase.rpc('admin_delete_video', {
+        video_id: videoId,
+        user_email: sessionEmail,
+        session_token: sessionToken,
+      });
+
+      if (deleteError) {
+        console.error('Erro ao excluir vídeo:', deleteError);
+        throw deleteError;
+      }
+
+      console.log('Vídeo excluído:', deleteResult);
+      
+      // Recarregar dados após exclusão
+      await updateVideos(content.videos.filter(v => v.id !== videoId));
       toast.success('Vídeo excluído com sucesso!');
+      
     } catch (error) {
       console.error('Erro ao excluir vídeo:', error);
       toast.error('Erro ao excluir vídeo. Tente novamente.');

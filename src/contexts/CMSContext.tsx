@@ -506,6 +506,29 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.error('Error loading hybrid activities:', hybridError);
       }
 
+      // Carregar vídeos (admin mode mostra todos, público apenas ativos)
+      const { data: videos, error: videosError } = await supabase
+        .from('videos')
+        .select('*')
+        .eq(adminMode ? undefined : 'is_active', adminMode ? undefined : true)
+        .order('order_index', { ascending: true });
+
+      if (videosError) {
+        console.error('Error loading videos:', videosError);
+      }
+
+      // Converter dados do Supabase para o formato do contexto
+      const videosFormatted: Video[] = videos?.map(video => ({
+        id: video.id,
+        title: video.title,
+        description: video.description || '',
+        videoType: video.video_type as 'youtube' | 'upload',
+        youtubeUrl: video.youtube_url || undefined,
+        uploadedVideoUrl: video.uploaded_video_url || undefined,
+        thumbnail: video.thumbnail,
+        order: video.order_index
+      })) || defaultContent.videos;
+
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
 
@@ -514,7 +537,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         bannerSlides, 
         speakers,
         eventConfig, 
-        hybridActivities 
+        hybridActivities,
+        videos: videosFormatted
       }));
       
       console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
@@ -840,9 +864,109 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateVideos = async (videos: Video[]) => {
     try {
-      setContent(prev => ({ ...prev, videos }));
+      console.log('Updating videos:', videos);
+      
+      // Recuperar sessão admin
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '' as string;
+      let sessionToken: string | undefined;
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Falha ao ler a sessão admin do localStorage');
+        }
+      }
+      
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Usuário não autenticado. Faça login novamente.');
+      }
+
+      const dataUrlToBlob = (dataUrl: string): { blob: Blob; mime: string; extension: string } => {
+        const parts = dataUrl.split(',');
+        const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+        const bstr = atob(parts[1] || '');
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const blob = new Blob([u8arr], { type: mime });
+        const extension = (mime.split('/')[1] || 'jpg').replace('+xml','');
+        return { blob, mime, extension };
+      };
+
+      // Processar cada vídeo individualmente
+      for (let i = 0; i < videos.length; i++) {
+        const video = videos[i];
+        
+        // Se a thumbnail for um data URL (upload local), enviar para o bucket público
+        let finalThumbnail = video.thumbnail || '';
+        if (finalThumbnail.startsWith('data:')) {
+          try {
+            const { blob, mime, extension } = dataUrlToBlob(finalThumbnail);
+            const filePath = `video-thumbnails/${Date.now()}_${i}.${extension}`;
+            const { error: uploadError } = await supabase.storage
+              .from('site-civeni')
+              .upload(filePath, blob, { upsert: true, contentType: mime });
+            if (uploadError) throw uploadError;
+            finalThumbnail = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
+          } catch (e) {
+            console.error('Erro ao enviar thumbnail do vídeo para o Storage:', e);
+          }
+        }
+
+        const videoPayload = {
+          id: video.id !== 'new' ? video.id : null,
+          title: video.title,
+          description: video.description || '',
+          video_type: video.videoType,
+          youtube_url: video.videoType === 'youtube' ? video.youtubeUrl : null,
+          uploaded_video_url: video.videoType === 'upload' ? video.uploadedVideoUrl : null,
+          thumbnail: finalThumbnail,
+          order_index: video.order || 1,
+          is_active: true,
+        };
+
+        // Upsert via função segura (garante RLS correta no mesmo request)
+        const { data: upsertData, error: upsertError } = await supabase.rpc('admin_upsert_video', {
+          video_data: videoPayload,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
+
+        if (upsertError) {
+          console.error('Erro no upsert do vídeo:', upsertError);
+          throw upsertError;
+        }
+        console.log('Vídeo salvo:', upsertData);
+      }
+
+      // Desativar vídeos que não estão na lista atual
+      const activeVideoIds = videos
+        .filter(video => video.id && video.id !== 'new')
+        .map(video => video.id);
+
+      if (activeVideoIds.length > 0) {
+        const { data: deactCount, error: deactivateError } = await supabase.rpc('admin_deactivate_missing_videos', {
+          active_ids: activeVideoIds,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
+        if (deactivateError) {
+          console.error('Erro ao desativar vídeos antigos:', deactivateError);
+        } else {
+          console.log('Vídeos desativados:', deactCount);
+        }
+      }
+
+      console.log('Videos updated successfully');
+      // Recarregar dados do banco para sincronizar (admin mode para mostrar todos)
+      await loadContent(true);
+
     } catch (error) {
       console.error('Error updating videos:', error);
+      throw error;
     }
   };
 
