@@ -3,44 +3,67 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Building } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Mail, Building, ExternalLink } from 'lucide-react';
 
-interface ComiteMember {
+interface Committee {
   id: string;
-  nome: string;
-  cargo_pt: string;
-  cargo_en: string;
-  cargo_es: string;
-  instituicao: string;
-  foto_url?: string;
-  categoria: 'organizador' | 'cientifico' | 'avaliacao' | 'apoio_tecnico';
-  ordem: number;
+  slug: string;
+  name: string;
+  sort_order: number;
+}
+
+interface CommitteeMember {
+  id: string;
+  committee_id: string;
+  name: string;
+  role: string;
+  affiliation: string;
+  photo_url?: string;
+  email?: string;
+  lattes_url?: string;
+  linkedin_url?: string;
+  sort_order: number;
+  visible: boolean;
 }
 
 const CongressoComite = () => {
   const { t, i18n } = useTranslation();
-  const [comiteMembers, setComiteMembers] = useState<ComiteMember[]>([]);
+  const [committees, setCommittees] = useState<Committee[]>([]);
+  const [committeeMembers, setCommitteeMembers] = useState<CommitteeMember[]>([]);
+  const [activeCommittee, setActiveCommittee] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchComiteMembers();
-  }, []);
+    fetchData();
+  }, [i18n.language]);
 
-  const fetchComiteMembers = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('congresso_comite')
+      const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language;
+      
+      // Fetch committees
+      const { data: committeesData, error: committeesError } = await supabase
+        .from('cms_committees')
         .select('*')
-        .eq('is_active', true)
-        .order('categoria')
-        .order('ordem');
+        .eq('locale', locale)
+        .order('sort_order');
 
-      if (error) {
-        console.error('Error fetching comite members:', error);
+      if (committeesError) {
+        console.error('Error fetching committees:', committeesError);
         return;
       }
 
-      setComiteMembers((data || []) as ComiteMember[]);
+      setCommittees(committeesData || []);
+      
+      // Set active committee to first one
+      if (committeesData && committeesData.length > 0) {
+        const firstCommittee = committeesData[0].id;
+        setActiveCommittee(firstCommittee);
+        
+        // Fetch members for the first committee
+        await fetchCommitteeMembers(firstCommittee, locale);
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -48,63 +71,32 @@ const CongressoComite = () => {
     }
   };
 
-  const getCurrentLanguageCargo = (member: ComiteMember) => {
-    const lang = i18n.language;
-    switch (lang) {
-      case 'en':
-        return member.cargo_en || member.cargo_pt;
-      case 'es':
-        return member.cargo_es || member.cargo_pt;
-      default:
-        return member.cargo_pt;
-    }
-  };
+  const fetchCommitteeMembers = async (committeeId: string, locale: string = 'pt-BR') => {
+    try {
+      const { data, error } = await supabase
+        .from('cms_committee_members')
+        .select('*')
+        .eq('committee_id', committeeId)
+        .eq('locale', locale)
+        .eq('visible', true)
+        .order('sort_order');
 
-  const getCategoryTitle = (categoria: string) => {
-    const titles = {
-      organizador: {
-        pt: 'Comitê Organizador',
-        en: 'Organizing Committee',
-        es: 'Comité Organizador'
-      },
-      cientifico: {
-        pt: 'Comitê Científico',
-        en: 'Scientific Committee',
-        es: 'Comité Científico'
-      },
-      avaliacao: {
-        pt: 'Comissão de Avaliação',
-        en: 'Evaluation Committee',
-        es: 'Comisión de Evaluación'
-      },
-      apoio_tecnico: {
-        pt: 'Comissão de Apoio Técnico',
-        en: 'Technical Support Committee',
-        es: 'Comisión de Apoyo Técnico'
+      if (error) {
+        console.error('Error fetching committee members:', error);
+        return;
       }
-    };
 
-    const lang = i18n.language as 'pt' | 'en' | 'es';
-    return titles[categoria as keyof typeof titles]?.[lang] || titles[categoria as keyof typeof titles]?.pt;
-  };
-
-  const getCategoryBadgeColor = (categoria: string) => {
-    const colors = {
-      organizador: 'bg-primary text-primary-foreground',
-      cientifico: 'bg-secondary text-secondary-foreground',
-      avaliacao: 'bg-accent text-accent-foreground',
-      apoio_tecnico: 'bg-muted text-muted-foreground'
-    };
-    return colors[categoria as keyof typeof colors] || colors.organizador;
-  };
-
-  const groupedMembers = comiteMembers.reduce((acc, member) => {
-    if (!acc[member.categoria]) {
-      acc[member.categoria] = [];
+      setCommitteeMembers(data || []);
+    } catch (error) {
+      console.error('Error:', error);
     }
-    acc[member.categoria].push(member);
-    return acc;
-  }, {} as Record<string, ComiteMember[]>);
+  };
+
+  const handleCommitteeChange = async (committeeId: string) => {
+    setActiveCommittee(committeeId);
+    const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language;
+    await fetchCommitteeMembers(committeeId, locale);
+  };
 
   if (loading) {
     return (
@@ -144,68 +136,120 @@ const CongressoComite = () => {
       {/* Committee Sections */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          {Object.entries(groupedMembers).map(([categoria, members]) => (
-            <div key={categoria} className="mb-16">
-              <div className="text-center mb-12">
-                <Badge className={`${getCategoryBadgeColor(categoria)} text-lg px-6 py-2 mb-4`}>
-                  {getCategoryTitle(categoria)}
-                </Badge>
-                <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-                  {getCategoryTitle(categoria)}
-                </h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {members.map((member) => (
-                  <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
-                    <CardContent className="p-0">
-                      {/* Photo Section */}
-                      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
-                        {member.foto_url ? (
-                          <img
-                            src={member.foto_url}
-                            alt={member.nome}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
-                              <span className="text-3xl font-bold text-primary">
-                                {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Overlay with category badge */}
-                        <div className="absolute top-4 right-4">
-                          <Badge className={`${getCategoryBadgeColor(categoria)} text-xs`}>
-                            {categoria.replace('_', ' ').toUpperCase()}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      {/* Info Section */}
-                      <div className="p-6">
-                        <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
-                          {member.nome}
-                        </h3>
-                        
-                        <p className="text-sm font-medium text-primary mb-3 line-clamp-2">
-                          {getCurrentLanguageCargo(member)}
-                        </p>
-                        
-                        <div className="flex items-center text-sm text-muted-foreground mb-4">
-                          <Building className="w-4 h-4 mr-2 flex-shrink-0" />
-                          <span className="line-clamp-2">{member.instituicao}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+          {committees.length > 0 && (
+            <Tabs value={activeCommittee} onValueChange={handleCommitteeChange} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-12">
+                {committees.map((committee) => (
+                  <TabsTrigger key={committee.id} value={committee.id} className="text-sm">
+                    {committee.name}
+                  </TabsTrigger>
                 ))}
-              </div>
-            </div>
-          ))}
+              </TabsList>
+              
+              {committees.map((committee) => (
+                <TabsContent key={committee.id} value={committee.id}>
+                  <div className="text-center mb-12">
+                    <Badge className="bg-primary text-primary-foreground text-lg px-6 py-2 mb-4">
+                      {committee.name}
+                    </Badge>
+                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
+                      {committee.name}
+                    </h2>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {committeeMembers.map((member) => (
+                      <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
+                        <CardContent className="p-0">
+                          {/* Photo Section */}
+                          <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
+                            {member.photo_url ? (
+                              <img
+                                src={member.photo_url}
+                                alt={member.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+                                  <span className="text-3xl font-bold text-primary">
+                                    {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Info Section */}
+                          <div className="p-6">
+                            <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
+                              {member.name}
+                            </h3>
+                            
+                            {member.role && (
+                              <p className="text-sm font-medium text-primary mb-3 line-clamp-2">
+                                {member.role}
+                              </p>
+                            )}
+                            
+                            <div className="flex items-center text-sm text-muted-foreground mb-4">
+                              <Building className="w-4 h-4 mr-2 flex-shrink-0" />
+                              <span className="line-clamp-2">{member.affiliation}</span>
+                            </div>
+                            
+                            {/* Links */}
+                            {(member.lattes_url || member.linkedin_url || member.email) && (
+                              <div className="flex flex-wrap gap-2">
+                                {member.lattes_url && (
+                                  <a
+                                    href={member.lattes_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded hover:bg-secondary/80 transition-colors"
+                                  >
+                                    <ExternalLink className="w-3 h-3 mr-1" />
+                                    Lattes
+                                  </a>
+                                )}
+                                {member.linkedin_url && (
+                                  <a
+                                    href={member.linkedin_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center text-xs bg-accent text-accent-foreground px-2 py-1 rounded hover:bg-accent/80 transition-colors"
+                                  >
+                                    <ExternalLink className="w-3 h-3 mr-1" />
+                                    LinkedIn
+                                  </a>
+                                )}
+                                {member.email && (
+                                  <a
+                                    href={`mailto:${member.email}`}
+                                    className="inline-flex items-center text-xs bg-muted text-muted-foreground px-2 py-1 rounded hover:bg-muted/80 transition-colors"
+                                  >
+                                    <Mail className="w-3 h-3 mr-1" />
+                                    Email
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  {committeeMembers.length === 0 && (
+                    <div className="text-center py-12">
+                      <p className="text-muted-foreground">
+                        {t('congress.committee.no_members', 'Nenhum membro encontrado para este comitê.')}
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
         </div>
       </section>
 

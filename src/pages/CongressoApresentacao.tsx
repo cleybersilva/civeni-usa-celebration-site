@@ -5,57 +5,67 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Users, Calendar, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
-interface CongressoData {
+interface CMSPageData {
   id: string;
-  titulo_pt: string;
-  titulo_en: string;
-  titulo_es: string;
-  descricao_pt: string;
-  descricao_en: string;
-  descricao_es: string;
-  tema_pt: string;
-  tema_en: string;
-  tema_es: string;
-  video_url?: string;
-  imagem_destaque?: string;
+  title: string;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_image_url?: string;
+  content_md: string;
+  status: string;
 }
 
 const CongressoApresentacao = () => {
   const { t, i18n } = useTranslation();
-  const [congressoData, setCongressoData] = useState<CongressoData | null>(null);
+  const [pageData, setPageData] = useState<CMSPageData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCongressoData();
-  }, []);
+    fetchPageData();
+  }, [i18n.language]);
 
-  const fetchCongressoData = async () => {
+  const fetchPageData = async () => {
     try {
+      const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language;
+      
       const { data, error } = await supabase
-        .from('congresso_apresentacao')
+        .from('cms_pages')
         .select('*')
-        .eq('is_active', true)
+        .eq('slug', 'congresso/apresentacao')
+        .eq('locale', locale)
+        .eq('status', 'published')
         .single();
 
-      if (error) {
-        console.error('Error fetching congresso data:', error);
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching page data:', error);
+        
+        // Fallback to Portuguese if current language not found
+        if (locale !== 'pt-BR') {
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from('cms_pages')
+            .select('*')
+            .eq('slug', 'congresso/apresentacao')
+            .eq('locale', 'pt-BR')
+            .eq('status', 'published')
+            .single();
+          
+          if (!fallbackError && fallbackData) {
+            setPageData(fallbackData);
+          }
+        }
         return;
       }
 
-      setCongressoData(data);
+      if (data) {
+        setPageData(data);
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const getCurrentLanguageText = (field: string) => {
-    if (!congressoData) return '';
-    const lang = i18n.language;
-    const key = `${field}_${lang}` as keyof CongressoData;
-    return (congressoData[key] as string) || congressoData[`${field}_pt` as keyof CongressoData] as string;
   };
 
   if (loading) {
@@ -84,16 +94,12 @@ const CongressoApresentacao = () => {
         <div className="container relative mx-auto px-4 py-16 lg:py-24">
           <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-fade-in">
-              {congressoData ? getCurrentLanguageText('titulo') : t('congress.presentation.title', 'III Congresso Virtual de Ensino de Engenharia do Nordeste')}
+              {pageData?.hero_title || 'III CIVENI 2025'}
             </h1>
             
             <div className="max-w-4xl mx-auto">
               <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed">
-                {congressoData ? getCurrentLanguageText('tema') : t('congress.presentation.theme', 'Inovação e Sustentabilidade no Ensino de Engenharia')}
-              </p>
-              
-              <p className="text-lg text-muted-foreground mb-10 leading-relaxed">
-                {congressoData ? getCurrentLanguageText('descricao') : t('congress.presentation.description', 'O CIVENI é um evento acadêmico que reúne estudantes, professores, pesquisadores e profissionais da área de ensino de engenharia para debater as mais recentes inovações, metodologias e desafios da educação em engenharia no nordeste brasileiro.')}
+                {pageData?.hero_subtitle || 'Congresso Internacional Multidisciplinar da VCCU'}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -116,33 +122,24 @@ const CongressoApresentacao = () => {
         </div>
       </section>
 
-      {/* Video Section */}
-      {congressoData?.video_url && (
-        <section className="py-16 bg-background/50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-                {t('congress.presentation.welcome_video', 'Vídeo de Boas-vindas')}
-              </h2>
-            </div>
-            
-            <div className="max-w-4xl mx-auto">
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="relative aspect-video">
-                    <iframe
-                      src={congressoData.video_url}
-                      title="Video de apresentação do congresso"
-                      className="w-full h-full"
-                      allowFullScreen
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+      {/* Main Content Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <article className="prose prose-lg prose-slate max-w-none dark:prose-invert">
+              {pageData?.content_md ? (
+                <ReactMarkdown>
+                  {pageData.content_md}
+                </ReactMarkdown>
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  <p>{t('congress.presentation.no_content', 'Conteúdo não disponível')}</p>
+                </div>
+              )}
+            </article>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Features Section */}
       <section className="py-16">
