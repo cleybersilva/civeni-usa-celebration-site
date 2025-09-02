@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useCMS, Video } from '@/contexts/CMSContext';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, Play, ExternalLink, Youtube, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Play, ExternalLink, Youtube, Upload, Eye, X, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ImageGuide from './ImageGuide';
 import SimpleImageUpload from './SimpleImageUpload';
@@ -18,6 +18,8 @@ const VideosManager = () => {
   const { user } = useAdminAuth();
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
+  const [isPreviewMaximized, setIsPreviewMaximized] = useState(false);
 
   // Forçar recarga dos dados em modo admin quando o componente carrega
   useEffect(() => {
@@ -199,6 +201,37 @@ const VideosManager = () => {
     }
   };
 
+  const getVideoEmbedUrl = (url: string) => {
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1].split('&')[0];
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&fs=1&cc_load_policy=1&iv_load_policy=3&autoplay=0`;
+    }
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}&rel=0&modestbranding=1&fs=1&cc_load_policy=1&iv_load_policy=3&autoplay=0`;
+    }
+    return url;
+  };
+
+  const handlePreview = (video: Video) => {
+    setPreviewVideo(video);
+    setIsPreviewMaximized(false);
+  };
+
+  const handleOpenVideo = (video: Video) => {
+    const url = video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      toast.error('URL do vídeo não encontrada');
+    }
+  };
+
+  const closePreview = () => {
+    setPreviewVideo(null);
+    setIsPreviewMaximized(false);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -322,67 +355,91 @@ const VideosManager = () => {
         </Dialog>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {content.videos.sort((a, b) => a.order - b.order).map((video) => (
-          <Card key={video.id} className={`${!video.id || video.id === 'new' ? 'opacity-50' : ''}`}>
-            <CardHeader>
-              <div className="relative h-48 rounded-lg overflow-hidden">
+          <Card key={video.id} className={`${!video.id || video.id === 'new' ? 'opacity-50' : ''} hover:shadow-lg transition-all duration-300`}>
+            <div className="relative">
+              <div className="relative h-32 rounded-t-lg overflow-hidden">
                 <img
                   src={video.thumbnail}
                   alt={video.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    // Fallback para erro de imagem
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=300&q=80';
+                    target.src = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=200&q=80';
                   }}
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <Play className="w-12 h-12 mx-auto mb-2" />
-                    <h3 className="text-xl font-bold mb-2">{video.title}</h3>
-                    <p className="text-sm">{video.description}</p>
-                  </div>
-                </div>
-                <div className="absolute top-2 right-2">
+                <div className="absolute inset-0 bg-black bg-opacity-30" />
+                <div className="absolute top-2 left-2">
                   {video.videoType === 'youtube' ? (
-                    <Youtube className="w-6 h-6 text-red-500" />
+                    <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+                      <Youtube className="w-3 h-3" />
+                      YouTube
+                    </div>
                   ) : (
-                    <Upload className="w-6 h-6 text-blue-500" />
+                    <div className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+                      <Upload className="w-3 h-3" />
+                      Upload
+                    </div>
                   )}
                 </div>
+                <div className="absolute top-2 right-2 text-white bg-black bg-opacity-50 px-2 py-1 rounded text-xs">
+                  #{video.order}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                  <Play className="w-8 h-8 text-white" />
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p><strong>Ordem:</strong> {video.order}</p>
-                <p><strong>Tipo:</strong> {video.videoType === 'youtube' ? 'YouTube' : 'Upload'}</p>
-                <p><strong>URL:</strong> {video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl}</p>
-              </div>
-              <div className="flex justify-end space-x-2 mt-4">
-                {video.videoType === 'youtube' && video.youtubeUrl && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => window.open(video.youtubeUrl, '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
-                )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleEdit(video)}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(video.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+            </div>
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">{video.title}</h3>
+                  <p className="text-sm text-gray-600 line-clamp-2 mt-1">{video.description}</p>
+                </div>
+                <div className="text-xs text-gray-500">
+                  <p className="truncate">
+                    <strong>URL:</strong> {video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl}
+                  </p>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <div className="flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handlePreview(video)}
+                      title="Visualizar"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleOpenVideo(video)}
+                      title="Abrir vídeo"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(video)}
+                      title="Editar"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(video.id)}
+                      title="Excluir"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -397,6 +454,77 @@ const VideosManager = () => {
           </Card>
         )}
       </div>
+
+      {/* Preview Modal */}
+      {previewVideo && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className={`bg-white rounded-lg overflow-hidden ${isPreviewMaximized ? 'w-full h-full' : 'max-w-4xl w-full max-h-[90vh]'}`}>
+            <div className="flex justify-between items-center p-4 bg-civeni-blue text-white">
+              <div>
+                <h3 className="text-lg font-semibold">{previewVideo.title}</h3>
+                <p className="text-sm opacity-90">Preview - {previewVideo.videoType === 'youtube' ? 'YouTube' : 'Upload'}</p>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setIsPreviewMaximized(!isPreviewMaximized)}
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded"
+                  title={isPreviewMaximized ? 'Minimizar' : 'Maximizar'}
+                >
+                  <Maximize2 size={20} />
+                </button>
+                <button
+                  onClick={() => handleOpenVideo(previewVideo)}
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded"
+                  title="Abrir em nova aba"
+                >
+                  <ExternalLink size={20} />
+                </button>
+                <button
+                  onClick={closePreview}
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded"
+                  title="Fechar"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className={`${isPreviewMaximized ? 'h-full' : 'aspect-video'}`}>
+              {previewVideo.videoType === 'youtube' ? (
+                <iframe
+                  src={getVideoEmbedUrl(previewVideo.youtubeUrl || '')}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  sandbox="allow-scripts allow-same-origin allow-presentation"
+                  title={previewVideo.title}
+                  onError={(e) => {
+                    console.error('Failed to load YouTube video:', previewVideo.youtubeUrl);
+                    toast.error('Erro ao carregar vídeo do YouTube');
+                  }}
+                />
+              ) : (
+                <video
+                  src={previewVideo.uploadedVideoUrl}
+                  className="w-full h-full"
+                  controls
+                  preload="metadata"
+                  title={previewVideo.title}
+                  onError={(e) => {
+                    console.error('Failed to load uploaded video:', previewVideo.uploadedVideoUrl);
+                    toast.error('Erro ao carregar vídeo');
+                  }}
+                />
+              )}
+            </div>
+            <div className="p-4 bg-gray-50">
+              <h4 className="font-medium text-gray-900 mb-2">{previewVideo.title}</h4>
+              <p className="text-sm text-gray-600">{previewVideo.description}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
