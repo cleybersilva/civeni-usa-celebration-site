@@ -5,11 +5,14 @@ import { useCMS, Speaker } from '@/contexts/CMSContext';
 import { Plus } from 'lucide-react';
 import SpeakerCard from './SpeakerCard';
 import SpeakerFormDialog from './SpeakerFormDialog';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const SpeakersManager = () => {
   const { content, updateSpeakers } = useCMS();
   const [editingSpeaker, setEditingSpeaker] = useState<Speaker | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -32,33 +35,36 @@ const SpeakersManager = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    const speakers = [...content.speakers];
-    
-    if (editingSpeaker) {
-      const index = speakers.findIndex(s => s.id === editingSpeaker.id);
-      speakers[index] = {
-        ...editingSpeaker,
-        ...formData
-      };
-    } else {
-      const newSpeaker: Speaker = {
-        id: Date.now().toString(),
-        ...formData,
-        order: speakers.length + 1
-      };
-      speakers.push(newSpeaker);
-    }
+    try {
+      const speakers = [...content.speakers];
+      
+      if (editingSpeaker) {
+        const index = speakers.findIndex(s => s.id === editingSpeaker.id);
+        speakers[index] = {
+          ...editingSpeaker,
+          ...formData
+        };
+      } else {
+        const newSpeaker: Speaker = {
+          id: 'new',
+          ...formData,
+          order: speakers.length + 1
+        };
+        speakers.push(newSpeaker);
+      }
 
-    // Fix Dr. Maria Rodriguez image if it exists
-    const mariaIndex = speakers.findIndex(s => s.name.includes('Maria Rodriguez'));
-    if (mariaIndex !== -1 && speakers[mariaIndex].image.includes('/lovable-uploads/')) {
-      speakers[mariaIndex].image = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+      await updateSpeakers(speakers);
+      toast.success(editingSpeaker ? 'Palestrante atualizado com sucesso!' : 'Palestrante adicionado com sucesso!');
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error saving speaker:', error);
+      toast.error('Erro ao salvar palestrante');
+    } finally {
+      setIsLoading(false);
     }
-
-    await updateSpeakers(speakers);
-    setIsDialogOpen(false);
-    resetForm();
   };
 
   const handleEdit = (speaker: Speaker) => {
@@ -74,9 +80,75 @@ const SpeakersManager = () => {
   };
 
   const handleDelete = async (speakerId: string) => {
-    if (confirm('Tem certeza que deseja excluir este palestrante?')) {
-      const speakers = content.speakers.filter(s => s.id !== speakerId);
-      await updateSpeakers(speakers);
+    if (!confirm('Tem certeza que deseja excluir este palestrante?')) {
+      return;
+    }
+
+    try {
+      console.log('Deleting speaker:', speakerId);
+
+      // Recuperar sessão admin
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '' as string;
+      let sessionToken: string | undefined;
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Falha ao ler a sessão admin do localStorage');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        toast.error('Sessão administrativa inválida. Faça login novamente.');
+        return;
+      }
+
+      // Deletar via função segura
+      const { data: deleteResult, error: deleteError } = await supabase.rpc('admin_delete_speaker', {
+        speaker_id: speakerId,
+        user_email: sessionEmail,
+        session_token: sessionToken,
+      });
+
+      if (deleteError) {
+        console.error('Erro ao deletar speaker:', deleteError);
+        toast.error('Erro ao deletar palestrante: ' + deleteError.message);
+        return;
+      }
+
+      if ((deleteResult as any)?.success) {
+        toast.success('Palestrante deletado com sucesso!');
+        
+        // Recarregar speakers do banco
+        const { data: updatedSpeakers, error: loadError } = await supabase
+          .from('cms_speakers')
+          .select('*')
+          .eq('is_active', true)
+          .order('order_index', { ascending: true });
+
+        if (!loadError && updatedSpeakers) {
+          const speakersFormatted = updatedSpeakers.map((speaker: any) => ({
+            id: speaker.id,
+            name: speaker.name,
+            title: speaker.title,
+            institution: speaker.institution,
+            image: speaker.image_url || '',
+            bio: speaker.bio,
+            order: speaker.order_index
+          }));
+          
+          // Forçar atualização do contexto
+          window.location.reload(); // Temporário para garantir sincronização
+        }
+      } else {
+        toast.error('Erro ao deletar palestrante');
+      }
+    } catch (error) {
+      console.error('Error deleting speaker:', error);
+      toast.error('Erro ao deletar palestrante');
     }
   };
 
@@ -102,6 +174,7 @@ const SpeakersManager = () => {
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleSubmit}
+        isLoading={isLoading}
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

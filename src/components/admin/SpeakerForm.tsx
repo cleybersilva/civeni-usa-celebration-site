@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Speaker } from '@/contexts/CMSContext';
+import ImageUploadField from './ImageUploadField';
 
 interface SpeakerFormProps {
   formData: {
@@ -55,12 +56,11 @@ const SpeakerForm = ({
         />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-2">URL da Imagem</label>
-        <Input
-          type="url"
+        <ImageUploadField
           value={formData.image}
-          onChange={(e) => setFormData({...formData, image: e.target.value})}
-          required
+          onChange={(imageValue) => setFormData({...formData, image: imageValue})}
+          label="Imagem do Palestrante"
+          type="speaker"
         />
       </div>
       <div>

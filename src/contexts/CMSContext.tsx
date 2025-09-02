@@ -448,6 +448,33 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       }) || defaultContent.bannerSlides;
 
+      // Carregar speakers do Supabase
+      let speakersQuery = supabase
+        .from('cms_speakers')
+        .select('*')
+        .order('order_index', { ascending: true });
+      
+      if (!adminMode) {
+        speakersQuery = speakersQuery.eq('is_active', true);
+      }
+      
+      const { data: speakersData, error: speakersError } = await speakersQuery;
+
+      if (speakersError) {
+        console.error('Error loading speakers:', speakersError);
+      }
+
+      // Converter dados do Supabase para o formato do contexto
+      const speakers: Speaker[] = speakersData?.map(speaker => ({
+        id: speaker.id,
+        name: speaker.name,
+        title: speaker.title,
+        institution: speaker.institution,
+        image: speaker.image_url || '',
+        bio: speaker.bio,
+        order: speaker.order_index
+      })) || defaultContent.speakers;
+
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
         .from('event_config')
@@ -485,6 +512,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setContent(prev => ({ 
         ...prev, 
         bannerSlides, 
+        speakers,
         eventConfig, 
         hybridActivities 
       }));
@@ -500,9 +528,108 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateSpeakers = async (speakers: Speaker[]) => {
     try {
-      setContent(prev => ({ ...prev, speakers }));
+      console.log('Updating speakers:', speakers);
+
+      // Recuperar sessão admin
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '' as string;
+      let sessionToken: string | undefined;
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Falha ao ler a sessão admin do localStorage');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida ou expirada. Faça login novamente.');
+      }
+
+      const dataUrlToBlob = (dataUrl: string): { blob: Blob; mime: string; extension: string } => {
+        const parts = dataUrl.split(',');
+        const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+        const bstr = atob(parts[1] || '');
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const blob = new Blob([u8arr], { type: mime });
+        const extension = (mime.split('/')[1] || 'jpg').replace('+xml','');
+        return { blob, mime, extension };
+      };
+
+      // Processar cada speaker individualmente
+      for (let i = 0; i < speakers.length; i++) {
+        const speaker = speakers[i];
+
+        // Se a imagem for um data URL (upload local), enviar para o bucket público
+        let finalImageUrl = speaker.image || '';
+        if (finalImageUrl.startsWith('data:')) {
+          try {
+            const { blob, mime, extension } = dataUrlToBlob(finalImageUrl);
+            const filePath = `speakers/${Date.now()}_${i}.${extension}`;
+            const { error: uploadError } = await supabase.storage
+              .from('site-civeni')
+              .upload(filePath, blob, { upsert: true, contentType: mime });
+            if (uploadError) throw uploadError;
+            finalImageUrl = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
+          } catch (e) {
+            console.error('Erro ao enviar imagem do speaker para o Storage:', e);
+          }
+        }
+
+        const speakerPayload: any = {
+          id: speaker.id !== 'new' ? speaker.id : null,
+          name: speaker.name || '',
+          title: speaker.title || '',
+          institution: speaker.institution || '',
+          bio: speaker.bio || '',
+          image_url: finalImageUrl || '',
+          order_index: speaker.order || (i + 1),
+          is_active: true,
+        };
+
+        // Upsert via função segura
+        const { data: upsertData, error: upsertError } = await supabase.rpc('admin_upsert_speaker', {
+          speaker_data: speakerPayload,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
+
+        if (upsertError) {
+          console.error('Erro no upsert do speaker:', upsertError);
+          throw upsertError;
+        }
+        console.log('Speaker salvo:', upsertData);
+      }
+
+      // Recarregar speakers atualizados do banco
+      const { data: updatedSpeakers, error: loadError } = await supabase
+        .from('cms_speakers')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (loadError) {
+        console.error('Erro ao recarregar speakers:', loadError);
+      } else {
+        const speakersFormatted: Speaker[] = updatedSpeakers?.map(speaker => ({
+          id: speaker.id,
+          name: speaker.name,
+          title: speaker.title,
+          institution: speaker.institution,
+          image: speaker.image_url || '',
+          bio: speaker.bio,
+          order: speaker.order_index
+        })) || [];
+        
+        setContent(prev => ({ ...prev, speakers: speakersFormatted }));
+      }
     } catch (error) {
       console.error('Error updating speakers:', error);
+      throw error;
     }
   };
 
