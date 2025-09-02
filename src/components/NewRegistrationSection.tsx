@@ -161,7 +161,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                             <span>{category.title_pt}</span>
                             <div className="ml-4 flex flex-col items-end">
                               <span className="font-semibold">
-                                {category.is_free ? t('registration.free') : `R$ ${(category.price_cents / 100).toFixed(2)}`}
+                                {category.is_free ? 'GRATUITO' : `R$ ${(loteVigente?.price_cents / 100).toFixed(2)}`}
                               </span>
                               {loteVigente && !category.is_free && (
                                 <span className="text-xs text-green-600 font-medium">
@@ -176,16 +176,24 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                   </Select>
                 </div>
 
-                {selectedCategory && !selectedCategory.is_free && (
+                {selectedCategory && (
                   <div>
-                    <Label htmlFor="couponCode">{t('registration.couponCode')}</Label>
+                    <Label htmlFor="couponCode">
+                      {selectedCategory.is_free ? 'Código do Cupom (obrigatório para categoria gratuita)' : t('registration.couponCode')}
+                    </Label>
                     <Input
                       id="couponCode"
-                      type="text"
+                      type="text"  
                       value={formData.couponCode}
                       onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
-                      placeholder={t('registration.couponPlaceholder')}
+                      placeholder={selectedCategory.is_free ? 'Digite seu código de professor VCCU' : t('registration.couponPlaceholder')}
+                      required={selectedCategory.is_free}
                     />
+                    {selectedCategory.is_free && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Para categoria gratuita, o código do cupom é obrigatório para validar sua elegibilidade como professor VCCU.
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -196,7 +204,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 <Button 
                   type="submit" 
                   className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
-                  disabled={loading || !formData.categoryId || !formData.participantType || (isVCCUStudent && (!formData.cursoId || !formData.turmaId))}
+                  disabled={loading || !formData.categoryId || !formData.participantType || (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || (selectedCategory?.is_free && !formData.couponCode)}
                 >
                   {loading ? t('registration.processing') : t('registration.registerNow')}
                 </Button>

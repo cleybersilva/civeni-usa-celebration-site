@@ -52,6 +52,18 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
       setError('Para alunos da VCCU, os campos Curso e Turma são obrigatórios.');
       return;
     }
+
+    // Validate coupon for free categories
+    const selectedCategory = await supabase
+      .from('event_category')
+      .select('*')
+      .eq('id', formData.categoryId)
+      .single();
+      
+    if (selectedCategory.data?.is_free && !formData.couponCode) {
+      setError('Código do cupom é obrigatório para categoria gratuita.');
+      return;
+    }
     
     setLoading(true);
     setError('');

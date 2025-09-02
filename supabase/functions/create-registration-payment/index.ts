@@ -3,196 +3,269 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Simple in-memory rate limiting
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX = 10; // max requests per window
-
-function checkRateLimit(clientIP: string): boolean {
-  const now = Date.now();
-  const key = clientIP;
-  const current = rateLimitMap.get(key);
-  
-  if (!current || now > current.resetTime) {
-    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-  
-  if (current.count >= RATE_LIMIT_MAX) {
-    return false;
-  }
-  
-  current.count++;
-  return true;
-}
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-REGISTRATION-PAYMENT] ${step}${detailsStr}`);
+};
 
 serve(async (req) => {
-  console.log(`[PAYMENT] Request received: ${req.method} ${req.url}`);
-  
-  if (req.method === 'OPTIONS') {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Rate limiting
-  const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-  if (!checkRateLimit(clientIP)) {
-    console.log(`[PAYMENT] Rate limit exceeded for IP: ${clientIP}`);
-    return new Response(JSON.stringify({ success: false, error: 'Rate limit exceeded' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 429,
-    });
-  }
-
   try {
-    const body = await req.json().catch(() => ({}));
-    console.log(`[PAYMENT] Request body:`, body);
-    
-    const origin = req.headers.get('origin') || 'https://wdkeqxfglmritghmakma.lovableproject.com';
+    logStep("Function started");
 
-    // Check all required environment variables
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    console.log(`[PAYMENT] Environment check - Stripe: ${!!stripeKey}, Supabase URL: ${!!supabaseUrl}, Service Key: ${!!supabaseServiceKey}`);
-    
-    if (!stripeKey) {
-      console.error('[PAYMENT] STRIPE_SECRET_KEY not found');
-      return new Response(JSON.stringify({ success: false, error: 'STRIPE_SECRET_KEY ausente' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      });
-    }
+    const body = await req.json();
+    const {
+      email,
+      fullName,
+      categoryId,
+      batchId,
+      couponCode,
+      cursoId,
+      turmaId,
+      participantType,
+      registrationType,
+      currency = 'BRL'
+    } = body;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('[PAYMENT] Supabase environment variables missing');
-      return new Response(JSON.stringify({ success: false, error: 'Supabase configuration missing' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      });
-    }
+    logStep("Request body received", { email, categoryId, batchId, participantType });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
-    console.log('[PAYMENT] Stripe client initialized');
-
-    // Load category to get price_cents
+    // Initialize Supabase with service role for database operations
     const supabase = createClient(
-      supabaseUrl,
-      supabaseServiceKey,
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
-    console.log('[PAYMENT] Supabase client initialized');
 
-    const { categoryId, email } = body as { categoryId?: string; email?: string };
-    console.log(`[PAYMENT] Processing payment for category: ${categoryId}, email: ${email}`);
-    
-    if (!categoryId) {
-      console.error('[PAYMENT] Category ID not provided');
-      return new Response(JSON.stringify({ success: false, error: 'Categoria não informada' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      });
-    }
+    logStep("Supabase client initialized");
 
-    const { data: category, error: catErr } = await supabase
+    // Get category details
+    const { data: category, error: categoryError } = await supabase
       .from('event_category')
-      .select('title_pt, price_cents, currency, is_free')
+      .select('*')
       .eq('id', categoryId)
+      .eq('is_active', true)
       .single();
 
-    if (catErr) {
-      console.error('[PAYMENT] Database error fetching category:', catErr);
-      return new Response(JSON.stringify({ success: false, error: 'Erro ao buscar categoria: ' + catErr.message }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      });
+    if (categoryError || !category) {
+      logStep("Category not found", { categoryError });
+      return new Response(
+        JSON.stringify({ success: false, error: "Categoria não encontrada" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
     }
 
-    if (!category) {
-      console.error('[PAYMENT] Category not found:', categoryId);
-      return new Response(JSON.stringify({ success: false, error: 'Categoria não encontrada' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 404,
-      });
+    logStep("Category found", { categoryTitle: category.title_pt, isFree: category.is_free });
+
+    // Get current lote (batch) details for pricing
+    const { data: lote, error: loteError } = await supabase
+      .from('lotes')
+      .select('*')
+      .eq('id', batchId)
+      .eq('ativo', true)
+      .single();
+
+    if (loteError || !lote) {
+      logStep("Batch not found", { loteError });
+      return new Response(
+        JSON.stringify({ success: false, error: "Lote não encontrado" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
     }
 
-    console.log('[PAYMENT] Category found:', category);
+    logStep("Batch found", { loteName: lote.nome, priceCents: lote.price_cents });
 
-    if (category.is_free) {
-      console.log('[PAYMENT] Free category, no payment required');
-      return new Response(JSON.stringify({ success: true, payment_required: false }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      });
-    }
+    // Validate coupon if provided
+    let finalPrice = category.is_free ? 0 : lote.price_cents;
+    let validCoupon = null;
 
-    // Always use price_data - never stripe_price_id to avoid test/live conflicts
-    const unitAmount = category.price_cents && category.price_cents > 0 ? category.price_cents : 7000; // Default R$ 70.00
-    const currency = (category.currency || 'BRL').toLowerCase();
-    
-    console.log(`[PAYMENT] Creating Stripe session - Amount: ${unitAmount}, Currency: ${currency}`);
-    
-    const lineItem = {
-      price_data: {
-        currency,
-        product_data: { 
-          name: category.title_pt || 'Inscrição CIVENI 2025',
-          description: 'Inscrição para o III CIVENI 2025'
-        },
-        unit_amount: unitAmount,
-      },
-      quantity: 1,
-    };
+    if (couponCode) {
+      const { data: coupon, error: couponError } = await supabase
+        .from('coupon_codes')
+        .select('*')
+        .eq('code', couponCode)
+        .eq('is_active', true)
+        .single();
 
-    console.log('[PAYMENT] Line item created:', lineItem);
-
-    const sessionConfig = {
-      mode: 'payment' as const,
-      payment_method_types: ['card'],
-      line_items: [lineItem],
-      success_url: `${origin}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/registration-canceled`,
-      customer_email: email,
-      metadata: {
-        category_id: categoryId,
-        email: email || 'no-email'
+      if (couponError || !coupon) {
+        logStep("Invalid coupon", { couponError });
+        return new Response(
+          JSON.stringify({ success: false, error: "Código de cupom inválido" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
       }
-    };
 
-    console.log('[PAYMENT] Creating Stripe session with config:', sessionConfig);
+      // Check usage limit
+      if (coupon.usage_limit && (coupon.used_count || 0) >= coupon.usage_limit) {
+        logStep("Coupon usage limit exceeded");
+        return new Response(
+          JSON.stringify({ success: false, error: "Código de cupom esgotado" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
+      }
 
-    const session = await stripe.checkout.sessions.create(sessionConfig);
+      validCoupon = coupon;
+      
+      // Apply coupon discount
+      if (coupon.discount_type === 'category_override' && coupon.category_id) {
+        // Override with coupon category (free for professors)
+        finalPrice = 0;
+      } else if (coupon.discount_type === 'percentage') {
+        finalPrice = Math.round(finalPrice * (1 - (coupon.discount_value / 100)));
+      } else if (coupon.discount_type === 'fixed') {
+        finalPrice = Math.max(0, finalPrice - (coupon.discount_value * 100)); // Convert to cents
+      }
 
-    console.log('[PAYMENT] Stripe session created:', session.id, session.url);
-
-    if (!session?.url) {
-      console.error('[PAYMENT] Stripe session created but no URL returned');
-      return new Response(JSON.stringify({ success: false, error: 'Stripe não retornou URL' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      });
+      logStep("Coupon applied", { discountType: coupon.discount_type, finalPrice });
     }
 
-    console.log('[PAYMENT] Success - returning session URL');
-    return new Response(JSON.stringify({ success: true, payment_required: true, url: session.url }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
+    // Create registration record
+    const registrationData = {
+      email: email.toLowerCase(),
+      full_name: fullName,
+      category_id: categoryId,
+      batch_id: batchId,
+      curso_id: cursoId,
+      turma_id: turmaId,
+      participant_type: participantType,
+      payment_status: finalPrice === 0 ? 'completed' : 'pending',
+      amount_paid: finalPrice / 100, // Convert to decimal
+      currency: currency,
+      coupon_code: couponCode || null,
+    };
+
+    logStep("Creating registration", registrationData);
+
+    const { data: registration, error: registrationError } = await supabase
+      .from('event_registrations')
+      .insert(registrationData)
+      .select()
+      .single();
+
+    if (registrationError) {
+      logStep("Registration creation failed", { registrationError });
+      return new Response(
+        JSON.stringify({ success: false, error: "Erro ao criar inscrição" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
+    }
+
+    logStep("Registration created", { registrationId: registration.id });
+
+    // Update coupon usage if used
+    if (validCoupon) {
+      await supabase
+        .from('coupon_codes')
+        .update({ used_count: (validCoupon.used_count || 0) + 1 })
+        .eq('id', validCoupon.id);
+      
+      logStep("Coupon usage updated");
+    }
+
+    // If free registration, send confirmation and return success
+    if (finalPrice === 0) {
+      logStep("Free registration completed");
+      
+      // Send confirmation notifications
+      try {
+        await supabase.functions.invoke('send-registration-confirmation', {
+          body: {
+            email,
+            fullName,
+            registrationId: registration.id,
+            categoryName: category.title_pt,
+            isFree: true
+          }
+        });
+        logStep("Confirmation notification sent");
+      } catch (notificationError) {
+        logStep("Notification failed", { notificationError });
+        // Don't fail the registration if notification fails
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          payment_required: false,
+          registration_id: registration.id,
+          message: "Inscrição gratuita realizada com sucesso!"
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
+    // For paid registrations, create Stripe session
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2023-10-16",
     });
+
+    logStep("Creating Stripe session");
+
+    // Check if customer exists
+    const customers = await stripe.customers.list({ email, limit: 1 });
+    let customerId;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+      logStep("Existing customer found", { customerId });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : email,
+      line_items: [
+        {
+          price_data: {
+            currency: currency.toLowerCase(),
+            product_data: {
+              name: `${category.title_pt} - ${lote.nome}`,
+              description: `Inscrição para Civeni 2025 - ${fullName}`,
+            },
+            unit_amount: finalPrice,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `${req.headers.get("origin")}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/registration-canceled`,
+      metadata: {
+        registration_id: registration.id,
+        participant_email: email,
+        participant_name: fullName,
+      },
+    });
+
+    // Update registration with Stripe session ID
+    await supabase
+      .from('event_registrations')
+      .update({ stripe_session_id: session.id })
+      .eq('id', registration.id);
+
+    logStep("Stripe session created", { sessionId: session.id, url: session.url });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        payment_required: true,
+        url: session.url,
+        registration_id: registration.id,
+        session_id: session.id
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+    );
+
   } catch (error: any) {
-    console.error('[PAYMENT] Unexpected error:', error);
-    console.error('[PAYMENT] Error stack:', error.stack);
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: error.message || 'Erro interno',
-      details: error.stack ? error.stack.substring(0, 500) : 'No stack trace'
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    });
+    logStep("ERROR", { message: error.message, stack: error.stack });
+    return new Response(
+      JSON.stringify({ success: false, error: error.message || "Erro interno do servidor" }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+    );
   }
 });
