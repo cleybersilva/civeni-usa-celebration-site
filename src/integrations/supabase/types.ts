@@ -1495,6 +1495,18 @@ export type Database = {
       }
     }
     Functions: {
+      admin_deactivate_missing_banners: {
+        Args: {
+          active_ids: string[]
+          session_token: string
+          user_email: string
+        }
+        Returns: number
+      }
+      admin_upsert_banner_slide: {
+        Args: { session_token: string; slide: Json; user_email: string }
+        Returns: Json
+      }
       check_partner_application_rate_limit: {
         Args: { user_email: string; user_ip: unknown }
         Returns: boolean

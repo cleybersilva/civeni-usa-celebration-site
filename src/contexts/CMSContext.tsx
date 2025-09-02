@@ -510,6 +510,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       console.log('Updating banner slides:', bannerSlides);
 
+      // Recuperar sessão admin (email + token) para autenticar as RPCs seguras
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '' as string;
+      let sessionToken: string | undefined;
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Falha ao ler a sessão admin do localStorage');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida ou expirada. Faça login novamente.');
+      }
+
       const dataUrlToBlob = (dataUrl: string): { blob: Blob; mime: string; extension: string } => {
         const parts = dataUrl.split(',');
         const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
@@ -543,7 +561,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }
 
-        const slideData = {
+        const slidePayload: any = {
+          id: slide.id !== 'new' ? slide.id : null,
           title: slide.title || '',
           subtitle: slide.subtitle || '',
           description: slide.description || '',
@@ -551,60 +570,45 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           button_text: slide.buttonText || '',
           button_link: slide.buttonLink || '',
           order_index: slide.order || (i + 1),
-          is_active: true
+          is_active: true,
         };
 
-        if (slide.id && slide.id !== 'new') {
-          // Atualizar slide existente
-          console.log('Updating existing slide:', slide.id, 'com dados:', slideData);
-          const { data: updatedData, error: updateError } = await supabase
-            .from('banner_slides')
-            .update(slideData)
-            .eq('id', slide.id)
-            .select();
+        // Upsert via função segura (garante RLS correta no mesmo request)
+        const { data: upsertData, error: upsertError } = await supabase.rpc('admin_upsert_banner_slide', {
+          slide: slidePayload,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
 
-          if (updateError) {
-            console.error('Error updating slide:', updateError);
-            throw updateError;
-          }
-          
-          console.log('Slide atualizado com sucesso:', updatedData);
-        } else {
-          // Inserir novo slide
-          console.log('Inserting new slide');
-          const { error: insertError } = await supabase
-            .from('banner_slides')
-            .insert([slideData]);
-
-          if (insertError) {
-            console.error('Error inserting slide:', insertError);
-            throw insertError;
-          }
+        if (upsertError) {
+          console.error('Erro no upsert do slide:', upsertError);
+          throw upsertError;
         }
+        console.log('Slide salvo:', upsertData);
       }
 
       // Desativar slides que não estão na lista atual
       const activeSlideIds = bannerSlides
         .filter(slide => slide.id && slide.id !== 'new')
         .map(slide => slide.id);
-      
-      if (activeSlideIds.length > 0) {
-        const { error: deactivateError } = await supabase
-          .from('banner_slides')
-          .update({ is_active: false })
-          .not('id', 'in', `(${activeSlideIds.map(id => `'${id}'`).join(',')})`);
 
+      if (activeSlideIds.length > 0) {
+        const { data: deactCount, error: deactivateError } = await supabase.rpc('admin_deactivate_missing_banners', {
+          active_ids: activeSlideIds,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
         if (deactivateError) {
-          console.error('Error deactivating unused slides:', deactivateError);
-          // Não throw aqui, só log
+          console.error('Erro ao desativar slides antigos:', deactivateError);
+        } else {
+          console.log('Slides desativados:', deactCount);
         }
       }
 
       console.log('Banner slides updated successfully');
-      
       // Recarregar dados do banco para sincronizar (admin mode para mostrar todos)
       await loadContent(true);
-      
+
     } catch (error) {
       console.error('Error updating banner slides:', error);
       throw error;
