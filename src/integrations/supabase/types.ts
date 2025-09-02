@@ -1542,8 +1542,20 @@ export type Database = {
         }
         Returns: number
       }
+      admin_deactivate_missing_videos: {
+        Args: {
+          active_ids: string[]
+          session_token: string
+          user_email: string
+        }
+        Returns: number
+      }
       admin_delete_speaker: {
         Args: { session_token: string; speaker_id: string; user_email: string }
+        Returns: Json
+      }
+      admin_delete_video: {
+        Args: { session_token: string; user_email: string; video_id: string }
         Returns: Json
       }
       admin_upsert_banner_slide: {
@@ -1552,6 +1564,10 @@ export type Database = {
       }
       admin_upsert_speaker: {
         Args: { session_token: string; speaker_data: Json; user_email: string }
+        Returns: Json
+      }
+      admin_upsert_video: {
+        Args: { session_token: string; user_email: string; video_data: Json }
         Returns: Json
       }
       check_partner_application_rate_limit: {

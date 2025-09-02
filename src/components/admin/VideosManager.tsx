@@ -1,139 +1,184 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Edit, Trash2, Youtube, Upload, Save, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCMS, Video } from '@/contexts/CMSContext';
-import { useToast } from '@/hooks/use-toast';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Plus, Edit, Trash2, Play, ExternalLink, Youtube, Upload } from 'lucide-react';
+import { toast } from 'sonner';
+import ImageGuide from './ImageGuide';
+import SimpleImageUpload from './SimpleImageUpload';
 
 const VideosManager = () => {
   const { content, updateVideos } = useCMS();
-  const { toast } = useToast();
+  const { user } = useAdminAuth();
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [videoForm, setVideoForm] = useState({
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Forçar recarga dos dados em modo admin quando o componente carrega
+  useEffect(() => {
+    const loadAdminContent = async () => {
+      try {
+        // Força recarregamento dos vídeos incluindo inativos
+        const { data: allVideos } = await supabase
+          .from('videos')
+          .select('*')
+          .order('order_index', { ascending: true });
+        
+        console.log('Loaded videos for admin:', allVideos);
+      } catch (error) {
+        console.error('Erro ao carregar dados do admin:', error);
+      }
+    };
+    loadAdminContent();
+  }, []);
+
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
     videoType: 'youtube' as 'youtube' | 'upload',
     youtubeUrl: '',
     uploadedVideoUrl: '',
     thumbnail: '',
+    uploadedThumbnail: '',
     order: 1
   });
 
-  const videos = content.videos.sort((a, b) => a.order - b.order);
-
   const resetForm = () => {
-    setVideoForm({
+    setFormData({
       title: '',
       description: '',
       videoType: 'youtube',
       youtubeUrl: '',
       uploadedVideoUrl: '',
       thumbnail: '',
-      order: Math.max(...videos.map(v => v.order), 0) + 1
+      uploadedThumbnail: '',
+      order: content.videos.length + 1
     });
+    setEditingVideo(null);
   };
 
-  const handleCreate = () => {
-    setIsCreating(true);
-    setEditingVideo(null);
-    resetForm();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user || !user.email) {
+      toast.error('Usuário não autenticado. Faça login novamente.');
+      return;
+    }
+    
+    try {
+      // Use uploaded thumbnail if available, otherwise use URL
+      const finalThumbnail = formData.uploadedThumbnail || formData.thumbnail;
+      
+      console.log('Dados do formulário:', formData);
+      console.log('Thumbnail final selecionada:', finalThumbnail);
+      
+      // Validate required fields
+      if (!formData.title || !formData.description) {
+        toast.error('Por favor, preencha todos os campos obrigatórios (título e descrição).');
+        return;
+      }
+      
+      // Validate video source
+      if (formData.videoType === 'youtube' && !formData.youtubeUrl) {
+        toast.error('Por favor, forneça a URL do YouTube.');
+        return;
+      }
+      
+      if (formData.videoType === 'upload' && !formData.uploadedVideoUrl) {
+        toast.error('Por favor, forneça a URL do vídeo carregado.');
+        return;
+      }
+      
+      // Validate that at least one thumbnail source is provided
+      if (!finalThumbnail) {
+        toast.error('Por favor, faça upload de uma thumbnail ou forneça uma URL para a thumbnail.');
+        return;
+      }
+      
+      const videos = [...content.videos];
+      
+      if (editingVideo) {
+        const index = videos.findIndex(v => v.id === editingVideo.id);
+        if (index !== -1) {
+          videos[index] = {
+            ...editingVideo,
+            title: formData.title,
+            description: formData.description,
+            videoType: formData.videoType,
+            youtubeUrl: formData.youtubeUrl,
+            uploadedVideoUrl: formData.uploadedVideoUrl,
+            thumbnail: finalThumbnail,
+            order: editingVideo.order // Manter ordem original
+          };
+        }
+      } else {
+        const newVideo: Video = {
+          id: 'new', // Será tratado no contexto CMS para gerar UUID no Supabase
+          title: formData.title,
+          description: formData.description,
+          videoType: formData.videoType,
+          youtubeUrl: formData.youtubeUrl,
+          uploadedVideoUrl: formData.uploadedVideoUrl,
+          thumbnail: finalThumbnail,
+          order: formData.order
+        };
+        videos.push(newVideo);
+      }
+
+      await updateVideos(videos);
+      setIsDialogOpen(false);
+      resetForm();
+      
+      toast.success('Vídeo salvo com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar vídeo:', error);
+      toast.error('Erro ao salvar vídeo. Tente novamente.');
+    }
   };
 
   const handleEdit = (video: Video) => {
     setEditingVideo(video);
-    setIsCreating(false);
-    setVideoForm({
+    setFormData({
       title: video.title,
       description: video.description,
       videoType: video.videoType,
       youtubeUrl: video.youtubeUrl || '',
       uploadedVideoUrl: video.uploadedVideoUrl || '',
       thumbnail: video.thumbnail,
+      uploadedThumbnail: '', // Limpar upload quando editar
       order: video.order
     });
-  };
-
-  const handleSave = async () => {
-    if (!videoForm.title.trim()) {
-      toast({
-        title: "Erro",
-        description: "Título é obrigatório",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (videoForm.videoType === 'youtube' && !videoForm.youtubeUrl.trim()) {
-      toast({
-        title: "Erro",
-        description: "URL do YouTube é obrigatória para vídeos do YouTube",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (videoForm.videoType === 'upload' && !videoForm.uploadedVideoUrl.trim()) {
-      toast({
-        title: "Erro",
-        description: "URL do vídeo é obrigatória para vídeos enviados",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newVideo: Video = {
-      id: editingVideo?.id || `video-${Date.now()}`,
-      title: videoForm.title,
-      description: videoForm.description,
-      videoType: videoForm.videoType,
-      youtubeUrl: videoForm.videoType === 'youtube' ? videoForm.youtubeUrl : undefined,
-      uploadedVideoUrl: videoForm.videoType === 'upload' ? videoForm.uploadedVideoUrl : undefined,
-      thumbnail: videoForm.thumbnail || 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=300&q=80',
-      order: videoForm.order
-    };
-
-    let updatedVideos;
-    if (editingVideo) {
-      updatedVideos = videos.map(v => v.id === editingVideo.id ? newVideo : v);
-    } else {
-      updatedVideos = [...videos, newVideo];
-    }
-
-    await updateVideos(updatedVideos);
-    setEditingVideo(null);
-    setIsCreating(false);
-    resetForm();
-
-    toast({
-      title: "Sucesso",
-      description: editingVideo ? "Vídeo atualizado com sucesso!" : "Vídeo criado com sucesso!"
-    });
+    setIsDialogOpen(true);
+    
+    console.log('Iniciando edição do vídeo:', video);
   };
 
   const handleDelete = async (videoId: string) => {
-    if (confirm('Tem certeza que deseja excluir este vídeo?')) {
-      const updatedVideos = videos.filter(v => v.id !== videoId);
-      await updateVideos(updatedVideos);
-      toast({
-        title: "Sucesso",
-        description: "Vídeo excluído com sucesso!"
-      });
+    if (!confirm('Tem certeza que deseja excluir este vídeo?')) {
+      return;
+    }
+    
+    try {
+      const videos = content.videos.filter(v => v.id !== videoId);
+      await updateVideos(videos);
+      toast.success('Vídeo excluído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir vídeo:', error);
+      toast.error('Erro ao excluir vídeo. Tente novamente.');
     }
   };
 
-  const handleCancel = () => {
-    setEditingVideo(null);
-    setIsCreating(false);
+  const handleAdd = () => {
     resetForm();
+    setIsDialogOpen(true);
   };
 
-  const getYoutubeThumbnail = (url: string) => {
+  const getYoutubeThumbnail = (url: string): string => {
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1].split('&')[0];
       return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
@@ -146,10 +191,10 @@ const VideosManager = () => {
   };
 
   const autoFillYoutubeThumbnail = () => {
-    if (videoForm.videoType === 'youtube' && videoForm.youtubeUrl && !videoForm.thumbnail) {
-      const thumbnail = getYoutubeThumbnail(videoForm.youtubeUrl);
+    if (formData.videoType === 'youtube' && formData.youtubeUrl && !formData.uploadedThumbnail) {
+      const thumbnail = getYoutubeThumbnail(formData.youtubeUrl);
       if (thumbnail) {
-        setVideoForm(prev => ({ ...prev, thumbnail }));
+        setFormData(prev => ({ ...prev, thumbnail }));
       }
     }
   };
@@ -158,178 +203,195 @@ const VideosManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Vídeos</h2>
-        <Button onClick={handleCreate} className="bg-civeni-blue hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Vídeo
-        </Button>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Vídeo
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingVideo ? 'Editar Vídeo' : 'Adicionar Vídeo'}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Título</label>
+                    <Input
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Descrição</label>
+                    <Textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Tipo de Vídeo</label>
+                    <Select 
+                      value={formData.videoType} 
+                      onValueChange={(value: 'youtube' | 'upload') => setFormData({...formData, videoType: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="youtube">YouTube</SelectItem>
+                        <SelectItem value="upload">Upload</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {formData.videoType === 'youtube' && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">URL do YouTube</label>
+                      <Input
+                        type="url"
+                        value={formData.youtubeUrl}
+                        onChange={(e) => {
+                          setFormData({...formData, youtubeUrl: e.target.value});
+                          if (e.target.value && !formData.uploadedThumbnail) {
+                            autoFillYoutubeThumbnail();
+                          }
+                        }}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                      />
+                    </div>
+                  )}
+                  {formData.videoType === 'upload' && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">URL do Vídeo Carregado</label>
+                      <Input
+                        type="url"
+                        value={formData.uploadedVideoUrl}
+                        onChange={(e) => setFormData({...formData, uploadedVideoUrl: e.target.value})}
+                        placeholder="URL do vídeo carregado"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <SimpleImageUpload
+                      label="Thumbnail (Upload)"
+                      value={formData.uploadedThumbnail}
+                      onChange={(value) => setFormData({...formData, uploadedThumbnail: value, thumbnail: ''})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">URL da Thumbnail (Opcional se fez upload)</label>
+                    <Input
+                      type="url"
+                      value={formData.thumbnail}
+                      onChange={(e) => setFormData({...formData, thumbnail: e.target.value})}
+                      placeholder="Cole aqui a URL da thumbnail ou faça upload acima"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Ordem de Exibição</label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={formData.order}
+                      onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 1})}
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                      {editingVideo ? 'Atualizar' : 'Adicionar'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+              
+              <div>
+                <ImageGuide type="video" title="Thumbnail do Vídeo" />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {(isCreating || editingVideo) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingVideo ? 'Editar Vídeo' : 'Novo Vídeo'}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Título *</label>
-              <Input
-                value={videoForm.title}
-                onChange={(e) => setVideoForm(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Título do vídeo"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Descrição</label>
-              <Textarea
-                value={videoForm.description}
-                onChange={(e) => setVideoForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Descrição do vídeo"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Tipo de Vídeo</label>
-              <Tabs 
-                value={videoForm.videoType} 
-                onValueChange={(value) => setVideoForm(prev => ({ ...prev, videoType: value as 'youtube' | 'upload' }))}
-              >
-                <TabsList>
-                  <TabsTrigger value="youtube">
-                    <Youtube className="w-4 h-4 mr-2" />
-                    YouTube
-                  </TabsTrigger>
-                  <TabsTrigger value="upload">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="youtube" className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">URL do YouTube *</label>
-                    <Input
-                      value={videoForm.youtubeUrl}
-                      onChange={(e) => setVideoForm(prev => ({ ...prev, youtubeUrl: e.target.value }))}
-                      onBlur={autoFillYoutubeThumbnail}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="upload" className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">URL do Vídeo *</label>
-                    <Input
-                      value={videoForm.uploadedVideoUrl}
-                      onChange={(e) => setVideoForm(prev => ({ ...prev, uploadedVideoUrl: e.target.value }))}
-                      placeholder="URL do vídeo enviado"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Cole aqui a URL do vídeo após fazer o upload para um serviço de hospedagem
-                    </p>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">URL da Thumbnail</label>
-              <Input
-                value={videoForm.thumbnail}
-                onChange={(e) => setVideoForm(prev => ({ ...prev, thumbnail: e.target.value }))}
-                placeholder="URL da imagem de capa (opcional)"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Para vídeos do YouTube, a thumbnail será preenchida automaticamente
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Ordem</label>
-              <Input
-                type="number"
-                value={videoForm.order}
-                onChange={(e) => setVideoForm(prev => ({ ...prev, order: parseInt(e.target.value) || 1 }))}
-                min="1"
-              />
-            </div>
-
-            <div className="flex space-x-2">
-              <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                <Save className="w-4 h-4 mr-2" />
-                Salvar
-              </Button>
-              <Button onClick={handleCancel} variant="outline">
-                <X className="w-4 h-4 mr-2" />
-                Cancelar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <div className="grid gap-6">
-        {videos.map((video) => (
-          <Card key={video.id}>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex space-x-4 flex-1">
-                  <img 
-                    src={video.thumbnail} 
-                    alt={video.title}
-                    className="w-24 h-16 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="text-lg font-semibold text-civeni-blue">{video.title}</h3>
-                      <Badge variant={video.videoType === 'youtube' ? 'destructive' : 'secondary'}>
-                        {video.videoType === 'youtube' ? (
-                          <>
-                            <Youtube className="w-3 h-3 mr-1" />
-                            YouTube
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-3 h-3 mr-1" />
-                            Upload
-                          </>
-                        )}
-                      </Badge>
-                      <Badge variant="outline">Ordem: {video.order}</Badge>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-2">{video.description}</p>
-                    <p className="text-xs text-gray-500">
-                      {video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl}
-                    </p>
+        {content.videos.sort((a, b) => a.order - b.order).map((video) => (
+          <Card key={video.id} className={`${!video.id || video.id === 'new' ? 'opacity-50' : ''}`}>
+            <CardHeader>
+              <div className="relative h-48 rounded-lg overflow-hidden">
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback para erro de imagem
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=400&h=300&q=80';
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <Play className="w-12 h-12 mx-auto mb-2" />
+                    <h3 className="text-xl font-bold mb-2">{video.title}</h3>
+                    <p className="text-sm">{video.description}</p>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => handleEdit(video)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(video.id)}
-                    variant="destructive"
-                    size="sm"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                <div className="absolute top-2 right-2">
+                  {video.videoType === 'youtube' ? (
+                    <Youtube className="w-6 h-6 text-red-500" />
+                  ) : (
+                    <Upload className="w-6 h-6 text-blue-500" />
+                  )}
                 </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <p><strong>Ordem:</strong> {video.order}</p>
+                <p><strong>Tipo:</strong> {video.videoType === 'youtube' ? 'YouTube' : 'Upload'}</p>
+                <p><strong>URL:</strong> {video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl}</p>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                {video.videoType === 'youtube' && video.youtubeUrl && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(video.youtubeUrl, '_blank')}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(video)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(video.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>
         ))}
-
-        {videos.length === 0 && (
+        
+        {content.videos.length === 0 && (
           <Card>
             <CardContent className="p-12 text-center">
-              <Youtube className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+              <Play className="w-12 h-12 mx-auto text-gray-400 mb-4" />
               <p className="text-gray-500">Nenhum vídeo cadastrado. Clique em "Novo Vídeo" para começar.</p>
             </CardContent>
           </Card>

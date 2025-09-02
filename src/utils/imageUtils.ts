@@ -25,6 +25,11 @@ export const IMAGE_CONFIGS = {
     width: 600,
     height: 400,
     description: "Imagem da atividade do formato híbrido"
+  },
+  video: {
+    width: 1280,
+    height: 720,
+    description: "Thumbnail do vídeo (16:9)"
   }
 } as const;
 
