@@ -840,9 +840,101 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateVideos = async (videos: Video[]) => {
     try {
-      setContent(prev => ({ ...prev, videos }));
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      // Get current session
+      const { data: sessionData } = await supabase
+        .from('admin_sessions')
+        .select('token')
+        .eq('email', user.email)
+        .single();
+
+      if (!sessionData?.token) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      // Process each video
+      for (const video of videos) {
+        if (video.id === 'new') {
+          // Create new video
+          const { data, error } = await supabase.rpc('admin_upsert_video', {
+            video_data: {
+              title: video.title,
+              description: video.description,
+              video_type: video.videoType,
+              youtube_url: video.youtubeUrl,
+              uploaded_video_url: video.uploadedVideoUrl,
+              thumbnail: video.thumbnail,
+              order_index: video.order,
+              is_active: true
+            },
+            user_email: user.email,
+            session_token: sessionData.token
+          });
+
+          if (error) throw error;
+        } else {
+          // Update existing video
+          const { data, error } = await supabase.rpc('admin_upsert_video', {
+            video_data: {
+              id: video.id,
+              title: video.title,
+              description: video.description,
+              video_type: video.videoType,
+              youtube_url: video.youtubeUrl,
+              uploaded_video_url: video.uploadedVideoUrl,
+              thumbnail: video.thumbnail,
+              order_index: video.order,
+              is_active: true
+            },
+            user_email: user.email,
+            session_token: sessionData.token
+          });
+
+          if (error) throw error;
+        }
+      }
+
+      // Delete videos not in the list
+      const currentVideoIds = videos.filter(v => v.id !== 'new').map(v => v.id);
+      if (currentVideoIds.length > 0) {
+        const { error: deleteError } = await supabase.rpc('admin_deactivate_missing_videos', {
+          active_ids: currentVideoIds,
+          user_email: user.email,
+          session_token: sessionData.token
+        });
+
+        if (deleteError) console.error('Error deactivating videos:', deleteError);
+      }
+
+      // Reload videos from database
+      const { data: updatedVideos, error: loadError } = await supabase
+        .from('videos')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (loadError) throw loadError;
+
+      // Convert to Video interface
+      const formattedVideos: Video[] = (updatedVideos || []).map(v => ({
+        id: v.id,
+        title: v.title,
+        description: v.description || '',
+        videoType: v.video_type as 'youtube' | 'upload',
+        youtubeUrl: v.youtube_url || '',
+        uploadedVideoUrl: v.uploaded_video_url || '',
+        thumbnail: v.thumbnail,
+        order: v.order_index
+      }));
+
+      setContent(prev => ({ ...prev, videos: formattedVideos }));
     } catch (error) {
       console.error('Error updating videos:', error);
+      throw error;
     }
   };
 
