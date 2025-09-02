@@ -111,6 +111,7 @@ export const ptTranslations = {
       couponCode: "Código do Cupom",
       couponPlaceholder: "Digite o código do cupom",
       free: "Gratuito",
+      freeCategory: "Categoria gratuita para Professor(a) VCCU com cupom válido.",
       noBatchActive: "Nenhum lote de inscrição ativo",
       course: "Curso",
       selectCourse: "Selecione o Curso",

@@ -198,7 +198,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 )}
 
                 {selectedCategory && (
-                  <PriceSummary selectedCategory={selectedCategory} />
+                  <PriceSummary selectedCategory={selectedCategory} priceCents={loteVigente?.price_cents ?? 0} />
                 )}
 
                 <Button 

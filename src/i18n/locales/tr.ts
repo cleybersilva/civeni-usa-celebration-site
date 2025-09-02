@@ -111,6 +111,7 @@ export const trTranslations = {
       couponCode: "Kupon Kodu",
       couponPlaceholder: "Kupon kodunu girin",
       free: "Ücretsiz",
+      freeCategory: "Geçerli kupon ile VCCU Profesörü için ücretsiz kategori.",
       noBatchActive: "Aktif kayıt dönemi yok",
       course: "Kurs",
       selectCourse: "Kurs Seç",
