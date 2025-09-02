@@ -7,12 +7,12 @@ import { resolveAssetUrl } from '@/utils/assetUrl';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'pt');
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const languages = [
-    { code: 'pt', flag: '🇧🇷', name: 'Português' },
     { code: 'en', flag: '🇺🇸', name: 'English' },
+    { code: 'pt', flag: '🇧🇷', name: 'Português' },
     { code: 'es', flag: '🇪🇸', name: 'Español' },
     { code: 'tr', flag: '🇹🇷', name: 'Türkçe' }
   ];
@@ -25,34 +25,34 @@ const Header = () => {
 
   const menuItems = [
     {
-      title: 'Congresso',
+      title: t('header.congress'),
       items: [
-        { name: 'Apresentação', href: '/congresso/apresentacao' },
-        { name: 'Comitê', href: '/congresso/comite' }
+        { name: t('header.presentation'), href: '/congresso/apresentacao' },
+        { name: t('header.committee'), href: '/congresso/comite' }
       ]
     },
     {
-      title: 'Cronograma',
+      title: t('header.schedule'),
       items: [
-        { name: 'Presencial', href: '/cronograma-presencial' },
-        { name: 'Online', href: '/cronograma-online' }
+        { name: t('header.inPerson'), href: '/cronograma-presencial' },
+        { name: t('header.online'), href: '/cronograma-online' }
       ]
     },
     {
-      title: 'Trabalhos',
+      title: t('header.papers'),
       items: [
-        { name: 'Submissão', href: '/submissao-trabalhos' },
-        { name: 'Apresentação Oral', href: '/apresentacao-oral' },
-        { name: 'Sessões Poster', href: '/sessoes-poster' },
-        { name: 'Manuscritos', href: '/manuscritos' }
+        { name: t('header.submission'), href: '/submissao-trabalhos' },
+        { name: t('header.oralPresentation'), href: '/apresentacao-oral' },
+        { name: t('header.posterSessions'), href: '/sessoes-poster' },
+        { name: t('header.manuscripts'), href: '/manuscritos' }
       ]
     },
     {
-      title: 'Áreas Temáticas',
+      title: t('header.thematicAreas'),
       items: []
     },
     {
-      title: 'Palestrantes',
+      title: t('header.speakers'),
       items: []
     }
   ];
@@ -68,7 +68,7 @@ const Header = () => {
               className="flex items-center gap-2 text-white hover:text-civeni-red transition-colors"
             >
               <Settings size={16} />
-              <span className="text-sm">Área Restrita</span>
+              <span className="text-sm">{t('header.adminArea')}</span>
             </Link>
           </div>
           
@@ -114,7 +114,7 @@ const Header = () => {
                 className="flex items-center space-x-2 text-white hover:text-civeni-red transition-colors bg-white bg-opacity-10 px-3 py-1 rounded-md hover:bg-opacity-20"
               >
                 <span className="text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
-                <span className="text-sm font-medium">BR {languages.find(l => l.code === selectedLanguage)?.name}</span>
+                <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -148,7 +148,7 @@ const Header = () => {
             <div className="flex items-center">
               <Link to="/">
                 <img 
-                  src={resolveAssetUrl("/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png")} 
+                  src={resolveAssetUrl("/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png")} 
                   alt="III Civeni 2025 Logo" 
                   className="h-14 w-auto"
                   onError={(e) => {
@@ -162,7 +162,7 @@ const Header = () => {
             <div className="hidden lg:flex items-center space-x-8">
               {menuItems.map((item) => (
                 <div key={item.title} className="relative">
-                  {item.title === 'Palestrantes' ? (
+                  {item.title === t('header.speakers') ? (
                     <Link
                       to="/palestrantes"
                       className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
@@ -170,7 +170,7 @@ const Header = () => {
                     >
                       {item.title}
                     </Link>
-                  ) : item.title === 'Áreas Temáticas' ? (
+                  ) : item.title === t('header.thematicAreas') ? (
                     <Link
                       to="/area-tematica"
                       className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
@@ -222,13 +222,13 @@ const Header = () => {
               to="/inscricoes"
               className="bg-civeni-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition-colors font-poppins"
             >
-              Inscrições
+              {t('header.registration')}
             </Link>
             <Link
               to="/contato"
               className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
             >
-              Contato
+              {t('header.contact')}
             </Link>
           </div>
         </div>
