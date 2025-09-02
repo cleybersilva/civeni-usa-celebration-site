@@ -148,7 +148,7 @@ const Header = () => {
             <div className="flex items-center">
               <Link to="/">
                 <img 
-                  src={resolveAssetUrl("/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png")} 
+                  src={resolveAssetUrl("/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png")} 
                   alt="III Civeni 2025 Logo" 
                   className="h-14 w-auto"
                   onError={(e) => {
