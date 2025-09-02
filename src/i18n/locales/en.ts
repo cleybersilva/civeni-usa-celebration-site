@@ -156,7 +156,7 @@ export const enTranslations = {
       next: "Next"
     },
     videos: {
-      title: "Videos from II Civeni 2024",
+      title: "Videos from I and II Civeni 2023/2024",
       description: "Relive the best moments and presentations from the II International Congress",
       watchVideo: "Watch Video",
       minimize: "Minimize",
@@ -166,7 +166,7 @@ export const enTranslations = {
       registerButton: "Register Now"
     },
     civeni2024Images: {
-      title: "II CIVENI 2024 Highlights",
+      title: "I and II CIVENI 2023/2024 Highlights",
       description: "Relive the best moments of the II International Multidisciplinary Congress of VCCU",
       registerButton: "Join III CIVENI 2025"
     },

@@ -156,7 +156,7 @@ export const trTranslations = {
       next: "Sonraki"
     },
     videos: {
-      title: "II Civeni 2024'ten Videolar",
+      title: "I ve II Civeni 2023/2024'ten Videolar",
       description: "II Uluslararası Kongre'nin en iyi anlarını ve sunumlarını yeniden yaşayın",
       watchVideo: "Video İzle",
       minimize: "Küçült",
@@ -166,7 +166,7 @@ export const trTranslations = {
       registerButton: "Şimdi Kayıt Ol"
     },
     civeni2024Images: {
-      title: "II CIVENI 2024 Öne Çıkanları",
+      title: "I ve II CIVENI 2023/2024 Öne Çıkanları",
       description: "VCCU'nun II Uluslararası Multidisipliner Kongresinin en iyi anlarını yeniden yaşayın",
       registerButton: "III CIVENI 2025'e Katılın"
     },

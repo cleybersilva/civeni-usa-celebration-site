@@ -121,7 +121,7 @@ const CongressoApresentacao = () => {
                 <Button asChild variant="outline" size="lg">
                   <Link to="/cronograma-presencial">
                     <Calendar className="w-5 h-5 mr-2" />
-                    {t('congress.presentation.schedule', 'Ver Cronograma')}
+                    {t('congress.presentation.schedule', 'Ver Programação')}
                   </Link>
                 </Button>
               </div>
