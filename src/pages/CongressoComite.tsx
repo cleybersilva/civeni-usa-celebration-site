@@ -26,6 +26,18 @@ interface CMSPageData {
   status: string;
 }
 
+// Helper to parse JSON settings embedded in content_md between markers
+function parseSettings(md?: string): Record<string, any> | null {
+  if (!md) return null;
+  const match = md.match(/<!--\s*CMS:SETTINGS\s*(\{[\s\S]*?\})\s*-->/);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    return null;
+  }
+}
+
 interface CommitteeMember {
   id: string;
   committee_id: string;

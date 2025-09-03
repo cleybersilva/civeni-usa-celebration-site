@@ -19,6 +19,18 @@ interface CMSPageData {
   status: string;
 }
 
+// Helper to parse JSON settings embedded in content_md between markers
+function parseSettings(md?: string): Record<string, any> | null {
+  if (!md) return null;
+  const match = md.match(/<!--\s*CMS:SETTINGS\s*(\{[\s\S]*?\})\s*-->/);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    return null;
+  }
+}
+
 const CongressoApresentacao = () => {
   const { t, i18n } = useTranslation();
   const [pageData, setPageData] = useState<CMSPageData | null>(null);
@@ -92,6 +104,21 @@ const CongressoApresentacao = () => {
     );
   }
 
+  // Extract optional editable settings from content_md
+  const settings = parseSettings(pageData?.content_md) || {};
+  const featuresTitle = settings.features_title || t('congress.presentation.why_participate', 'Por que Participar?');
+  const featuresDescription = settings.features_description || t('congress.presentation.why_description', 'Descubra as principais razões para fazer parte do maior evento de ensino de engenharia do Nordeste');
+  const feature1Title = settings.feature1_title || t('congress.features.networking.title', 'Networking Qualificado');
+  const feature1Desc = settings.feature1_description || t('congress.features.networking.description', 'Conecte-se com profissionais, pesquisadores e estudantes de todo o Nordeste');
+  const feature2Title = settings.feature2_title || t('congress.features.knowledge.title', 'Conhecimento Atualizado');
+  const feature2Desc = settings.feature2_description || t('congress.features.knowledge.description', 'Palestras e workshops com as mais recentes tendências em educação em engenharia');
+  const feature3Title = settings.feature3_title || t('congress.features.format.title', 'Formato Híbrido');
+  const feature3Desc = settings.feature3_description || t('congress.features.format.description', 'Participe presencialmente ou online, com total flexibilidade e interação');
+  const ctaTitle = settings.cta_title || t('congress.cta.title', 'Não Perca Esta Oportunidade!');
+  const ctaDescription = settings.cta_description || t('congress.cta.description', 'Junte-se a centenas de profissionais e estudantes que estão moldando o futuro da educação em engenharia');
+  const ctaButtonText = settings.cta_button_text || t('congress.cta.register_now', 'Inscreva-se Agora');
+  const ctaButtonLink = settings.cta_button_link || '/inscricoes';
+
   return (
     <>
       <Header />
@@ -154,10 +181,10 @@ const CongressoApresentacao = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-              {t('congress.presentation.why_participate', 'Por que Participar?')}
+              {featuresTitle}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('congress.presentation.why_description', 'Descubra as principais razões para fazer parte do maior evento de ensino de engenharia do Nordeste')}
+              {featuresDescription}
             </p>
           </div>
           
@@ -168,10 +195,10 @@ const CongressoApresentacao = () => {
                   <Users className="w-8 h-8 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">
-                  {t('congress.features.networking.title', 'Networking Qualificado')}
+                  {feature1Title}
                 </h3>
                 <p className="text-muted-foreground">
-                  {t('congress.features.networking.description', 'Conecte-se com profissionais, pesquisadores e estudantes de todo o Nordeste')}
+                  {feature1Desc}
                 </p>
               </CardContent>
             </Card>
@@ -182,10 +209,10 @@ const CongressoApresentacao = () => {
                   <Award className="w-8 h-8 text-secondary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">
-                  {t('congress.features.knowledge.title', 'Conhecimento Atualizado')}
+                  {feature2Title}
                 </h3>
                 <p className="text-muted-foreground">
-                  {t('congress.features.knowledge.description', 'Palestras e workshops com as mais recentes tendências em educação em engenharia')}
+                  {feature2Desc}
                 </p>
               </CardContent>
             </Card>
@@ -196,10 +223,10 @@ const CongressoApresentacao = () => {
                   <Play className="w-8 h-8 text-accent" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">
-                  {t('congress.features.format.title', 'Formato Híbrido')}
+                  {feature3Title}
                 </h3>
                 <p className="text-muted-foreground">
-                  {t('congress.features.format.description', 'Participe presencialmente ou online, com total flexibilidade e interação')}
+                  {feature3Desc}
                 </p>
               </CardContent>
             </Card>
@@ -211,15 +238,15 @@ const CongressoApresentacao = () => {
       <section className="py-16 bg-gradient-to-r from-primary/10 to-secondary/10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
-            {t('congress.cta.title', 'Não Perca Esta Oportunidade!')}
+            {ctaTitle}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t('congress.cta.description', 'Junte-se a centenas de profissionais e estudantes que estão moldando o futuro da educação em engenharia')}
+            {ctaDescription}
           </p>
           
           <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-            <Link to="/inscricoes">
-              {t('congress.cta.register_now', 'Inscreva-se Agora')}
+            <Link to={ctaButtonLink}>
+              {ctaButtonText}
             </Link>
           </Button>
         </div>
