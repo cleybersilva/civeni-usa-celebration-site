@@ -102,7 +102,7 @@ const CongressoApresentacao = () => {
         <div className="container relative mx-auto px-4 py-16 lg:py-24">
           <div className="text-center">
             <h1 className="text-5xl lg:text-7xl font-bold text-foreground mb-6 animate-fade-in">
-              III CIVENI - Congresso Internacional Multidisciplinar da VCCU
+              {pageData?.hero_title || 'III CIVENI - Congresso Internacional Multidisciplinar da VCCU'}
             </h1>
             
             <div className="max-w-4xl mx-auto">
@@ -119,7 +119,7 @@ const CongressoApresentacao = () => {
                 </Button>
                 
                 <Button asChild variant="outline" size="lg">
-                  <Link to="/cronograma-presencial">
+                  <Link to="/programacao-presencial">
                     <Calendar className="w-5 h-5 mr-2" />
                     {t('congress.presentation.schedule', 'Ver Programação')}
                   </Link>

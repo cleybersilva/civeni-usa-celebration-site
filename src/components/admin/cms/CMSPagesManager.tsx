@@ -257,6 +257,7 @@ const CMSPagesManager = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="congresso/apresentacao">Congresso - Apresentação</SelectItem>
+              <SelectItem value="congresso/comite">Congresso - Comitê</SelectItem>
               {/* Add more pages here as needed */}
             </SelectContent>
           </Select>

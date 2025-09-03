@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, Building, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -13,6 +14,16 @@ interface Committee {
   slug: string;
   name: string;
   sort_order: number;
+}
+
+interface CMSPageData {
+  id: string;
+  title: string;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_image_url?: string;
+  content_md: string;
+  status: string;
 }
 
 interface CommitteeMember {
@@ -34,6 +45,7 @@ const CongressoComite = () => {
   const [committees, setCommittees] = useState<Committee[]>([]);
   const [committeeMembers, setCommitteeMembers] = useState<CommitteeMember[]>([]);
   const [activeCommittee, setActiveCommittee] = useState<string>('');
+  const [pageData, setPageData] = useState<CMSPageData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,6 +55,32 @@ const CongressoComite = () => {
   const fetchData = async () => {
     try {
       const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language;
+      
+      // Fetch page data
+      const { data: pageDataResponse, error: pageError } = await supabase
+        .from('cms_pages')
+        .select('*')
+        .eq('slug', 'congresso/comite')
+        .eq('locale', locale)
+        .eq('status', 'published')
+        .single();
+
+      if (pageDataResponse) {
+        setPageData(pageDataResponse);
+      } else if (locale !== 'pt-BR') {
+        // Fallback to Portuguese
+        const { data: fallbackData } = await supabase
+          .from('cms_pages')
+          .select('*')
+          .eq('slug', 'congresso/comite')
+          .eq('locale', 'pt-BR')
+          .eq('status', 'published')
+          .single();
+        
+        if (fallbackData) {
+          setPageData(fallbackData);
+        }
+      }
       
       // Fetch committees
       const { data: committeesData, error: committeesError } = await supabase
@@ -131,11 +169,11 @@ const CongressoComite = () => {
         <div className="container relative mx-auto px-4 py-16 lg:py-24">
           <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-fade-in">
-              {t('congress.committee.title', 'Comitê do Congresso')}
+              {pageData?.hero_title || t('congress.committee.title', 'Comitê do Congresso')}
             </h1>
             
             <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-4xl mx-auto">
-              {t('congress.committee.description', 'Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência.')}
+              {pageData?.hero_subtitle || t('congress.committee.description', 'Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência.')}
             </p>
           </div>
         </div>
@@ -260,6 +298,19 @@ const CongressoComite = () => {
           )}
         </div>
       </section>
+
+      {/* Content Section */}
+      {pageData?.content_md && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <article className="prose prose-lg prose-slate max-w-none dark:prose-invert">
+                <ReactMarkdown>{pageData.content_md}</ReactMarkdown>
+              </article>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Acknowledgment Section */}
       <section className="py-16 bg-gradient-to-r from-primary/10 to-secondary/10">
