@@ -28,12 +28,28 @@ interface CMSPage {
   updated_at?: string;
 }
 
+interface PageSettings {
+  features_title?: string;
+  features_description?: string;
+  feature1_title?: string;
+  feature1_description?: string;
+  feature2_title?: string;
+  feature2_description?: string;
+  feature3_title?: string;
+  feature3_description?: string;
+  cta_title?: string;
+  cta_description?: string;
+  cta_button_text?: string;
+  cta_button_link?: string;
+}
+
 const CMSPagesManager = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('pt-BR');
   const [pages, setPages] = useState<CMSPage[]>([]);
   const [selectedSlug, setSelectedSlug] = useState('congresso/apresentacao');
+  const [pageSettings, setPageSettings] = useState<PageSettings>({});
   
   const [formData, setFormData] = useState<CMSPage>({
     slug: 'congresso/apresentacao',
@@ -49,6 +65,32 @@ const CMSPagesManager = () => {
   useEffect(() => {
     fetchPages();
   }, [selectedSlug]);
+
+  // Helper function to parse settings from content_md
+  const parseSettings = (contentMd?: string): PageSettings => {
+    if (!contentMd) return {};
+    const match = contentMd.match(/<!--\s*CMS:SETTINGS\s*(\{[\s\S]*?\})\s*-->/);
+    if (!match) return {};
+    try {
+      return JSON.parse(match[1]);
+    } catch {
+      return {};
+    }
+  };
+
+  // Helper function to update settings in content_md
+  const updateContentWithSettings = (contentMd: string = '', settings: PageSettings): string => {
+    const settingsJson = JSON.stringify(settings, null, 2);
+    const settingsBlock = `<!-- CMS:SETTINGS ${settingsJson} -->`;
+    
+    // If settings block exists, replace it
+    if (contentMd.includes('<!-- CMS:SETTINGS')) {
+      return contentMd.replace(/<!--\s*CMS:SETTINGS\s*\{[\s\S]*?\}\s*-->/, settingsBlock);
+    } else {
+      // Add settings block at the beginning
+      return settingsBlock + '\n\n' + contentMd;
+    }
+  };
 
   const fetchPages = async () => {
     try {
@@ -69,6 +111,7 @@ const CMSPagesManager = () => {
       const currentLocalePage = (data || []).find(p => p.locale === activeTab);
       if (currentLocalePage) {
         setFormData(currentLocalePage as CMSPage);
+        setPageSettings(parseSettings(currentLocalePage.content_md));
       } else {
         setFormData({
           slug: selectedSlug,
@@ -80,6 +123,7 @@ const CMSPagesManager = () => {
           content_md: '',
           status: 'published'
         });
+        setPageSettings({});
       }
     } catch (error) {
       console.error('Error:', error);
@@ -94,6 +138,9 @@ const CMSPagesManager = () => {
 
     setLoading(true);
     try {
+      // Update content with settings
+      const updatedContentMd = updateContentWithSettings(formData.content_md, pageSettings);
+      
       if (formData.id) {
         // Update existing page
         const { error } = await supabase
@@ -103,7 +150,7 @@ const CMSPagesManager = () => {
             hero_title: formData.hero_title,
             hero_subtitle: formData.hero_subtitle,
             hero_image_url: formData.hero_image_url,
-            content_md: formData.content_md,
+            content_md: updatedContentMd,
             status: formData.status,
             updated_at: new Date().toISOString()
           })
@@ -121,7 +168,7 @@ const CMSPagesManager = () => {
             hero_title: formData.hero_title,
             hero_subtitle: formData.hero_subtitle,
             hero_image_url: formData.hero_image_url,
-            content_md: formData.content_md,
+            content_md: updatedContentMd,
             status: formData.status
           }]);
 
@@ -178,6 +225,7 @@ const CMSPagesManager = () => {
     const pageInLocale = pages.find(p => p.locale === locale);
     if (pageInLocale) {
       setFormData(pageInLocale);
+      setPageSettings(parseSettings(pageInLocale.content_md));
     } else {
       setFormData({
         slug: selectedSlug,
@@ -189,7 +237,15 @@ const CMSPagesManager = () => {
         content_md: '',
         status: 'published'
       });
+      setPageSettings({});
     }
+  };
+
+  const handleSettingsChange = (field: keyof PageSettings, value: string) => {
+    setPageSettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const getPageUrl = (slug: string) => {
@@ -340,16 +396,155 @@ const CMSPagesManager = () => {
                 </div>
               </div>
 
+              {/* Page-specific settings */}
+              {selectedSlug === 'congresso/apresentacao' && (
+                <Card className="p-4 bg-muted/30">
+                  <h3 className="text-lg font-semibold mb-4">Configurações da Página de Apresentação</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Features Section */}
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Seção "Por que Participar?"</h4>
+                      <div>
+                        <Label>Título da Seção</Label>
+                        <Input
+                          value={pageSettings.features_title || ''}
+                          onChange={(e) => handleSettingsChange('features_title', e.target.value)}
+                          placeholder="Por que Participar?"
+                        />
+                      </div>
+                      <div>
+                        <Label>Descrição da Seção</Label>
+                        <Textarea
+                          value={pageSettings.features_description || ''}
+                          onChange={(e) => handleSettingsChange('features_description', e.target.value)}
+                          placeholder="Descubra as principais razões..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Feature 1 */}
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Benefício 1</h4>
+                      <div>
+                        <Label>Título</Label>
+                        <Input
+                          value={pageSettings.feature1_title || ''}
+                          onChange={(e) => handleSettingsChange('feature1_title', e.target.value)}
+                          placeholder="Networking Qualificado"
+                        />
+                      </div>
+                      <div>
+                        <Label>Descrição</Label>
+                        <Textarea
+                          value={pageSettings.feature1_description || ''}
+                          onChange={(e) => handleSettingsChange('feature1_description', e.target.value)}
+                          placeholder="Conecte-se com profissionais..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Feature 2 */}
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Benefício 2</h4>
+                      <div>
+                        <Label>Título</Label>
+                        <Input
+                          value={pageSettings.feature2_title || ''}
+                          onChange={(e) => handleSettingsChange('feature2_title', e.target.value)}
+                          placeholder="Conhecimento Atualizado"
+                        />
+                      </div>
+                      <div>
+                        <Label>Descrição</Label>
+                        <Textarea
+                          value={pageSettings.feature2_description || ''}
+                          onChange={(e) => handleSettingsChange('feature2_description', e.target.value)}
+                          placeholder="Palestras e workshops..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Feature 3 */}
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Benefício 3</h4>
+                      <div>
+                        <Label>Título</Label>
+                        <Input
+                          value={pageSettings.feature3_title || ''}
+                          onChange={(e) => handleSettingsChange('feature3_title', e.target.value)}
+                          placeholder="Formato Híbrido"
+                        />
+                      </div>
+                      <div>
+                        <Label>Descrição</Label>
+                        <Textarea
+                          value={pageSettings.feature3_description || ''}
+                          onChange={(e) => handleSettingsChange('feature3_description', e.target.value)}
+                          placeholder="Participe presencialmente ou online..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+
+                    {/* CTA Section */}
+                    <div className="space-y-3 lg:col-span-2">
+                      <h4 className="font-medium">Seção "Call to Action"</h4>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        <div>
+                          <Label>Título da CTA</Label>
+                          <Input
+                            value={pageSettings.cta_title || ''}
+                            onChange={(e) => handleSettingsChange('cta_title', e.target.value)}
+                            placeholder="Não Perca Esta Oportunidade!"
+                          />
+                        </div>
+                        <div>
+                          <Label>Texto do Botão</Label>
+                          <Input
+                            value={pageSettings.cta_button_text || ''}
+                            onChange={(e) => handleSettingsChange('cta_button_text', e.target.value)}
+                            placeholder="Inscreva-se Agora"
+                          />
+                        </div>
+                        <div>
+                          <Label>Link do Botão</Label>
+                          <Input
+                            value={pageSettings.cta_button_link || ''}
+                            onChange={(e) => handleSettingsChange('cta_button_link', e.target.value)}
+                            placeholder="/inscricoes"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Descrição da CTA</Label>
+                        <Textarea
+                          value={pageSettings.cta_description || ''}
+                          onChange={(e) => handleSettingsChange('cta_description', e.target.value)}
+                          placeholder="Junte-se a centenas de profissionais..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+
               <div>
-                <Label htmlFor="content_md">Conteúdo (Markdown)</Label>
+                <Label htmlFor="content_md">Conteúdo Principal (Markdown)</Label>
                 <Textarea
                   id="content_md"
                   value={formData.content_md || ''}
                   onChange={(e) => handleInputChange('content_md', e.target.value)}
                   placeholder="Conteúdo em Markdown..."
-                  rows={12}
+                  rows={8}
                   className="font-mono"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Este é o conteúdo principal que aparece na seção central da página
+                </p>
               </div>
             </div>
           </Tabs>
