@@ -111,7 +111,7 @@ const CongressoApresentacao = () => {
   const feature1Title = settings.feature1_title || t('congress.features.networking.title', 'Networking Qualificado');
   const feature1Desc = settings.feature1_description || t('congress.features.networking.description', 'Conecte-se com profissionais, pesquisadores e estudantes de todo o MUNDO');
   const feature2Title = settings.feature2_title || t('congress.features.knowledge.title', 'Conhecimento Atualizado');
-  const feature2Desc = settings.feature2_description || t('congress.features.knowledge.description', 'Palestras e workshops com as mais recentes tendências em educação em engenharia');
+  const feature2Desc = settings.feature2_description || t('congress.features.knowledge.description', 'Palestras e workshops com as mais recentes tendências em educação, inovação, justiça, humanidade, religiosidade e tecnologia');
   const feature3Title = settings.feature3_title || t('congress.features.format.title', 'Formato Híbrido');
   const feature3Desc = settings.feature3_description || t('congress.features.format.description', 'Participe presencialmente ou online, com total flexibilidade e interação');
   const ctaTitle = settings.cta_title || t('congress.cta.title', 'Não Perca Esta Oportunidade!');
