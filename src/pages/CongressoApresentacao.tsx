@@ -115,7 +115,7 @@ const CongressoApresentacao = () => {
   const feature3Title = settings.feature3_title || t('congress.features.format.title', 'Formato Híbrido');
   const feature3Desc = settings.feature3_description || t('congress.features.format.description', 'Participe presencialmente ou online, com total flexibilidade e interação');
   const ctaTitle = settings.cta_title || t('congress.cta.title', 'Não Perca Esta Oportunidade!');
-  const ctaDescription = settings.cta_description || t('congress.cta.description', 'Junte-se a centenas de profissionais e estudantes que estão moldando o futuro da educação em engenharia');
+  const ctaDescription = settings.cta_description || t('congress.cta.description', 'Junte-se a centenas de profissionais e estudantes que estão moldando o futuro da educação com inovação, justiça, humanidade, religiosidade e tecnologia');
   const ctaButtonText = settings.cta_button_text || t('congress.cta.register_now', 'Inscreva-se Agora');
   const ctaButtonLink = settings.cta_button_link || '/inscricoes';
 
