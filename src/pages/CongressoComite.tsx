@@ -332,7 +332,7 @@ const CongressoComite = () => {
           </h2>
           
           <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            {t('congress.committee.acknowledgment.description', 'Nosso sincero agradecimento a todos os membros do comitê que dedicam seu tempo e expertise para tornar o CIVENI um evento de referência no ensino de engenharia. Seu comprometimento e dedicação são fundamentais para o sucesso do congresso.')}
+            {t('congress.committee.acknowledgment.description', 'Nosso sincero agradecimento a todos os membros do comitê que dedicam seu tempo e expertise para tornar o CIVENI um evento de referência no universo da educação mundial. Seu comprometimento e dedicação são fundamentais para o sucesso do congresso.')}
           </p>
           
           <div className="flex items-center justify-center">
