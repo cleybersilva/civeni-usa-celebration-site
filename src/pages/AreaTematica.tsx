@@ -3,49 +3,38 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { BookOpen, Lightbulb, Users, Globe, Brain, Laptop } from 'lucide-react';
+import { BookOpen, Heart, Scale, Users, Globe, Laptop } from 'lucide-react';
+import { useThematicAreas } from '@/hooks/useThematicAreas';
 
 const AreaTematica = () => {
   const { t } = useTranslation();
+  const { thematicAreas, isLoading, getLocalizedContent } = useThematicAreas();
 
-  const thematicAreas = [
-    {
-      id: 1,
-      icon: BookOpen,
-      name: "Educação e Tecnologia",
-      description: "Inovações tecnológicas no processo educativo e metodologias de ensino digital."
-    },
-    {
-      id: 2,
-      icon: Lightbulb,
-      name: "Metodologias Inovadoras",
-      description: "Novas abordagens pedagógicas e estratégias de ensino-aprendizagem."
-    },
-    {
-      id: 3,
-      icon: Users,
-      name: "Formação Docente",
-      description: "Capacitação e desenvolvimento profissional de educadores."
-    },
-    {
-      id: 4,
-      icon: Globe,
-      name: "Educação Global",
-      description: "Perspectivas internacionais e multiculturais na educação."
-    },
-    {
-      id: 5,
-      icon: Brain,
-      name: "Neuroeducação",
-      description: "Aplicação de conhecimentos neurocientíficos no processo educativo."
-    },
-    {
-      id: 6,
-      icon: Laptop,
-      name: "Educação Digital",
-      description: "Ensino a distância, plataformas digitais e ambientes virtuais de aprendizagem."
-    }
-  ];
+  // Icon mapping
+  const iconMap = {
+    BookOpen,
+    Heart,
+    Scale,
+    Users,
+    Globe,
+    Laptop
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white font-poppins">
+        <Header />
+        <main className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <div className="text-xl">{t('common.loading', 'Carregando...')}</div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-poppins">
@@ -63,22 +52,27 @@ const AreaTematica = () => {
           </div>
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            {thematicAreas.map((area) => (
-              <div
-                key={area.id}
-                className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-gray-100"
-              >
-                <div className="flex items-center justify-center w-16 h-16 bg-civeni-blue rounded-full mb-6 mx-auto">
-                  <area.icon className="w-8 h-8 text-white" />
+            {thematicAreas?.map((area) => {
+              const { name, description } = getLocalizedContent(area);
+              const IconComponent = iconMap[area.icon_name as keyof typeof iconMap] || BookOpen;
+              
+              return (
+                <div
+                  key={area.id}
+                  className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-gray-100"
+                >
+                  <div className={`flex items-center justify-center w-16 h-16 bg-${area.color_class || 'civeni-blue'} rounded-full mb-6 mx-auto`}>
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-civeni-blue mb-4 font-poppins text-center">
+                    {name}
+                  </h3>
+                  <p className="text-gray-700 text-center leading-relaxed">
+                    {description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-civeni-blue mb-4 font-poppins text-center">
-                  {area.name}
-                </h3>
-                <p className="text-gray-700 text-center leading-relaxed">
-                  {area.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
           
           <div className="mt-16 text-center">

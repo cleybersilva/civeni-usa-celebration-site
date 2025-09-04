@@ -24,6 +24,7 @@ import WorkSubmissionsManager from '@/components/admin/WorkSubmissionsManager';
 import WorksManager from '@/components/admin/WorksManager';
 import MidiaDigitalManager from '@/components/admin/MidiaDigitalManager';
 import CongressoManager from '@/components/admin/CongressoManager';
+import ThematicAreasManager from '@/components/admin/ThematicAreasManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -71,6 +72,13 @@ const AdminDashboardContent = () => {
       case 'midia-digital':
         return (hasPermission('banner') || hasPermission('videos') || hasPermission('palestrantes') || isAdminRoot()) ? (
           <MidiaDigitalManager />
+        ) : null;
+      
+      case 'areas-tematicas':
+        return (hasPermission('textos') || isAdminRoot()) ? (
+          <PermissionGuard resource="textos">
+            <ThematicAreasManager />
+          </PermissionGuard>
         ) : null;
       
       case 'congresso':

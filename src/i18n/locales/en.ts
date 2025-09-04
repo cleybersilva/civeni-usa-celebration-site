@@ -294,7 +294,10 @@ export const enTranslations = {
       registration: "Registration",
       contact: "Contact",
       copyright: "© 2025 III CIVENI USA. All rights reserved.",
-      privacyPolicy: "Privacy Policy"
+      privacyPolicy: "Privacy Policy",
+      eventTitle: "III International Multidisciplinary Congress of VCCU",
+      eventDates: "December 11, 12 and 13, 2025 • Celebration, Florida",
+      poweredBy: "Powered by CIVENI • Veni Creator Christian University"
     },
     admin: {
       eventDescription: "International Congress of Educational Innovation and New Technologies is the main event that brings together educators, researchers and technology professionals from around the world.",
@@ -335,7 +338,7 @@ export const enTranslations = {
         online: "Online",
         speakers: "Speakers",
         partners: "Partners",
-        texts: "Texts",
+        thematicAreas: "Thematic Areas",
         users: "Users",
         videos: "Videos",
         digitalMedia: "Digital Media"

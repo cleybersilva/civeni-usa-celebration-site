@@ -26,8 +26,8 @@ const Footer = () => {
               III CIVENI <span className="text-civeni-red">2025</span>
             </div>
             <p className="text-lg opacity-90 mb-6 leading-relaxed">
-              III International Multidisciplinary Congress of VCCU<br/>
-              December 8-10, 2025 • Celebration, Florida
+              {t('footer.eventTitle')}<br/>
+              {t('footer.eventDates')}
             </p>
             <div className="flex items-center space-x-4 mb-4">
               <a 
@@ -114,7 +114,7 @@ const Footer = () => {
               {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
             <div className="text-sm opacity-75">
-              Powered by CIVENI • Veni Creator Christian University
+              {t('footer.poweredBy')}
             </div>
             <div className="text-sm opacity-75">
               <Link 

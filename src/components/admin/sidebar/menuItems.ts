@@ -34,8 +34,8 @@ export const createMenuItems = (
     },
     // Demais itens serão ordenados alfabeticamente
     {
-      id: 'congresso',
-      label: t('admin.menu.congress', 'Congresso'),
+      id: 'areas-tematicas',
+      label: t('admin.menu.thematicAreas', 'Áreas Temáticas'),
       icon: FileText,
       show: hasPermission('textos') || isAdminRoot(),
       isPriority: false

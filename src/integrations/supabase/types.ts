@@ -1290,6 +1290,60 @@ export type Database = {
         }
         Relationships: []
       }
+      thematic_areas: {
+        Row: {
+          color_class: string | null
+          created_at: string
+          description_en: string | null
+          description_es: string | null
+          description_pt: string
+          description_tr: string | null
+          icon_name: string
+          id: string
+          is_active: boolean
+          name_en: string | null
+          name_es: string | null
+          name_pt: string
+          name_tr: string | null
+          order_index: number
+          updated_at: string
+        }
+        Insert: {
+          color_class?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_es?: string | null
+          description_pt: string
+          description_tr?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          name_en?: string | null
+          name_es?: string | null
+          name_pt: string
+          name_tr?: string | null
+          order_index?: number
+          updated_at?: string
+        }
+        Update: {
+          color_class?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_es?: string | null
+          description_pt?: string
+          description_tr?: string | null
+          icon_name?: string
+          id?: string
+          is_active?: boolean
+          name_en?: string | null
+          name_es?: string | null
+          name_pt?: string
+          name_tr?: string | null
+          order_index?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transmissoes_live: {
         Row: {
           created_at: string

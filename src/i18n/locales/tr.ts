@@ -294,7 +294,10 @@ export const trTranslations = {
       registration: "Kayıt",
       contact: "İletişim",
       copyright: "© 2025 III CIVENI ABD. Tüm hakları saklıdır.",
-      privacyPolicy: "Gizlilik Politikası"
+      privacyPolicy: "Gizlilik Politikası",
+      eventTitle: "III VCCU Uluslararası Multidisipliner Kongresi",
+      eventDates: "11, 12 ve 13 Aralık 2025 • Celebration, Florida",
+      poweredBy: "Powered by CIVENI • Veni Creator Christian University"
     },
     admin: {
       eventDescription: "Uluslararası Eğitim İnovasyonu ve Yeni Teknolojiler Kongresi, dünya çapından eğitimcileri, araştırmacıları ve teknoloji profesyonellerini bir araya getiren ana etkinliktir.",
@@ -335,7 +338,7 @@ export const trTranslations = {
         online: "Online",
         speakers: "Konuşmacılar",
         partners: "Ortaklar",
-        texts: "Metinler",
+        thematicAreas: "Tematik Alanlar",
         users: "Kullanıcılar",
         videos: "Videolar",
         digitalMedia: "Dijital Medya"
