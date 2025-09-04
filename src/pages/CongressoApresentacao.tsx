@@ -106,8 +106,8 @@ const CongressoApresentacao = () => {
 
   // Extract optional editable settings from content_md
   const settings = parseSettings(pageData?.content_md) || {};
-  const featuresTitle = settings.features_title || t('congress.presentation.why_participate', 'Por que Participar?');
-  const featuresDescription = settings.features_description || t('congress.presentation.why_description', 'Descubra as principais razões para fazer parte do maior evento de ensino de engenharia do Nordeste');
+  const featuresTitle = settings.features_title || t('congress.presentation.why_participate', 'Por que Participar do III Civeni 2025?');
+  const featuresDescription = settings.features_description || t('congress.presentation.why_description', 'Descubra as principais razões para fazer parte do maior Congresso Internacional Multidisciplinar do MUNDO');
   const feature1Title = settings.feature1_title || t('congress.features.networking.title', 'Networking Qualificado');
   const feature1Desc = settings.feature1_description || t('congress.features.networking.description', 'Conecte-se com profissionais, pesquisadores e estudantes de todo o Nordeste');
   const feature2Title = settings.feature2_title || t('congress.features.knowledge.title', 'Conhecimento Atualizado');
