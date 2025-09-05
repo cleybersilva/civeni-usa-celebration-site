@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
 
 const CountdownTimer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { content } = useCMS();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -17,8 +17,12 @@ const CountdownTimer = () => {
     // Use counter settings from database if available
     const eventDate = content.counterSettings?.eventDate || content.eventConfig.eventDate;
     if (!eventDate) return;
-    
-    const targetDate = new Date(eventDate + 'T00:00:00').getTime();
+
+    // Prefer the configured start time (with seconds if provided)
+    const rawTime = content.eventConfig.startTime || '00:00:00';
+    const time = /\d{2}:\d{2}:\d{2}/.test(rawTime) ? rawTime : `${rawTime}:00`;
+
+    const targetDate = new Date(`${eventDate}T${time}`).getTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -40,7 +44,7 @@ const CountdownTimer = () => {
     const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
-  }, [content.eventConfig.eventDate, content.counterSettings?.eventDate]);
+  }, [content.eventConfig.eventDate, content.eventConfig.startTime, content.counterSettings?.eventDate]);
 
   // Escutar evento personalizado para atualização
   useEffect(() => {
@@ -63,9 +67,36 @@ const CountdownTimer = () => {
     { label: t('countdown.seconds'), value: timeLeft.seconds }
   ];
 
+  const localeMap: Record<string, string> = {
+    pt: 'pt-BR',
+    en: 'en-US',
+    es: 'es-ES',
+    tr: 'tr-TR',
+  };
+  const eventDateStr = content.counterSettings?.eventDate || content.eventConfig.eventDate;
+  const firstDayLabel = eventDateStr
+    ? new Date(eventDateStr).toLocaleDateString(localeMap[i18n.language] || i18n.language || 'pt-BR', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      })
+    : '';
+
   return (
     <section className="py-20 bg-gradient-to-r from-civeni-blue to-civeni-red">
       <div className="container mx-auto px-4 text-center">
+        {/* Logo + 1º dia do evento */}
+        <div className="mb-6 flex flex-col items-center justify-center">
+          <img
+            src={"/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png"}
+            alt="Logo do evento"
+            className="h-16 w-auto mb-3"
+          />
+          {firstDayLabel && (
+            <div className="text-white/90 text-sm font-medium">
+              {firstDayLabel}
+            </div>
+          )}
+        </div>
+
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-poppins">
           {t('countdown.title')}
         </h2>

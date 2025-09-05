@@ -92,7 +92,7 @@ const AdminDashboardContent = () => {
       case 'contador':
         return (hasPermission('contador') || isAdminRoot()) ? (
           <PermissionGuard resource="contador">
-            <CounterConfigManager />
+            <EventConfigManager />
           </PermissionGuard>
         ) : null;
       
