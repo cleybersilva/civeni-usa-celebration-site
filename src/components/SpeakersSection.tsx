@@ -1,6 +1,7 @@
 
-import { Speaker, useCMS } from '@/contexts/CMSContext';
-import { resolveAssetUrl } from '@/utils/assetUrl';
+import SpeakerImagePlaceholder from '@/components/SpeakerImagePlaceholder';
+import { useCMS } from '@/contexts/CMSContext';
+import { useFixedSpeakerImage } from '@/hooks/useFixedSpeakerImage';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,37 +12,37 @@ const SpeakersSection = () => {
   
   const speakers = content.speakers.sort((a, b) => a.order - b.order);
 
-  // Função para obter imagem padrão de palestrante
-  const getDefaultSpeakerImage = () => {
-    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZ0dyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjNmNGY2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZTVlN2ViIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9InVybCgjYmdHcmFkaWVudCkiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIxNDAiIHI9IjUwIiBmaWxsPSIjOWNhM2FmIi8+PHBhdGggZD0ibTEwMCAzMjBjMC00NCA0MC04MCA5MC04MGgxMjBjNTAgMCA5MCAzNiA5MCA4MHYyMGgtMzAweiIgZmlsbD0iIzljYTNhZiIvPjx0ZXh0IHg9IjIwMCIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2YjczODAiPkltYWdlbSBOw6NvIERpc3BvbsOtdmVsPC90ZXh0Pjwvc3ZnPg==';
-  };
-
-  // Função para obter URL segura da imagem do palestrante
-  const getSpeakerImageSrc = (speaker: Speaker): string => {
-    if (!speaker.image) {
-      console.info('No image provided for speaker:', speaker.name, '- using default');
-      return getDefaultSpeakerImage();
-    }
-
-    // Se for uma imagem base64, verificar se não é muito grande
-    if (speaker.image.startsWith('data:')) {
-      // Se a string base64 for muito grande (>50KB), usar imagem padrão
-      if (speaker.image.length > 50000) {
-        console.info('Speaker image too large (>50KB), using default for:', speaker.name);
-        return getDefaultSpeakerImage();
-      }
-      return speaker.image;
-    }
-
-    try {
-      // Para URLs normais, usar resolveAssetUrl com versioning
-      const version = speaker.photoVersion || Date.now();
-      const resolvedUrl = resolveAssetUrl(speaker.image);
-      return `${resolvedUrl}?v=${version}`;
-    } catch (error) {
-      console.warn('Error resolving speaker image URL for:', speaker.name, error);
-      return getDefaultSpeakerImage();
-    }
+  // Componente para a imagem do speaker atual
+  const CurrentSpeakerImage = () => {
+    const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speakers[currentSpeaker]);
+    
+    return (
+      <div className="relative w-full h-64 md:h-full">
+        {hasError ? (
+          <SpeakerImagePlaceholder
+            name={speakers[currentSpeaker].name}
+            showError={true}
+            onRetry={retryLoad}
+            isLoading={isLoading}
+          />
+        ) : (
+          <>
+            <img
+              src={imageSrc}
+              alt={speakers[currentSpeaker].name}
+              className={`w-full h-full object-cover transition-opacity duration-300 ${
+                isLoading ? 'opacity-50' : 'opacity-100'
+              }`}
+            />
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
   };
 
   const nextSpeaker = () => {
@@ -72,22 +73,7 @@ const SpeakersSection = () => {
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div className="md:flex">
               <div className="md:w-1/3">
-                <img
-                  src={getSpeakerImageSrc(speakers[currentSpeaker])}
-                  alt={speakers[currentSpeaker].name}
-                  className="w-full h-64 md:h-full object-cover"
-                  onError={(e) => {
-                    console.info('Image load failed for speaker:', speakers[currentSpeaker].name, '- using fallback');
-                    // Set fallback image directly
-                    const target = e.currentTarget as HTMLImageElement;
-                    if (target && target.src !== getDefaultSpeakerImage()) {
-                      target.src = getDefaultSpeakerImage();
-                    }
-                  }}
-                  onLoad={() => {
-                    console.info('Successfully loaded image for speaker:', speakers[currentSpeaker].name);
-                  }}
-                />
+                <CurrentSpeakerImage />
               </div>
               <div className="md:w-2/3 p-8">
                 <h3 className="text-3xl font-bold text-civeni-blue mb-2 font-poppins">
