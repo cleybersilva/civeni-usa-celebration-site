@@ -39,7 +39,7 @@ const HeroBanner = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ 
-              backgroundImage: `url(${resolveAssetUrl(slide.bgImage)})`,
+              backgroundImage: `url(${resolveAssetUrl(slide.bgImage)}?v=${slide.imageVersion || 1})`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat'

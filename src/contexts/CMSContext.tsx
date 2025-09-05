@@ -10,6 +10,8 @@ export interface Speaker {
   image: string;
   bio: string;
   order: number;
+  photoVersion?: number;
+  updatedAt?: string;
 }
 
 export interface BannerSlide {
@@ -21,6 +23,8 @@ export interface BannerSlide {
   buttonText: string;
   buttonLink: string;
   order: number;
+  imageVersion?: number;
+  updatedAt?: string;
 }
 
 export interface RegistrationTier {
@@ -117,6 +121,22 @@ export interface HybridActivity {
   is_active: boolean;
 }
 
+export interface CounterSettings {
+  id: string;
+  eventDate: string;
+  eventTitlePt: string;
+  eventTitleEn: string;
+  eventTitleEs: string;
+  eventTitleTr: string;
+  eventDescriptionPt: string;
+  eventDescriptionEn: string;
+  eventDescriptionEs: string;
+  eventDescriptionTr: string;
+  isActive: boolean;
+  updatedBy?: string;
+  updatedAt?: string;
+}
+
 export interface CMSContent {
   speakers: Speaker[];
   bannerSlides: BannerSlide[];
@@ -129,6 +149,7 @@ export interface CMSContent {
   videos: Video[];
   siteTexts: SiteTexts;
   hybridActivities: HybridActivity[];
+  counterSettings?: CounterSettings;
 }
 
 interface CMSContextType {
@@ -444,7 +465,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           bgImage: bgImage,
           buttonText: slide.button_text,
           buttonLink: slide.button_link,
-          order: slide.order_index
+          order: slide.order_index,
+          imageVersion: slide.image_version,
+          updatedAt: slide.updated_at
         };
       }) || defaultContent.bannerSlides;
 
@@ -472,7 +495,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         institution: speaker.institution,
         image: speaker.image_url || '',
         bio: speaker.bio,
-        order: speaker.order_index
+        order: speaker.order_index,
+        photoVersion: speaker.photo_version,
+        updatedAt: speaker.updated_at
       })) || defaultContent.speakers;
 
       // Carregar configurações do evento do Supabase
@@ -532,6 +557,33 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         order: video.order_index
       })) || (adminMode ? [] : defaultContent.videos);
 
+      // Load counter settings
+      const { data: counterData, error: counterError } = await supabase
+        .from('counter_settings')
+        .select('*')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      let counterSettings = undefined;
+      if (counterData && !counterError) {
+        counterSettings = {
+          id: counterData.id,
+          eventDate: counterData.event_date,
+          eventTitlePt: counterData.event_title_pt,
+          eventTitleEn: counterData.event_title_en,
+          eventTitleEs: counterData.event_title_es,
+          eventTitleTr: counterData.event_title_tr,
+          eventDescriptionPt: counterData.event_description_pt,
+          eventDescriptionEn: counterData.event_description_en,
+          eventDescriptionEs: counterData.event_description_es,
+          eventDescriptionTr: counterData.event_description_tr,
+          isActive: counterData.is_active,
+          updatedBy: counterData.updated_by,
+          updatedAt: counterData.updated_at
+        };
+      }
+
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
 
@@ -541,7 +593,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         speakers,
         eventConfig, 
         hybridActivities,
-        videos: videosFormatted
+        videos: videosFormatted,
+        counterSettings
       }));
       
       console.log('CMSContext - Final content state hybridActivities:', hybridActivities);

@@ -109,6 +109,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          image_version: number
           is_active: boolean
           order_index: number
           subtitle: string
@@ -122,6 +123,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          image_version?: number
           is_active?: boolean
           order_index?: number
           subtitle: string
@@ -135,6 +137,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          image_version?: number
           is_active?: boolean
           order_index?: number
           subtitle?: string
@@ -323,6 +326,7 @@ export type Database = {
           is_active: boolean
           name: string
           order_index: number
+          photo_version: number
           title: string
           updated_at: string
         }
@@ -335,6 +339,7 @@ export type Database = {
           is_active?: boolean
           name: string
           order_index?: number
+          photo_version?: number
           title: string
           updated_at?: string
         }
@@ -347,6 +352,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           order_index?: number
+          photo_version?: number
           title?: string
           updated_at?: string
         }
@@ -448,6 +454,57 @@ export type Database = {
           nome?: string
           ordem?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      counter_settings: {
+        Row: {
+          created_at: string
+          event_date: string | null
+          event_description_en: string | null
+          event_description_es: string | null
+          event_description_pt: string | null
+          event_description_tr: string | null
+          event_title_en: string | null
+          event_title_es: string | null
+          event_title_pt: string | null
+          event_title_tr: string | null
+          id: string
+          is_active: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_date?: string | null
+          event_description_en?: string | null
+          event_description_es?: string | null
+          event_description_pt?: string | null
+          event_description_tr?: string | null
+          event_title_en?: string | null
+          event_title_es?: string | null
+          event_title_pt?: string | null
+          event_title_tr?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_date?: string | null
+          event_description_en?: string | null
+          event_description_es?: string | null
+          event_description_pt?: string | null
+          event_description_tr?: string | null
+          event_title_en?: string | null
+          event_title_es?: string | null
+          event_title_pt?: string | null
+          event_title_tr?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -1717,6 +1774,22 @@ export type Database = {
       }
       revoke_admin_session: {
         Args: { session_token: string; user_email: string }
+        Returns: Json
+      }
+      save_counter_settings: {
+        Args: {
+          p_event_date: string
+          p_event_description_en: string
+          p_event_description_es: string
+          p_event_description_pt: string
+          p_event_description_tr: string
+          p_event_title_en: string
+          p_event_title_es: string
+          p_event_title_pt: string
+          p_event_title_tr: string
+          p_session_token: string
+          p_user_email: string
+        }
         Returns: Json
       }
       set_current_user_email_secure: {

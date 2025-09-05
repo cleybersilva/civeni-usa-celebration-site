@@ -25,6 +25,7 @@ import WorksManager from '@/components/admin/WorksManager';
 import MidiaDigitalManager from '@/components/admin/MidiaDigitalManager';
 import CongressoManager from '@/components/admin/CongressoManager';
 import ThematicAreasManager from '@/components/admin/ThematicAreasManager';
+import CounterConfigManager from '@/components/admin/CounterConfigManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -91,7 +92,7 @@ const AdminDashboardContent = () => {
       case 'contador':
         return (hasPermission('contador') || isAdminRoot()) ? (
           <PermissionGuard resource="contador">
-            <EventConfigManager />
+            <CounterConfigManager />
           </PermissionGuard>
         ) : null;
       

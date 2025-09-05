@@ -14,9 +14,11 @@ const CountdownTimer = () => {
   });
 
   useEffect(() => {
-    if (!content.eventConfig.eventDate) return;
+    // Use counter settings from database if available
+    const eventDate = content.counterSettings?.eventDate || content.eventConfig.eventDate;
+    if (!eventDate) return;
     
-    const targetDate = new Date(content.eventConfig.eventDate + 'T00:00:00').getTime();
+    const targetDate = new Date(eventDate + 'T00:00:00').getTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -38,7 +40,7 @@ const CountdownTimer = () => {
     const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
-  }, [content.eventConfig.eventDate]);
+  }, [content.eventConfig.eventDate, content.counterSettings?.eventDate]);
 
   // Escutar evento personalizado para atualização
   useEffect(() => {

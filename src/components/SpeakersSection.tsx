@@ -40,7 +40,7 @@ const SpeakersSection = () => {
             <div className="md:flex">
               <div className="md:w-1/3">
                 <img
-                  src={resolveAssetUrl(speakers[currentSpeaker].image)}
+                  src={`${resolveAssetUrl(speakers[currentSpeaker].image)}?v=${speakers[currentSpeaker].photoVersion || 1}`}
                   alt={speakers[currentSpeaker].name}
                   className="w-full h-64 md:h-full object-cover"
                   onError={(e) => {
