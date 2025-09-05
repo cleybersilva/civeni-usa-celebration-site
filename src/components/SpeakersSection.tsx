@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useCMS } from '@/contexts/CMSContext';
+import { Speaker, useCMS } from '@/contexts/CMSContext';
 import { resolveAssetUrl } from '@/utils/assetUrl';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const SpeakersSection = () => {
   const { t } = useTranslation();
@@ -10,6 +10,39 @@ const SpeakersSection = () => {
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
   const speakers = content.speakers.sort((a, b) => a.order - b.order);
+
+  // Função para obter imagem padrão de palestrante
+  const getDefaultSpeakerImage = () => {
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZ0dyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjNmNGY2Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZTVlN2ViIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9InVybCgjYmdHcmFkaWVudCkiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIxNDAiIHI9IjUwIiBmaWxsPSIjOWNhM2FmIi8+PHBhdGggZD0ibTEwMCAzMjBjMC00NCA0MC04MCA5MC04MGgxMjBjNTAgMCA5MCAzNiA5MCA4MHYyMGgtMzAweiIgZmlsbD0iIzljYTNhZiIvPjx0ZXh0IHg9IjIwMCIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2YjczODAiPkltYWdlbSBOw6NvIERpc3BvbsOtdmVsPC90ZXh0Pjwvc3ZnPg==';
+  };
+
+  // Função para obter URL segura da imagem do palestrante
+  const getSpeakerImageSrc = (speaker: Speaker): string => {
+    if (!speaker.image) {
+      console.info('No image provided for speaker:', speaker.name, '- using default');
+      return getDefaultSpeakerImage();
+    }
+
+    // Se for uma imagem base64, verificar se não é muito grande
+    if (speaker.image.startsWith('data:')) {
+      // Se a string base64 for muito grande (>50KB), usar imagem padrão
+      if (speaker.image.length > 50000) {
+        console.info('Speaker image too large (>50KB), using default for:', speaker.name);
+        return getDefaultSpeakerImage();
+      }
+      return speaker.image;
+    }
+
+    try {
+      // Para URLs normais, usar resolveAssetUrl com versioning
+      const version = speaker.photoVersion || Date.now();
+      const resolvedUrl = resolveAssetUrl(speaker.image);
+      return `${resolvedUrl}?v=${version}`;
+    } catch (error) {
+      console.warn('Error resolving speaker image URL for:', speaker.name, error);
+      return getDefaultSpeakerImage();
+    }
+  };
 
   const nextSpeaker = () => {
     setCurrentSpeaker((prev) => (prev + 1) % speakers.length);
@@ -40,37 +73,19 @@ const SpeakersSection = () => {
             <div className="md:flex">
               <div className="md:w-1/3">
                 <img
-                  src={`${resolveAssetUrl(speakers[currentSpeaker].image)}?v=${speakers[currentSpeaker].photoVersion || 1}`}
+                  src={getSpeakerImageSrc(speakers[currentSpeaker])}
                   alt={speakers[currentSpeaker].name}
                   className="w-full h-64 md:h-full object-cover"
                   onError={(e) => {
-                    console.warn('Failed to load speaker image:', speakers[currentSpeaker].image);
-                    // Try alternative paths for cPanel
-                    const fallbackPaths = [
-                      `./public/${speakers[currentSpeaker].image.replace(/^\/+/, '')}`,
-                      `public/${speakers[currentSpeaker].image.replace(/^\/+/, '')}`,
-                      speakers[currentSpeaker].image
-                    ];
-                    
-                    let pathIndex = 0;
-                    const tryNextPath = () => {
-                      if (pathIndex < fallbackPaths.length) {
-                        const testImg = new Image();
-                        testImg.onload = () => {
-                          (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
-                        };
-                        testImg.onerror = () => {
-                          pathIndex++;
-                          if (pathIndex < fallbackPaths.length) {
-                            tryNextPath();
-                          } else {
-                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE2MCIgcj0iNjAiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTEwMCAzMDBDMTAwIDI1MCA1MCAyMDAgMjAwIDIwMFMzMDAgMjUwIDMwMCAzMDBIMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
-                          }
-                        };
-                        testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
-                      }
-                    };
-                    tryNextPath();
+                    console.info('Image load failed for speaker:', speakers[currentSpeaker].name, '- using fallback');
+                    // Set fallback image directly
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (target && target.src !== getDefaultSpeakerImage()) {
+                      target.src = getDefaultSpeakerImage();
+                    }
+                  }}
+                  onLoad={() => {
+                    console.info('Successfully loaded image for speaker:', speakers[currentSpeaker].name);
                   }}
                 />
               </div>
