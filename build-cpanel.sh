@@ -19,6 +19,9 @@ rm -f civeni-saas-cpanel.zip
 
 # Executar build de produção
 echo "⚡ Gerando build de produção..."
+# Definir variável de ambiente para produção
+export NODE_ENV=production
+export VITE_PRODUCTION=true
 npm run build
 
 # Verificar se o build foi bem-sucedido
@@ -58,12 +61,21 @@ RewriteRule . /index.html [L]
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: https: blob:; media-src 'self' data: https: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.google.com https://maps.google.com https://youtube.com; connect-src 'self' https://wdkeqxfglmritghmakma.supabase.co https://www.google-analytics.com; object-src 'none'; base-uri 'self'; form-action 'self';"
     
+    # Cache longo para assets estáticos
     <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
     
+    # NUNCA cachear páginas HTML
     <FilesMatch "\.html$">
         Header set Cache-Control "public, max-age=0, must-revalidate"
+    </FilesMatch>
+    
+    # NUNCA cachear service worker e manifest
+    <FilesMatch "(service-worker\.js|manifest\.webmanifest)$">
+        Header set Cache-Control "public, max-age=0, no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
     </FilesMatch>
 </IfModule>
 

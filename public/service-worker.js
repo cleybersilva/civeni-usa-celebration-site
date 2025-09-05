@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civeni-static-v1.0.0';
+const CACHE_NAME = 'civeni-static-v2.0.0-no-images';
 const STATIC_CACHE_URLS = [
   '/',
   '/offline.html',
@@ -48,7 +48,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first strategy for static assets
+  // NEVER cache Supabase images (speakers photos)
+  if (event.request.url.includes('supabase.co') && 
+      event.request.url.includes('/storage/v1/object/')) {
+    event.respondWith(
+      fetch(event.request, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      })
+    );
+    return;
+  }
+
+  // Cache-first strategy ONLY for known static assets
   if (event.request.url.includes('/lovable-uploads/') ||
       event.request.url.includes('/manifest.webmanifest') ||
       event.request.url.includes('favicon')) {
@@ -61,9 +75,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for other requests
+  // Network-first for all other requests (including external images)
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, {
+      cache: event.request.url.includes('unsplash.com') ? 'default' : 'no-cache'
+    })
       .catch(() => {
         return caches.match(event.request);
       })

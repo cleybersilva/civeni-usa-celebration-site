@@ -1,15 +1,27 @@
 
 import SpeakerCard from '@/components/SpeakerCard';
 import { useCMS } from '@/contexts/CMSContext';
+import { clearImageCaches, isProduction } from '@/utils/productionImageUtils';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 // Import para debug (remover em produção)
 import '../utils/speakerImageDiagnostic';
+// Import para diagnóstico de produção
+import '../utils/productionDiagnostic';
 
 const Palestrantes = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
+
+  // Limpar cache de imagens em produção
+  useEffect(() => {
+    if (isProduction()) {
+      clearImageCaches();
+      console.log('🧹 Cache de imagens limpo para produção');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-poppins">

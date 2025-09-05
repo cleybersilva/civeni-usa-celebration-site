@@ -1,5 +1,10 @@
 import { Speaker } from '@/contexts/CMSContext';
 import { supabase } from '@/integrations/supabase/client';
+import {
+    fixSupabaseUrlForProduction,
+    isProduction,
+    testImageUrlForProduction
+} from '@/utils/productionImageUtils';
 import { useEffect, useState } from 'react';
 
 // Imagem padrão SVG para palestrantes
@@ -19,24 +24,18 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
   const [retryCount, setRetryCount] = useState<number>(0);
 
   const testImageUrl = (url: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      if (!url) {
-        resolve(false);
-        return;
-      }
-      
-      const img = new Image();
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
-      
-      // Timeout após 8 segundos
-      setTimeout(() => resolve(false), 8000);
-      
-      img.src = url;
-    });
+    return testImageUrlForProduction(url);
   };
 
   const fixSupabaseUrl = (originalUrl: string): string[] => {
+    // Usar a função de produção que inclui cache busting
+    const productionUrls = fixSupabaseUrlForProduction(originalUrl);
+    
+    if (productionUrls.length > 0) {
+      return productionUrls;
+    }
+    
+    // Fallback para método original se a função de produção falhar
     const urls: string[] = [];
     
     if (!originalUrl) return urls;
@@ -98,7 +97,7 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
       return;
     }
 
-    console.log(`[${speaker.name}] Processing image:`, speaker.image);
+    console.log(`[${speaker.name}] Processing image (${isProduction() ? 'PRODUCTION' : 'DEVELOPMENT'}):`, speaker.image);
     setIsLoading(true);
     setHasError(false);
 
@@ -112,7 +111,7 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
 
       // Gerar URLs para testar
       const urlsToTry = fixSupabaseUrl(speaker.image);
-      console.log(`[${speaker.name}] Testing ${urlsToTry.length} URLs:`, urlsToTry);
+      console.log(`[${speaker.name}] Testing ${urlsToTry.length} URLs (${isProduction() ? 'prod' : 'dev'} mode):`, urlsToTry);
 
       let foundWorkingUrl = false;
       
