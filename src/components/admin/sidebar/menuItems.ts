@@ -48,8 +48,8 @@ export const createMenuItems = (
       isPriority: false
     },
     {
-      id: 'cronograma',
-      label: t('admin.menu.schedule', 'Cronograma'),
+      id: 'programacao',
+      label: t('admin.menu.schedule', 'Programação'),
       icon: Calendar,
       show: hasPermission('cronograma') || isAdminRoot(),
       isPriority: false

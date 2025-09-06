@@ -34,8 +34,8 @@ const Header = () => {
     {
       title: t('header.schedule'),
       items: [
-        { name: t('header.inPerson'), href: '/cronograma-presencial' },
-        { name: t('header.online'), href: '/cronograma-online' }
+        { name: t('header.inPerson'), href: '/programacao-presencial' },
+        { name: t('header.online'), href: '/programacao-online' }
       ]
     },
     {

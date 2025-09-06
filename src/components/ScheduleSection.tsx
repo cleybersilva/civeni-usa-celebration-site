@@ -8,11 +8,11 @@ const ScheduleSection = () => {
   const navigate = useNavigate();
 
   const handlePresentialClick = () => {
-    navigate('/inscricao-presencial');
+    navigate('/programacao-presencial');
   };
 
   const handleOnlineClick = () => {
-    navigate('/inscricao-online');
+    navigate('/programacao-online');
   };
 
   return (

@@ -103,8 +103,8 @@ const AdminDashboardContent = () => {
           </PermissionGuard>
         ) : null;
       
-      case 'cronograma':
-        console.log('Rendering ScheduleManager for cronograma tab');
+      case 'programacao':
+        console.log('Rendering ScheduleManager for programacao tab');
         return (hasPermission('cronograma') || isAdminRoot()) ? (
           <PermissionGuard resource="cronograma">
             <ScheduleManager />
