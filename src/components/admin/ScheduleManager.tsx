@@ -92,10 +92,10 @@ const ScheduleManager = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Gerenciar Cronogramas
+            Gerenciar Programação
           </CardTitle>
           <CardDescription>
-            Gerencie os cronogramas presencial e online do evento
+            Gerencie a programação presencial e online do evento
           </CardDescription>
         </CardHeader>
         <CardContent>

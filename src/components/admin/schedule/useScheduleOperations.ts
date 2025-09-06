@@ -37,43 +37,49 @@ export const useScheduleOperations = () => {
     mutationFn: async ({ formData, editingSchedule }: { formData: ScheduleFormData; editingSchedule?: any }) => {
       console.log('Upserting schedule:', { formData, editingSchedule });
       
-      // Ensure all required fields are present for database insertion
-      const dataToInsert = {
-        type: formData.type,
-        date: formData.date,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
-        title: formData.title,
-        category: formData.category,
-        description: formData.description || null,
-        speaker_name: formData.speaker_name || null,
-        speaker_photo_url: formData.speaker_photo_url || null,
-        location: formData.location || null,
-        virtual_link: formData.virtual_link || null,
-        platform: formData.platform || null,
-        is_recorded: formData.is_recorded || false,
-        recording_url: formData.recording_url || null,
-        is_published: formData.is_published || false,
+      // Get session data
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+      
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
+      }
+
+      const scheduleData = {
+        ...formData,
+        ...(editingSchedule?.id && { id: editingSchedule.id })
       };
 
-      if (editingSchedule) {
-        const { error } = await supabase
-          .from('schedules')
-          .update(dataToInsert)
-          .eq('id', editingSchedule.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('schedules')
-          .insert(dataToInsert);
-        if (error) throw error;
+      const { data: result, error } = await supabase.rpc('admin_upsert_schedule', {
+        schedule: scheduleData,
+        user_email: sessionEmail,
+        session_token: sessionToken,
+      });
+
+      if (error) {
+        console.error('Error upserting schedule:', error);
+        throw error;
       }
+
+      return result;
     },
     onSuccess: (_, { editingSchedule }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-schedules'] });
       queryClient.invalidateQueries({ queryKey: ['schedules'] });
       toast({
-        title: editingSchedule ? 'Cronograma atualizado' : 'Cronograma criado',
+        title: editingSchedule ? 'Programação atualizada' : 'Programação criada',
         description: 'As alterações foram salvas com sucesso.',
       });
     },
@@ -81,7 +87,7 @@ export const useScheduleOperations = () => {
       console.error('Error upserting schedule:', error);
       toast({
         title: 'Erro',
-        description: 'Ocorreu um erro ao salvar o cronograma.',
+        description: 'Ocorreu um erro ao salvar a programação.',
         variant: 'destructive',
       });
     },
@@ -91,17 +97,44 @@ export const useScheduleOperations = () => {
   const deleteScheduleMutation = useMutation({
     mutationFn: async (id: string) => {
       console.log('Deleting schedule:', id);
-      const { error } = await supabase
-        .from('schedules')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
+      
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+      
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
+      }
+
+      const { data: result, error } = await supabase.rpc('admin_delete_schedule', {
+        schedule_id: id,
+        user_email: sessionEmail,
+        session_token: sessionToken,
+      });
+
+      if (error) {
+        console.error('Error deleting schedule:', error);
+        throw error;
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-schedules'] });
       queryClient.invalidateQueries({ queryKey: ['schedules'] });
       toast({
-        title: 'Cronograma excluído',
+        title: 'Programação excluída',
         description: 'O item foi removido com sucesso.',
       });
     },
@@ -109,7 +142,7 @@ export const useScheduleOperations = () => {
       console.error('Error deleting schedule:', error);
       toast({
         title: 'Erro',
-        description: 'Ocorreu um erro ao excluir o cronograma.',
+        description: 'Ocorreu um erro ao excluir a programação.',
         variant: 'destructive',
       });
     },
@@ -119,11 +152,39 @@ export const useScheduleOperations = () => {
   const togglePublishMutation = useMutation({
     mutationFn: async ({ id, is_published }: { id: string; is_published: boolean }) => {
       console.log('Toggling publish status:', { id, is_published });
-      const { error } = await supabase
-        .from('schedules')
-        .update({ is_published })
-        .eq('id', id);
-      if (error) throw error;
+      
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+      
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
+      }
+
+      const { data: result, error } = await supabase.rpc('admin_toggle_publish_schedule', {
+        schedule_id: id,
+        is_published,
+        user_email: sessionEmail,
+        session_token: sessionToken,
+      });
+
+      if (error) {
+        console.error('Error toggling publish status:', error);
+        throw error;
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-schedules'] });

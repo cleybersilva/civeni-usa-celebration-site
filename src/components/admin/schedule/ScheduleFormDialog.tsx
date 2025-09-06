@@ -33,10 +33,10 @@ const ScheduleFormDialog: React.FC<ScheduleFormDialogProps> = ({
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {editingSchedule ? 'Editar Cronograma' : 'Novo Cronograma'}
+            {editingSchedule ? 'Editar Programação' : 'Nova Programação'}
           </DialogTitle>
           <DialogDescription>
-            {editingSchedule ? 'Edite as informações do cronograma' : 'Adicione um novo item ao cronograma'}
+            {editingSchedule ? 'Edite as informações da programação' : 'Adicione um novo item à programação'}
           </DialogDescription>
         </DialogHeader>
 

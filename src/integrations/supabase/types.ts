@@ -1661,6 +1661,10 @@ export type Database = {
         }
         Returns: number
       }
+      admin_delete_schedule: {
+        Args: { schedule_id: string; session_token: string; user_email: string }
+        Returns: Json
+      }
       admin_delete_speaker: {
         Args: { session_token: string; speaker_id: string; user_email: string }
         Returns: Json
@@ -1669,8 +1673,21 @@ export type Database = {
         Args: { session_token: string; user_email: string; video_id: string }
         Returns: Json
       }
+      admin_toggle_publish_schedule: {
+        Args: {
+          is_published: boolean
+          schedule_id: string
+          session_token: string
+          user_email: string
+        }
+        Returns: Json
+      }
       admin_upsert_banner_slide: {
         Args: { session_token: string; slide: Json; user_email: string }
+        Returns: Json
+      }
+      admin_upsert_schedule: {
+        Args: { schedule: Json; session_token: string; user_email: string }
         Returns: Json
       }
       admin_upsert_speaker: {
