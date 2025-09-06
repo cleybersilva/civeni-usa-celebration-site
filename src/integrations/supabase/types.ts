@@ -1722,6 +1722,16 @@ export type Database = {
         }
         Returns: Json
       }
+      create_admin_user_secure: {
+        Args: {
+          admin_email: string
+          session_token: string
+          user_email: string
+          user_password: string
+          user_type: Database["public"]["Enums"]["admin_user_type"]
+        }
+        Returns: Json
+      }
       create_event_category_secure: {
         Args: { category: Json; session_token: string; user_email: string }
         Returns: Json
@@ -1825,9 +1835,27 @@ export type Database = {
         Args: { new_password: string; user_id: string }
         Returns: Json
       }
+      update_admin_user_password_secure: {
+        Args: {
+          admin_email: string
+          new_password: string
+          session_token: string
+          user_id: string
+        }
+        Returns: Json
+      }
       update_admin_user_type: {
         Args: {
           new_user_type: Database["public"]["Enums"]["admin_user_type"]
+          user_id: string
+        }
+        Returns: Json
+      }
+      update_admin_user_type_secure: {
+        Args: {
+          admin_email: string
+          new_user_type: Database["public"]["Enums"]["admin_user_type"]
+          session_token: string
           user_id: string
         }
         Returns: Json
