@@ -1740,6 +1740,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: Json
       }
+      delete_admin_user_secure: {
+        Args: { admin_email: string; session_token: string; user_id: string }
+        Returns: Json
+      }
       generate_daily_report: {
         Args: { report_date?: string }
         Returns: Json

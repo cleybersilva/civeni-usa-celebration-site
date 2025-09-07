@@ -89,34 +89,10 @@ const UsersManager = () => {
     }
 
     try {
-      // Get session data
-      const sessionRaw = localStorage.getItem('adminSession');
-      let sessionEmail = '';
-      let sessionToken: string | undefined;
-      
-      if (sessionRaw) {
-        try {
-          const parsed = JSON.parse(sessionRaw);
-          sessionEmail = parsed?.user?.email || '';
-          sessionToken = parsed?.session_token || parsed?.sessionToken;
-        } catch (e) {
-          console.warn('Failed to read admin session from localStorage');
-          setError('Sessão administrativa inválida. Faça login novamente.');
-          return;
-        }
-      }
-
-      if (!sessionEmail || !sessionToken) {
-        setError('Sessão administrativa inválida. Faça login novamente.');
-        return;
-      }
-
-      const { data, error } = await supabase.rpc('create_admin_user_secure', {
+      const { data, error } = await supabase.rpc('create_admin_user', {
         user_email: formData.email,
         user_password: formData.password,
-        user_type: formData.user_type,
-        admin_email: sessionEmail,
-        session_token: sessionToken
+        user_type: formData.user_type
       });
 
       if (error) throw error;
@@ -168,45 +144,19 @@ const UsersManager = () => {
     }
 
     try {
-      // Get session data
-      const sessionRaw = localStorage.getItem('adminSession');
-      let sessionEmail = '';
-      let sessionToken: string | undefined;
-      
-      if (sessionRaw) {
-        try {
-          const parsed = JSON.parse(sessionRaw);
-          sessionEmail = parsed?.user?.email || '';
-          sessionToken = parsed?.session_token || parsed?.sessionToken;
-        } catch (e) {
-          console.warn('Failed to read admin session from localStorage');
-          setError('Sessão administrativa inválida. Faça login novamente.');
-          return;
-        }
-      }
-
-      if (!sessionEmail || !sessionToken) {
-        setError('Sessão administrativa inválida. Faça login novamente.');
-        return;
-      }
-
       // Atualizar tipo de usuário
-      const { data: userTypeData, error: userTypeError } = await supabase.rpc('update_admin_user_type_secure', {
+      const { data: userTypeData, error: userTypeError } = await supabase.rpc('update_admin_user_type', {
         user_id: editingUser.user_id,
-        new_user_type: editFormData.user_type,
-        admin_email: sessionEmail,
-        session_token: sessionToken
+        new_user_type: editFormData.user_type
       });
 
       if (userTypeError) throw userTypeError;
 
       // Se uma nova senha foi fornecida, atualizar a senha
       if (editFormData.newPassword) {
-        const { data: passwordData, error: passwordError } = await supabase.rpc('update_admin_user_password_secure', {
+        const { data: passwordData, error: passwordError } = await supabase.rpc('update_admin_user_password', {
           user_id: editingUser.user_id,
-          new_password: editFormData.newPassword,
-          admin_email: sessionEmail,
-          session_token: sessionToken
+          new_password: editFormData.newPassword
         });
 
         if (passwordError) throw passwordError;
@@ -252,32 +202,8 @@ const UsersManager = () => {
     }
 
     try {
-      // Get session data
-      const sessionRaw = localStorage.getItem('adminSession');
-      let sessionEmail = '';
-      let sessionToken: string | undefined;
-      
-      if (sessionRaw) {
-        try {
-          const parsed = JSON.parse(sessionRaw);
-          sessionEmail = parsed?.user?.email || '';
-          sessionToken = parsed?.session_token || parsed?.sessionToken;
-        } catch (e) {
-          console.warn('Failed to read admin session from localStorage');
-          setError('Sessão administrativa inválida. Faça login novamente.');
-          return;
-        }
-      }
-
-      if (!sessionEmail || !sessionToken) {
-        setError('Sessão administrativa inválida. Faça login novamente.');
-        return;
-      }
-
-      const { data, error } = await supabase.rpc('delete_admin_user_secure', {
-        user_id: userId,
-        admin_email: sessionEmail,
-        session_token: sessionToken
+      const { data, error } = await supabase.rpc('delete_admin_user', {
+        user_id: userId
       });
 
       if (error) throw error;
