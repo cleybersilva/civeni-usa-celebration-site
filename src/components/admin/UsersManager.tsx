@@ -56,14 +56,14 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.rpc('list_admin_users_secure', {
+      const { data, error } = await (supabase as any).rpc('list_admin_users_secure', {
         user_email: user?.email,
         session_token: sessionToken
       });
       
       if (error) throw error;
       
-      setUsers(data || []);
+      setUsers((data as AdminUser[]) || []);
     } catch (error) {
       setError('Erro ao carregar usuários');
       console.error('Error fetching users:', error);
@@ -92,7 +92,7 @@ const UsersManager = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc('create_admin_user_secure', {
+      const { data, error } = await (supabase as any).rpc('create_admin_user_secure', {
         user_email: formData.email,
         user_password: formData.password,
         user_type: formData.user_type,
@@ -150,7 +150,7 @@ const UsersManager = () => {
 
     try {
       // Atualizar tipo de usuário
-      const { data: userTypeData, error: userTypeError } = await supabase.rpc('update_admin_user_type_secure', {
+      const { data: userTypeData, error: userTypeError } = await (supabase as any).rpc('update_admin_user_type_secure', {
         user_id: editingUser.user_id,
         new_user_type: editFormData.user_type,
         admin_email: user?.email,
@@ -161,7 +161,7 @@ const UsersManager = () => {
 
       // Se uma nova senha foi fornecida, atualizar a senha
       if (editFormData.newPassword) {
-        const { data: passwordData, error: passwordError } = await supabase.rpc('update_admin_user_password_secure', {
+        const { data: passwordData, error: passwordError } = await (supabase as any).rpc('update_admin_user_password_secure', {
           user_id: editingUser.user_id,
           new_password: editFormData.newPassword,
           admin_email: user?.email,
@@ -211,7 +211,7 @@ const UsersManager = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc('delete_admin_user_secure', {
+      const { data, error } = await (supabase as any).rpc('delete_admin_user_secure', {
         user_id: userId,
         admin_email: user?.email,
         session_token: sessionToken

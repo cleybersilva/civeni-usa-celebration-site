@@ -1799,6 +1799,16 @@ export type Database = {
           user_type: Database["public"]["Enums"]["admin_user_type"]
         }[]
       }
+      list_admin_users_secure: {
+        Args: { session_token: string; user_email: string }
+        Returns: {
+          created_at: string
+          email: string
+          is_admin_root: boolean
+          user_id: string
+          user_type: Database["public"]["Enums"]["admin_user_type"]
+        }[]
+      }
       request_password_reset: {
         Args: { user_email: string }
         Returns: boolean
