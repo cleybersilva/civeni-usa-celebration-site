@@ -28,6 +28,7 @@ interface SessionData {
 
 interface AdminAuthContextType {
   user: AdminUser | null;
+  sessionToken?: string;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   hasPermission: (resource: string) => boolean;
@@ -38,6 +39,7 @@ const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
 
 export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AdminUser | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     // Check for valid session
@@ -47,6 +49,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         const sessionData: SessionData = JSON.parse(savedSession);
         if (sessionData.expires > Date.now()) {
           setUser(sessionData.user);
+          setSessionToken(sessionData.session_token);
           // Set the current user email for RLS policies when restoring session
           if (sessionData.session_token) {
             (async () => {
@@ -108,6 +111,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         };
         
         setUser(adminUser);
+        setSessionToken(loginResponse.session_token);
         
         // Set the current user email for RLS policies using secure method
         const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
@@ -160,6 +164,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
       }
       
       setUser(null);
+      setSessionToken(undefined);
       localStorage.removeItem('adminSession');
       localStorage.removeItem('adminUser'); // Clean up old format too
     } catch (error) {
@@ -191,7 +196,7 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, login, logout, hasPermission, isAdminRoot }}>
+    <AdminAuthContext.Provider value={{ user, sessionToken, login, logout, hasPermission, isAdminRoot }}>
       {children}
     </AdminAuthContext.Provider>
   );

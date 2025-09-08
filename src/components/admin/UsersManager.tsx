@@ -30,7 +30,7 @@ const UsersManager = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-  const { user, isAdminRoot } = useAdminAuth();
+  const { user, sessionToken, isAdminRoot } = useAdminAuth();
 
   // Verificar se o usuário pode executar operações de gerenciamento
   const canManageUsers = isAdminRoot() || user?.user_type === 'admin';
@@ -56,7 +56,10 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.rpc('list_admin_users');
+      const { data, error } = await supabase.rpc('list_admin_users_secure', {
+        user_email: user?.email,
+        session_token: sessionToken
+      });
       
       if (error) throw error;
       
@@ -89,10 +92,12 @@ const UsersManager = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc('create_admin_user', {
+      const { data, error } = await supabase.rpc('create_admin_user_secure', {
         user_email: formData.email,
         user_password: formData.password,
-        user_type: formData.user_type
+        user_type: formData.user_type,
+        admin_email: user?.email,
+        session_token: sessionToken
       });
 
       if (error) throw error;
@@ -145,18 +150,22 @@ const UsersManager = () => {
 
     try {
       // Atualizar tipo de usuário
-      const { data: userTypeData, error: userTypeError } = await supabase.rpc('update_admin_user_type', {
+      const { data: userTypeData, error: userTypeError } = await supabase.rpc('update_admin_user_type_secure', {
         user_id: editingUser.user_id,
-        new_user_type: editFormData.user_type
+        new_user_type: editFormData.user_type,
+        admin_email: user?.email,
+        session_token: sessionToken
       });
 
       if (userTypeError) throw userTypeError;
 
       // Se uma nova senha foi fornecida, atualizar a senha
       if (editFormData.newPassword) {
-        const { data: passwordData, error: passwordError } = await supabase.rpc('update_admin_user_password', {
+        const { data: passwordData, error: passwordError } = await supabase.rpc('update_admin_user_password_secure', {
           user_id: editingUser.user_id,
-          new_password: editFormData.newPassword
+          new_password: editFormData.newPassword,
+          admin_email: user?.email,
+          session_token: sessionToken
         });
 
         if (passwordError) throw passwordError;
@@ -202,8 +211,10 @@ const UsersManager = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc('delete_admin_user', {
-        user_id: userId
+      const { data, error } = await supabase.rpc('delete_admin_user_secure', {
+        user_id: userId,
+        admin_email: user?.email,
+        session_token: sessionToken
       });
 
       if (error) throw error;
