@@ -1,4 +1,5 @@
-const CACHE_NAME = 'civeni-static-v2.0.0-no-images';
+const BUILD_ID = Date.now();
+const CACHE_NAME = `civeni-assets-v${BUILD_ID}`;
 const STATIC_CACHE_URLS = [
   '/',
   '/offline.html',
@@ -48,7 +49,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // NEVER cache Supabase images (speakers photos)
+  // Handle versioned images (respect ?v= parameter for cache busting)
+  if (event.request.url.match(/\.(png|jpg|jpeg|webp|avif)$/)) {
+    const url = new URL(event.request.url);
+    if (url.searchParams.has('v')) {
+      // Network-first for versioned images to respect cache busting
+      event.respondWith(
+        fetch(event.request, {
+          cache: 'no-cache'
+        }).catch(() => caches.match(event.request))
+      );
+      return;
+    }
+  }
+
+  // NEVER cache Supabase images (speakers photos) 
   if (event.request.url.includes('supabase.co') && 
       event.request.url.includes('/storage/v1/object/')) {
     event.respondWith(

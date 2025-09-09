@@ -56,14 +56,23 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await (supabase as any).rpc('list_admin_users_secure', {
-        user_email: user?.email,
-        session_token: sessionToken
+      // Get the current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('No valid session');
+      }
+
+      // Call the edge function with proper authentication
+      const { data, error } = await supabase.functions.invoke('admin-list-users', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
       });
       
       if (error) throw error;
       
-      setUsers((data as AdminUser[]) || []);
+      setUsers((data?.data as AdminUser[]) || []);
     } catch (error) {
       setError('Erro ao carregar usuários');
       console.error('Error fetching users:', error);
