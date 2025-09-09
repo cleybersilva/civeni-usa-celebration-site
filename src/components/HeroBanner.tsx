@@ -37,6 +37,21 @@ const HeroBanner = () => {
       if (slides.length === 0) return;
       
       try {
+        // Add preload links to head dynamically
+        const preloadContainer = document.getElementById('banner-preloads');
+        if (preloadContainer) {
+          slides.forEach(slide => {
+            const timestamp = slide.updatedAt ? new Date(slide.updatedAt).getTime() : Date.now();
+            const src = `${resolveAssetUrl(slide.bgImage)}?v=${timestamp}`;
+            
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'image';
+            link.href = src;
+            preloadContainer.appendChild(link);
+          });
+        }
+        
         const prepared = await Promise.all(
           slides.map(async (slide) => {
             // Generate cache-busting URL with updated_at timestamp
@@ -79,7 +94,14 @@ const HeroBanner = () => {
     };
     
     preloadSlides();
-    return () => { mounted = false; };
+    return () => { 
+      mounted = false; 
+      // Cleanup preload links on unmount
+      const preloadContainer = document.getElementById('banner-preloads');
+      if (preloadContainer) {
+        preloadContainer.innerHTML = '';
+      }
+    };
   }, [slides]);
 
   useEffect(() => {
