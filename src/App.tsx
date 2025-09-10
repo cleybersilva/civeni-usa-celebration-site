@@ -31,6 +31,7 @@ import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 import ApresentacaoOral from "./pages/ApresentacaoOral";
 import SessoesPoster from "./pages/SessoesPoster";
 import Manuscritos from "./pages/Manuscritos";
+import Sobre from "./pages/Sobre";
 
 import './App.css';
 
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
                 <Route path="/sessoes-poster" element={<SessoesPoster />} />
                 <Route path="/manuscritos" element={<Manuscritos />} />
+                <Route path="/sobre" element={<Sobre />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="*" element={<NotFound />} />

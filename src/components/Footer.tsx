@@ -10,11 +10,11 @@ const Footer = () => {
   const { content } = useCMS();
   
   const quickLinks = [
-    { name: t('footer.about'), href: '#about' },
-    { name: t('footer.schedule'), href: '#schedule' },
-    { name: t('footer.speakers'), href: '#speakers' },
-    { name: t('footer.registration'), href: '#registration' },
-    { name: t('footer.contact'), href: '#contact' }
+    { name: t('footer.about'), href: '/sobre' },
+    { name: t('footer.schedule'), href: '/cronograma-presencial' },
+    { name: t('footer.speakers'), href: '/palestrantes' },
+    { name: t('footer.registration'), href: '/inscricoes' },
+    { name: t('footer.contact'), href: '/us/contact/' }
   ];
 
   return (
@@ -79,12 +79,21 @@ const Footer = () => {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
-                  >
-                    {link.name}
-                  </a>
+                  {link.href.startsWith('/') ? (
+                    <Link
+                      to={link.href}
+                      className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
