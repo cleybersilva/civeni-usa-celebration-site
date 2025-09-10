@@ -177,7 +177,7 @@ const CongressoComite = () => {
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue via-primary to-civeni-red opacity-90"></div>
         <div className="container relative mx-auto px-4 py-16 lg:py-24">
           <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-fade-in">
