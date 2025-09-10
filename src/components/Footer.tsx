@@ -14,7 +14,7 @@ const Footer = () => {
     { name: t('footer.schedule'), href: '/cronograma-presencial' },
     { name: t('footer.speakers'), href: '/palestrantes' },
     { name: t('footer.registration'), href: '/inscricoes' },
-    { name: t('footer.contact'), href: '/us/contact/' }
+    { name: t('footer.contact'), href: '/contato' }
   ];
 
   return (
