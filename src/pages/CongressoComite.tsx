@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, Building, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -176,18 +177,21 @@ const CongressoComite = () => {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue via-primary to-civeni-red opacity-90"></div>
-        <div className="container relative mx-auto px-4 py-16 lg:py-24">
-          <div className="text-center">
-            <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 animate-fade-in">
-              {pageData?.hero_title || t('congress.committee.title', 'Comitê do Congresso')}
-            </h1>
-            
-            <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-4xl mx-auto">
-              {pageData?.hero_subtitle || t('congress.committee.description', 'Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência.')}
-            </p>
-          </div>
+      <section className="bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <nav className="text-sm mb-6 opacity-90">
+            <Link to="/" className="hover:text-civeni-red transition-colors">Home</Link>
+            <span className="mx-2">›</span>
+            <Link to="/congresso/comite" className="hover:text-civeni-red transition-colors">Programação</Link>
+            <span className="mx-2">›</span>
+            <span>Comitê</span>
+          </nav>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+            {pageData?.hero_title || t('congress.committee.title', 'Comitê do Congresso')}
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+            {pageData?.hero_subtitle || t('congress.committee.description', 'Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência.')}
+          </p>
         </div>
       </section>
 

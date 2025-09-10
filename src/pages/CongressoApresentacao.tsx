@@ -124,35 +124,36 @@ const CongressoApresentacao = () => {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue via-primary to-civeni-red opacity-90"></div>
-        <div className="container relative mx-auto px-4 py-16 lg:py-24">
-          <div className="text-center">
-            <h1 className="text-5xl lg:text-7xl font-bold text-foreground mb-6 animate-fade-in">
-              {pageData?.hero_title || 'III CIVENI - Congresso Internacional Multidisciplinar da VCCU'}
-            </h1>
+      <section className="bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <nav className="text-sm mb-6 opacity-90">
+            <Link to="/" className="hover:text-civeni-red transition-colors">Home</Link>
+            <span className="mx-2">›</span>
+            <Link to="/congresso/apresentacao" className="hover:text-civeni-red transition-colors">Programação</Link>
+            <span className="mx-2">›</span>
+            <span>Apresentação</span>
+          </nav>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+            {pageData?.hero_title || 'III CIVENI - Congresso Internacional Multidisciplinar da VCCU'}
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+            {pageData?.hero_subtitle || 'TEMA e CONTEXTO do congresso serão apresentados aqui com mais detalhes sobre o evento, sua importância e objetivos principais.'}
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-white text-civeni-blue hover:bg-white/90">
+              <Link to="/inscricoes">
+                <Users className="w-5 h-5 mr-2" />
+                {t('congress.presentation.register', 'Fazer Inscrição')}
+              </Link>
+            </Button>
             
-            <div className="max-w-4xl mx-auto">
-              <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed">
-                {pageData?.hero_subtitle || 'TEMA e CONTEXTO do congresso serão apresentados aqui com mais detalhes sobre o evento, sua importância e objetivos principais.'}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-                  <Link to="/inscricoes">
-                    <Users className="w-5 h-5 mr-2" />
-                    {t('congress.presentation.register', 'Fazer Inscrição')}
-                  </Link>
-                </Button>
-                
-                <Button asChild variant="outline" size="lg">
-                  <Link to="/programacao-presencial">
-                    <Calendar className="w-5 h-5 mr-2" />
-                    {t('congress.presentation.schedule', 'Ver Programação')}
-                  </Link>
-                </Button>
-              </div>
-            </div>
+            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-civeni-blue">
+              <Link to="/programacao-presencial">
+                <Calendar className="w-5 h-5 mr-2" />
+                {t('congress.presentation.schedule', 'Ver Programação')}
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
