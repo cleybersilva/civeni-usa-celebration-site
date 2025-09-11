@@ -579,6 +579,80 @@ export type Database = {
         }
         Relationships: []
       }
+      event_areas: {
+        Row: {
+          area_id: string
+          created_at: string
+          event_id: string
+          id: string
+        }
+        Insert: {
+          area_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+        }
+        Update: {
+          area_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_areas_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "thematic_areas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_areas_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_assets: {
+        Row: {
+          asset_url: string
+          caption: string | null
+          created_at: string
+          event_id: string
+          id: string
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          asset_url: string
+          caption?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          asset_url?: string
+          caption?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_assets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_category: {
         Row: {
           available_from: string | null
@@ -713,6 +787,77 @@ export type Database = {
           },
         ]
       }
+      event_cert_issuances: {
+        Row: {
+          arquivo_url: string | null
+          created_at: string
+          emitido_at: string | null
+          event_id: string
+          hash: string
+          id: string
+          status: string
+          updated_at: string
+          user_email: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          created_at?: string
+          emitido_at?: string | null
+          event_id: string
+          hash: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_email: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          created_at?: string
+          emitido_at?: string | null
+          event_id?: string
+          hash?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_cert_issuances_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_cert_templates: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          nome: string
+          template_url: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          nome: string
+          template_url: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          nome?: string
+          template_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_config: {
         Row: {
           created_at: string
@@ -840,6 +985,227 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      event_sessions: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          event_id: string
+          fim_at: string | null
+          id: string
+          inicio_at: string
+          ordem: number
+          sala_url: string | null
+          speaker_id: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          event_id: string
+          fim_at?: string | null
+          id?: string
+          inicio_at: string
+          ordem?: number
+          sala_url?: string | null
+          speaker_id?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          event_id?: string
+          fim_at?: string | null
+          id?: string
+          inicio_at?: string
+          ordem?: number
+          sala_url?: string | null
+          speaker_id?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_sessions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_sessions_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "cms_speakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_speakers: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          ordem: number
+          speaker_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          ordem?: number
+          speaker_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          ordem?: number
+          speaker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_speakers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_speakers_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "cms_speakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_translations: {
+        Row: {
+          created_at: string
+          descricao_richtext: string | null
+          event_id: string
+          id: string
+          idioma: string
+          meta_description: string | null
+          meta_title: string | null
+          og_image: string | null
+          subtitulo: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao_richtext?: string | null
+          event_id: string
+          id?: string
+          idioma?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image?: string | null
+          subtitulo?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao_richtext?: string | null
+          event_id?: string
+          id?: string
+          idioma?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image?: string | null
+          subtitulo?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_translations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          banner_url: string | null
+          cert_drive_link: string | null
+          cert_modelo_id: string | null
+          created_at: string
+          created_by: string | null
+          endereco: string | null
+          exibir_passado: boolean
+          featured: boolean
+          fim_at: string | null
+          geo_json: Json | null
+          id: string
+          inicio_at: string
+          inscricao_url: string | null
+          modalidade: string
+          playlist_url: string | null
+          slug: string
+          status_publicacao: string
+          tem_inscricao: boolean
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          banner_url?: string | null
+          cert_drive_link?: string | null
+          cert_modelo_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          endereco?: string | null
+          exibir_passado?: boolean
+          featured?: boolean
+          fim_at?: string | null
+          geo_json?: Json | null
+          id?: string
+          inicio_at: string
+          inscricao_url?: string | null
+          modalidade: string
+          playlist_url?: string | null
+          slug: string
+          status_publicacao?: string
+          tem_inscricao?: boolean
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          banner_url?: string | null
+          cert_drive_link?: string | null
+          cert_modelo_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          endereco?: string | null
+          exibir_passado?: boolean
+          featured?: boolean
+          fim_at?: string | null
+          geo_json?: Json | null
+          id?: string
+          inicio_at?: string
+          inscricao_url?: string | null
+          modalidade?: string
+          playlist_url?: string | null
+          slug?: string
+          status_publicacao?: string
+          tem_inscricao?: boolean
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
       }
       hybrid_format_config: {
         Row: {
@@ -1661,6 +2027,10 @@ export type Database = {
         }
         Returns: number
       }
+      admin_delete_event: {
+        Args: { event_id: string; session_token: string; user_email: string }
+        Returns: Json
+      }
       admin_delete_schedule: {
         Args: { schedule_id: string; session_token: string; user_email: string }
         Returns: Json
@@ -1684,6 +2054,10 @@ export type Database = {
       }
       admin_upsert_banner_slide: {
         Args: { session_token: string; slide: Json; user_email: string }
+        Returns: Json
+      }
+      admin_upsert_event: {
+        Args: { event_data: Json; session_token: string; user_email: string }
         Returns: Json
       }
       admin_upsert_schedule: {
