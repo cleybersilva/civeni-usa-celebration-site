@@ -373,7 +373,7 @@ export const EventFormDialog: React.FC<EventFormDialogProps> = ({
                     label="Banner do Evento (16:9 recomendado)"
                     value={formData.banner_url}
                     onChange={(url) => setFormData(prev => ({ ...prev, banner_url: url }))}
-                    type="banner"
+                    type="event"
                   />
                   
                   <Separator />
@@ -440,7 +440,7 @@ export const EventFormDialog: React.FC<EventFormDialogProps> = ({
                     label="Imagem Open Graph (1200x630 recomendado)"
                     value={formData.og_image}
                     onChange={(url) => setFormData(prev => ({ ...prev, og_image: url }))}
-                    type="banner"
+                    type="event"
                   />
                 </CardContent>
               </Card>

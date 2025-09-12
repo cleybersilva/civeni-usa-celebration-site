@@ -26,6 +26,7 @@ import MidiaDigitalManager from '@/components/admin/MidiaDigitalManager';
 import CongressoManager from '@/components/admin/CongressoManager';
 import ThematicAreasManager from '@/components/admin/ThematicAreasManager';
 import CounterConfigManager from '@/components/admin/CounterConfigManager';
+import EventsManager from '@/components/admin/EventsManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -93,6 +94,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('contador') || isAdminRoot()) ? (
           <PermissionGuard resource="contador">
             <EventConfigManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'eventos':
+        return (hasPermission('eventos') || isAdminRoot()) ? (
+          <PermissionGuard resource="eventos">
+            <EventsManager />
           </PermissionGuard>
         ) : null;
       

@@ -13,6 +13,7 @@ import {
   Play,
   Settings,
   FileText,
+  CalendarDays,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -45,6 +46,13 @@ export const createMenuItems = (
       label: t('admin.menu.counter', 'Contador'),
       icon: Timer,
       show: hasPermission('contador') || isAdminRoot(),
+      isPriority: false
+    },
+    {
+      id: 'eventos',
+      label: t('admin.menu.events', 'Eventos'),
+      icon: CalendarDays,
+      show: hasPermission('eventos') || isAdminRoot(),
       isPriority: false
     },
     {

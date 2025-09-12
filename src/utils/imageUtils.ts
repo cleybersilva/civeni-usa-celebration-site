@@ -30,6 +30,11 @@ export const IMAGE_CONFIGS = {
     width: 1280,
     height: 720,
     description: "Thumbnail do vídeo (16:9)"
+  },
+  event: {
+    width: 1920,
+    height: 1080,
+    description: "Banner do evento (16:9)"
   }
 } as const;
 

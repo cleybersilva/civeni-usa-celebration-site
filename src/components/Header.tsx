@@ -25,11 +25,23 @@ const Header = () => {
 
   const menuItems = [
     {
+      title: t('header.thematicAreas'),
+      items: []
+    },
+    {
       title: t('header.congress'),
       items: [
         { name: t('header.presentation'), href: '/congresso/apresentacao' },
         { name: t('header.committee'), href: '/congresso/comite' }
       ]
+    },
+    {
+      title: t('header.events'),
+      items: []
+    },
+    {
+      title: t('header.speakers'),
+      items: []
     },
     {
       title: t('header.schedule'),
@@ -46,14 +58,6 @@ const Header = () => {
         { name: t('header.posterSessions'), href: '/sessoes-poster' },
         { name: t('header.manuscripts'), href: '/manuscritos' }
       ]
-    },
-    {
-      title: t('header.thematicAreas'),
-      items: []
-    },
-    {
-      title: t('header.speakers'),
-      items: []
     }
   ];
 
@@ -173,6 +177,14 @@ const Header = () => {
                   ) : item.title === t('header.thematicAreas') ? (
                     <Link
                       to="/area-tematica"
+                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
+                      onClick={() => setOpenDropdown(null)}
+                    >
+                      {item.title}
+                    </Link>
+                  ) : item.title === t('header.events') ? (
+                    <Link
+                      to="/eventos"
                       className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
                       onClick={() => setOpenDropdown(null)}
                     >
