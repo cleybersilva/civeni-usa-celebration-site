@@ -13,6 +13,7 @@ export const esTranslations = {
       posterSessions: "Sesiones de Póster",
       manuscripts: "Manuscritos",
       thematicAreas: "Áreas Temáticas",
+      events: "Eventos",
       speakers: "Ponentes",
       registration: "Inscripciones",
       contact: "Contacto",

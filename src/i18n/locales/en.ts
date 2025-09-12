@@ -13,6 +13,7 @@ export const enTranslations = {
       posterSessions: "Poster Sessions",
       manuscripts: "Manuscripts",
       thematicAreas: "Thematic Areas",
+      events: "Events",
       speakers: "Speakers",
       registration: "Registration",
       contact: "Contact",

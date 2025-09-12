@@ -13,6 +13,7 @@ export const trTranslations = {
       posterSessions: "Poster Oturumları",
       manuscripts: "El Yazmaları",
       thematicAreas: "Tematik Alanlar",
+      events: "Etkinlikler",
       speakers: "Konuşmacılar",
       registration: "Kayıt",
       contact: "İletişim",
