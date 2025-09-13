@@ -32,8 +32,13 @@ const UsersManager = () => {
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const { user, sessionToken, isAdminRoot } = useAdminAuth();
 
+  // Debug logs
+  console.log('UsersManager - User:', user);
+  console.log('UsersManager - SessionToken:', sessionToken);
+  console.log('UsersManager - isAdminRoot():', isAdminRoot());
+
   // Verificar se o usuário pode executar operações de gerenciamento
-  const canManageUsers = isAdminRoot();
+  const canManageUsers = isAdminRoot() || (user?.user_type === 'admin' || user?.user_type === 'admin_root');
   const canDeleteUsers = isAdminRoot(); // Apenas Admin Root pode deletar
 
   // Form state
@@ -56,39 +61,34 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
+      console.log('Fetching users...');
+      console.log('User email:', user?.email);
+      console.log('Session token:', sessionToken);
+      
       if (!user?.email || !sessionToken) {
         setError('Sessão inválida. Faça login novamente.');
         return;
       }
 
-      // Get current session to verify authentication
-      const { data: session } = await supabase.auth.getSession();
-      
-      if (!session?.session?.access_token) {
-        setError('Sessão expirada. Faça login novamente.');
-        return;
-      }
-
-      // Call the edge function to list users
-      const supabaseUrl = 'https://wdkeqxfglmritghmakma.supabase.co';
-      const response = await fetch(`${supabaseUrl}/functions/v1/admin-list-users`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${session.session.access_token}`,
-          'Content-Type': 'application/json',
-        },
+      // Use the existing RPC function
+      const { data, error } = await supabase.rpc('list_admin_users_secure', {
+        user_email: user.email,
+        session_token: sessionToken
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao carregar usuários');
+      
+      console.log('RPC Response:', { data, error });
+      
+      if (error) {
+        console.error('RPC Error:', error);
+        throw error;
       }
-
-      const data = await response.json();
-      setUsers(data.data || []);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro ao carregar usuários');
-      console.error('Error fetching users:', error);
+      
+      console.log('Users fetched:', data);
+      setUsers((data as AdminUser[]) || []);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Erro ao carregar usuários';
+      console.error('Error in fetchUsers:', error);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -282,6 +282,17 @@ const UsersManager = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-civeni-blue"></div>
+        <span className="ml-2">Carregando usuários...</span>
+      </div>
+    );
+  }
+
+  if (!canManageUsers) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Alert>
+          <AlertDescription>Acesso negado: você não tem permissão para gerenciar usuários.</AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -421,76 +432,77 @@ const UsersManager = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-3 font-semibold">{t('admin.users.email')}</th>
-                  <th className="text-left p-3 font-semibold">{t('admin.users.userType')}</th>
-                  <th className="text-left p-3 font-semibold">{t('admin.users.created')}</th>
-                  <th className="text-left p-3 font-semibold">{t('admin.users.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((adminUser) => (
-                  <tr key={adminUser.user_id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{adminUser.email}</span>
-                        {adminUser.email === user?.email && (
-                          <Badge variant="outline" className="text-xs">{t('admin.users.you')}</Badge>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <Badge className={getUserTypeColor(adminUser.user_type)}>
-                        {getUserTypeLabel(adminUser.user_type)}
-                        {adminUser.is_admin_root && <Shield className="w-3 h-3 ml-1" />}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm text-gray-600">
-                      {new Date(adminUser.created_at).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditUser(adminUser)}
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            {canDeleteUsers && (
+          {users.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              {t('admin.users.noUsersFound')}
+              <p className="text-sm mt-2">Debug: canManageUsers={canManageUsers.toString()}, userType={user?.user_type}, isAdminRoot={isAdminRoot().toString()}</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3 font-semibold">Email</th>
+                    <th className="text-left p-3 font-semibold">Tipo de Usuário</th>
+                    <th className="text-left p-3 font-semibold">Criado em</th>
+                    <th className="text-left p-3 font-semibold">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((adminUser) => (
+                    <tr key={adminUser.user_id} className="border-b hover:bg-gray-50">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{adminUser.email}</span>
+                          {adminUser.email === user?.email && (
+                            <Badge variant="outline" className="text-xs">Você</Badge>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <Badge className={getUserTypeColor(adminUser.user_type)}>
+                          {getUserTypeLabel(adminUser.user_type)}
+                          {adminUser.is_admin_root && <Shield className="w-3 h-3 ml-1" />}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-sm text-gray-600">
+                        {new Date(adminUser.created_at).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
+                            <>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleEditUser(adminUser)}
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Edit className="w-4 h-4" />
                               </Button>
-                            )}
-                          </>
-                        )}
-                        {adminUser.email === 'cleyber.silva@live.com' && (
-                          <Badge variant="outline" className="text-xs">
-                            {t('admin.users.protected')}
-                          </Badge>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {users.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              {t('admin.users.noUsersFound')}
+                              {canDeleteUsers && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </>
+                          )}
+                          {adminUser.email === 'cleyber.silva@live.com' && (
+                            <Badge variant="outline" className="text-xs">
+                              Protegido
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </CardContent>
