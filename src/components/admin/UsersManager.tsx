@@ -38,8 +38,8 @@ const UsersManager = () => {
   console.log('UsersManager - isAdminRoot():', isAdminRoot());
 
   // Verificar se o usuário pode executar operações de gerenciamento
-  const canManageUsers = isAdminRoot() || (user?.user_type === 'admin' || user?.user_type === 'admin_root');
-  const canDeleteUsers = isAdminRoot(); // Apenas Admin Root pode deletar
+  const canManageUsers = user && (user.user_type === 'admin_root' || user.user_type === 'admin' || user.is_admin_root === true);
+  const canDeleteUsers = user && (user.user_type === 'admin_root' || user.is_admin_root === true);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -61,16 +61,52 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
-      console.log('Fetching users...');
-      console.log('User email:', user?.email);
-      console.log('Session token:', sessionToken);
+      console.log('=== FETCHUSERS DEBUG START ===');
+      console.log('User:', user);
+      console.log('Session Token:', sessionToken);
+      console.log('User Type:', user?.user_type);
+      console.log('Is Admin Root:', isAdminRoot());
       
-      if (!user?.email || !sessionToken) {
-        setError('Sessão inválida. Faça login novamente.');
+      if (!user?.email) {
+        console.log('ERROR: No user email');
+        setError('Usuário não logado');
         return;
       }
 
-      // Use the existing RPC function
+      if (!sessionToken) {
+        console.log('ERROR: No session token');
+        // Try to fetch without session token for debug
+        console.log('Attempting direct query...');
+        
+        const { data: directData, error: directError } = await supabase
+          .from('admin_users')
+          .select('id, email, user_type, is_admin_root, created_at')
+          .order('created_at', { ascending: false });
+        
+        console.log('Direct query result:', { directData, directError });
+        
+        if (directError) {
+          console.error('Direct query error:', directError);
+          setError('Erro ao acessar dados: ' + directError.message);
+          return;
+        }
+        
+        // Transform the data
+        const transformedUsers = (directData || []).map(user => ({
+          user_id: user.id,
+          email: user.email,
+          user_type: user.user_type,
+          is_admin_root: user.is_admin_root,
+          created_at: user.created_at
+        }));
+        
+        console.log('Transformed users:', transformedUsers);
+        setUsers(transformedUsers);
+        return;
+      }
+
+      // Try RPC with session
+      console.log('Attempting RPC call...');
       const { data, error } = await supabase.rpc('list_admin_users_secure', {
         user_email: user.email,
         session_token: sessionToken
@@ -80,11 +116,37 @@ const UsersManager = () => {
       
       if (error) {
         console.error('RPC Error:', error);
-        throw error;
+        // Fallback to direct query if RPC fails
+        console.log('RPC failed, trying direct query...');
+        
+        const { data: directData, error: directError } = await supabase
+          .from('admin_users')
+          .select('id, email, user_type, is_admin_root, created_at')
+          .order('created_at', { ascending: false });
+        
+        console.log('Fallback query result:', { directData, directError });
+        
+        if (directError) {
+          throw new Error('Erro ao carregar usuários: ' + directError.message);
+        }
+        
+        // Transform the data
+        const transformedUsers = (directData || []).map(user => ({
+          user_id: user.id,
+          email: user.email,
+          user_type: user.user_type,
+          is_admin_root: user.is_admin_root,
+          created_at: user.created_at
+        }));
+        
+        setUsers(transformedUsers);
+        return;
       }
       
-      console.log('Users fetched:', data);
+      console.log('Users from RPC:', data);
       setUsers((data as AdminUser[]) || []);
+      console.log('=== FETCHUSERS DEBUG END ===');
+      
     } catch (error: any) {
       const errorMessage = error?.message || 'Erro ao carregar usuários';
       console.error('Error in fetchUsers:', error);
@@ -95,10 +157,14 @@ const UsersManager = () => {
   };
 
   useEffect(() => {
-    if (user && canManageUsers) {
+    console.log('UsersManager useEffect triggered');
+    console.log('User:', user);
+    console.log('canManageUsers:', canManageUsers);
+    
+    if (user) {
       fetchUsers();
     }
-  }, [user, canManageUsers]);
+  }, [user]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
