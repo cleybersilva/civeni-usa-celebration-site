@@ -36,10 +36,10 @@ const AdminTabs = () => {
 
   const isAdminRoot = () => user.user_type === 'admin_root';
   const canViewFinanceiro = user.user_type === 'admin_root' || user.user_type === 'admin';
-  const canViewUsuarios = user.user_type === 'admin_root';
+  const canViewUsuarios = user.user_type === 'admin_root' || user.is_admin_root;
 
   return (
-    <Tabs defaultValue="banner" className="w-full">
+    <Tabs defaultValue={canViewFinanceiro ? "financeiro" : hasPermission('banner') ? "banner" : canViewUsuarios ? "usuarios" : "palestrantes"} className="w-full">
       <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
         {canViewFinanceiro && (
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>

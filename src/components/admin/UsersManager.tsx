@@ -33,7 +33,7 @@ const UsersManager = () => {
   const { user, sessionToken, isAdminRoot } = useAdminAuth();
 
   // Verificar se o usuário pode executar operações de gerenciamento
-  const canManageUsers = isAdminRoot() || user?.user_type === 'admin';
+  const canManageUsers = isAdminRoot();
   const canDeleteUsers = isAdminRoot(); // Apenas Admin Root pode deletar
 
   // Form state
@@ -56,16 +56,38 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await (supabase as any).rpc('list_admin_users_secure', {
-        user_email: user?.email,
-        session_token: sessionToken
+      if (!user?.email || !sessionToken) {
+        setError('Sessão inválida. Faça login novamente.');
+        return;
+      }
+
+      // Get current session to verify authentication
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session?.session?.access_token) {
+        setError('Sessão expirada. Faça login novamente.');
+        return;
+      }
+
+      // Call the edge function to list users
+      const supabaseUrl = 'https://wdkeqxfglmritghmakma.supabase.co';
+      const response = await fetch(`${supabaseUrl}/functions/v1/admin-list-users`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.session.access_token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
-      if (error) throw error;
-      
-      setUsers((data as AdminUser[]) || []);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao carregar usuários');
+      }
+
+      const data = await response.json();
+      setUsers(data.data || []);
     } catch (error) {
-      setError('Erro ao carregar usuários');
+      setError(error instanceof Error ? error.message : 'Erro ao carregar usuários');
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
@@ -73,8 +95,10 @@ const UsersManager = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (user && canManageUsers) {
+      fetchUsers();
+    }
+  }, [user, canManageUsers]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
