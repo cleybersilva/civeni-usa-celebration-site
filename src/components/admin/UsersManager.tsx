@@ -41,6 +41,8 @@ const UsersManager = () => {
   const canManageUsers = user && (user.user_type === 'admin_root' || user.user_type === 'admin' || user.is_admin_root === true);
   const canDeleteUsers = user && (user.user_type === 'admin_root' || user.is_admin_root === true);
 
+  console.log('Permissions - canManageUsers:', canManageUsers, 'canDeleteUsers:', canDeleteUsers);
+
   // Form state
   const [formData, setFormData] = useState({
     email: '',
@@ -61,91 +63,43 @@ const UsersManager = () => {
 
   const fetchUsers = async () => {
     try {
-      console.log('=== FETCHUSERS DEBUG START ===');
-      console.log('User:', user);
-      console.log('Session Token:', sessionToken);
-      console.log('User Type:', user?.user_type);
-      console.log('Is Admin Root:', isAdminRoot());
+      setLoading(true);
+      setError('');
+      
+      console.log('Fetching users... User:', user?.email);
       
       if (!user?.email) {
-        console.log('ERROR: No user email');
         setError('Usuário não logado');
         return;
       }
 
-      if (!sessionToken) {
-        console.log('ERROR: No session token');
-        // Try to fetch without session token for debug
-        console.log('Attempting direct query...');
-        
-        const { data: directData, error: directError } = await supabase
-          .from('admin_users')
-          .select('id, email, user_type, is_admin_root, created_at')
-          .order('created_at', { ascending: false });
-        
-        console.log('Direct query result:', { directData, directError });
-        
-        if (directError) {
-          console.error('Direct query error:', directError);
-          setError('Erro ao acessar dados: ' + directError.message);
-          return;
-        }
-        
-        // Transform the data
-        const transformedUsers = (directData || []).map(user => ({
-          user_id: user.id,
-          email: user.email,
-          user_type: user.user_type,
-          is_admin_root: user.is_admin_root,
-          created_at: user.created_at
-        }));
-        
-        console.log('Transformed users:', transformedUsers);
-        setUsers(transformedUsers);
+      // Admin check será feito na UI, não bloquear aqui
+
+      // Buscar usuários diretamente do banco de dados
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('id, email, user_type, is_admin_root, created_at')
+        .order('created_at', { ascending: false });
+
+      console.log('Query result:', { data, error });
+
+      if (error) {
+        console.error('Database error:', error);
+        setError('Erro ao carregar usuários: ' + error.message);
         return;
       }
 
-      // Try RPC with session
-      console.log('Attempting RPC call...');
-      const { data, error } = await supabase.rpc('list_admin_users_secure', {
-        user_email: user.email,
-        session_token: sessionToken
-      });
-      
-      console.log('RPC Response:', { data, error });
-      
-      if (error) {
-        console.error('RPC Error:', error);
-        // Fallback to direct query if RPC fails
-        console.log('RPC failed, trying direct query...');
-        
-        const { data: directData, error: directError } = await supabase
-          .from('admin_users')
-          .select('id, email, user_type, is_admin_root, created_at')
-          .order('created_at', { ascending: false });
-        
-        console.log('Fallback query result:', { directData, directError });
-        
-        if (directError) {
-          throw new Error('Erro ao carregar usuários: ' + directError.message);
-        }
-        
-        // Transform the data
-        const transformedUsers = (directData || []).map(user => ({
-          user_id: user.id,
-          email: user.email,
-          user_type: user.user_type,
-          is_admin_root: user.is_admin_root,
-          created_at: user.created_at
-        }));
-        
-        setUsers(transformedUsers);
-        return;
-      }
-      
-      console.log('Users from RPC:', data);
-      setUsers((data as AdminUser[]) || []);
-      console.log('=== FETCHUSERS DEBUG END ===');
+      // Transformar os dados para o formato esperado
+      const transformedUsers = (data || []).map(user => ({
+        user_id: user.id,
+        email: user.email,
+        user_type: user.user_type,
+        is_admin_root: user.is_admin_root,
+        created_at: user.created_at
+      }));
+
+      console.log('Setting users:', transformedUsers);
+      setUsers(transformedUsers);
       
     } catch (error: any) {
       const errorMessage = error?.message || 'Erro ao carregar usuários';
@@ -157,9 +111,7 @@ const UsersManager = () => {
   };
 
   useEffect(() => {
-    console.log('UsersManager useEffect triggered');
-    console.log('User:', user);
-    console.log('canManageUsers:', canManageUsers);
+    console.log('UsersManager useEffect - User:', user?.email);
     
     if (user) {
       fetchUsers();
@@ -353,15 +305,7 @@ const UsersManager = () => {
     );
   }
 
-  if (!canManageUsers) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Alert>
-          <AlertDescription>Acesso negado: você não tem permissão para gerenciar usuários.</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
+  // Remover verificação restritiva aqui - deixar que os dados sejam carregados primeiro
 
   return (
     <div className="space-y-6">
@@ -490,14 +434,22 @@ const UsersManager = () => {
         </Alert>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Administração de Usuários ({users.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      {!canManageUsers ? (
+        <Alert>
+          <Shield className="h-4 w-4" />
+          <AlertDescription>
+            Acesso negado: você não tem permissão para gerenciar usuários.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Administração de Usuários ({users.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
           {users.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               {t('admin.users.noUsersFound')}
@@ -572,7 +524,8 @@ const UsersManager = () => {
             </div>
           )}
         </CardContent>
-      </Card>
+        </Card>
+      )}
 
       {/* Edit User Dialog */}
       {canManageUsers && (
