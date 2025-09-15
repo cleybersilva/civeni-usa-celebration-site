@@ -1686,6 +1686,33 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          access_details: Json | null
+          access_type: string
+          accessed_by: string
+          accessed_table: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          access_details?: Json | null
+          access_type: string
+          accessed_by: string
+          accessed_table: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          access_details?: Json | null
+          access_type?: string
+          accessed_by?: string
+          accessed_table?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       site_config: {
         Row: {
           config_key: string
@@ -2182,6 +2209,19 @@ export type Database = {
           user_id: string
           user_type: Database["public"]["Enums"]["admin_user_type"]
         }[]
+      }
+      log_security_access: {
+        Args: {
+          access_type: string
+          details?: Json
+          table_name: string
+          user_email: string
+        }
+        Returns: undefined
+      }
+      mask_email_if_not_admin_root: {
+        Args: { email_input: string; user_email: string }
+        Returns: string
       }
       request_password_reset: {
         Args: { user_email: string }
