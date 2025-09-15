@@ -2170,6 +2170,23 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_registration_data_secure: {
+        Args: {
+          registration_id?: string
+          session_token: string
+          user_email: string
+        }
+        Returns: {
+          access_level: string
+          amount_paid: number
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          participant_type: string
+          payment_status: string
+        }[]
+      }
       get_registration_details_secure: {
         Args: { registration_id: string }
         Returns: Json
