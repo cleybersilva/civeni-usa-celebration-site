@@ -131,44 +131,51 @@ const SejaNossoParceiro = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue-dark">
+    <div className="min-h-screen bg-white">
       <Header />
       
-      <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 px-4">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="mb-8">
-              <Badge className="bg-white/10 text-white border-white/20 mb-4">
-                <Handshake className="h-4 w-4 mr-2" />
-                Parcerias Estratégicas
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                Seja Nosso <span className="text-civeni-accent">Parceiro</span>
-              </h1>
-              <p className="text-xl text-civeni-blue-light max-w-3xl mx-auto leading-relaxed">
-                Junte-se ao III CIVENI 2025 e conecte sua marca a um dos maiores eventos 
-                de ciências humanas e tecnologia do Brasil
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6 mt-12">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">500+</div>
-                <div className="text-civeni-blue-light">Participantes Esperados</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">3</div>
-                <div className="text-civeni-blue-light">Dias de Evento</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">100%</div>
-                <div className="text-civeni-blue-light">Alcance Digital</div>
-              </div>
+      {/* Hero Section with Banner */}
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><a href="/" className="hover:text-blue-200 transition-colors">Home</a></li>
+              <li className="text-blue-200">›</li>
+              <li>Seja Nosso Parceiro</li>
+            </ol>
+          </nav>
+          
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              Seja Nosso Parceiro
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              Junte-se ao III CIVENI 2025 e conecte sua marca a um dos maiores eventos 
+              de ciências humanas e tecnologia do Brasil
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/inscricoes">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
+              </a>
+              
+              <a href="mailto:parcerias@civeni2025.com">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Mail className="w-5 h-5" />
+                  E-mail Direto
+                </button>
+              </a>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
+      <main className="pt-0">
         {/* Benefits Section */}
         <section className="py-16 px-4 bg-white">
           <div className="max-w-6xl mx-auto">
