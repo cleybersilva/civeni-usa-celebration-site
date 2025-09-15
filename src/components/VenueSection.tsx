@@ -43,7 +43,7 @@ const VenueSection = () => {
               </div>
             </div>
             
-          <div className="bg-gradient-to-br from-civeni-blue to-blue-600 text-white rounded-2xl p-8">
+          <div className="bg-gradient-to-br from-civeni-red to-red-600 text-white rounded-2xl p-8">
             <h3 className="text-2xl font-bold mb-6 font-poppins">💻 {t('venue.onlinePlatform')}</h3>
             <div className="space-y-4">
               <div>
