@@ -84,26 +84,25 @@ const ScheduleOnline = () => {
                 {settings?.page_title || 'Programação Online'}
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-                {settings?.page_subtitle || 'Confira toda a programação online do III CIVENI 2025'}
+                {settings?.page_subtitle || 'Confira toda a programação online do III CIVENI 2025 - Acesse de qualquer lugar do mundo'}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/inscricoes">
-                  <Button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors">
-                    <Users className="w-5 h-5 mr-2" />
+                  <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                    <Users className="w-5 h-5" />
                     Fazer Inscrição
-                  </Button>
+                  </button>
                 </Link>
                 
                 {settings?.show_download_pdf && (
-                  <Button 
+                  <button 
                     onClick={generatePDF}
-                    variant="outline"
-                    className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors"
+                    className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
                   >
-                    <Download className="w-5 h-5 mr-2" />
+                    <Download className="w-5 h-5" />
                     Baixar Programação
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>
