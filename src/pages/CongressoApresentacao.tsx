@@ -124,36 +124,43 @@ const CongressoApresentacao = () => {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <nav className="text-sm mb-6 opacity-90">
-            <Link to="/" className="hover:text-civeni-red transition-colors">Home</Link>
-            <span className="mx-2">›</span>
-            <Link to="/congresso/apresentacao" className="hover:text-civeni-red transition-colors">Programação</Link>
-            <span className="mx-2">›</span>
-            <span>Apresentação</span>
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li className="text-blue-200">›</li>
+              <li><Link to="/congresso/apresentacao" className="hover:text-blue-200 transition-colors">Congresso</Link></li>
+              <li className="text-blue-200">›</li>
+              <li>Apresentação</li>
+            </ol>
           </nav>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-            {pageData?.hero_title || 'III CIVENI - Congresso Internacional Multidisciplinar da VCCU'}
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-            {pageData?.hero_subtitle || 'TEMA e CONTEXTO do congresso serão apresentados aqui com mais detalhes sobre o evento, sua importância e objetivos principais.'}
-          </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-white text-civeni-blue hover:bg-white/90">
-              <Link to="/inscricoes">
-                <Users className="w-5 h-5 mr-2" />
-                {t('congress.presentation.register', 'Fazer Inscrição')}
-              </Link>
-            </Button>
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              {pageData?.hero_title || 'III CIVENI 2025'}
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              {pageData?.hero_subtitle || 'Congresso Internacional Multidisciplinar da VCCU - Conheça a apresentação completa do evento, seus objetivos e a importância para a educação mundial'}
+            </p>
             
-            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/20 hover:text-white">
-              <Link to="/programacao-presencial">
-                <Calendar className="w-5 h-5 mr-2" />
-                {t('congress.presentation.schedule', 'Ver Programação')}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/inscricoes">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
               </Link>
-            </Button>
+              
+              <Link to="/programacao-presencial">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Ver Programação
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
