@@ -79,7 +79,7 @@ const ScheduleInPerson = () => {
               {settings?.page_title || 'Programação Presencial'}
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              {settings?.page_subtitle || 'Confira toda a programação presencial do III CIVENI 2025 - Experimente o evento ao vivo em Fortaleza/CE'}
+              {settings?.page_subtitle || 'Confira toda a programação presencial do III CIVENI 2025'}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
