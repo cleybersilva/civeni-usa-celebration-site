@@ -63,6 +63,13 @@ export const createMenuItems = (
       isPriority: false
     },
     {
+      id: 'civeni-programacao',
+      label: 'Programação CIVENI',
+      icon: CalendarDays,
+      show: hasPermission('cronograma') || isAdminRoot(),
+      isPriority: false
+    },
+    {
       id: 'inscricoes',
       label: t('admin.menu.registrations', 'Inscrições'),
       icon: UserPlus,

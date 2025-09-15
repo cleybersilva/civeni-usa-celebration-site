@@ -27,6 +27,7 @@ import CongressoManager from '@/components/admin/CongressoManager';
 import ThematicAreasManager from '@/components/admin/ThematicAreasManager';
 import CounterConfigManager from '@/components/admin/CounterConfigManager';
 import EventsManager from '@/components/admin/EventsManager';
+import CiveniProgramManager from '@/components/admin/CiveniProgramManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -116,6 +117,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('cronograma') || isAdminRoot()) ? (
           <PermissionGuard resource="cronograma">
             <ScheduleManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'civeni-programacao':
+        return (hasPermission('cronograma') || isAdminRoot()) ? (
+          <PermissionGuard resource="cronograma">
+            <CiveniProgramManager />
           </PermissionGuard>
         ) : null;
       

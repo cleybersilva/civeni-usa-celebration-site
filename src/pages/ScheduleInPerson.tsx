@@ -1,31 +1,58 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Users, Download } from 'lucide-react';
+import { Calendar, Download, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import ScheduleFilters from '@/components/schedule/ScheduleFilters';
-import ScheduleDay from '@/components/schedule/ScheduleDay';
-import ScheduleEmpty from '@/components/schedule/ScheduleEmpty';
-import { useScheduleData } from '@/hooks/useScheduleData';
-import { downloadSchedule } from '@/utils/scheduleUtils';
-import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { useCiveniProgramData } from '@/hooks/useCiveniProgramData';
+import DayTabs from '@/components/civeni/DayTabs';
+import DayTimeline from '@/components/civeni/DayTimeline';
+import { Tabs } from '@/components/ui/tabs';
 
 const ScheduleInPerson = () => {
-  const { t } = useTranslation();
-  const {
-    isLoading,
-    selectedDate,
-    setSelectedDate,
-    selectedCategory,
-    setSelectedCategory,
-    uniqueDates,
-    categories,
-    filteredSchedules,
-  } = useScheduleData('presencial');
+  const { settings, days, isLoading, getSessionsForDay } = useCiveniProgramData();
+  const [activeDay, setActiveDay] = useState<string>('');
 
-  const handleDownload = () => {
-    downloadSchedule(filteredSchedules, 'presencial');
+  // Set first day as active when data loads
+  React.useEffect(() => {
+    if (days && days.length > 0 && !activeDay) {
+      setActiveDay(days[0].id);
+    }
+  }, [days, activeDay]);
+
+  const generatePDF = async () => {
+    // Simple CSV export for now - can be enhanced to proper PDF later
+    if (!days || !days.length) return;
+    
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Data,Horário,Título,Tipo,Modalidade,Descrição\n";
+    
+    days.forEach(day => {
+      const sessions = getSessionsForDay(day.id);
+      sessions.forEach(session => {
+        const startTime = new Date(session.start_at).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Fortaleza'
+        });
+        const endTime = session.end_at ? new Date(session.end_at).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Fortaleza'
+        }) : '';
+        
+        csvContent += `"${day.weekday_label}, ${new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR')}","${startTime}${endTime ? ' - ' + endTime : ''}","${session.title}","${session.session_type}","${session.modality}","${session.description || ''}"\n`;
+      });
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `programacao-civeni-2025.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -49,28 +76,30 @@ const ScheduleInPerson = () => {
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              Programação Presencial
+              {settings?.page_title || 'Programação Presencial'}
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Descubra todas as atividades presenciais do III CIVENI 2025 - 
-              Palestras, workshops e networking com especialistas de todo o mundo
+              {settings?.page_subtitle || 'Confira toda a programação presencial do III CIVENI 2025'}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/inscricoes">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+                <Button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors">
+                  <Users className="w-5 h-5 mr-2" />
                   Fazer Inscrição
-                </button>
+                </Button>
               </Link>
               
-              <button 
-                onClick={handleDownload}
-                className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
-              >
-                <Download className="w-5 h-5" />
-                Baixar Programação
-              </button>
+              {settings?.show_download_pdf && (
+                <Button 
+                  onClick={generatePDF}
+                  variant="outline"
+                  className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Baixar Programação
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -78,44 +107,36 @@ const ScheduleInPerson = () => {
       
       <main className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins flex items-center justify-center gap-3">
-              <MapPin className="w-8 h-8 text-civeni-blue" />
-              Cronograma das Atividades Presenciais
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Organize sua agenda e não perca nenhuma das experiências presenciais exclusivas do congresso
-            </p>
-          </div>
-
-          <ScheduleFilters
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            uniqueDates={uniqueDates}
-            categories={categories}
-            onDownload={handleDownload}
-          />
-
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">{t('schedule.loading')}</p>
+              <p className="mt-4 text-gray-600">Carregando programação...</p>
+            </div>
+          ) : !days || days.length === 0 ? (
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Programação em breve
+              </h2>
+              <p className="text-gray-600">
+                A programação ainda não foi publicada. Volte em breve!
+              </p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {uniqueDates.map(date => {
-                const daySchedules = filteredSchedules?.filter(s => s.date === date);
-                if (!daySchedules?.length) return null;
-
-                return (
-                  <ScheduleDay key={date} date={date} schedules={daySchedules} />
-                );
-              })}
+            <Tabs value={activeDay} onValueChange={setActiveDay}>
+              <DayTabs 
+                days={days} 
+                activeDay={activeDay} 
+                onDayChange={setActiveDay} 
+              />
               
-              {!filteredSchedules?.length && <ScheduleEmpty />}
-            </div>
+              {days.map(day => (
+                <DayTimeline
+                  key={day.id}
+                  day={day}
+                  sessions={getSessionsForDay(day.id)}
+                />
+              ))}
+            </Tabs>
           )}
         </div>
       </main>
