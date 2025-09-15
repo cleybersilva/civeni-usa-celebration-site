@@ -170,15 +170,67 @@ const CongressoApresentacao = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <article className="prose prose-lg prose-slate max-w-none dark:prose-invert">
-              {pageData?.content_md ? (
+               {pageData?.content_md ? (
                 <ReactMarkdown>
                   {pageData.content_md}
                 </ReactMarkdown>
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <p>{t('congress.presentation.no_content', 'Conteúdo não disponível')}</p>
+               ) : (
+                <div className="space-y-8">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl md:text-4xl font-bold text-civeni-blue mb-6 font-poppins">
+                      III CIVENI - Congresso Internacional Multidisciplinar da VCCU
+                    </h2>
+                    <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-2xl p-8 mb-8">
+                      <h3 className="text-2xl font-bold text-civeni-red mb-4 font-poppins">
+                        TEMA: Saberes em Conexão: Inovação, Justiça e Humanidade na Sociedade Contemporânea
+                      </h3>
+                    </div>
+                  </div>
+                  
+                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6">
+                    <p className="text-xl text-gray-800 font-medium">
+                      No contexto da sociedade contemporânea, marcada por crises globais, desigualdades persistentes e transformações tecnológicas aceleradas, torna-se urgente repensar os modos de produção e circulação do conhecimento.
+                    </p>
+                    
+                    <p>
+                      A articulação entre <strong>saberes diversos e conectados</strong> — científicos, éticos, culturais e espirituais — revela-se fundamental para promover soluções inovadoras que estejam alinhadas não apenas à eficiência, mas à <em>justiça social</em> e ao <em>cuidado com a dignidade humana</em>.
+                    </p>
+                    
+                    <div className="bg-blue-50 border-l-4 border-civeni-blue p-6 rounded-r-lg">
+                      <p className="text-civeni-blue font-semibold mb-2">Visão Transformadora:</p>
+                      <p>
+                        A inovação não pode ser compreendida apenas como avanço técnico, mas como <strong>prática situada e comprometida com o bem comum</strong>. Unir inovação, justiça e humanidade significa construir pontes entre disciplinas, setores e povos, em busca de uma sociedade mais inclusiva.
+                      </p>
+                    </div>
+                    
+                    <p>
+                      O III CIVENI 2025 propõe-se a ser um espaço de <strong>diálogo interdisciplinar</strong>, onde pesquisadores, educadores, profissionais e estudantes possam compartilhar experiências, debater perspectivas e construir coletivamente caminhos para uma sociedade mais justa, humana e tecnologicamente responsável.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 gap-6 mt-8">
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl">
+                        <h4 className="font-bold text-civeni-blue mb-3 flex items-center">
+                          <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                          Objetivo Principal
+                        </h4>
+                        <p className="text-gray-700">
+                          Promover a integração de saberes para enfrentar os desafios contemporâneos com soluções inovadoras e humanizadas.
+                        </p>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-6 rounded-xl">
+                        <h4 className="font-bold text-civeni-blue mb-3 flex items-center">
+                          <span className="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
+                          Impacto Esperado
+                        </h4>
+                        <p className="text-gray-700">
+                          Formar uma rede global de profissionais comprometidos com a transformação social através da educação e tecnologia.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
+               )}
             </article>
           </div>
         </div>
@@ -273,7 +325,7 @@ const CongressoApresentacao = () => {
               </Link>
             </Button>
             
-            <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white hover:text-civeni-blue border-2 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
+            <Button asChild size="lg" className="bg-white/20 text-white hover:bg-white hover:text-civeni-blue border-2 border-white px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105 backdrop-blur-sm">
               <Link to="/programacao-presencial" className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Ver Programação
