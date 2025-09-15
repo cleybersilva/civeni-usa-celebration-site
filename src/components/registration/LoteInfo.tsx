@@ -39,7 +39,7 @@ const LoteInfo = ({ lote }: LoteInfoProps) => {
   const daysRemaining = getDaysRemaining();
 
   return (
-    <Card className="max-w-md mx-auto mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+    <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
       <CardHeader>
         <CardTitle className="flex items-center justify-center gap-2 text-primary">
           <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>

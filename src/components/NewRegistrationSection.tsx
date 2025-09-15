@@ -85,19 +85,26 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
               : t('registration.newTitle')
             }
           </h2>
-          
-          <LoteInfo lote={loteVigente} />
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Ticket className="w-5 h-5" />
-                {t('registration.formTitle')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Informações do Lote - Lado Esquerdo */}
+          <div className="lg:order-1">
+            <div className="sticky top-8">
+              <LoteInfo lote={loteVigente} />
+            </div>
+          </div>
+
+          {/* Formulário - Lado Direito */}
+          <div className="lg:order-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ticket className="w-5 h-5" />
+                  {t('registration.formTitle')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
               <form onSubmit={handleFormSubmit} className="space-y-6">
                 {error && (
                   <Alert variant="destructive">
@@ -209,8 +216,9 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                   {loading ? t('registration.processing') : t('registration.registerNow')}
                 </Button>
               </form>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </section>
