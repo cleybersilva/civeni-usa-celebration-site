@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Users, Calendar, Award, BookOpen, Monitor } from 'lucide-react';
+import { Play, Users, Calendar, Award, BookOpen, Monitor, Network, Brain, Globe, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import Header from '@/components/Header';
@@ -185,57 +185,69 @@ const CongressoApresentacao = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16">
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
               {featuresTitle}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               {featuresDescription}
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-lg transition-all duration-300 hover-scale">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Users className="w-8 h-8 text-primary" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <CardContent className="p-8 text-center relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Network className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 font-poppins group-hover:text-civeni-blue transition-colors">
                   {feature1Title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600 leading-relaxed mb-4">
                   {feature1Desc}
                 </p>
+                <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Saiba mais <ArrowRight className="w-4 h-4 ml-1" />
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-all duration-300 hover-scale">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <BookOpen className="w-8 h-8 text-secondary" />
+            <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <CardContent className="p-8 text-center relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Brain className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 font-poppins group-hover:text-civeni-blue transition-colors">
                   {feature2Title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600 leading-relaxed mb-4">
                   {feature2Desc}
                 </p>
+                <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Saiba mais <ArrowRight className="w-4 h-4 ml-1" />
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-all duration-300 hover-scale">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Monitor className="w-8 h-8 text-accent" />
+            <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-violet-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <CardContent className="p-8 text-center relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Globe className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 font-poppins group-hover:text-civeni-blue transition-colors">
                   {feature3Title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-gray-600 leading-relaxed mb-4">
                   {feature3Desc}
                 </p>
+                <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Saiba mais <ArrowRight className="w-4 h-4 ml-1" />
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -243,20 +255,31 @@ const CongressoApresentacao = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary/10 to-secondary/10">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+      <section className="py-20 bg-gradient-to-r from-civeni-blue via-civeni-blue to-civeni-red relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 font-poppins">
             {ctaTitle}
           </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
             {ctaDescription}
           </p>
           
-          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-            <Link to={ctaButtonLink}>
-              {ctaButtonText}
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
+              <Link to={ctaButtonLink} className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                {ctaButtonText}
+              </Link>
+            </Button>
+            
+            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
+              <Link to="/programacao-presencial" className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Ver Programação
+              </Link>
+            </Button>
+          </div>
         </div>
         </section>
       </div>
