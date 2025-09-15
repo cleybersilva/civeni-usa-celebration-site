@@ -90,6 +90,12 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Informações do Lote - Lado Esquerdo */}
           <div className="lg:order-1">
+            {/* Botão Vagas Limitadas */}
+            <div className="text-center mb-4">
+              <div className="inline-block bg-orange-500 text-white px-6 py-2 rounded-full text-sm font-semibold animate-pulse cursor-default">
+                Vagas Limitadas
+              </div>
+            </div>
             <div className="sticky top-8">
               <LoteInfo lote={loteVigente} />
             </div>
@@ -99,7 +105,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
           <div className="lg:order-2">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center justify-center gap-2">
                   <Ticket className="w-5 h-5" />
                   {t('registration.formTitle')}
                 </CardTitle>
