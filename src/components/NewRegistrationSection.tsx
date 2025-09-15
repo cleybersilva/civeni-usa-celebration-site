@@ -79,7 +79,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
               ? t('registration.presentialFormTitle', 'Formulário de Inscrição Presencial')
               : registrationType === 'online'
               ? t('registration.onlineFormTitle', 'Formulário de Inscrição Online')
-              : t('registration.newTitle')
+              : 'Inscrições III Civeni 2025'
             }
           </h2>
         </div>
