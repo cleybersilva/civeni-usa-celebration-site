@@ -64,8 +64,15 @@ export const createMenuItems = (
     },
     {
       id: 'civeni-programacao',
-      label: 'Programação CIVENI',
+      label: 'CIVENI Presencial',
       icon: CalendarDays,
+      show: hasPermission('cronograma') || isAdminRoot(),
+      isPriority: false
+    },
+    {
+      id: 'civeni-online-programacao',
+      label: 'CIVENI Online',
+      icon: Monitor,
       show: hasPermission('cronograma') || isAdminRoot(),
       isPriority: false
     },
