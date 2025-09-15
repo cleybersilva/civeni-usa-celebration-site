@@ -21,6 +21,7 @@ export const useCiveniProgramData = () => {
       const { data, error } = await supabase
         .from('civeni_program_days')
         .select('*')
+        .eq('event_slug', 'iii-civeni-2025')
         .eq('is_published', true)
         .order('sort_order');
       
