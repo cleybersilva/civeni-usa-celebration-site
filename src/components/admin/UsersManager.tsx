@@ -89,6 +89,8 @@ const UsersManager = () => {
         return;
       }
 
+      console.log('Raw data from database:', data);
+
       // Transformar os dados para o formato esperado
       const transformedUsers = (data || []).map(user => ({
         user_id: user.id,
@@ -98,7 +100,8 @@ const UsersManager = () => {
         created_at: user.created_at
       }));
 
-      console.log('Setting users:', transformedUsers);
+      console.log('Transformed users:', transformedUsers);
+      console.log('About to set users state with:', transformedUsers.length, 'users');
       setUsers(transformedUsers);
       
     } catch (error: any) {
