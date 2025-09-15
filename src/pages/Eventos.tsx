@@ -95,33 +95,25 @@ const Eventos = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-pink-800 text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue via-blue-700 to-purple-800 text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
           <nav className="mb-8 text-sm">
             <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-purple-200 transition-colors">Home</Link></li>
-              <li className="text-purple-200">›</li>
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li className="text-blue-200">›</li>
               <li>Eventos</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              III CIVENI 2025
+              {t('events.title', 'Eventos')}
             </h1>
-            <p className="text-xl text-purple-100 max-w-3xl mx-auto mb-8">
-              Congresso Internacional Multidisciplinar da VCCU
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              {t('events.description', 'Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do CIVENI')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button className="bg-civeni-blue hover:bg-civeni-blue/90 text-white px-8 py-3">
-                Fazer Inscrição
-              </Button>
-              <Button variant="outline" className="bg-white/10 border-white text-white hover:bg-white hover:text-purple-700 px-8 py-3">
-                Ver Programação
-              </Button>
-            </div>
           </div>
         </div>
       </section>
