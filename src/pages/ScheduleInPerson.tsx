@@ -90,15 +90,13 @@ const ScheduleInPerson = () => {
                 </button>
               </Link>
               
-              {settings?.show_download_pdf && (
-                <button 
-                  onClick={generatePDF}
-                  className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
-                >
-                  <Download className="w-5 h-5" />
-                  Baixar Programação
-                </button>
-              )}
+              <button 
+                onClick={generatePDF}
+                className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
+              >
+                <Download className="w-5 h-5" />
+                Baixar Programação
+              </button>
             </div>
           </div>
         </div>
