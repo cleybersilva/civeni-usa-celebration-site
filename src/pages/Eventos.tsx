@@ -95,7 +95,7 @@ const Eventos = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue via-blue-700 to-purple-800 text-white py-20">
+      <section className="bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
