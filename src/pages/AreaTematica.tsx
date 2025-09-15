@@ -94,14 +94,22 @@ const AreaTematica = () => {
           </div>
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            {thematicAreas?.map((area) => {
+            {thematicAreas?.map((area, index) => {
               const { name, description } = getLocalizedContent(area);
               const IconComponent = iconMap[area.icon_name as keyof typeof iconMap] || BookOpen;
+              
+              // Check if this is the "Espiritualidade" card and apply centering
+              const isEspiritualidade = name.toLowerCase().includes('espiritualidade') || 
+                                       area.name_pt.toLowerCase().includes('espiritualidade');
+              const shouldCenter = isEspiritualidade && thematicAreas.length % 3 !== 0 && 
+                                 index === thematicAreas.length - 1;
               
               return (
                 <div
                   key={area.id}
-                  className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-gray-100"
+                  className={`bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-gray-100 ${
+                    shouldCenter ? 'md:col-span-2 lg:col-span-3 max-w-md mx-auto' : ''
+                  }`}
                 >
                   <div className={`flex items-center justify-center w-16 h-16 bg-${area.color_class || 'civeni-blue'} rounded-full mb-6 mx-auto`}>
                     <IconComponent className="w-8 h-8 text-white" />
