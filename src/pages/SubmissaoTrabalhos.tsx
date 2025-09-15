@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Upload, FileText, CheckCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Users, BookOpen } from 'lucide-react';
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
@@ -124,7 +125,7 @@ const SubmissaoTrabalhos = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-white font-poppins">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
         <Header />
         
         <main className="py-20">
@@ -156,18 +157,61 @@ const SubmissaoTrabalhos = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-poppins">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
+      
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li className="text-blue-200">›</li>
+              <li><Link to="/area-tematica" className="hover:text-blue-200 transition-colors">Trabalhos</Link></li>
+              <li className="text-blue-200">›</li>
+              <li>Submissão</li>
+            </ol>
+          </nav>
+          
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              Submissão de Trabalhos
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              Compartilhe suas pesquisas e experiências no III CIVENI 2025 - 
+              Contribua para o avanço do conhecimento multidisciplinar mundial
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/area-tematica">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Ver Áreas Temáticas
+                </button>
+              </Link>
+              
+              <Link to="/inscricoes">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
       
       <main className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6">
-                Submissão de Trabalhos
-              </h1>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-poppins">
+                Formulário de Submissão
+              </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Compartilhe suas pesquisas e experiências no III CIVENI USA 2025
+                Preencha todos os campos obrigatórios para submeter seu trabalho ao congresso
               </p>
             </div>
 

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, ExternalLink, Calendar, Presentation } from 'lucide-react';
+import { FileText, Download, ExternalLink, Calendar, Presentation, Users, BookOpen } from 'lucide-react';
 import { createSafeHtml } from '@/utils/sanitizeHtml';
 
 interface WorkContent {
@@ -159,22 +160,64 @@ const SessoesPoster = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Presentation className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl font-bold text-foreground">
-                {t('works.poster.title', 'Sessões de Pôster')}
-              </h1>
-            </div>
-            <p className="text-lg text-muted-foreground">
-              {t('works.poster.subtitle', 'Modalidade de apresentação em pôster para o III CIVENI 2025')}
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li className="text-blue-200">›</li>
+              <li><Link to="/submissao-trabalhos" className="hover:text-blue-200 transition-colors">Trabalhos</Link></li>
+              <li className="text-blue-200">›</li>
+              <li>Sessões de Pôster</li>
+            </ol>
+          </nav>
+          
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              Sessões de Pôster
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              Modalidade de apresentação em pôster para o III CIVENI 2025 - 
+              Apresente visualmente suas descobertas e pesquisas inovadoras
             </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/submissao-trabalhos">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Submeter Trabalho
+                </button>
+              </Link>
+              
+              <Link to="/inscricoes">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
+              </Link>
+            </div>
           </div>
+        </div>
+      </section>
+      
+      <main className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins flex items-center justify-center gap-3">
+                <Presentation className="w-8 h-8 text-civeni-blue" />
+                Informações sobre Sessões de Pôster
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Saiba como preparar e apresentar seu pôster científico seguindo as diretrizes do congresso
+              </p>
+            </div>
 
           {loading ? (
             <div className="text-center py-8">
@@ -195,7 +238,8 @@ const SessoesPoster = () => {
                 </p>
               </CardContent>
             </Card>
-          )}
+           )}
+          </div>
         </div>
       </main>
 
