@@ -273,7 +273,7 @@ const CongressoApresentacao = () => {
               </Link>
             </Button>
             
-            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/20 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
+            <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white hover:text-civeni-blue border-2 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
               <Link to="/programacao-presencial" className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Ver Programação
