@@ -74,9 +74,6 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
     <section id="registration" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <div className="inline-block bg-civeni-red text-white px-6 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
-            {t('registration.urgent')}
-          </div>
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
             {registrationType === 'presencial' 
               ? t('registration.presentialFormTitle', 'Formulário de Inscrição Presencial')
