@@ -95,7 +95,7 @@ const Eventos = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
@@ -108,12 +108,29 @@ const Eventos = () => {
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              {t('events.title', 'Eventos')}
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              Eventos
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              {t('events.description', 'Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do CIVENI')}
+            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do III CIVENI 2025 -
+              Uma experiência única de aprendizado e networking mundial
             </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/inscricoes">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
+              </Link>
+              
+              <Link to="/programacao-presencial">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Ver Programação
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
