@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface RegistrationStats {
   total_registrations: number;
@@ -27,8 +28,24 @@ export const useFinancialData = () => {
   const [alerts, setAlerts] = useState<AlertLog[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAdminAuth();
+  
+  // Only admin_root can access financial data
+  const canAccessFinancialData = user?.user_type === 'admin_root';
 
   const fetchStats = useCallback(async () => {
+    if (!canAccessFinancialData) {
+      setStats({
+        total_registrations: 0,
+        completed_payments: 0,
+        pending_payments: 0,
+        total_revenue: 0,
+        today_registrations: 0,
+        today_revenue: 0
+      });
+      return;
+    }
+    
     try {
       const { data: registrations, error: regError } = await supabase
         .from('event_registrations')
@@ -74,7 +91,7 @@ export const useFinancialData = () => {
         variant: "destructive"
       });
     }
-  }, [toast]);
+  }, [toast, canAccessFinancialData]);
 
   const fetchAlerts = useCallback(async () => {
     try {

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Shield } from 'lucide-react';
 import StatsCards from './dashboard/StatsCards';
 import ActionsCard from './dashboard/ActionsCard';
 import AlertsLog from './dashboard/AlertsLog';
@@ -11,9 +13,26 @@ import RevenueCharts from './dashboard/RevenueCharts';
 import RegistrationReports from './dashboard/RegistrationReports';
 import { useFinancialData } from './dashboard/hooks/useFinancialData';
 import { useChartData } from './dashboard/hooks/useChartData';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const FinancialDashboard = () => {
   const { t } = useTranslation();
+  const { user } = useAdminAuth();
+  
+  // Only admin_root can access financial data
+  if (user?.user_type !== 'admin_root') {
+    return (
+      <div className="p-6">
+        <Alert>
+          <Shield className="h-4 w-4" />
+          <AlertDescription>
+            Acesso restrito: Apenas usuários Admin Root podem visualizar dados financeiros.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+  
   const {
     stats,
     alerts,

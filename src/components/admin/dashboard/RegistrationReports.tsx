@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Download, FileText, FileSpreadsheet, TrendingUp, Calendar, Users, DollarSign } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Download, FileText, FileSpreadsheet, TrendingUp, Calendar, Users, DollarSign, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface RegistrationReport {
   id: string;
@@ -39,11 +41,27 @@ interface ReportSummary {
 
 const RegistrationReports = () => {
   const { t } = useTranslation();
+  const { user } = useAdminAuth();
   const [reports, setReports] = useState<RegistrationReport[]>([]);
   const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
   const { toast } = useToast();
+  
+  // Only admin_root can access full financial reports
+  const canAccessFinancialData = user?.user_type === 'admin_root';
+  
+  // Non-admin-root cannot access registration reports at all
+  if (!user || (user.user_type !== 'admin_root' && user.user_type !== 'admin')) {
+    return (
+      <Alert>
+        <Shield className="h-4 w-4" />
+        <AlertDescription>
+          Acesso restrito: Apenas usuários Admin podem visualizar relatórios de inscrições.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   useEffect(() => {
     fetchReports();
@@ -86,32 +104,32 @@ const RegistrationReports = () => {
 
       const formattedReports = registrations?.map(reg => ({
         id: reg.id,
-        email: reg.email,
+        email: canAccessFinancialData ? reg.email : reg.email.substring(0, 3) + '***@' + reg.email.split('@')[1],
         full_name: reg.full_name,
         category_name: 'Categoria', // Simplified for now
         batch_number: 'Lote Atual', // Simplified for now
         payment_status: reg.payment_status,
-        amount_paid: reg.amount_paid || 0,
+        amount_paid: canAccessFinancialData ? (reg.amount_paid || 0) : 0, // Hide amounts from non-root
         currency: reg.currency,
         coupon_code: reg.coupon_code || 'Não usado',
-        payment_method: reg.payment_method || 'N/A',
-        card_brand: reg.card_brand || 'N/A',
-        installments: reg.installments || 1,
-        payment_type: reg.payment_type || 'N/A',
+        payment_method: canAccessFinancialData ? (reg.payment_method || 'N/A') : 'Restrito',
+        card_brand: canAccessFinancialData ? (reg.card_brand || 'N/A') : 'Restrito',
+        installments: canAccessFinancialData ? (reg.installments || 1) : 0,
+        payment_type: canAccessFinancialData ? (reg.payment_type || 'N/A') : 'Restrito',
         created_at: reg.created_at,
         updated_at: reg.updated_at
       })) || [];
 
       setReports(formattedReports);
       
-      // Calcular resumo
+      // Calcular resumo (apenas admin_root vê dados financeiros reais)
       const totalRegistrations = formattedReports.length;
       const completedPayments = formattedReports.filter(r => r.payment_status === 'completed').length;
       const pendingPayments = formattedReports.filter(r => r.payment_status === 'pending').length;
-      const totalRevenue = formattedReports
+      const totalRevenue = canAccessFinancialData ? formattedReports
         .filter(r => r.payment_status === 'completed')
-        .reduce((sum, r) => sum + r.amount_paid, 0);
-      const averageTicket = completedPayments > 0 ? totalRevenue / completedPayments : 0;
+        .reduce((sum, r) => sum + r.amount_paid, 0) : 0;
+      const averageTicket = canAccessFinancialData && completedPayments > 0 ? totalRevenue / completedPayments : 0;
       const conversionRate = totalRegistrations > 0 ? (completedPayments / totalRegistrations) * 100 : 0;
 
       setSummary({
@@ -292,7 +310,14 @@ const RegistrationReports = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-green-600 font-medium">Receita Total</p>
-                  <p className="text-2xl font-bold text-green-900">R$ {summary.totalRevenue.toFixed(2)}</p>
+                  {canAccessFinancialData ? (
+                    <p className="text-2xl font-bold text-green-900">R$ {summary.totalRevenue.toFixed(2)}</p>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Shield className="h-3 w-3" />
+                      Restrito
+                    </div>
+                  )}
                 </div>
                 <DollarSign className="h-8 w-8 text-green-600" />
               </div>
@@ -304,7 +329,14 @@ const RegistrationReports = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-purple-600 font-medium">Ticket Médio</p>
-                  <p className="text-2xl font-bold text-purple-900">R$ {summary.averageTicket.toFixed(2)}</p>
+                  {canAccessFinancialData ? (
+                    <p className="text-2xl font-bold text-purple-900">R$ {summary.averageTicket.toFixed(2)}</p>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Shield className="h-3 w-3" />
+                      Restrito
+                    </div>
+                  )}
                 </div>
                 <TrendingUp className="h-8 w-8 text-purple-600" />
               </div>
@@ -384,16 +416,32 @@ const RegistrationReports = () => {
                         <TableCell>{report.category_name}</TableCell>
                         <TableCell>{report.batch_number}</TableCell>
                         <TableCell>{getStatusBadge(report.payment_status)}</TableCell>
-                        <TableCell>R$ {report.amount_paid.toFixed(2)}</TableCell>
                         <TableCell>
-                          <div className="text-sm">
-                            <div>{report.payment_method}</div>
-                            {report.card_brand !== 'N/A' && (
-                              <div className="text-gray-500">
-                                {report.card_brand} - {report.installments}x
-                              </div>
-                            )}
-                          </div>
+                          {canAccessFinancialData ? (
+                            `R$ ${report.amount_paid.toFixed(2)}`
+                          ) : (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Shield className="h-3 w-3" />
+                              Restrito
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {canAccessFinancialData ? (
+                            <div className="text-sm">
+                              <div>{report.payment_method}</div>
+                              {report.card_brand !== 'N/A' && report.card_brand !== 'Restrito' && (
+                                <div className="text-gray-500">
+                                  {report.card_brand} - {report.installments}x
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Shield className="h-3 w-3" />
+                              Restrito
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell>{report.coupon_code}</TableCell>
                         <TableCell>{new Date(report.created_at).toLocaleDateString('pt-BR')}</TableCell>
