@@ -182,6 +182,218 @@ export type Database = {
         }
         Relationships: []
       }
+      civeni_program_days: {
+        Row: {
+          created_at: string | null
+          date: string
+          event_slug: string
+          headline: string
+          id: string
+          is_published: boolean
+          location: string | null
+          modality: Database["public"]["Enums"]["civeni_modality"] | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string | null
+          sort_order: number
+          theme: string
+          updated_at: string | null
+          weekday_label: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          event_slug?: string
+          headline: string
+          id?: string
+          is_published?: boolean
+          location?: string | null
+          modality?: Database["public"]["Enums"]["civeni_modality"] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string | null
+          sort_order?: number
+          theme: string
+          updated_at?: string | null
+          weekday_label: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          event_slug?: string
+          headline?: string
+          id?: string
+          is_published?: boolean
+          location?: string | null
+          modality?: Database["public"]["Enums"]["civeni_modality"] | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string | null
+          sort_order?: number
+          theme?: string
+          updated_at?: string | null
+          weekday_label?: string
+        }
+        Relationships: []
+      }
+      civeni_program_sessions: {
+        Row: {
+          created_at: string | null
+          day_id: string
+          description: string | null
+          end_at: string | null
+          id: string
+          is_featured: boolean | null
+          is_parallel: boolean | null
+          is_published: boolean
+          livestream_url: string | null
+          materials_url: string | null
+          modality: Database["public"]["Enums"]["civeni_modality"] | null
+          order_in_day: number
+          room: string | null
+          session_type: Database["public"]["Enums"]["civeni_session_type"]
+          start_at: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_id: string
+          description?: string | null
+          end_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_parallel?: boolean | null
+          is_published?: boolean
+          livestream_url?: string | null
+          materials_url?: string | null
+          modality?: Database["public"]["Enums"]["civeni_modality"] | null
+          order_in_day?: number
+          room?: string | null
+          session_type: Database["public"]["Enums"]["civeni_session_type"]
+          start_at: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_id?: string
+          description?: string | null
+          end_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_parallel?: boolean | null
+          is_published?: boolean
+          livestream_url?: string | null
+          materials_url?: string | null
+          modality?: Database["public"]["Enums"]["civeni_modality"] | null
+          order_in_day?: number
+          room?: string | null
+          session_type?: Database["public"]["Enums"]["civeni_session_type"]
+          start_at?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civeni_program_sessions_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "civeni_program_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      civeni_program_settings: {
+        Row: {
+          id: number
+          last_published_at: string | null
+          page_subtitle: string | null
+          page_title: string | null
+          show_add_to_calendar: boolean | null
+          show_download_pdf: boolean | null
+        }
+        Insert: {
+          id?: number
+          last_published_at?: string | null
+          page_subtitle?: string | null
+          page_title?: string | null
+          show_add_to_calendar?: boolean | null
+          show_download_pdf?: boolean | null
+        }
+        Update: {
+          id?: number
+          last_published_at?: string | null
+          page_subtitle?: string | null
+          page_title?: string | null
+          show_add_to_calendar?: boolean | null
+          show_download_pdf?: boolean | null
+        }
+        Relationships: []
+      }
+      civeni_session_speakers: {
+        Row: {
+          role: string | null
+          session_id: string
+          speaker_id: string
+        }
+        Insert: {
+          role?: string | null
+          session_id: string
+          speaker_id: string
+        }
+        Update: {
+          role?: string | null
+          session_id?: string
+          speaker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "civeni_session_speakers_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "civeni_program_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "civeni_session_speakers_speaker_id_fkey"
+            columns: ["speaker_id"]
+            isOneToOne: false
+            referencedRelation: "civeni_speakers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      civeni_speakers: {
+        Row: {
+          affiliation: string | null
+          created_at: string | null
+          id: string
+          name: string
+          photo_url: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          affiliation?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          affiliation?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cms_committee_members: {
         Row: {
           affiliation: string | null
@@ -2320,6 +2532,20 @@ export type Database = {
     }
     Enums: {
       admin_user_type: "admin" | "editor" | "viewer" | "design" | "admin_root"
+      civeni_modality: "presencial" | "online" | "hibrido"
+      civeni_session_type:
+        | "credenciamento"
+        | "abertura"
+        | "conferencia"
+        | "palestra"
+        | "painel"
+        | "mesa_redonda"
+        | "workshop"
+        | "sessoes_simultaneas"
+        | "intervalo"
+        | "encerramento"
+        | "cerimonia"
+        | "outro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2448,6 +2674,21 @@ export const Constants = {
   public: {
     Enums: {
       admin_user_type: ["admin", "editor", "viewer", "design", "admin_root"],
+      civeni_modality: ["presencial", "online", "hibrido"],
+      civeni_session_type: [
+        "credenciamento",
+        "abertura",
+        "conferencia",
+        "palestra",
+        "painel",
+        "mesa_redonda",
+        "workshop",
+        "sessoes_simultaneas",
+        "intervalo",
+        "encerramento",
+        "cerimonia",
+        "outro",
+      ],
     },
   },
 } as const
