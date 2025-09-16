@@ -17,7 +17,7 @@ const SpeakersSection = () => {
     const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speakers[currentSpeaker]);
     
     return (
-      <div className="relative w-full h-64 md:h-full">
+      <div className="relative w-full h-64 md:h-full bg-gradient-to-br from-civeni-blue/10 to-civeni-red/10">
         {hasError ? (
           <SpeakerImagePlaceholder
             name={speakers[currentSpeaker].name}
@@ -30,9 +30,10 @@ const SpeakersSection = () => {
             <img
               src={imageSrc}
               alt={speakers[currentSpeaker].name}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                isLoading ? 'opacity-50' : 'opacity-100'
+              className={`w-full h-full object-contain transition-all duration-300 ${
+                isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
               }`}
+              style={{ objectPosition: 'center top' }}
             />
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">

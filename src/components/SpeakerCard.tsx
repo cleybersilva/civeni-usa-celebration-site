@@ -13,7 +13,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-      <div className="aspect-square overflow-hidden relative">
+      <div className="aspect-[3/4] overflow-hidden relative bg-gradient-to-br from-civeni-blue/10 to-civeni-red/10">
         {hasError ? (
           <SpeakerImagePlaceholder
             name={speaker.name}
@@ -26,10 +26,11 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
             <img 
               src={imageSrc} 
               alt={speaker.name}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                isLoading ? 'opacity-50' : 'opacity-100'
+              className={`w-full h-full object-contain transition-all duration-300 ${
+                isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
               }`}
               loading="lazy"
+              style={{ objectPosition: 'center top' }}
             />
             
             {/* Indicador de carregamento */}
