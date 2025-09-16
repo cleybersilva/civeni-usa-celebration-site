@@ -42,6 +42,48 @@ export const useAdminEvents = () => {
 
       console.log('Admin events fetched:', data);
 
+      // Ensure all events have Portuguese translations
+      if (data && user) {
+        for (const event of data) {
+          const ptTranslation = event.event_translations?.find((t: any) => t.idioma === 'pt-BR');
+          
+          if (!ptTranslation) {
+            console.log(`Creating missing translation for event: ${event.slug}`);
+            
+            // Create default translation
+            const defaultTitle = event.slug.replace(/-/g, ' ').toUpperCase();
+            const { error: translationError } = await supabase
+              .from('event_translations')
+              .insert({
+                event_id: event.id,
+                idioma: 'pt-BR',
+                titulo: defaultTitle,
+                subtitulo: 'Evento do III CIVENI 2025',
+                descricao_richtext: `Participe do ${defaultTitle}, um evento importante do III CIVENI 2025.`,
+                meta_title: defaultTitle,
+                meta_description: `Participe do ${defaultTitle} - III CIVENI 2025`
+              });
+
+            if (translationError) {
+              console.error('Error creating translation:', translationError);
+            } else {
+              console.log(`Translation created for: ${defaultTitle}`);
+              // Add the created translation to the event data
+              if (!event.event_translations) event.event_translations = [];
+              event.event_translations.push({
+                idioma: 'pt-BR',
+                titulo: defaultTitle,
+                subtitulo: 'Evento do III CIVENI 2025',
+                descricao_richtext: `Participe do ${defaultTitle}, um evento importante do III CIVENI 2025.`,
+                meta_title: defaultTitle,
+                meta_description: `Participe do ${defaultTitle} - III CIVENI 2025`,
+                og_image: event.banner_url || ''
+              });
+            }
+          }
+        }
+      }
+
       // Transform data to flatten translations
       const transformedEvents = data?.map((event: any) => {
         const ptTranslation = event.event_translations?.find((t: any) => t.idioma === 'pt-BR');

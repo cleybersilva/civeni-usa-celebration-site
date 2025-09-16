@@ -107,20 +107,18 @@ export const useEvents = () => {
       console.log('Raw events data from database:', data);
 
       // Transform data to flatten translations and filter by language
-      const transformedEvents = data?.filter((event: any) => {
-        // Check if event has translation for current language
+      const transformedEvents = data?.map((event: any) => {
         const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
-        return translation !== undefined;
-      }).map((event: any) => {
-        const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        
+        // If no translation exists, use the event slug as title
         return {
           ...event,
-          titulo: translation?.titulo,
-          subtitulo: translation?.subtitulo,
-          descricao_richtext: translation?.descricao_richtext,
-          meta_title: translation?.meta_title,
-          meta_description: translation?.meta_description,
-          og_image: translation?.og_image,
+          titulo: translation?.titulo || event.slug.replace(/-/g, ' ').toUpperCase(),
+          subtitulo: translation?.subtitulo || '',
+          descricao_richtext: translation?.descricao_richtext || '',
+          meta_title: translation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
+          meta_description: translation?.meta_description || '',
+          og_image: translation?.og_image || event.banner_url,
           speakers: event.event_speakers
             ?.sort((a: any, b: any) => a.ordem - b.ordem)
             ?.map((es: any) => es.cms_speakers)
@@ -151,7 +149,17 @@ export const useEvents = () => {
   useEffect(() => {
     console.log('useEvents hook mounted, fetching events...');
     fetchEvents();
+    
+    // Log when events change
+    if (events && events.length > 0) {
+      console.log('Events loaded in useEffect:', events);
+    }
   }, []);
+
+  // Add another useEffect to log whenever events state changes
+  useEffect(() => {
+    console.log('useEvents - events state changed:', events);
+  }, [events]);
 
   return { events, loading, refetch: fetchEvents };
 };
