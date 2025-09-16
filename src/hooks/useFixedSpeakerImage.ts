@@ -97,7 +97,6 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
       return;
     }
 
-    console.log(`[${speaker.name}] Processing image (${isProduction() ? 'PRODUCTION' : 'DEVELOPMENT'}):`, speaker.image);
     setIsLoading(true);
     setHasError(false);
 
@@ -106,6 +105,7 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
       if (speaker.image.startsWith('data:')) {
         setImageSrc(speaker.image);
         setIsLoading(false);
+        setHasError(false);
         return;
       }
 
@@ -117,17 +117,14 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
       
       for (let i = 0; i < urlsToTry.length; i++) {
         const url = urlsToTry[i];
-        console.log(`[${speaker.name}] Testing URL ${i + 1}/${urlsToTry.length}:`, url);
         
         const works = await testImageUrl(url);
         
         if (works) {
-          console.log(`[${speaker.name}] ✅ SUCCESS with URL:`, url);
           setImageSrc(url);
+          setHasError(false);
           foundWorkingUrl = true;
           break;
-        } else {
-          console.log(`[${speaker.name}] ❌ Failed URL:`, url);
         }
       }
 
