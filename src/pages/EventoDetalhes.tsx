@@ -161,7 +161,7 @@ const EventoDetalhes = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-12">
+      <section className="relative bg-gradient-to-br from-civeni-blue via-blue-700 to-purple-800 text-white py-12">
         <div className="absolute inset-0 bg-black/20"></div>
         {event.banner_url && (
           <div 
