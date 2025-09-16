@@ -247,7 +247,7 @@ const Eventos = () => {
                         
                         <div className="pt-3">
                           <Link to={`/eventos/${event.slug}`}>
-                            <Button className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90">
+                            <Button className="w-full">
                               Ver Detalhes
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
@@ -303,7 +303,7 @@ const Eventos = () => {
                       
                       <div className="pt-3">
                         <Link to={`/eventos/${event.slug}`}>
-                          <Button variant="outline" className="w-full border-civeni-blue text-civeni-blue hover:bg-gradient-to-r hover:from-civeni-blue hover:to-civeni-red hover:text-white hover:border-transparent">
+                          <Button variant="outline" className="w-full">
                             Ver Detalhes
                             <ExternalLink className="h-4 w-4 ml-2" />
                           </Button>
@@ -377,12 +377,12 @@ const Eventos = () => {
                       
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full border-civeni-blue text-civeni-blue hover:bg-gradient-to-r hover:from-civeni-blue hover:to-civeni-red hover:text-white hover:border-transparent">
+                          <Button variant="outline" size="sm" className="w-full">
                             Ver Detalhes
                           </Button>
                         </Link>
                         {event.youtube_url && (
-                          <Button variant="default" size="sm" className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90" asChild>
+                          <Button variant="default" size="sm" asChild>
                             <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                               Gravação
                             </a>
