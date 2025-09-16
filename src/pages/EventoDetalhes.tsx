@@ -13,10 +13,17 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventoDetalhes = () => {
+  console.log('🔴 EventoDetalhes component started');
+  
   const { slug } = useParams();
   const { t } = useTranslation();
   
+  console.log('🔴 Slug from params:', slug);
+  
   const { event, loading } = useEventBySlug(slug || '');
+  
+  console.log('🔴 Event data:', event);
+  console.log('🔴 Loading state:', loading);
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -121,7 +128,10 @@ const EventoDetalhes = () => {
     link.click();
   };
 
+  console.log('🔴 Checking loading state:', loading);
+  
   if (loading) {
+    console.log('🔴 Rendering loading state');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
         <Header />
@@ -129,6 +139,7 @@ const EventoDetalhes = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-civeni-blue mx-auto"></div>
             <p className="mt-4 text-gray-600">Carregando evento...</p>
+            <p className="mt-2 text-sm text-gray-400">Slug: {slug}</p>
           </div>
         </div>
         <Footer />
@@ -136,7 +147,10 @@ const EventoDetalhes = () => {
     );
   }
 
+  console.log('🔴 Checking event existence:', !!event);
+  
   if (!event) {
+    console.log('🔴 Event not found, rendering 404');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
         <Header />
@@ -144,6 +158,7 @@ const EventoDetalhes = () => {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Evento não encontrado</h1>
             <p className="text-gray-600 mb-8">O evento que você procura não existe ou foi removido.</p>
+            <p className="text-sm text-gray-400 mb-4">Slug procurado: {slug}</p>
             <Link to="/eventos">
               <Button>Voltar para Eventos</Button>
             </Link>

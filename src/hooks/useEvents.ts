@@ -106,17 +106,23 @@ export const useEvents = () => {
 };
 
 export const useEventBySlug = (slug: string) => {
+  console.log('🟡 useEventBySlug hook called with slug:', slug);
+  
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchEvent = async () => {
+    console.log('🟡 fetchEvent called with slug:', slug);
+    
     if (!slug) {
+      console.log('🟡 No slug provided, setting loading to false');
       setLoading(false);
       return;
     }
     
     try {
+      console.log('🟡 Starting fetch operation...');
       setLoading(true);
       
       // First get the event
