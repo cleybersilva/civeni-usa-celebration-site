@@ -67,12 +67,13 @@ serve(async (req) => {
 
         // 6. Upsert na tabela media_assets
         const { data: assetData, error: upsertError } = await supabase
-          .from('media_assets')
+          .from('image_cache_assets')
           .upsert({
             storage_path: fullPath,
             content_hash: contentHash,
             cdn_url: cdnUrl,
             versioned_url: versionedUrl,
+            kind: kind,
             is_published: true,
             updated_at: new Date().toISOString()
           }, {

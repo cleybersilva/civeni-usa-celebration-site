@@ -1455,6 +1455,42 @@ export type Database = {
         }
         Relationships: []
       }
+      image_cache_assets: {
+        Row: {
+          cdn_url: string | null
+          content_hash: string
+          created_at: string | null
+          id: string
+          is_published: boolean | null
+          kind: string | null
+          storage_path: string
+          updated_at: string | null
+          versioned_url: string | null
+        }
+        Insert: {
+          cdn_url?: string | null
+          content_hash: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          kind?: string | null
+          storage_path: string
+          updated_at?: string | null
+          versioned_url?: string | null
+        }
+        Update: {
+          cdn_url?: string | null
+          content_hash?: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          kind?: string | null
+          storage_path?: string
+          updated_at?: string | null
+          versioned_url?: string | null
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempted_at: string

@@ -8,7 +8,7 @@ interface VersionedImageResult {
   refresh: () => void;
 }
 
-interface MediaAsset {
+interface ImageCacheAsset {
   id: string;
   storage_path: string;
   content_hash: string;
@@ -57,7 +57,7 @@ export const useVersionedImage = (originalUrl: string): VersionedImageResult => 
       if (storagePath) {
         // Tentar buscar URL versionada da tabela media_assets
         const { data: asset, error: fetchError } = await supabase
-          .from('media_assets')
+          .from('image_cache_assets')
           .select('versioned_url, content_hash, cdn_url')
           .eq('storage_path', storagePath)
           .eq('is_published', true)
@@ -90,25 +90,25 @@ export const useVersionedImage = (originalUrl: string): VersionedImageResult => 
     fetchVersionedUrl();
   }, [fetchVersionedUrl]);
 
-  // Listen for real-time updates to media_assets
+  // Listen for real-time updates to image_cache_assets
   useEffect(() => {
     const storagePath = extractStoragePath(originalUrl);
     if (!storagePath) return;
 
     const channel = supabase
-      .channel('media-assets-changes')
+      .channel('image-cache-assets-changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'media_assets',
+          table: 'image_cache_assets',
           filter: `storage_path=eq.${storagePath}`
         },
         (payload) => {
-          console.log('Media asset updated:', payload);
-          if (payload.new && (payload.new as MediaAsset).versioned_url) {
-            setVersionedUrl((payload.new as MediaAsset).versioned_url);
+          console.log('Image cache asset updated:', payload);
+          if (payload.new && (payload.new as ImageCacheAsset).versioned_url) {
+            setVersionedUrl((payload.new as ImageCacheAsset).versioned_url);
           }
         }
       )
