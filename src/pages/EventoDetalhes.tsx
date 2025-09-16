@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Calendar, MapPin, Clock, Users, Share2, Download, ExternalLink, Youtube, Award } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,68 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { supabase } from '@/integrations/supabase/client';
+import { useEventBySlug } from '@/hooks/useEvents';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventoDetalhes = () => {
   const { slug } = useParams();
-  const [event, setEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadEvent = async () => {
-      if (!slug) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Buscar evento
-        const { data: eventData, error: eventError } = await supabase
-          .from('events')
-          .select('*')
-          .eq('slug', slug)
-          .eq('status_publicacao', 'published')
-          .single();
-
-        if (eventError || !eventData) {
-          setError('Evento não encontrado');
-          setEvent(null);
-          return;
-        }
-
-        // Buscar tradução
-        const { data: translationData } = await supabase
-          .from('event_translations')
-          .select('*')
-          .eq('event_id', eventData.id)
-          .eq('idioma', 'pt-BR')
-          .maybeSingle();
-
-        // Combinar dados
-        const fullEvent = {
-          ...eventData,
-          titulo: translationData?.titulo || slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
-          subtitulo: translationData?.subtitulo || '',
-          descricao_richtext: translationData?.descricao_richtext || '',
-        };
-
-        setEvent(fullEvent);
-      } catch (err: any) {
-        setError('Erro ao carregar evento');
-        console.error('Erro ao carregar evento:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadEvent();
-  }, [slug]);
+  const { t } = useTranslation();
+  
+  console.log('EventoDetalhes component mounted with slug:', slug);
+  
+  const { event, loading } = useEventBySlug(slug || '');
+  
+  console.log('EventoDetalhes - event:', event, 'loading:', loading);
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -109,7 +61,7 @@ const EventoDetalhes = () => {
     
     return (
       <Badge variant="outline" className={`text-base px-3 py-1 ${colors[modalidade as keyof typeof colors] || ''}`}>
-        {modalidade?.charAt(0).toUpperCase() + modalidade?.slice(1)}
+        {modalidade.charAt(0).toUpperCase() + modalidade.slice(1)}
       </Badge>
     );
   };
@@ -126,8 +78,8 @@ const EventoDetalhes = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: event?.titulo || 'Evento CIVENI',
-          text: event?.subtitulo || '',
+          title: event.titulo,
+          text: event.subtitulo,
           url: window.location.href,
         });
       } catch (error) {
@@ -137,6 +89,40 @@ const EventoDetalhes = () => {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
     }
+  };
+
+  const generateCalendarFile = () => {
+    if (!event) return;
+    
+    const startDate = new Date(event.inicio_at);
+    const endDate = event.fim_at ? new Date(event.fim_at) : new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours default
+    
+    const formatICSDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+    
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//CIVENI//Event Calendar//PT',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@civeni.com`,
+      `DTSTAMP:${formatICSDate(new Date())}`,
+      `DTSTART:${formatICSDate(startDate)}`,
+      `DTEND:${formatICSDate(endDate)}`,
+      `SUMMARY:${event.titulo}`,
+      `DESCRIPTION:${event.subtitulo || ''}`,
+      event.endereco ? `LOCATION:${event.endereco}` : '',
+      `URL:${window.location.href}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].filter(Boolean).join('\r\n');
+    
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${event.slug}.ics`;
+    link.click();
   };
 
   if (loading) {
@@ -154,7 +140,7 @@ const EventoDetalhes = () => {
     );
   }
 
-  if (error || !event) {
+  if (!event) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
         <Header />
@@ -179,7 +165,7 @@ const EventoDetalhes = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
-      {/* Hero Section - Same style as Eventos page */}
+      {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         {event.banner_url && (
@@ -201,31 +187,36 @@ const EventoDetalhes = () => {
             </ol>
           </nav>
           
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="flex flex-wrap gap-3 mb-6 justify-center">
+          <div className="max-w-4xl">
+            <div className="flex flex-wrap gap-3 mb-6">
               {getStatusBadge(event)}
               {getModalidadeBadge(event.modalidade)}
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
               {event.titulo}
             </h1>
             
             {event.subtitulo && (
-              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              <p className="text-xl text-blue-100 mb-6 leading-relaxed">
                 {event.subtitulo}
               </p>
             )}
             
             {/* Quick Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={handleShare} variant="secondary" size="lg" className="bg-white text-civeni-blue hover:bg-white/90">
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={generateCalendarFile} variant="secondary" size="lg">
+                <Calendar className="h-5 w-5 mr-2" />
+                Adicionar ao Calendário
+              </Button>
+              
+              <Button onClick={handleShare} variant="secondary" size="lg">
                 <Share2 className="h-5 w-5 mr-2" />
                 Compartilhar
               </Button>
               
               {event.youtube_url && (
-                <Button variant="secondary" size="lg" className="border-white text-white hover:bg-white/20 border-2" asChild>
+                <Button variant="secondary" size="lg" asChild>
                   <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                     <Youtube className="h-5 w-5 mr-2" />
                     {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}
@@ -320,16 +311,180 @@ const EventoDetalhes = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Media & Links */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="h-6 w-6 text-civeni-blue" />
+                  Mídia e Links
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {event.banner_url && (
+                  <div>
+                    <h4 className="font-medium mb-2">Banner do Evento</h4>
+                    <img 
+                      src={event.banner_url} 
+                      alt={`Banner - ${event.titulo}`}
+                      className="w-full max-w-md rounded-lg border"
+                    />
+                  </div>
+                )}
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  {event.youtube_url && (
+                    <div className="p-3 border rounded-lg">
+                      <h5 className="font-medium text-sm mb-2">YouTube</h5>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
+                          <Youtube className="h-4 w-4 mr-2" />
+                          {isPastEvent ? 'Ver Gravação' : 'Transmissão Ao Vivo'}
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {event.playlist_url && (
+                    <div className="p-3 border rounded-lg">
+                      <h5 className="font-medium text-sm mb-2">Playlist</h5>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={event.playlist_url} target="_blank" rel="noopener noreferrer">
+                          <Youtube className="h-4 w-4 mr-2" />
+                          Ver Playlist
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {event.tem_inscricao && event.inscricao_url && (
+                    <div className="p-3 border rounded-lg">
+                      <h5 className="font-medium text-sm mb-2">Inscrições</h5>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Fazer Inscrição
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {!event.youtube_url && !event.playlist_url && !event.inscricao_url && (
+                  <div className="text-center py-4 text-gray-500">
+                    <p>Nenhuma mídia ou link adicional disponível</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Speakers Section */}
+            {event.speakers && event.speakers.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-6 w-6 text-civeni-blue" />
+                    Palestrantes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {event.speakers.map((speaker: any) => (
+                      <div key={speaker.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                        {speaker.image_url && (
+                          <img
+                            src={speaker.image_url}
+                            alt={speaker.name}
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
+                        )}
+                        <div>
+                          <h4 className="font-semibold">{speaker.name}</h4>
+                          <p className="text-sm text-gray-600">{speaker.title}</p>
+                          <p className="text-sm text-gray-500">{speaker.institution}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Schedule/Sessions */}
+            {event.sessions && event.sessions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-6 w-6 text-civeni-blue" />
+                    Programação
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {event.sessions.map((session: any) => (
+                      <div key={session.id} className="flex gap-4 p-4 border rounded-lg">
+                        <div className="text-sm font-medium text-civeni-blue min-w-20">
+                          {formatEventTime(session.inicio_at)}
+                          {session.fim_at && ` - ${formatEventTime(session.fim_at)}`}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold mb-1">{session.titulo}</h4>
+                          {session.descricao && (
+                            <p className="text-gray-600 text-sm">{session.descricao}</p>
+                          )}
+                          {session.speaker_name && (
+                            <p className="text-civeni-blue text-sm mt-1">
+                              Palestrante: {session.speaker_name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Certificate Section - Only for past events */}
+            {isPastEvent && (
+              <Card className="border-green-200 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-800">
+                    <Award className="h-6 w-6" />
+                    Certificado
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-green-700 text-sm">
+                    Este evento já foi realizado. Se você participou, pode baixar seu certificado.
+                  </p>
+                  <div className="space-y-2">
+                    <Button className="w-full bg-green-600 hover:bg-green-700" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Baixar Certificado
+                    </Button>
+                    <p className="text-xs text-green-600">
+                      * Não use e-mail profissional. Verifique sua caixa de SPAM.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Actions Card */}
             <Card>
               <CardHeader>
                 <CardTitle>Ações Rápidas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                <Button onClick={generateCalendarFile} variant="outline" size="sm" className="w-full">
+                  <Download className="h-4 w-4 mr-2" />
+                  Baixar .ics
+                </Button>
+                
                 <Button onClick={handleShare} variant="outline" size="sm" className="w-full">
                   <Share2 className="h-4 w-4 mr-2" />
                   Compartilhar

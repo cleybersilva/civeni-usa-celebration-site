@@ -45,6 +45,8 @@ export const useEvents = () => {
       // Get current language from localStorage or default to 'pt-BR'
       const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
       
+      console.log('Fetching events for public site with language:', currentLanguage);
+      
       const { data, error } = await supabase
         .from('events')
         .select(`
@@ -63,8 +65,11 @@ export const useEvents = () => {
         .order('inicio_at', { ascending: true });
 
       if (error) {
+        console.error('Error fetching events for public site:', error);
         throw error;
       }
+
+      console.log('Raw events data from database:', data);
 
       // Transform data to flatten translations and filter by language
       const transformedEvents = data?.map((event: any) => {
@@ -86,8 +91,11 @@ export const useEvents = () => {
         };
       }) || [];
 
+      console.log('Transformed events for public site:', transformedEvents);
+
       setEvents(transformedEvents);
     } catch (error: any) {
+      console.error('Error fetching events:', error);
       toast({
         title: 'Erro ao carregar eventos',
         description: error.message,
@@ -99,31 +107,38 @@ export const useEvents = () => {
   };
 
   useEffect(() => {
+    console.log('useEvents hook mounted, fetching events...');
     fetchEvents();
+    
+    // Log when events change
+    if (events && events.length > 0) {
+      console.log('Events loaded in useEffect:', events);
+    }
   }, []);
+
+  // Add another useEffect to log whenever events state changes
+  useEffect(() => {
+    console.log('useEvents - events state changed:', events);
+  }, [events]);
 
   return { events, loading, refetch: fetchEvents };
 };
 
 export const useEventBySlug = (slug: string) => {
-  console.log('🟡 useEventBySlug hook called with slug:', slug);
-  
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchEvent = async () => {
-    console.log('🟡 fetchEvent called with slug:', slug);
-    
     if (!slug) {
-      console.log('🟡 No slug provided, setting loading to false');
+      console.log('No slug provided');
       setLoading(false);
       return;
     }
     
     try {
-      console.log('🟡 Starting fetch operation...');
       setLoading(true);
+      console.log('Starting fetch for slug:', slug);
       
       // First get the event
       const { data: eventData, error: eventError } = await supabase
@@ -133,27 +148,29 @@ export const useEventBySlug = (slug: string) => {
         .eq('status_publicacao', 'published')
         .single();
 
+      console.log('Event data:', eventData, 'Error:', eventError);
+
       if (eventError) {
-        if (eventError.code !== 'PGRST116') { // Not found error
-          throw eventError;
-        }
-        setEvent(null);
-        return;
+        console.error('Error fetching event:', eventError);
+        throw eventError;
       }
 
       if (!eventData) {
+        console.log('No event found');
         setEvent(null);
         return;
       }
 
       // Then get the translation
       const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
-      const { data: translationData } = await supabase
+      const { data: translationData, error: translationError } = await supabase
         .from('event_translations')
         .select('*')
         .eq('event_id', eventData.id)
         .eq('idioma', currentLanguage)
-        .maybeSingle();
+        .single();
+
+      console.log('Translation data:', translationData, 'Error:', translationError);
 
       // Combine event and translation data
       const combinedEvent = {
@@ -170,15 +187,19 @@ export const useEventBySlug = (slug: string) => {
         assets: []
       };
 
+      console.log('Final combined event:', combinedEvent);
       setEvent(combinedEvent as Event);
       
     } catch (error: any) {
+      console.error('Error in fetchEvent:', error);
       setEvent(null);
-      toast({
-        title: 'Erro ao carregar evento',
-        description: error.message,
-        variant: 'destructive',
-      });
+      if (error.code !== 'PGRST116') {
+        toast({
+          title: 'Erro ao carregar evento',
+          description: error.message,
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }
