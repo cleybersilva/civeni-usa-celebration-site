@@ -6,13 +6,30 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useEventBySlug } from '@/hooks/useEvents';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 const EventoDetalhesSimples = () => {
   const { slug } = useParams();
-  const { event, loading } = useEventBySlug(slug || '');
+
+  // Mock data for now - replace with real data later
+  const event = {
+    titulo: 'Evento de Teste',
+    subtitulo: 'Um evento de exemplo para testar a página',
+    inicio_at: '2024-12-15T14:00:00Z',
+    fim_at: '2024-12-15T18:00:00Z',
+    modalidade: 'presencial',
+    endereco: 'Centro de Convenções, Fortaleza - CE',
+    banner_url: null,
+    youtube_url: null,
+    playlist_url: null,
+    tem_inscricao: true,
+    inscricao_url: 'https://exemplo.com/inscricao',
+    featured: true,
+    descricao_richtext: '<p>Esta é uma descrição de exemplo do evento.</p>',
+    speakers: [],
+    timezone: 'America/Sao_Paulo'
+  };
+
+  const loading = false;
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -59,11 +76,18 @@ const EventoDetalhesSimples = () => {
   };
 
   const formatEventDate = (dateString: string) => {
-    return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   };
 
   const formatEventTime = (dateString: string) => {
-    return format(new Date(dateString), "HH:mm", { locale: ptBR });
+    return new Date(dateString).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const handleShare = async () => {
@@ -82,6 +106,9 @@ const EventoDetalhesSimples = () => {
       navigator.clipboard.writeText(window.location.href);
     }
   };
+
+  const eventStatus = getEventStatus(event);
+  const isPastEvent = eventStatus === 'past';
 
   if (loading) {
     return (
@@ -119,22 +146,13 @@ const EventoDetalhesSimples = () => {
     );
   }
 
-  const eventStatus = getEventStatus(event);
-  const isPastEvent = eventStatus === 'past';
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue via-blue-700 to-purple-800 text-white py-12">
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-purple-800 text-white py-12">
         <div className="absolute inset-0 bg-black/20"></div>
-        {event.banner_url && (
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-30"
-            style={{ backgroundImage: `url(${event.banner_url})` }}
-          ></div>
-        )}
         
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
@@ -176,24 +194,6 @@ const EventoDetalhesSimples = () => {
                 Compartilhar
               </Button>
               
-              {event.youtube_url && (
-                <Button variant="secondary" size="lg" asChild>
-                  <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-5 w-5 mr-2" />
-                    {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}
-                  </a>
-                </Button>
-              )}
-
-              {event.playlist_url && (
-                <Button variant="secondary" size="lg" asChild>
-                  <a href={event.playlist_url} target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-5 w-5 mr-2" />
-                    Ver Playlist
-                  </a>
-                </Button>
-              )}
-              
               {event.tem_inscricao && event.inscricao_url && !isPastEvent && (
                 <Button size="lg" className="bg-green-600 hover:bg-green-700" asChild>
                   <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
@@ -216,7 +216,7 @@ const EventoDetalhesSimples = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-6 w-6 text-civeni-blue" />
+                  <Calendar className="h-6 w-6 text-blue-600" />
                   Informações do Evento
                 </CardTitle>
               </CardHeader>
@@ -272,54 +272,6 @@ const EventoDetalhesSimples = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Banner/Image */}
-            {event.banner_url && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Banner do Evento</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <img 
-                    src={event.banner_url} 
-                    alt={`Banner - ${event.titulo}`}
-                    className="w-full rounded-lg border"
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Speakers */}
-            {event.speakers && event.speakers.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-6 w-6 text-civeni-blue" />
-                    Palestrantes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {event.speakers.map((speaker: any) => (
-                      <div key={speaker.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                        {speaker.image_url && (
-                          <img
-                            src={speaker.image_url}
-                            alt={speaker.name}
-                            className="w-16 h-16 rounded-full object-cover"
-                          />
-                        )}
-                        <div>
-                          <h4 className="font-semibold">{speaker.name}</h4>
-                          <p className="text-sm text-gray-600">{speaker.title}</p>
-                          <p className="text-sm text-gray-500">{speaker.institution}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Sidebar */}
@@ -345,24 +297,6 @@ const EventoDetalhesSimples = () => {
                       </div>
                     )}
                   </div>
-                )}
-
-                {event.youtube_url && (
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
-                      <Youtube className="h-4 w-4 mr-2" />
-                      {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}
-                    </a>
-                  </Button>
-                )}
-
-                {event.playlist_url && (
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href={event.playlist_url} target="_blank" rel="noopener noreferrer">
-                      <Youtube className="h-4 w-4 mr-2" />
-                      Ver Playlist
-                    </a>
-                  </Button>
                 )}
 
                 <Button onClick={handleShare} variant="outline" className="w-full">
