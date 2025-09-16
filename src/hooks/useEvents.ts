@@ -51,7 +51,7 @@ export const useEvents = () => {
         .from('events')
         .select(`
           *,
-          event_translations!inner(
+          event_translations(
             titulo,
             subtitulo,
             descricao_richtext,
@@ -59,6 +59,41 @@ export const useEvents = () => {
             meta_description,
             og_image,
             idioma
+          ),
+          event_speakers(
+            ordem,
+            cms_speakers(
+              id,
+              name,
+              title,
+              institution,
+              image_url
+            )
+          ),
+          event_areas(
+            thematic_areas(
+              id,
+              name_pt,
+              name_en,
+              description_pt,
+              description_en
+            )
+          ),
+          event_sessions(
+            id,
+            inicio_at,
+            fim_at,
+            titulo,
+            descricao,
+            speaker_id,
+            sala_url,
+            ordem
+          ),
+          event_assets(
+            id,
+            asset_url,
+            caption,
+            ordem
           )
         `)
         .eq('status_publicacao', 'published')
@@ -84,10 +119,15 @@ export const useEvents = () => {
           meta_title: translation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
           meta_description: translation?.meta_description || '',
           og_image: translation?.og_image || event.banner_url,
-          speakers: [],
-          areas: [],
-          sessions: [],
-          assets: []
+          speakers: event.event_speakers
+            ?.sort((a: any, b: any) => a.ordem - b.ordem)
+            ?.map((es: any) => es.cms_speakers)
+            ?.filter(Boolean) || [],
+          areas: event.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
+          sessions: event.event_sessions
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
+          assets: event.event_assets
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
         };
       }) || [];
 
@@ -142,7 +182,7 @@ export const useEventBySlug = (slug: string) => {
         .from('events')
         .select(`
           *,
-          event_translations!inner(
+          event_translations(
             titulo,
             subtitulo,
             descricao_richtext,
@@ -150,6 +190,41 @@ export const useEventBySlug = (slug: string) => {
             meta_description,
             og_image,
             idioma
+          ),
+          event_speakers(
+            ordem,
+            cms_speakers(
+              id,
+              name,
+              title,
+              institution,
+              image_url
+            )
+          ),
+          event_areas(
+            thematic_areas(
+              id,
+              name_pt,
+              name_en,
+              description_pt,
+              description_en
+            )
+          ),
+          event_sessions(
+            id,
+            inicio_at,
+            fim_at,
+            titulo,
+            descricao,
+            speaker_id,
+            sala_url,
+            ordem
+          ),
+          event_assets(
+            id,
+            asset_url,
+            caption,
+            ordem
           )
         `)
         .eq('slug', slug)
@@ -171,10 +246,15 @@ export const useEventBySlug = (slug: string) => {
           meta_title: translation?.meta_title || data.slug.replace(/-/g, ' ').toUpperCase(),
           meta_description: translation?.meta_description || '',
           og_image: translation?.og_image || data.banner_url,
-          speakers: [],
-          areas: [],
-          sessions: [],
-          assets: []
+          speakers: data.event_speakers
+            ?.sort((a: any, b: any) => a.ordem - b.ordem)
+            ?.map((es: any) => es.cms_speakers)
+            ?.filter(Boolean) || [],
+          areas: data.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
+          sessions: data.event_sessions
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
+          assets: data.event_assets
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
         };
         
         setEvent(transformedEvent as Event);
