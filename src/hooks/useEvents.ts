@@ -45,6 +45,8 @@ export const useEvents = () => {
       // Get current language from localStorage or default to 'pt-BR'
       const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
       
+      console.log('Fetching events for public site with language:', currentLanguage);
+      
       const { data, error } = await supabase
         .from('events')
         .select(`
@@ -97,7 +99,12 @@ export const useEvents = () => {
         .eq('event_translations.idioma', currentLanguage)
         .order('inicio_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching events for public site:', error);
+        throw error;
+      }
+
+      console.log('Raw events data from database:', data);
 
       // Transform data to flatten translations
       const transformedEvents = data?.map((event: any) => ({
@@ -118,6 +125,8 @@ export const useEvents = () => {
         assets: event.event_assets
           ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
       })) || [];
+
+      console.log('Transformed events for public site:', transformedEvents);
 
       setEvents(transformedEvents);
     } catch (error: any) {

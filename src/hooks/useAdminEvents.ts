@@ -79,13 +79,20 @@ export const useAdminEvents = () => {
     }
 
     try {
+      console.log('Creating event with data:', eventData);
+      
       const { data, error } = await supabase.rpc('admin_upsert_event', {
         event_data: eventData,
         user_email: user.email,
         session_token: sessionToken
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from admin_upsert_event:', error);
+        throw error;
+      }
+
+      console.log('Event created response:', data);
 
       // If event was created, also create translation
       if (data && eventData.translation && typeof data === 'object' && 'id' in data) {
@@ -94,18 +101,22 @@ export const useAdminEvents = () => {
           event_id: (data as any).id
         };
 
+        console.log('Creating translation with data:', translationData);
+
         const { error: translationError } = await supabase
           .from('event_translations')
           .insert(translationData);
 
         if (translationError) {
           console.error('Error creating translation:', translationError);
+        } else {
+          console.log('Translation created successfully');
         }
       }
 
       toast({
         title: 'Evento criado com sucesso',
-        description: `O evento "${eventData.translation?.titulo || eventData.slug}" foi criado.`
+        description: `O evento "${eventData.translation?.titulo || eventData.slug}" foi criado e publicado.`
       });
       
       await fetchEvents();
