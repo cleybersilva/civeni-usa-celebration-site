@@ -15,7 +15,14 @@ import { ptBR } from 'date-fns/locale';
 const EventoDetalhes = () => {
   const { slug } = useParams();
   const { t } = useTranslation();
+  
+  console.log('EventoDetalhes - Component rendered with slug:', slug);
+  console.log('EventoDetalhes - URL params:', useParams());
+  console.log('EventoDetalhes - Current location:', window.location.href);
+  
   const { event, loading } = useEventBySlug(slug || '');
+  
+  console.log('EventoDetalhes - Hook returned:', { event, loading });
 
   const getEventStatus = (event: any) => {
     const now = new Date();
