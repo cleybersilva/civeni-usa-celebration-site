@@ -39,19 +39,23 @@ const ScheduleOnline = () => {
         throw new Error('Erro ao gerar PDF');
       }
 
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `civeni-programacao-online-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const html = await response.text();
+      
+      // Open HTML in new window that can be printed as PDF
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(html);
+        newWindow.document.close();
+        
+        // Add print functionality
+        setTimeout(() => {
+          newWindow.print();
+        }, 1000);
+      }
       
       toast({
         title: "PDF gerado com sucesso!",
-        description: "O download da programação foi iniciado.",
+        description: "Abra a nova janela e use Ctrl+P (ou Cmd+P) para imprimir/salvar como PDF.",
       });
       
     } catch (error) {

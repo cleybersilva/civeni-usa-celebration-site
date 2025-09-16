@@ -1,7 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0'
-import { jsPDF } from 'https://esm.sh/jspdf@2.5.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -91,8 +90,8 @@ serve(async (req) => {
     return new Response(pdfBytes, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf"`,
+        'Content-Type': 'text/html',
+        'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store'
       },
     });
@@ -120,8 +119,8 @@ serve(async (req) => {
     return new Response(pdfBytes, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf"`,
+        'Content-Type': 'text/html',
+        'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff'
       },
@@ -142,171 +141,47 @@ function getCurrentDateString(): string {
 
 function generateEmptyProgramHtml(modalidade: string, bannerUrl: string): string {
   const modalidadeTitle = modalidade === 'presencial' ? 'PRESENCIAL' : 'ONLINE';
+  const currentDate = new Date().toLocaleString('pt-BR', { 
+    timeZone: 'America/Fortaleza',
+    day: '2-digit',
+    month: '2-digit', 
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
   
   return `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Programação ${modalidadeTitle}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    @page { size: A4; margin: 0; }
-    :root {
-      --brand-primary: hsl(210, 100%, 45%);
-      --brand-secondary: hsl(0, 85%, 55%);
-      --text-primary: hsl(220, 13%, 13%);
-      --text-muted: hsl(220, 9%, 46%);
-      --bg-white: hsl(0, 0%, 100%);
-      --bg-soft: hsl(210, 20%, 98%);
-    }
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: 'Poppins', system-ui, sans-serif;
-      color: var(--text-primary);
-      background: var(--bg-white);
-      line-height: 1.6;
-    }
-    
-    .side-stripe {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6px;
-      background: linear-gradient(180deg, var(--brand-primary), var(--brand-secondary));
-      z-index: 1000;
-    }
-    
-    .banner {
-      position: relative;
-      height: 140px;
-      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-      background-image: url('${bannerUrl}');
-      background-size: cover;
-      background-position: center;
-      display: flex;
-      align-items: flex-end;
-      padding: 24px;
-      margin-bottom: 40px;
-    }
-    
-    .banner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.3);
-    }
-    
-    .banner-title {
-      position: relative;
-      z-index: 10;
-      color: white;
-    }
-    
-    .micro {
-      font-size: 10px;
-      opacity: 0.9;
-      text-transform: uppercase;
-      font-weight: 500;
-      letter-spacing: 1px;
-    }
-    
-    .macro {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      margin: 4px 0;
-    }
-    
-    .meta {
-      font-size: 11px;
-      opacity: 0.95;
-      font-weight: 400;
-    }
-    
-    .content {
-      padding: 40px 24px;
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 24px;
-      opacity: 0.3;
-    }
-    
-    .empty-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--brand-primary);
-      margin-bottom: 16px;
-    }
-    
-    .empty-message {
-      font-size: 16px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-    }
-    
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50px;
-      background: var(--bg-soft);
-      border-top: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: var(--text-muted);
-      text-align: center;
-      padding: 0 24px;
-    }
-  </style>
-</head>
-<body>
-  <div class="side-stripe"></div>
-  
-  <header class="banner">
+  <header class="banner" style="background-image: url('${bannerUrl}');">
     <div class="banner-title">
       <div class="micro">III CIVENI – Programa Oficial</div>
       <div class="macro">Programação ${modalidadeTitle}</div>
-      <div class="meta">Fortaleza/CE • Atualizado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' })} (GMT-3)</div>
+      <div class="meta">Fortaleza/CE • Atualizado em ${currentDate} (GMT-3)</div>
     </div>
   </header>
 
   <div class="content">
-    <div class="empty-icon">📅</div>
-    <h2 class="empty-title">Programação ainda não publicada</h2>
-    <p class="empty-message">
-      A programação ${modalidade} ainda não foi disponibilizada. <br>
-      Acesse o site para acompanhar as atualizações.
-    </p>
-  </div>
-
-  <div class="footer">
-    <div>
-      <strong>III CIVENI 2025</strong> • *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes. <br>
-      A versão mais atual está em https://iiiciveni.com.br/programacao-${modalidade}
+    <div class="empty-content">
+      <div class="empty-icon">📅</div>
+      <h2 class="empty-title">Programação ainda não publicada</h2>
+      <p class="empty-message">
+        A programação ${modalidade} ainda não foi disponibilizada. <br>
+        Acesse o site para acompanhar as atualizações.
+      </p>
     </div>
-  </div>
-</body>
-</html>`;
+  </div>`;
 }
 
 function generateProgramHtml(modalidade: string, days: any[], settings: any, bannerUrl: string): string {
   const modalidadeTitle = modalidade === 'presencial' ? 'PRESENCIAL' : 'ONLINE';
   const pageTitle = settings?.page_title || `Programação ${modalidadeTitle}`;
+  const currentDate = new Date().toLocaleString('pt-BR', { 
+    timeZone: 'America/Fortaleza',
+    day: '2-digit',
+    month: '2-digit', 
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
   
   const daysHtml = days.map(day => {
     const sessionsHtml = day.sessions.map((session: any) => {
@@ -341,7 +216,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
     return `
       <div class="day-section">
         <h2 class="day-title">${day.weekday_label} – ${day.headline} – ${dayDate}</h2>
-        <table class="sessions-table">
+        <table class="sessions-table" aria-label="Programação do dia">
           <thead>
             <tr>
               <th>Horário</th>
@@ -359,12 +234,29 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
   }).join('');
 
   return `
+  <header class="banner" style="background-image: url('${bannerUrl}');">
+    <div class="banner-title">
+      <div class="micro">III CIVENI – Programa Oficial</div>
+      <div class="macro">Programação ${modalidadeTitle}</div>
+      <div class="meta">Fortaleza/CE • Atualizado em ${currentDate} (GMT-3)</div>
+    </div>
+  </header>
+
+  <div class="content">
+    ${daysHtml}
+  </div>`;
+}
+
+async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
+  try {
+    // Generate complete HTML with proper styling for PDF conversion
+    const fullHtml = `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${pageTitle}</title>
+  <title>Programação III CIVENI 2025</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -381,6 +273,8 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       --text-muted: hsl(220, 9%, 46%);
       --bg-white: hsl(0, 0%, 100%);
       --bg-soft: hsl(210, 20%, 98%);
+      --gradient-primary: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+      --gradient-sidebar: linear-gradient(180deg, var(--brand-primary), var(--brand-secondary));
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -391,6 +285,8 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       background: var(--bg-white);
       line-height: 1.6;
       font-size: 11pt;
+      padding-bottom: 80px;
+      margin-left: 8px;
     }
     
     .side-stripe {
@@ -399,21 +295,21 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       top: 0;
       bottom: 0;
       width: 6px;
-      background: linear-gradient(180deg, var(--brand-primary), var(--brand-secondary));
+      background: var(--gradient-sidebar);
       z-index: 1000;
     }
     
     .banner {
       position: relative;
       height: 140px;
-      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-      background-image: url('${bannerUrl}');
+      background: var(--gradient-primary);
       background-size: cover;
       background-position: center;
       display: flex;
       align-items: flex-end;
       padding: 24px;
       margin-bottom: 40px;
+      overflow: hidden;
     }
     
     .banner::after {
@@ -435,6 +331,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       text-transform: uppercase;
       font-weight: 500;
       letter-spacing: 1px;
+      margin-bottom: 2px;
     }
     
     .macro {
@@ -448,6 +345,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       font-size: 11px;
       opacity: 0.95;
       font-weight: 400;
+      margin-top: 4px;
     }
     
     .content {
@@ -466,6 +364,8 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       margin-bottom: 16px;
       padding-bottom: 8px;
       border-bottom: 2px solid var(--brand-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .sessions-table {
@@ -492,14 +392,11 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       padding: 12px 8px;
       vertical-align: top;
       border-bottom: 1px solid #eee;
+      font-size: 10.5pt;
     }
     
     .sessions-table tr:nth-child(even) {
       background: #fafafa;
-    }
-    
-    .sessions-table tr:hover {
-      background: var(--bg-soft);
     }
     
     .time-cell {
@@ -518,6 +415,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       font-weight: 600;
       font-size: 11pt;
       margin-bottom: 4px;
+      color: var(--text-primary);
     }
     
     .session-description {
@@ -543,15 +441,15 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       bottom: 0;
       left: 0;
       right: 0;
-      height: 60px;
+      height: 70px;
       background: var(--bg-soft);
-      border-top: 1px solid #eee;
+      border-top: 2px solid var(--brand-primary);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px 30px;
-      font-size: 10px;
+      padding: 12px 30px 12px 36px;
+      font-size: 9pt;
       color: var(--text-muted);
       text-align: center;
     }
@@ -559,7 +457,36 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
     .footer-logo {
       font-weight: 700;
       color: var(--brand-primary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      font-size: 11pt;
+    }
+    
+    .footer-info {
+      line-height: 1.3;
+    }
+    
+    .empty-content {
+      text-align: center;
+      padding: 60px 30px;
+    }
+    
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+      opacity: 0.3;
+    }
+    
+    .empty-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--brand-primary);
+      margin-bottom: 16px;
+    }
+    
+    .empty-message {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
     }
     
     @media print {
@@ -585,119 +512,22 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
 </head>
 <body>
   <div class="side-stripe"></div>
+  ${html}
   
-  <header class="banner">
-    <div class="banner-title">
-      <div class="micro">III CIVENI – Programa Oficial</div>
-      <div class="macro">Programação ${modalidadeTitle}</div>
-      <div class="meta">Fortaleza/CE • Atualizado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' })} (GMT-3)</div>
-    </div>
-  </header>
-
-  <div class="content">
-    ${daysHtml}
-  </div>
-
   <div class="footer">
     <div class="footer-logo">III CIVENI 2025</div>
-    <div>*Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.</div>
-    <div>A versão mais atual está em https://iiiciveni.com.br/programacao-${modalidade}</div>
+    <div class="footer-info">
+      *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.<br>
+      A versão mais atual está em iiiciveni.com.br
+    </div>
   </div>
 </body>
 </html>`;
-}
-
-async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
-  try {
-    // Create a new PDF document
-    const doc = new jsPDF('p', 'mm', 'a4');
     
-    // Set font
-    doc.setFont('helvetica');
-    
-    // Add title
-    doc.setFontSize(20);
-    doc.text('III CIVENI - Programação', 20, 30);
-    
-    // Add content (simplified text extraction from HTML)
-    const textContent = html
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    doc.setFontSize(12);
-    const lines = doc.splitTextToSize(textContent, 170);
-    
-    let y = 50;
-    const pageHeight = doc.internal.pageSize.height;
-    
-    for (const line of lines) {
-      if (y > pageHeight - 20) {
-        doc.addPage();
-        y = 20;
-      }
-      doc.text(line, 20, y);
-      y += 7;
-    }
-    
-    // Convert to Uint8Array
-    const pdfOutput = doc.output('arraybuffer');
-    return new Uint8Array(pdfOutput);
+    return new TextEncoder().encode(fullHtml);
     
   } catch (error) {
-    console.error('Error generating PDF with jsPDF:', error);
-    
-    // Fallback: create a minimal PDF manually
-    const minimalPdf = `%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
->>
-endobj
-4 0 obj
-<<
-/Length 44
->>
-stream
-BT
-/F1 12 Tf
-72 720 Td
-(III CIVENI - Programacao) Tj
-ET
-endstream
-endobj
-xref
-0 5
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000189 00000 n 
-trailer
-<<
-/Size 5
-/Root 1 0 R
->>
-startxref
-284
-%%EOF`;
-    
-    return new TextEncoder().encode(minimalPdf);
+    console.error('Error generating PDF HTML:', error);
+    throw error;
   }
 }
