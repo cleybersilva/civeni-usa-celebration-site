@@ -18,55 +18,66 @@ const EventoDetalhes = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadEvent = async () => {
-      if (!slug) {
-        setLoading(false);
+  const loadEvent = async () => {
+    console.log('🟡 loadEvent chamado com slug:', slug);
+    
+    if (!slug) {
+      console.log('🔴 Slug está vazio ou undefined');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🟡 Fazendo query para slug:', slug);
+
+      // Buscar evento
+      const { data: eventData, error: eventError } = await supabase
+        .from('events')
+        .select('*')
+        .eq('slug', slug)
+        .eq('status_publicacao', 'published')
+        .single();
+
+      console.log('🟡 Resultado da query events:', { eventData, eventError });
+
+      if (eventError || !eventData) {
+        console.log('🔴 Evento não encontrado:', eventError);
+        setError('Evento não encontrado');
+        setEvent(null);
         return;
       }
 
-      try {
-        setLoading(true);
-        setError(null);
+      // Buscar tradução
+      const { data: translationData, error: translationError } = await supabase
+        .from('event_translations')
+        .select('*')
+        .eq('event_id', eventData.id)
+        .eq('idioma', 'pt-BR')
+        .maybeSingle();
 
-        // Buscar evento
-        const { data: eventData, error: eventError } = await supabase
-          .from('events')
-          .select('*')
-          .eq('slug', slug)
-          .eq('status_publicacao', 'published')
-          .single();
+      console.log('🟡 Resultado da query translations:', { translationData, translationError });
 
-        if (eventError || !eventData) {
-          setError('Evento não encontrado');
-          setEvent(null);
-          return;
-        }
+      // Combinar dados
+      const fullEvent = {
+        ...eventData,
+        titulo: translationData?.titulo || slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
+        subtitulo: translationData?.subtitulo || '',
+        descricao_richtext: translationData?.descricao_richtext || '',
+      };
 
-        // Buscar tradução
-        const { data: translationData } = await supabase
-          .from('event_translations')
-          .select('*')
-          .eq('event_id', eventData.id)
-          .eq('idioma', 'pt-BR')
-          .maybeSingle();
-
-        // Combinar dados
-        const fullEvent = {
-          ...eventData,
-          titulo: translationData?.titulo || slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
-          subtitulo: translationData?.subtitulo || '',
-          descricao_richtext: translationData?.descricao_richtext || '',
-        };
-
-        setEvent(fullEvent);
-      } catch (err: any) {
-        setError('Erro ao carregar evento');
-        console.error('Erro ao carregar evento:', err);
-        console.log('Slug usado na query:', slug);
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log('🟢 Evento carregado com sucesso:', fullEvent.titulo);
+      setEvent(fullEvent);
+    } catch (err: any) {
+      setError('Erro ao carregar evento');
+      console.error('🔴 Erro ao carregar evento:', err);
+      console.log('🔴 Slug usado na query:', slug);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     loadEvent();
   }, [slug]);
