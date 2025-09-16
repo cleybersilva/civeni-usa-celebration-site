@@ -182,14 +182,13 @@ export const useEventBySlug = (slug: string) => {
         .from('events')
         .select(`
           *,
-          event_translations(
+          event_translations!inner(
             titulo,
             subtitulo,
             descricao_richtext,
             meta_title,
             meta_description,
-            og_image,
-            idioma
+            og_image
           ),
           event_speakers(
             ordem,
@@ -229,23 +228,21 @@ export const useEventBySlug = (slug: string) => {
         `)
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
+        .eq('event_translations.idioma', currentLanguage)
         .single();
 
       if (error) throw error;
 
       // Transform data to flatten translations
       if (data) {
-        // Find translation for current language or use fallback
-        const translation = data.event_translations?.find((t: any) => t.idioma === currentLanguage);
-        
         const transformedEvent = {
           ...data,
-          titulo: translation?.titulo || data.slug.replace(/-/g, ' ').toUpperCase(),
-          subtitulo: translation?.subtitulo || '',
-          descricao_richtext: translation?.descricao_richtext || '',
-          meta_title: translation?.meta_title || data.slug.replace(/-/g, ' ').toUpperCase(),
-          meta_description: translation?.meta_description || '',
-          og_image: translation?.og_image || data.banner_url,
+          titulo: data.event_translations[0]?.titulo,
+          subtitulo: data.event_translations[0]?.subtitulo,
+          descricao_richtext: data.event_translations[0]?.descricao_richtext,
+          meta_title: data.event_translations[0]?.meta_title,
+          meta_description: data.event_translations[0]?.meta_description,
+          og_image: data.event_translations[0]?.og_image,
           speakers: data.event_speakers
             ?.sort((a: any, b: any) => a.ordem - b.ordem)
             ?.map((es: any) => es.cms_speakers)
