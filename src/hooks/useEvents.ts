@@ -51,13 +51,14 @@ export const useEvents = () => {
         .from('events')
         .select(`
           *,
-          event_translations!inner(
+          event_translations(
             titulo,
             subtitulo,
             descricao_richtext,
             meta_title,
             meta_description,
-            og_image
+            og_image,
+            idioma
           ),
           event_speakers(
             ordem,
@@ -96,7 +97,6 @@ export const useEvents = () => {
           )
         `)
         .eq('status_publicacao', 'published')
-        .eq('event_translations.idioma', currentLanguage)
         .order('inicio_at', { ascending: true });
 
       if (error) {
@@ -106,25 +106,32 @@ export const useEvents = () => {
 
       console.log('Raw events data from database:', data);
 
-      // Transform data to flatten translations
-      const transformedEvents = data?.map((event: any) => ({
-        ...event,
-        titulo: event.event_translations[0]?.titulo,
-        subtitulo: event.event_translations[0]?.subtitulo,
-        descricao_richtext: event.event_translations[0]?.descricao_richtext,
-        meta_title: event.event_translations[0]?.meta_title,
-        meta_description: event.event_translations[0]?.meta_description,
-        og_image: event.event_translations[0]?.og_image,
-        speakers: event.event_speakers
-          ?.sort((a: any, b: any) => a.ordem - b.ordem)
-          ?.map((es: any) => es.cms_speakers)
-          ?.filter(Boolean) || [],
-        areas: event.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
-        sessions: event.event_sessions
-          ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
-        assets: event.event_assets
-          ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
-      })) || [];
+      // Transform data to flatten translations and filter by language
+      const transformedEvents = data?.filter((event: any) => {
+        // Check if event has translation for current language
+        const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        return translation !== undefined;
+      }).map((event: any) => {
+        const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        return {
+          ...event,
+          titulo: translation?.titulo,
+          subtitulo: translation?.subtitulo,
+          descricao_richtext: translation?.descricao_richtext,
+          meta_title: translation?.meta_title,
+          meta_description: translation?.meta_description,
+          og_image: translation?.og_image,
+          speakers: event.event_speakers
+            ?.sort((a: any, b: any) => a.ordem - b.ordem)
+            ?.map((es: any) => es.cms_speakers)
+            ?.filter(Boolean) || [],
+          areas: event.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
+          sessions: event.event_sessions
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
+          assets: event.event_assets
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
+        };
+      }) || [];
 
       console.log('Transformed events for public site:', transformedEvents);
 
@@ -142,6 +149,7 @@ export const useEvents = () => {
   };
 
   useEffect(() => {
+    console.log('useEvents hook mounted, fetching events...');
     fetchEvents();
   }, []);
 
