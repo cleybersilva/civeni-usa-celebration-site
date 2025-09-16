@@ -9,6 +9,7 @@ import { Tabs } from '@/components/ui/tabs';
 import DayTabs from '@/components/civeni/DayTabs';
 import DayTimeline from '@/components/civeni/DayTimeline';
 import { useCiveniOnlineProgramData } from '@/hooks/useCiveniOnlineProgramData';
+import { toast } from '@/hooks/use-toast';
 
 const ScheduleOnline = () => {
   const { settings, days, isLoading, getSessionsForDay } = useCiveniOnlineProgramData();
@@ -21,38 +22,48 @@ const ScheduleOnline = () => {
     }
   }, [days, activeDay]);
 
-  const generatePDF = async () => {
-    // Simple CSV export for now - can be enhanced to proper PDF later
-    if (!days || !days.length) return;
-    
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Data,Horário,Título,Tipo,Modalidade,Sala,Descrição\n";
-    
-    days.forEach(day => {
-      const sessions = getSessionsForDay(day.id);
-      sessions.forEach(session => {
-        const startTime = new Date(session.start_at).toLocaleTimeString('pt-BR', {
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'America/Fortaleza'
-        });
-        const endTime = session.end_at ? new Date(session.end_at).toLocaleTimeString('pt-BR', {
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'America/Fortaleza'
-        }) : '';
-        
-        csvContent += `"${day.weekday_label}, ${new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR')}","${startTime}${endTime ? ' - ' + endTime : ''}","${session.title}","${session.session_type}","${session.modality}","${session.room || ''}","${session.description || ''}"\n`;
-      });
-    });
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `programacao-online-civeni-2025.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const generatePDF = async () => {
+    try {
+      setIsGeneratingPdf(true);
+      
+      const response = await fetch(`https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=online`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka2VxeGZnbG1yaXRnaG1ha21hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyNDc0ODksImV4cCI6MjA2NTgyMzQ4OX0.h-HiLfyMh2EaYWQro1TvCVROwHnOJDyynsUIptmhKuo`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao gerar PDF');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `civeni-programacao-online-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "PDF gerado com sucesso!",
+        description: "O download da programação foi iniciado.",
+      });
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro ao gerar PDF",
+        description: "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -95,15 +106,23 @@ const ScheduleOnline = () => {
                   </button>
                 </Link>
                 
-                {settings?.show_download_pdf && (
-                  <button 
-                    onClick={generatePDF}
-                    className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
-                  >
-                    <Download className="w-5 h-5" />
-                    Baixar Programação
-                  </button>
-                )}
+                <button 
+                  onClick={generatePDF}
+                  disabled={isGeneratingPdf}
+                  className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGeneratingPdf ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Gerando PDF...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-5 h-5" />
+                      Baixar Programação
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
