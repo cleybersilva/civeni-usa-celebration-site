@@ -119,8 +119,8 @@ serve(async (req) => {
     return new Response(pdfBytes, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/html',
-        'Content-Disposition': `attachment; filename="${filename.replace('.pdf', '.html')}"`,
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff'
       },
@@ -576,57 +576,133 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
 
 async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
   try {
-    // Using PDF-lib or similar library for Deno to generate PDF
-    // For now, we'll use a simpler HTML-to-PDF approach with a free service
+    // Use jsPDF to generate actual PDF
+    const { jsPDF } = await import('https://esm.sh/jspdf@2.5.1');
     
-    // Alternative: Generate a simple PDF with basic content
-    // Since we can't easily use external services, let's return the HTML as a downloadable file
-    // that browsers can save as PDF using print functionality
+    // Create new PDF document
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
     
-    // For a proper PDF implementation, you would need to:
-    // 1. Use Puppeteer in a Docker container 
-    // 2. Use a PDF generation library like jsPDF
-    // 3. Use a paid service like HTMLCSStoImage
+    // Add title
+    pdf.setFontSize(20);
+    pdf.text('Programação III CIVENI 2025', 20, 30);
     
-    // For this MVP, we'll return a well-formatted HTML that can be printed as PDF
-    const pdfHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Programação CIVENI PDF</title>
-  <style>
-    @media print {
-      body { margin: 0; }
-      .no-print { display: none; }
+    // Parse HTML content to extract text (simple approach)
+    const textContent = html
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Split text into lines that fit the page width
+    const lines = pdf.splitTextToSize(textContent, 170); // 170mm width
+    let yPosition = 50;
+    
+    pdf.setFontSize(10);
+    
+    // Add lines to PDF with page breaks
+    for (let i = 0; i < lines.length; i++) {
+      if (yPosition > 280) { // Near bottom of page
+        pdf.addPage();
+        yPosition = 20;
+      }
+      pdf.text(lines[i], 20, yPosition);
+      yPosition += 5;
     }
-    body { font-family: Arial, sans-serif; }
-  </style>
-</head>
-<body>
-  ${html}
-  <div class="no-print" style="position: fixed; top: 10px; right: 10px; background: blue; color: white; padding: 10px; border-radius: 5px;">
-    Use Ctrl+P para salvar como PDF
-  </div>
-</body>
-</html>`;
     
-    return new TextEncoder().encode(pdfHtml);
+    // Add footer
+    const pageCount = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.text(`Página ${i} de ${pageCount} - III CIVENI 2025`, 20, 290);
+    }
+    
+    // Return PDF as Uint8Array
+    const pdfOutput = pdf.output('arraybuffer');
+    return new Uint8Array(pdfOutput);
+    
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error('Error generating PDF with jsPDF:', error);
     
-    // Fallback: return simple HTML
-    const fallbackHtml = `
-      <html>
-        <head><title>Programação CIVENI</title></head>
-        <body style="font-family: Arial, sans-serif; padding: 40px;">
-          <h1>Programação III CIVENI 2025</h1>
-          <p>Use Ctrl+P para salvar como PDF.</p>
-          ${html}
-        </body>
-      </html>
-    `;
+    // Fallback: create a simple text-based PDF using basic approach
+    const simpleContent = `
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+/Resources <<
+  /Font <<
+    /F1 5 0 R
+  >>
+>>
+>>
+endobj
+
+4 0 obj
+<<
+/Length 200
+>>
+stream
+BT
+/F1 12 Tf
+50 700 Td
+(Programação III CIVENI 2025) Tj
+0 -20 Td
+(Erro na geração do PDF. Acesse o site para ver a programação.) Tj
+0 -20 Td
+(https://iiiciveni.com.br) Tj
+ET
+endstream
+endobj
+
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000274 00000 n 
+0000000526 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+625
+%%EOF`;
     
-    return new TextEncoder().encode(fallbackHtml);
+    return new TextEncoder().encode(simpleContent);
   }
 }
