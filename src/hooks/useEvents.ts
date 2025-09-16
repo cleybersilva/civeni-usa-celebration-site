@@ -130,70 +130,61 @@ export const useEventBySlug = (slug: string) => {
   const { toast } = useToast();
 
   const fetchEvent = async () => {
-    if (!slug) {
-      console.log('No slug provided');
-      setLoading(false);
-      return;
-    }
+    if (!slug) return;
     
     try {
       setLoading(true);
-      console.log('Starting fetch for slug:', slug);
       
-      // First get the event
-      const { data: eventData, error: eventError } = await supabase
+      // Get current language from localStorage or default to 'pt-BR'
+      const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
+      
+      const { data, error } = await supabase
         .from('events')
-        .select('*')
+        .select(`
+          *,
+          event_translations!inner(
+            titulo,
+            subtitulo,
+            descricao_richtext,
+            meta_title,
+            meta_description,
+            og_image,
+            idioma
+          )
+        `)
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
         .single();
 
-      console.log('Event data:', eventData, 'Error:', eventError);
+      if (error) throw error;
 
-      if (eventError) {
-        console.error('Error fetching event:', eventError);
-        throw eventError;
-      }
-
-      if (!eventData) {
-        console.log('No event found');
+      // Transform data to flatten translations
+      if (data) {
+        // Find translation for current language or use fallback
+        const translation = data.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        
+        const transformedEvent = {
+          ...data,
+          titulo: translation?.titulo || data.slug.replace(/-/g, ' ').toUpperCase(),
+          subtitulo: translation?.subtitulo || '',
+          descricao_richtext: translation?.descricao_richtext || '',
+          meta_title: translation?.meta_title || data.slug.replace(/-/g, ' ').toUpperCase(),
+          meta_description: translation?.meta_description || '',
+          og_image: translation?.og_image || data.banner_url,
+          speakers: [],
+          areas: [],
+          sessions: [],
+          assets: []
+        };
+        
+        setEvent(transformedEvent as Event);
+      } else {
         setEvent(null);
-        return;
       }
-
-      // Then get the translation
-      const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
-      const { data: translationData, error: translationError } = await supabase
-        .from('event_translations')
-        .select('*')
-        .eq('event_id', eventData.id)
-        .eq('idioma', currentLanguage)
-        .single();
-
-      console.log('Translation data:', translationData, 'Error:', translationError);
-
-      // Combine event and translation data
-      const combinedEvent = {
-        ...eventData,
-        titulo: translationData?.titulo || eventData.slug.replace(/-/g, ' ').toUpperCase(),
-        subtitulo: translationData?.subtitulo || '',
-        descricao_richtext: translationData?.descricao_richtext || '',
-        meta_title: translationData?.meta_title || eventData.slug.replace(/-/g, ' ').toUpperCase(),
-        meta_description: translationData?.meta_description || '',
-        og_image: translationData?.og_image || eventData.banner_url,
-        speakers: [],
-        areas: [],
-        sessions: [],
-        assets: []
-      };
-
-      console.log('Final combined event:', combinedEvent);
-      setEvent(combinedEvent as Event);
-      
     } catch (error: any) {
-      console.error('Error in fetchEvent:', error);
+      console.error('Error fetching event:', error);
       setEvent(null);
-      if (error.code !== 'PGRST116') {
+      if (error.code !== 'PGRST116') { // Don't show error for "not found"
         toast({
           title: 'Erro ao carregar evento',
           description: error.message,
