@@ -1,7 +1,6 @@
 import SpeakerImagePlaceholder from '@/components/SpeakerImagePlaceholder';
 import { Speaker } from '@/contexts/CMSContext';
-import { useVersionedImage } from '@/hooks/useVersionedImage';
-import { SmartImage } from '@/components/SmartImage';
+import { useFixedSpeakerImage } from '@/hooks/useFixedSpeakerImage';
 import { RefreshCw } from 'lucide-react';
 import React from 'react';
 
@@ -10,19 +9,7 @@ interface SpeakerCardProps {
 }
 
 const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
-  const { versionedUrl, isLoading, error, refresh } = useVersionedImage(speaker.image || '');
-  const [imageError, setImageError] = React.useState(false);
-
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
-  const handleRetry = () => {
-    setImageError(false);
-    refresh();
-  };
-
-  const hasError = imageError || !!error;
+  const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
 
   return (
     <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100/50 backdrop-blur-sm">
@@ -35,15 +22,14 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
             <SpeakerImagePlaceholder
               name={speaker.name}
               showError={true}
-              onRetry={handleRetry}
+              onRetry={retryLoad}
               isLoading={isLoading}
             />
           ) : (
             <>
               <img 
-                src={versionedUrl} 
+                src={imageSrc} 
                 alt={speaker.name}
-                onError={handleImageError}
                 className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${
                   isLoading ? 'opacity-50 blur-sm' : 'opacity-100 blur-0'
                 }`}
@@ -68,7 +54,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
               {hasError && !isLoading && (
                 <div className="absolute top-4 right-4">
                   <button
-                    onClick={handleRetry}
+                    onClick={retryLoad}
                     className="bg-white/90 text-civeni-blue p-3 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/50"
                     title="Tentar carregar imagem novamente"
                   >
