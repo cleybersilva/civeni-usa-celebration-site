@@ -89,8 +89,6 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
   };
 
   const processImage = async () => {
-    console.log(`[DEBUG] Processing image for speaker: ${speaker?.name}`);
-    
     if (!speaker.image) {
       console.info(`[${speaker.name}] No image provided, using default`);
       setImageSrc(DEFAULT_SPEAKER_IMAGE);
@@ -99,14 +97,12 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
       return;
     }
 
-    console.log(`[${speaker.name}] Processing image (${isProduction() ? 'PRODUCTION' : 'DEVELOPMENT'}):`, speaker.image?.substring(0, 100) + '...');
     setIsLoading(true);
     setHasError(false);
 
     try {
       // Se for base64, usar diretamente
       if (speaker.image.startsWith('data:')) {
-        console.log(`[${speaker.name}] Using base64 image directly`);
         setImageSrc(speaker.image);
         setIsLoading(false);
         setHasError(false);
@@ -121,18 +117,14 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
       
       for (let i = 0; i < urlsToTry.length; i++) {
         const url = urlsToTry[i];
-        console.log(`[${speaker.name}] Testing URL ${i + 1}/${urlsToTry.length}:`, url?.substring(0, 100) + '...');
         
         const works = await testImageUrl(url);
         
         if (works) {
-          console.log(`[${speaker.name}] ✅ SUCCESS with URL:`, url?.substring(0, 100) + '...');
           setImageSrc(url);
           setHasError(false);
           foundWorkingUrl = true;
           break;
-        } else {
-          console.log(`[${speaker.name}] ❌ Failed URL:`, url?.substring(0, 100) + '...');
         }
       }
 

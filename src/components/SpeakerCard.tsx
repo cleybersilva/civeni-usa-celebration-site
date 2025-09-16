@@ -9,9 +9,7 @@ interface SpeakerCardProps {
 }
 
 const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
-  console.log('SpeakerCard rendering for:', speaker.name, 'Image URL:', speaker.image);
   const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
-  console.log('SpeakerCard state:', { imageSrc: imageSrc?.substring(0, 100) + '...', isLoading, hasError });
 
   return (
     <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100/50 backdrop-blur-sm">
