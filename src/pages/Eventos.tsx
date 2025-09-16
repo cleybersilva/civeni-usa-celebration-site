@@ -17,10 +17,6 @@ import { ptBR } from 'date-fns/locale';
 const Eventos = () => {
   const { t } = useTranslation();
   const { events, loading } = useEvents();
-  
-  // Debug: log events data
-  console.log('Events page - events data:', events);
-  console.log('Events page - loading state:', loading);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [modalidadeFilter, setModalidadeFilter] = useState('all');
@@ -318,17 +314,8 @@ const Eventos = () => {
                 <div className="text-center py-16">
                   <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-xl text-gray-600">
-                    {events && events.length > 0 
-                      ? "Nenhum evento encontrado com os filtros selecionados."
-                      : "Nenhum evento disponível no momento."
-                    }
+                    Nenhum evento encontrado com os filtros selecionados.
                   </p>
-                  {/* Debug info */}
-                  <div className="mt-4 text-sm text-gray-500">
-                    <p>Debug: Total events loaded: {events?.length || 0}</p>
-                    <p>Filtered events: {filteredEvents.length}</p>
-                    <p>Loading: {loading ? 'true' : 'false'}</p>
-                  </div>
                 </div>
               )}
             </section>
