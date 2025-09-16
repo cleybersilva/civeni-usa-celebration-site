@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Users, Share2, Download, ExternalLink, Youtube, Award } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Share2, ExternalLink, Youtube, Award, ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -219,13 +219,20 @@ const EventoDetalhes = () => {
             
             {/* Quick Actions */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={handleShare} variant="secondary" size="lg" className="bg-white text-civeni-blue hover:bg-white/90">
+              <Link to="/eventos">
+                <Button variant="secondary" size="lg" className="bg-white text-civeni-blue hover:bg-white/90">
+                  <ArrowLeft className="h-5 w-5 mr-2" />
+                  Voltar para Eventos
+                </Button>
+              </Link>
+              
+              <Button onClick={handleShare} variant="secondary" size="lg" className="border-white text-white hover:bg-white/20 border-2">
                 <Share2 className="h-5 w-5 mr-2" />
                 Compartilhar
               </Button>
               
               {event.youtube_url && (
-                <Button variant="secondary" size="lg" className="border-white text-white hover:bg-white/20 border-2" asChild>
+                <Button size="lg" className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90" asChild>
                   <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                     <Youtube className="h-5 w-5 mr-2" />
                     {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}
@@ -252,70 +259,90 @@ const EventoDetalhes = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Event Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
+              <CardHeader className="bg-gradient-to-r from-civeni-blue/5 to-civeni-red/5">
+                <CardTitle className="flex items-center gap-2 text-2xl">
                   <Calendar className="h-6 w-6 text-civeni-blue" />
                   Detalhes do Evento
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-gray-500" />
+              <CardContent className="space-y-6 p-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                    <div className="flex-shrink-0 w-12 h-12 bg-civeni-blue/10 rounded-full flex items-center justify-center">
+                      <Calendar className="h-6 w-6 text-civeni-blue" />
+                    </div>
                     <div>
-                      <p className="font-medium">Data</p>
-                      <p className="text-gray-600">{formatEventDate(event.inicio_at)}</p>
+                      <p className="font-semibold text-gray-900">Data</p>
+                      <p className="text-gray-700">{formatEventDate(event.inicio_at)}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-5 w-5 text-gray-500" />
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                    <div className="flex-shrink-0 w-12 h-12 bg-civeni-red/10 rounded-full flex items-center justify-center">
+                      <Clock className="h-6 w-6 text-civeni-red" />
+                    </div>
                     <div>
-                      <p className="font-medium">Horário</p>
-                      <p className="text-gray-600">
+                      <p className="font-semibold text-gray-900">Horário</p>
+                      <p className="text-gray-700">
                         {formatEventTime(event.inicio_at)}
                         {event.fim_at && ` - ${formatEventTime(event.fim_at)}`}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Users className="h-5 w-5 text-gray-500" />
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                    <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                      <Users className="h-6 w-6 text-purple-600" />
+                    </div>
                     <div>
-                      <p className="font-medium">Modalidade</p>
-                      <p className="text-gray-600 capitalize">{event.modalidade}</p>
+                      <p className="font-semibold text-gray-900">Modalidade</p>
+                      <p className="text-gray-700 capitalize">{event.modalidade}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Award className="h-5 w-5 text-gray-500" />
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                    <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <Award className="h-6 w-6 text-green-600" />
+                    </div>
                     <div>
-                      <p className="font-medium">Fuso Horário</p>
-                      <p className="text-gray-600">{event.timezone || 'America/Sao_Paulo'}</p>
+                      <p className="font-semibold text-gray-900">Fuso Horário</p>
+                      <p className="text-gray-700">{event.timezone || 'America/Sao_Paulo'}</p>
                     </div>
                   </div>
                   
                   {event.endereco && (
-                    <div className="flex items-center gap-3 md:col-span-2">
-                      <MapPin className="h-5 w-5 text-gray-500" />
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg md:col-span-2">
+                      <div className="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                        <MapPin className="h-6 w-6 text-orange-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Local</p>
-                        <p className="text-gray-600">{event.endereco}</p>
+                        <p className="font-semibold text-gray-900">Local</p>
+                        <p className="text-gray-700">{event.endereco}</p>
                       </div>
                     </div>
                   )}
                 </div>
                 
-                <Separator />
+                <Separator className="my-6" />
                 
-                {event.descricao_richtext && (
+                {event.descricao_richtext ? (
                   <div>
-                    <h3 className="text-lg font-semibold mb-3">Descrição</h3>
+                    <h3 className="text-xl font-bold mb-4 text-gray-900 flex items-center gap-2">
+                      <div className="w-1 h-6 bg-gradient-to-b from-civeni-blue to-civeni-red rounded-full"></div>
+                      Descrição do Evento
+                    </h3>
                     <div 
-                      className="prose prose-gray max-w-none"
+                      className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-civeni-blue"
                       dangerouslySetInnerHTML={{ __html: event.descricao_richtext }}
                     />
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500 text-lg">Descrição detalhada em breve</p>
                   </div>
                 )}
               </CardContent>
@@ -325,21 +352,37 @@ const EventoDetalhes = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Actions Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Ações Rápidas</CardTitle>
+            <Card className="overflow-hidden border-2 border-civeni-blue/20">
+              <CardHeader className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white">
+                <CardTitle className="text-white">Ações Disponíveis</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 p-4">
+                <Link to="/eventos">
+                  <Button variant="outline" size="sm" className="w-full border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Voltar para Eventos
+                  </Button>
+                </Link>
+                
                 <Button onClick={handleShare} variant="outline" size="sm" className="w-full">
                   <Share2 className="h-4 w-4 mr-2" />
-                  Compartilhar
+                  Compartilhar Evento
                 </Button>
                 
                 {event.youtube_url && (
-                  <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Button size="sm" className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90" asChild>
                     <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                       <Youtube className="h-4 w-4 mr-2" />
-                      YouTube
+                      {isPastEvent ? 'Ver Gravação' : 'Transmissão Ao Vivo'}
+                    </a>
+                  </Button>
+                )}
+
+                {event.tem_inscricao && event.inscricao_url && !isPastEvent && (
+                  <Button size="sm" className="w-full bg-green-600 hover:bg-green-700" asChild>
+                    <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Inscrever-se Agora
                     </a>
                   </Button>
                 )}
@@ -349,28 +392,36 @@ const EventoDetalhes = () => {
             {/* Event Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Resumo do Evento</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-civeni-blue" />
+                  Resumo do Evento
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                    <span className="font-medium">Status:</span>
+                  <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg">
+                    <span className="font-semibold text-gray-900">Status:</span>
                     <div className="flex items-center gap-2">
                       {getStatusBadge(event)}
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                    <span className="font-medium">Modalidade:</span>
-                    <span className="capitalize text-gray-600">{event.modalidade}</span>
+                  <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg">
+                    <span className="font-semibold text-gray-900">Modalidade:</span>
+                    {getModalidadeBadge(event.modalidade)}
                   </div>
 
                   {event.tem_inscricao && (
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <span className="font-medium">Aceita Inscrições:</span>
-                      <Badge variant="default">Sim</Badge>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg">
+                      <span className="font-semibold text-gray-900">Inscrições:</span>
+                      <Badge className="bg-green-100 text-green-800">Abertas</Badge>
                     </div>
                   )}
+
+                  <div className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg">
+                    <span className="font-semibold text-gray-900">Evento:</span>
+                    <Badge variant="outline" className="border-civeni-blue text-civeni-blue">CIVENI 2025</Badge>
+                  </div>
                 </div>
               </CardContent>
             </Card>
