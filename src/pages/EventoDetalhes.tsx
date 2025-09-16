@@ -62,6 +62,7 @@ const EventoDetalhes = () => {
       } catch (err: any) {
         setError('Erro ao carregar evento');
         console.error('Erro ao carregar evento:', err);
+        console.log('Slug usado na query:', slug);
       } finally {
         setLoading(false);
       }
