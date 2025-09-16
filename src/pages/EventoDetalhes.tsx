@@ -161,7 +161,7 @@ const EventoDetalhes = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue via-blue-700 to-purple-800 text-white py-12">
         <div className="absolute inset-0 bg-black/20"></div>
         {event.banner_url && (
           <div 
@@ -266,22 +266,6 @@ const EventoDetalhes = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Users className="h-5 w-5 text-gray-500" />
-                    <div>
-                      <p className="font-medium">Modalidade</p>
-                      <p className="text-gray-600 capitalize">{event.modalidade}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Award className="h-5 w-5 text-gray-500" />
-                    <div>
-                      <p className="font-medium">Fuso Horário</p>
-                      <p className="text-gray-600">{event.timezone || 'America/Sao_Paulo'}</p>
-                    </div>
-                  </div>
-                  
                   {event.endereco && (
                     <div className="flex items-center gap-3 md:col-span-2">
                       <MapPin className="h-5 w-5 text-gray-500" />
@@ -302,72 +286,6 @@ const EventoDetalhes = () => {
                       className="prose prose-gray max-w-none"
                       dangerouslySetInnerHTML={{ __html: event.descricao_richtext }}
                     />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Media & Links */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="h-6 w-6 text-civeni-blue" />
-                  Mídia e Links
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {event.banner_url && (
-                  <div>
-                    <h4 className="font-medium mb-2">Banner do Evento</h4>
-                    <img 
-                      src={event.banner_url} 
-                      alt={`Banner - ${event.titulo}`}
-                      className="w-full max-w-md rounded-lg border"
-                    />
-                  </div>
-                )}
-
-                <div className="grid gap-3 md:grid-cols-2">
-                  {event.youtube_url && (
-                    <div className="p-3 border rounded-lg">
-                      <h5 className="font-medium text-sm mb-2">YouTube</h5>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
-                          <Youtube className="h-4 w-4 mr-2" />
-                          {isPastEvent ? 'Ver Gravação' : 'Transmissão Ao Vivo'}
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-
-                  {event.playlist_url && (
-                    <div className="p-3 border rounded-lg">
-                      <h5 className="font-medium text-sm mb-2">Playlist</h5>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={event.playlist_url} target="_blank" rel="noopener noreferrer">
-                          <Youtube className="h-4 w-4 mr-2" />
-                          Ver Playlist
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-
-                  {event.tem_inscricao && event.inscricao_url && (
-                    <div className="p-3 border rounded-lg">
-                      <h5 className="font-medium text-sm mb-2">Inscrições</h5>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Fazer Inscrição
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {!event.youtube_url && !event.playlist_url && !event.inscricao_url && (
-                  <div className="text-center py-4 text-gray-500">
-                    <p>Nenhuma mídia ou link adicional disponível</p>
                   </div>
                 )}
               </CardContent>
@@ -496,32 +414,32 @@ const EventoDetalhes = () => {
               </CardContent>
             </Card>
 
-            {/* Event Summary */}
+            {/* Event Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Resumo do Evento</CardTitle>
+                <CardTitle>Informações</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                    <span className="font-medium">Status:</span>
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(event)}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                    <span className="font-medium">Modalidade:</span>
-                    <span className="capitalize text-gray-600">{event.modalidade}</span>
-                  </div>
-
-                  {event.tem_inscricao && (
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <span className="font-medium">Aceita Inscrições:</span>
-                      <Badge variant="default">Sim</Badge>
-                    </div>
-                  )}
+              <CardContent className="space-y-4 text-sm">
+                <div>
+                  <span className="font-medium">Modalidade:</span>
+                  <span className="ml-2 capitalize">{event.modalidade}</span>
                 </div>
+                
+                <div>
+                  <span className="font-medium">Status:</span>
+                  <span className="ml-2">
+                    {eventStatus === 'upcoming' && 'Próximo'}
+                    {eventStatus === 'live' && 'Ao Vivo'}
+                    {eventStatus === 'past' && 'Encerrado'}
+                  </span>
+                </div>
+                
+                {event.tem_inscricao && (
+                  <div>
+                    <span className="font-medium">Inscrições:</span>
+                    <span className="ml-2 text-green-600">Abertas</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
