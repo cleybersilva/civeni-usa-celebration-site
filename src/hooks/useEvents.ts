@@ -175,21 +175,12 @@ export const useEventBySlug = (slug: string) => {
     try {
       setLoading(true);
       
-      // Get current language from localStorage or default to 'pt-BR'
-      const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
+      console.log('useEventBySlug - Fetching event with slug:', slug);
       
       const { data, error } = await supabase
         .from('events')
         .select(`
           *,
-          event_translations!inner(
-            titulo,
-            subtitulo,
-            descricao_richtext,
-            meta_title,
-            meta_description,
-            og_image
-          ),
           event_speakers(
             ordem,
             cms_speakers(
@@ -198,15 +189,6 @@ export const useEventBySlug = (slug: string) => {
               title,
               institution,
               image_url
-            )
-          ),
-          event_areas(
-            thematic_areas(
-              id,
-              name_pt,
-              name_en,
-              description_pt,
-              description_en
             )
           ),
           event_sessions(
@@ -218,48 +200,47 @@ export const useEventBySlug = (slug: string) => {
             speaker_id,
             sala_url,
             ordem
-          ),
-          event_assets(
-            id,
-            asset_url,
-            caption,
-            ordem
           )
         `)
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
-        .eq('event_translations.idioma', currentLanguage)
         .single();
 
-      if (error) throw error;
+      console.log('useEventBySlug - Query result:', { data, error });
 
-      // Transform data to flatten translations
+      if (error) {
+        console.error('useEventBySlug - Database error:', error);
+        throw error;
+      }
+
+      // Transform data
       if (data) {
         const transformedEvent = {
           ...data,
-          titulo: data.event_translations[0]?.titulo,
-          subtitulo: data.event_translations[0]?.subtitulo,
-          descricao_richtext: data.event_translations[0]?.descricao_richtext,
-          meta_title: data.event_translations[0]?.meta_title,
-          meta_description: data.event_translations[0]?.meta_description,
-          og_image: data.event_translations[0]?.og_image,
+          // Use the event title directly from the events table (fallback to slug if needed)
+          titulo: data.slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
+          subtitulo: '',  // Can be filled from actual field if exists
+          descricao_richtext: '',  // Can be filled from actual field if exists  
+          meta_title: data.slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
+          meta_description: '',
+          og_image: data.banner_url,
           speakers: data.event_speakers
             ?.sort((a: any, b: any) => a.ordem - b.ordem)
             ?.map((es: any) => es.cms_speakers)
             ?.filter(Boolean) || [],
-          areas: data.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
           sessions: data.event_sessions
             ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
-          assets: data.event_assets
-            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
+          assets: []  // Can be added later if needed
         };
         
+        console.log('useEventBySlug - Transformed event:', transformedEvent);
         setEvent(transformedEvent as Event);
       } else {
+        console.log('useEventBySlug - No event found');
         setEvent(null);
       }
     } catch (error: any) {
-      console.error('Error fetching event:', error);
+      console.error('useEventBySlug - Error fetching event:', error);
       setEvent(null);
       if (error.code !== 'PGRST116') { // Don't show error for "not found"
         toast({
