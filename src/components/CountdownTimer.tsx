@@ -48,15 +48,31 @@ const CountdownTimer = () => {
     return () => clearInterval(timer);
   }, [content.eventConfig.eventDate, content.eventConfig.startTime]);
 
-  // Escutar evento personalizado para atualização
+  // Atualizar quando evento de configuração é disparado
   useEffect(() => {
-    const handleUpdate = (event: any) => {
-      console.log('EventConfig updated, reloading countdown...', event.detail);
-      // Força re-render depois que o contexto é atualizado
+    const handleEventUpdate = (event: any) => {
+      console.log('CountdownTimer - Event config updated:', event.detail);
+      // Força re-render imediato
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('forceContentReload'));
+      }, 100);
     };
     
-    window.addEventListener('eventConfigUpdated', handleUpdate);
-    return () => window.removeEventListener('eventConfigUpdated', handleUpdate);
+    const handleEventLoaded = (event: any) => {
+      console.log('CountdownTimer - Event config loaded from DB:', event.detail);
+      // Força re-render quando dados são carregados do banco
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('forceContentReload'));
+      }, 100);
+    };
+    
+    window.addEventListener('eventConfigUpdated', handleEventUpdate);
+    window.addEventListener('eventConfigLoaded', handleEventLoaded);
+    
+    return () => {
+      window.removeEventListener('eventConfigUpdated', handleEventUpdate);
+      window.removeEventListener('eventConfigLoaded', handleEventLoaded);
+    };
   }, []);
 
   // Force reload on component mount to get fresh data
@@ -66,11 +82,8 @@ const CountdownTimer = () => {
       window.dispatchEvent(new CustomEvent('forceContentReload'));
     };
     
-    // Force reload after component mount and every 5 seconds to ensure fresh data
-    forceReload();
-    const reloadInterval = setInterval(forceReload, 5000);
-    
-    return () => clearInterval(reloadInterval);
+    // Force reload after component mount
+    setTimeout(forceReload, 100);
   }, []);
 
   // Debug para verificar se está carregando as configurações corretas

@@ -286,7 +286,7 @@ const defaultContent: CMSContent = {
   ],
   batchInfo: "FIRST BATCH: November 1 - December 15, 2024",
   eventConfig: {
-    eventDate: "2025-12-08",
+    eventDate: "2025-12-11",
     eventLocation: "Celebration, Florida",
     eventCity: "Celebration",
     startTime: "09:00",
@@ -520,6 +520,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { data: eventConfigData, error: eventError } = await supabase
         .from('event_config')
         .select('*')
+        .order('updated_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
@@ -535,6 +536,13 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.log('Event config loaded from DB:', eventConfig);
         console.log('Raw DB eventDate:', eventConfigData.event_date);
         console.log('Formatted eventDate for context:', eventConfig.eventDate);
+        
+        // Notificar imediatamente sobre o carregamento
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('eventConfigLoaded', { 
+            detail: eventConfig 
+          }));
+        }, 100);
       } else {
         console.log('Using default event config - no DB data or error:', eventError);
       }
