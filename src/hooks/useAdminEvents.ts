@@ -17,13 +17,14 @@ export const useAdminEvents = () => {
         .from('events')
         .select(`
           *,
-          event_translations!inner(
+          event_translations(
             titulo,
             subtitulo,
             descricao_richtext,
             meta_title,
             meta_description,
-            og_image
+            og_image,
+            idioma
           ),
           event_speakers(
             ordem,
@@ -35,25 +36,31 @@ export const useAdminEvents = () => {
             )
           )
         `)
-        .eq('event_translations.idioma', 'pt-BR')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
+      console.log('Admin events fetched:', data);
+
       // Transform data to flatten translations
-      const transformedEvents = data?.map((event: any) => ({
-        ...event,
-        titulo: event.event_translations[0]?.titulo,
-        subtitulo: event.event_translations[0]?.subtitulo,
-        descricao_richtext: event.event_translations[0]?.descricao_richtext,
-        meta_title: event.event_translations[0]?.meta_title,
-        meta_description: event.event_translations[0]?.meta_description,
-        og_image: event.event_translations[0]?.og_image,
-        speakers: event.event_speakers
-          ?.sort((a: any, b: any) => a.ordem - b.ordem)
-          ?.map((es: any) => es.cms_speakers)
-          ?.filter(Boolean) || []
-      })) || [];
+      const transformedEvents = data?.map((event: any) => {
+        const ptTranslation = event.event_translations?.find((t: any) => t.idioma === 'pt-BR');
+        return {
+          ...event,
+          titulo: ptTranslation?.titulo || event.slug,
+          subtitulo: ptTranslation?.subtitulo,
+          descricao_richtext: ptTranslation?.descricao_richtext,
+          meta_title: ptTranslation?.meta_title,
+          meta_description: ptTranslation?.meta_description,
+          og_image: ptTranslation?.og_image,
+          speakers: event.event_speakers
+            ?.sort((a: any, b: any) => a.ordem - b.ordem)
+            ?.map((es: any) => es.cms_speakers)
+            ?.filter(Boolean) || []
+        };
+      }) || [];
+
+      console.log('Transformed admin events:', transformedEvents);
 
       setEvents(transformedEvents);
     } catch (error: any) {
@@ -79,35 +86,61 @@ export const useAdminEvents = () => {
     }
 
     try {
+      console.log('Creating event with data:', eventData);
+      
+      // Create the event first
       const { data, error } = await supabase.rpc('admin_upsert_event', {
         event_data: eventData,
         user_email: user.email,
         session_token: sessionToken
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from admin_upsert_event:', error);
+        throw error;
+      }
 
-      // If event was created, also create translation
-      if (data && eventData.translation && typeof data === 'object' && 'id' in data) {
+      console.log('Event created successfully:', data);
+
+      let eventId = null;
+      if (typeof data === 'object' && data && 'id' in data) {
+        eventId = (data as any).id;
+      }
+
+      // Create translation if provided and we have an event ID
+      if (eventData.translation && eventId) {
         const translationData = {
           ...eventData.translation,
-          event_id: (data as any).id
+          event_id: eventId
         };
+
+        console.log('Creating translation with data:', translationData);
 
         const { error: translationError } = await supabase
           .from('event_translations')
-          .insert(translationData);
+          .upsert(translationData, {
+            onConflict: 'event_id,idioma'
+          });
 
         if (translationError) {
           console.error('Error creating translation:', translationError);
+          // Don't fail the entire operation, just log the error
+          toast({
+            title: 'Aviso',
+            description: 'Evento criado mas houve problema na tradução. Edite o evento para corrigir.',
+            variant: 'default'
+          });
+        } else {
+          console.log('Translation created successfully');
         }
       }
 
       toast({
         title: 'Evento criado com sucesso',
-        description: `O evento "${eventData.translation?.titulo || eventData.slug}" foi criado.`
+        description: `O evento "${eventData.translation?.titulo || eventData.slug}" foi criado e está disponível no site.`
       });
       
+      // Refresh events list
       await fetchEvents();
       return true;
     } catch (error: any) {

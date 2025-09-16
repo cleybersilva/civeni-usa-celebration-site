@@ -61,7 +61,7 @@ export const EventFormDialog: React.FC<EventFormDialogProps> = ({
     // Settings
     featured: false,
     exibir_passado: true,
-    status_publicacao: 'draft',
+        status_publicacao: 'published',
     
     // SEO
     meta_title: '',
@@ -112,7 +112,7 @@ export const EventFormDialog: React.FC<EventFormDialogProps> = ({
         inscricao_url: '',
         featured: false,
         exibir_passado: true,
-        status_publicacao: 'draft',
+        status_publicacao: 'published',
         meta_title: '',
         meta_description: '',
         og_image: ''
