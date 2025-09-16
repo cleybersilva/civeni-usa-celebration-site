@@ -59,41 +59,6 @@ export const useEvents = () => {
             meta_description,
             og_image,
             idioma
-          ),
-          event_speakers(
-            ordem,
-            cms_speakers(
-              id,
-              name,
-              title,
-              institution,
-              image_url
-            )
-          ),
-          event_areas(
-            thematic_areas(
-              id,
-              name_pt,
-              name_en,
-              description_pt,
-              description_en
-            )
-          ),
-          event_sessions(
-            id,
-            inicio_at,
-            fim_at,
-            titulo,
-            descricao,
-            speaker_id,
-            sala_url,
-            ordem
-          ),
-          event_assets(
-            id,
-            asset_url,
-            caption,
-            ordem
           )
         `)
         .eq('status_publicacao', 'published')
@@ -119,15 +84,10 @@ export const useEvents = () => {
           meta_title: translation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
           meta_description: translation?.meta_description || '',
           og_image: translation?.og_image || event.banner_url,
-          speakers: event.event_speakers
-            ?.sort((a: any, b: any) => a.ordem - b.ordem)
-            ?.map((es: any) => es.cms_speakers)
-            ?.filter(Boolean) || [],
-          areas: event.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
-          sessions: event.event_sessions
-            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
-          assets: event.event_assets
-            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
+          speakers: [],
+          areas: [],
+          sessions: [],
+          assets: []
         };
       }) || [];
 
@@ -182,76 +142,39 @@ export const useEventBySlug = (slug: string) => {
         .from('events')
         .select(`
           *,
-          event_translations!inner(
+          event_translations(
             titulo,
             subtitulo,
             descricao_richtext,
             meta_title,
             meta_description,
-            og_image
-          ),
-          event_speakers(
-            ordem,
-            cms_speakers(
-              id,
-              name,
-              title,
-              institution,
-              image_url
-            )
-          ),
-          event_areas(
-            thematic_areas(
-              id,
-              name_pt,
-              name_en,
-              description_pt,
-              description_en
-            )
-          ),
-          event_sessions(
-            id,
-            inicio_at,
-            fim_at,
-            titulo,
-            descricao,
-            speaker_id,
-            sala_url,
-            ordem
-          ),
-          event_assets(
-            id,
-            asset_url,
-            caption,
-            ordem
+            og_image,
+            idioma
           )
         `)
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
-        .eq('event_translations.idioma', currentLanguage)
         .single();
 
       if (error) throw error;
 
       // Transform data to flatten translations
       if (data) {
+        // Find translation for current language or use fallback
+        const translation = data.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        
         const transformedEvent = {
           ...data,
-          titulo: data.event_translations[0]?.titulo,
-          subtitulo: data.event_translations[0]?.subtitulo,
-          descricao_richtext: data.event_translations[0]?.descricao_richtext,
-          meta_title: data.event_translations[0]?.meta_title,
-          meta_description: data.event_translations[0]?.meta_description,
-          og_image: data.event_translations[0]?.og_image,
-          speakers: data.event_speakers
-            ?.sort((a: any, b: any) => a.ordem - b.ordem)
-            ?.map((es: any) => es.cms_speakers)
-            ?.filter(Boolean) || [],
-          areas: data.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
-          sessions: data.event_sessions
-            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
-          assets: data.event_assets
-            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
+          titulo: translation?.titulo || data.slug.replace(/-/g, ' ').toUpperCase(),
+          subtitulo: translation?.subtitulo || '',
+          descricao_richtext: translation?.descricao_richtext || '',
+          meta_title: translation?.meta_title || data.slug.replace(/-/g, ' ').toUpperCase(),
+          meta_description: translation?.meta_description || '',
+          og_image: translation?.og_image || data.banner_url,
+          speakers: [],
+          areas: [],
+          sessions: [],
+          assets: []
         };
         
         setEvent(transformedEvent as Event);
