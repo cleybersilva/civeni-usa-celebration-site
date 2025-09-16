@@ -14,11 +14,9 @@ const CountdownTimer = () => {
   });
 
   useEffect(() => {
-    // Use counter settings from database if available
-    const eventDate = content.counterSettings?.eventDate || content.eventConfig.eventDate;
-    console.log('CountdownTimer - eventDate from context:', eventDate);
-    console.log('CountdownTimer - counterSettings:', content.counterSettings);
-    console.log('CountdownTimer - eventConfig:', content.eventConfig);
+    // Always prioritize eventConfig.eventDate for consistency
+    const eventDate = content.eventConfig.eventDate;
+    console.log('CountdownTimer - eventDate from eventConfig:', eventDate);
     
     if (!eventDate) return;
 
@@ -48,7 +46,7 @@ const CountdownTimer = () => {
     const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
-  }, [content.eventConfig.eventDate, content.eventConfig.startTime, content.counterSettings?.eventDate, content.counterSettings?.updatedAt]);
+  }, [content.eventConfig.eventDate, content.eventConfig.startTime]);
 
   // Escutar evento personalizado para atualização
   useEffect(() => {
@@ -87,7 +85,7 @@ const CountdownTimer = () => {
     es: 'es-ES',
     tr: 'tr-TR',
   };
-  const eventDateStr = content.counterSettings?.eventDate || content.eventConfig.eventDate;
+  const eventDateStr = content.eventConfig.eventDate;
   const firstDayLabel = eventDateStr
     ? new Date(eventDateStr).toLocaleDateString(localeMap[i18n.language] || i18n.language || 'pt-BR', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
