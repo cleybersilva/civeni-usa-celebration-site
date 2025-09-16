@@ -119,8 +119,8 @@ serve(async (req) => {
     return new Response(pdfBytes, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Content-Type': 'text/html',
+        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff'
       },
@@ -153,6 +153,7 @@ function generateEmptyProgramHtml(modalidade: string, bannerUrl: string): string
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    @page { size: A4; margin: 0; }
     :root {
       --brand-primary: hsl(210, 100%, 45%);
       --brand-secondary: hsl(0, 85%, 55%);
@@ -178,6 +179,7 @@ function generateEmptyProgramHtml(modalidade: string, bannerUrl: string): string
       bottom: 0;
       width: 6px;
       background: linear-gradient(180deg, var(--brand-primary), var(--brand-secondary));
+      z-index: 1000;
     }
     
     .banner {
@@ -254,12 +256,20 @@ function generateEmptyProgramHtml(modalidade: string, bannerUrl: string): string
     }
     
     .footer {
-      margin-top: 60px;
-      padding: 20px 24px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: var(--bg-soft);
+      border-top: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 10px;
       color: var(--text-muted);
       text-align: center;
-      border-top: 1px solid #eee;
+      padding: 0 24px;
     }
   </style>
 </head>
@@ -284,8 +294,10 @@ function generateEmptyProgramHtml(modalidade: string, bannerUrl: string): string
   </div>
 
   <div class="footer">
-    *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes. <br>
-    A versão mais atual está em https://iiiciveni.com.br/programacao-${modalidade}
+    <div>
+      <strong>III CIVENI 2025</strong> • *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes. <br>
+      A versão mais atual está em https://iiiciveni.com.br/programacao-${modalidade}
+    </div>
   </div>
 </body>
 </html>`;
@@ -356,6 +368,11 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    @page { 
+      size: A4; 
+      margin: 0; 
+    }
+    
     :root {
       --brand-primary: hsl(210, 100%, 45%);
       --brand-secondary: hsl(0, 85%, 55%);
@@ -382,6 +399,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       bottom: 0;
       width: 6px;
       background: linear-gradient(180deg, var(--brand-primary), var(--brand-secondary));
+      z-index: 1000;
     }
     
     .banner {
@@ -432,7 +450,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
     }
     
     .content {
-      padding: 0 24px;
+      padding: 0 30px 100px 36px;
     }
     
     .day-section {
@@ -520,12 +538,21 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
     }
     
     .footer {
-      margin-top: 60px;
-      padding: 20px 24px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--bg-soft);
+      border-top: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 30px;
       font-size: 10px;
       color: var(--text-muted);
       text-align: center;
-      border-top: 1px solid #eee;
     }
     
     .footer-logo {
@@ -546,6 +573,11 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       .sessions-table tr {
         page-break-inside: avoid;
         page-break-after: auto;
+      }
+      
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
       }
     }
   </style>
@@ -576,133 +608,84 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
 
 async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
   try {
-    // Use jsPDF to generate actual PDF
-    const { jsPDF } = await import('https://esm.sh/jspdf@2.5.1');
+    // Generate optimized HTML for PDF printing
+    const pdfOptimizedHtml = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Programação III CIVENI 2025</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
     
-    // Create new PDF document
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
-    });
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     
-    // Add title
-    pdf.setFontSize(20);
-    pdf.text('Programação III CIVENI 2025', 20, 30);
+    body {
+      font-family: 'Arial', sans-serif;
+      color: #1a202c;
+      background: white;
+      line-height: 1.4;
+      font-size: 11pt;
+      padding-bottom: 80px;
+    }
     
-    // Parse HTML content to extract text (simple approach)
-    const textContent = html
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+    .side-stripe {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: linear-gradient(180deg, #1e40af, #dc2626);
+      z-index: 1000;
+    }
     
-    // Split text into lines that fit the page width
-    const lines = pdf.splitTextToSize(textContent, 170); // 170mm width
-    let yPosition = 50;
-    
-    pdf.setFontSize(10);
-    
-    // Add lines to PDF with page breaks
-    for (let i = 0; i < lines.length; i++) {
-      if (yPosition > 280) { // Near bottom of page
-        pdf.addPage();
-        yPosition = 20;
+    @media print {
+      .day-section {
+        page-break-inside: avoid;
       }
-      pdf.text(lines[i], 20, yPosition);
-      yPosition += 5;
+      
+      .sessions-table {
+        page-break-inside: avoid;
+      }
+      
+      .sessions-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
     }
+  </style>
+</head>
+<body>
+  <div class="side-stripe"></div>
+  
+  ${html}
+  
+  <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 36px; font-size: 8pt; color: #64748b;">
+    <div>
+      <span style="font-weight: 700; color: #1e40af;">III CIVENI 2025</span>
+      <span style="margin-left: 16px;">*Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.</span>
+    </div>
+    <div>iiiciveni.com.br</div>
+  </div>
+</body>
+</html>`;
     
-    // Add footer
-    const pageCount = pdf.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      pdf.setPage(i);
-      pdf.setFontSize(8);
-      pdf.text(`Página ${i} de ${pageCount} - III CIVENI 2025`, 20, 290);
-    }
-    
-    // Return PDF as Uint8Array
-    const pdfOutput = pdf.output('arraybuffer');
-    return new Uint8Array(pdfOutput);
+    return new TextEncoder().encode(pdfOptimizedHtml);
     
   } catch (error) {
-    console.error('Error generating PDF with jsPDF:', error);
-    
-    // Fallback: create a simple text-based PDF using basic approach
-    const simpleContent = `
-%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
-
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
-
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
-/Resources <<
-  /Font <<
-    /F1 5 0 R
-  >>
->>
->>
-endobj
-
-4 0 obj
-<<
-/Length 200
->>
-stream
-BT
-/F1 12 Tf
-50 700 Td
-(Programação III CIVENI 2025) Tj
-0 -20 Td
-(Erro na geração do PDF. Acesse o site para ver a programação.) Tj
-0 -20 Td
-(https://iiiciveni.com.br) Tj
-ET
-endstream
-endobj
-
-5 0 obj
-<<
-/Type /Font
-/Subtype /Type1
-/BaseFont /Helvetica
->>
-endobj
-
-xref
-0 6
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000274 00000 n 
-0000000526 00000 n 
-trailer
-<<
-/Size 6
-/Root 1 0 R
->>
-startxref
-625
-%%EOF`;
-    
-    return new TextEncoder().encode(simpleContent);
+    console.error('Error generating PDF:', error);
+    throw error;
   }
 }
