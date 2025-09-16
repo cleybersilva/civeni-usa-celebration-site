@@ -16,11 +16,7 @@ const EventoDetalhes = () => {
   const { slug } = useParams();
   const { t } = useTranslation();
   
-  console.log('EventoDetalhes component mounted with slug:', slug);
-  
   const { event, loading } = useEventBySlug(slug || '');
-  
-  console.log('EventoDetalhes - event:', event, 'loading:', loading);
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -165,7 +161,7 @@ const EventoDetalhes = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
-      {/* Hero Section */}
+      {/* Hero Section - Same style as Eventos page */}
       <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         {event.banner_url && (
@@ -187,36 +183,36 @@ const EventoDetalhes = () => {
             </ol>
           </nav>
           
-          <div className="max-w-4xl">
-            <div className="flex flex-wrap gap-3 mb-6">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="flex flex-wrap gap-3 mb-6 justify-center">
               {getStatusBadge(event)}
               {getModalidadeBadge(event.modalidade)}
             </div>
             
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
               {event.titulo}
             </h1>
             
             {event.subtitulo && (
-              <p className="text-xl text-blue-100 mb-6 leading-relaxed">
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
                 {event.subtitulo}
               </p>
             )}
             
             {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
-              <Button onClick={generateCalendarFile} variant="secondary" size="lg">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={generateCalendarFile} variant="secondary" size="lg" className="bg-white text-civeni-blue hover:bg-white/90">
                 <Calendar className="h-5 w-5 mr-2" />
                 Adicionar ao Calendário
               </Button>
               
-              <Button onClick={handleShare} variant="secondary" size="lg">
+              <Button onClick={handleShare} variant="secondary" size="lg" className="border-white text-white hover:bg-white/20 border-2">
                 <Share2 className="h-5 w-5 mr-2" />
                 Compartilhar
               </Button>
               
               {event.youtube_url && (
-                <Button variant="secondary" size="lg" asChild>
+                <Button variant="secondary" size="lg" className="border-white text-white hover:bg-white/20 border-2" asChild>
                   <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                     <Youtube className="h-5 w-5 mr-2" />
                     {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}

@@ -18,9 +18,6 @@ const Eventos = () => {
   const { t } = useTranslation();
   const { events, loading } = useEvents();
   
-  // Debug: log events data
-  console.log('Events page - events data:', events);
-  console.log('Events page - loading state:', loading);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [modalidadeFilter, setModalidadeFilter] = useState('all');
@@ -324,11 +321,6 @@ const Eventos = () => {
                     }
                   </p>
                   {/* Debug info */}
-                  <div className="mt-4 text-sm text-gray-500">
-                    <p>Debug: Total events loaded: {events?.length || 0}</p>
-                    <p>Filtered events: {filteredEvents.length}</p>
-                    <p>Loading: {loading ? 'true' : 'false'}</p>
-                  </div>
                 </div>
               )}
             </section>
