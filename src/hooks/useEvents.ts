@@ -19,10 +19,18 @@ interface Event {
   status_publicacao: string;
   created_at: string;
   updated_at: string;
-  // Derived fields for display
-  titulo: string;
+  // From translations
+  titulo?: string;
   subtitulo?: string;
   descricao_richtext?: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: string;
+  // Related data
+  speakers?: any[];
+  areas?: any[];
+  sessions?: any[];
+  assets?: any[];
 }
 
 export const useEvents = () => {
@@ -34,34 +42,52 @@ export const useEvents = () => {
     try {
       setLoading(true);
       
-      console.log('Fetching events from database...');
+      // Get current language from localStorage or default to 'pt-BR'
+      const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
       
       const { data, error } = await supabase
         .from('events')
-        .select('*')
+        .select(`
+          *,
+          event_translations!inner(
+            titulo,
+            subtitulo,
+            descricao_richtext,
+            meta_title,
+            meta_description,
+            og_image,
+            idioma
+          )
+        `)
         .eq('status_publicacao', 'published')
         .order('inicio_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching events:', error);
         throw error;
       }
 
-      console.log('Raw events data:', data);
+      // Transform data to flatten translations and filter by language
+      const transformedEvents = data?.map((event: any) => {
+        const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        
+        // If no translation exists, use the event slug as title
+        return {
+          ...event,
+          titulo: translation?.titulo || event.slug.replace(/-/g, ' ').toUpperCase(),
+          subtitulo: translation?.subtitulo || '',
+          descricao_richtext: translation?.descricao_richtext || '',
+          meta_title: translation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
+          meta_description: translation?.meta_description || '',
+          og_image: translation?.og_image || event.banner_url,
+          speakers: [],
+          areas: [],
+          sessions: [],
+          assets: []
+        };
+      }) || [];
 
-      // Transform data with fallback values
-      const transformedEvents = data?.map((event: any) => ({
-        ...event,
-        titulo: event.slug?.replace(/-/g, ' ').toUpperCase() || 'Evento sem título',
-        subtitulo: 'Evento do III CIVENI 2025',
-        descricao_richtext: '<p>Informações do evento em breve.</p>'
-      })) || [];
-
-      console.log('Transformed events:', transformedEvents);
       setEvents(transformedEvents);
     } catch (error: any) {
-      console.error('Error fetching events:', error);
-      setEvents([]);
       toast({
         title: 'Erro ao carregar eventos',
         description: error.message,
@@ -80,56 +106,79 @@ export const useEvents = () => {
 };
 
 export const useEventBySlug = (slug: string) => {
+  console.log('🟡 useEventBySlug hook called with slug:', slug);
+  
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchEvent = async () => {
-    if (!slug) return;
+    console.log('🟡 fetchEvent called with slug:', slug);
+    
+    if (!slug) {
+      console.log('🟡 No slug provided, setting loading to false');
+      setLoading(false);
+      return;
+    }
     
     try {
+      console.log('🟡 Starting fetch operation...');
       setLoading(true);
       
-      console.log('Fetching event with slug:', slug);
-      
-      const { data, error } = await supabase
+      // First get the event
+      const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select('*')
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
+        .single();
+
+      if (eventError) {
+        if (eventError.code !== 'PGRST116') { // Not found error
+          throw eventError;
+        }
+        setEvent(null);
+        return;
+      }
+
+      if (!eventData) {
+        setEvent(null);
+        return;
+      }
+
+      // Then get the translation
+      const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
+      const { data: translationData } = await supabase
+        .from('event_translations')
+        .select('*')
+        .eq('event_id', eventData.id)
+        .eq('idioma', currentLanguage)
         .maybeSingle();
 
-      if (error) {
-        console.error('Database error:', error);
-        throw error;
-      }
+      // Combine event and translation data
+      const combinedEvent = {
+        ...eventData,
+        titulo: translationData?.titulo || eventData.slug.replace(/-/g, ' ').toUpperCase(),
+        subtitulo: translationData?.subtitulo || '',
+        descricao_richtext: translationData?.descricao_richtext || '',
+        meta_title: translationData?.meta_title || eventData.slug.replace(/-/g, ' ').toUpperCase(),
+        meta_description: translationData?.meta_description || '',
+        og_image: translationData?.og_image || eventData.banner_url,
+        speakers: [],
+        areas: [],
+        sessions: [],
+        assets: []
+      };
 
-      console.log('Query result:', data);
-
-      if (data) {
-        const transformedEvent = {
-          ...data,
-          titulo: data.slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
-          subtitulo: 'Evento do III CIVENI 2025',
-          descricao_richtext: '<p>Informações detalhadas do evento em breve.</p>'
-        };
-        
-        console.log('Transformed event:', transformedEvent);
-        setEvent(transformedEvent as Event);
-      } else {
-        console.log('No event found');
-        setEvent(null);
-      }
+      setEvent(combinedEvent as Event);
+      
     } catch (error: any) {
-      console.error('Error fetching event:', error);
       setEvent(null);
-      if (error.code !== 'PGRST116') {
-        toast({
-          title: 'Erro ao carregar evento',
-          description: error.message,
-          variant: 'destructive'
-        });
-      }
+      toast({
+        title: 'Erro ao carregar evento',
+        description: error.message,
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }

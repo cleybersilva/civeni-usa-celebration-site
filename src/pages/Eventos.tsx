@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock, Users, Filter, Search, ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
@@ -10,10 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEvents } from '@/hooks/useEvents';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const Eventos = () => {
+  const { t } = useTranslation();
   const { events, loading } = useEvents();
   
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [modalidadeFilter, setModalidadeFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('upcoming');
+
   const getEventStatus = (event: any) => {
     const now = new Date();
     const startDate = new Date(event.inicio_at);
@@ -23,18 +32,13 @@ const Eventos = () => {
     if (now >= startDate && now <= endDate) return 'live';
     return 'past';
   };
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [modalidadeFilter, setModalidadeFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState('upcoming');
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
 
     return events.filter((event: any) => {
       const matchesSearch = event.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.subtitulo?.toLowerCase().includes(searchTerm.toLowerCase());
+                           event.descricao_richtext?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const eventStatus = getEventStatus(event);
       const matchesStatus = statusFilter === 'all' || eventStatus === statusFilter;
@@ -84,36 +88,15 @@ const Eventos = () => {
   };
 
   const formatEventDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
-        <Header />
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Carregando eventos...</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 to-purple-800 text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
@@ -130,12 +113,13 @@ const Eventos = () => {
               Eventos
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do III CIVENI 2025
+              Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do III CIVENI 2025 -
+              Uma experiência única de aprendizado e networking mundial
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/inscricoes">
-                <button className="bg-white text-blue-600 hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                   <Users className="w-5 h-5" />
                   Fazer Inscrição
                 </button>
@@ -152,7 +136,7 @@ const Eventos = () => {
         </div>
       </section>
 
-      {/* Filters Section */}
+      {/* Filters Section - Sticky */}
       <section className="bg-white border-b sticky top-0 z-40 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap gap-4 items-center">
@@ -191,6 +175,11 @@ const Eventos = () => {
                 <SelectItem value="hibrido">Híbrido</SelectItem>
               </SelectContent>
             </Select>
+
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros
+            </Button>
           </div>
         </div>
       </section>
@@ -214,12 +203,12 @@ const Eventos = () => {
             {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').length > 0 && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Users className="h-6 w-6 text-blue-600" />
+                  <Users className="h-6 w-6 text-civeni-blue" />
                   Eventos em Destaque
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').map((event: any) => (
-                    <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-2 border-blue-600/20">
+                    <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-2 border-civeni-blue/20">
                       <div className="relative">
                         {event.banner_url && (
                           <img 
@@ -255,7 +244,7 @@ const Eventos = () => {
                         
                         <div className="pt-3">
                           <Link to={`/eventos/${event.slug}`}>
-                            <Button className="w-full">
+                            <Button className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90">
                               Ver Detalhes
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
@@ -311,7 +300,7 @@ const Eventos = () => {
                       
                       <div className="pt-3">
                         <Link to={`/eventos/${event.slug}`}>
-                          <Button variant="outline" className="w-full">
+                          <Button variant="outline" className="w-full border-civeni-blue text-civeni-blue hover:bg-gradient-to-r hover:from-civeni-blue hover:to-civeni-red hover:text-white hover:border-transparent">
                             Ver Detalhes
                             <ExternalLink className="h-4 w-4 ml-2" />
                           </Button>
@@ -331,9 +320,7 @@ const Eventos = () => {
                       : "Nenhum evento disponível no momento."
                     }
                   </p>
-                  <div className="mt-4 text-sm text-gray-500">
-                    <p>Total de eventos: {events?.length || 0}</p>
-                  </div>
+                  {/* Debug info */}
                 </div>
               )}
             </section>
@@ -382,12 +369,12 @@ const Eventos = () => {
                       
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">
+                          <Button variant="outline" size="sm" className="w-full border-civeni-blue text-civeni-blue hover:bg-gradient-to-r hover:from-civeni-blue hover:to-civeni-red hover:text-white hover:border-transparent">
                             Ver Detalhes
                           </Button>
                         </Link>
                         {event.youtube_url && (
-                          <Button variant="default" size="sm" asChild>
+                          <Button variant="default" size="sm" className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90" asChild>
                             <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                               Gravação
                             </a>
@@ -410,15 +397,6 @@ const Eventos = () => {
             </section>
           </TabsContent>
         </Tabs>
-
-        {/* Debug info for testing */}
-        {events && events.length > 0 && (
-          <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm">
-            <p className="font-semibold">Debug: Eventos carregados com sucesso</p>
-            <p>Total: {events.length} eventos</p>
-            <p>Filtrados: {filteredEvents.length} eventos</p>
-          </div>
-        )}
       </main>
 
       <Footer />
