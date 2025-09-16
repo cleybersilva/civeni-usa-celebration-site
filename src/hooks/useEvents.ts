@@ -51,7 +51,7 @@ export const useEvents = () => {
         .from('events')
         .select(`
           *,
-          event_translations(
+          event_translations!inner(
             titulo,
             subtitulo,
             descricao_richtext,
@@ -142,7 +142,7 @@ export const useEventBySlug = (slug: string) => {
         .from('events')
         .select(`
           *,
-          event_translations(
+          event_translations!inner(
             titulo,
             subtitulo,
             descricao_richtext,
