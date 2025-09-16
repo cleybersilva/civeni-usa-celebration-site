@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock, Users, Filter, Search, ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
@@ -11,11 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEvents } from '@/hooks/useEvents';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 const Eventos = () => {
-  const { t } = useTranslation();
   const { events, loading } = useEvents();
   
   const getEventStatus = (event: any) => {
@@ -38,7 +34,7 @@ const Eventos = () => {
 
     return events.filter((event: any) => {
       const matchesSearch = event.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.descricao_richtext?.toLowerCase().includes(searchTerm.toLowerCase());
+                           event.subtitulo?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const eventStatus = getEventStatus(event);
       const matchesStatus = statusFilter === 'all' || eventStatus === statusFilter;
@@ -88,15 +84,36 @@ const Eventos = () => {
   };
 
   const formatEventDate = (dateString: string) => {
-    return format(new Date(dateString), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
+        <Header />
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Carregando eventos...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+      <section className="relative bg-gradient-to-br from-blue-600 to-purple-800 text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
@@ -113,13 +130,12 @@ const Eventos = () => {
               Eventos
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do III CIVENI 2025 -
-              Uma experiência única de aprendizado e networking mundial
+              Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do III CIVENI 2025
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/inscricoes">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                <button className="bg-white text-blue-600 hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                   <Users className="w-5 h-5" />
                   Fazer Inscrição
                 </button>
@@ -136,7 +152,7 @@ const Eventos = () => {
         </div>
       </section>
 
-      {/* Filters Section - Sticky */}
+      {/* Filters Section */}
       <section className="bg-white border-b sticky top-0 z-40 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap gap-4 items-center">
@@ -175,11 +191,6 @@ const Eventos = () => {
                 <SelectItem value="hibrido">Híbrido</SelectItem>
               </SelectContent>
             </Select>
-
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              Filtros
-            </Button>
           </div>
         </div>
       </section>
@@ -203,12 +214,12 @@ const Eventos = () => {
             {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').length > 0 && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Users className="h-6 w-6 text-civeni-blue" />
+                  <Users className="h-6 w-6 text-blue-600" />
                   Eventos em Destaque
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').map((event: any) => (
-                    <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-2 border-civeni-blue/20">
+                    <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-2 border-blue-600/20">
                       <div className="relative">
                         {event.banner_url && (
                           <img 
@@ -266,10 +277,10 @@ const Eventos = () => {
                 {filteredEvents.map((event: any) => (
                   <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
                     <div className="relative">
-                      {event.cover_image_url && (
+                      {event.banner_url && (
                         <img 
-                          src={event.cover_image_url} 
-                          alt={event.title}
+                          src={event.banner_url} 
+                          alt={event.titulo}
                           className="w-full h-48 object-cover"
                         />
                       )}
@@ -277,26 +288,26 @@ const Eventos = () => {
                         {getStatusBadge(event)}
                       </div>
                       <div className="absolute top-4 right-4">
-                        {getModalidadeBadge(event.mode)}
+                        {getModalidadeBadge(event.modalidade)}
                       </div>
                     </div>
                     <CardHeader>
-                      <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
+                      <CardTitle className="text-lg line-clamp-2">{event.titulo}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="h-4 w-4" />
-                        {formatEventDate(event.start_at)}
+                        {formatEventDate(event.inicio_at)}
                       </div>
                       
-                      {event.address && (
+                      {event.endereco && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="h-4 w-4" />
-                          <span className="line-clamp-1">{event.address}</span>
+                          <span className="line-clamp-1">{event.endereco}</span>
                         </div>
                       )}
                       
-                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitle || event.short_description}</p>
+                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
                       <div className="pt-3">
                         <Link to={`/eventos/${event.slug}`}>
@@ -320,11 +331,8 @@ const Eventos = () => {
                       : "Nenhum evento disponível no momento."
                     }
                   </p>
-                  {/* Debug info */}
                   <div className="mt-4 text-sm text-gray-500">
-                    <p>Debug: Total events loaded: {events?.length || 0}</p>
-                    <p>Filtered events: {filteredEvents.length}</p>
-                    <p>Loading: {loading ? 'true' : 'false'}</p>
+                    <p>Total de eventos: {events?.length || 0}</p>
                   </div>
                 </div>
               )}
@@ -340,10 +348,10 @@ const Eventos = () => {
                 {filteredEvents.map((event: any) => (
                   <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 opacity-90">
                     <div className="relative">
-                      {event.cover_image_url && (
+                      {event.banner_url && (
                         <img 
-                          src={event.cover_image_url} 
-                          alt={event.title}
+                          src={event.banner_url} 
+                          alt={event.titulo}
                           className="w-full h-48 object-cover grayscale"
                         />
                       )}
@@ -351,26 +359,26 @@ const Eventos = () => {
                         {getStatusBadge(event)}
                       </div>
                       <div className="absolute top-4 right-4">
-                        {getModalidadeBadge(event.mode)}
+                        {getModalidadeBadge(event.modalidade)}
                       </div>
                     </div>
                     <CardHeader>
-                      <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
+                      <CardTitle className="text-lg line-clamp-2">{event.titulo}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="h-4 w-4" />
-                        {formatEventDate(event.start_at)}
+                        {formatEventDate(event.inicio_at)}
                       </div>
                       
-                      {event.address && (
+                      {event.endereco && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="h-4 w-4" />
-                          <span className="line-clamp-1">{event.address}</span>
+                          <span className="line-clamp-1">{event.endereco}</span>
                         </div>
                       )}
                       
-                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitle || event.short_description}</p>
+                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
@@ -378,9 +386,9 @@ const Eventos = () => {
                             Ver Detalhes
                           </Button>
                         </Link>
-                        {event.youtube_playlist_url && (
+                        {event.youtube_url && (
                           <Button variant="default" size="sm" asChild>
-                            <a href={event.youtube_playlist_url} target="_blank" rel="noopener noreferrer">
+                            <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
                               Gravação
                             </a>
                           </Button>
@@ -402,6 +410,15 @@ const Eventos = () => {
             </section>
           </TabsContent>
         </Tabs>
+
+        {/* Debug info for testing */}
+        {events && events.length > 0 && (
+          <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm">
+            <p className="font-semibold">Debug: Eventos carregados com sucesso</p>
+            <p>Total: {events.length} eventos</p>
+            <p>Filtrados: {filteredEvents.length} eventos</p>
+          </div>
+        )}
       </main>
 
       <Footer />

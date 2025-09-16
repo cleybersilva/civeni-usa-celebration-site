@@ -6,30 +6,11 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useEventBySlug } from '@/hooks/useEvents';
 
 const EventoDetalhesSimples = () => {
   const { slug } = useParams();
-
-  // Mock data for now - replace with real data later
-  const event = {
-    titulo: 'Evento de Teste',
-    subtitulo: 'Um evento de exemplo para testar a página',
-    inicio_at: '2024-12-15T14:00:00Z',
-    fim_at: '2024-12-15T18:00:00Z',
-    modalidade: 'presencial',
-    endereco: 'Centro de Convenções, Fortaleza - CE',
-    banner_url: null,
-    youtube_url: null,
-    playlist_url: null,
-    tem_inscricao: true,
-    inscricao_url: 'https://exemplo.com/inscricao',
-    featured: true,
-    descricao_richtext: '<p>Esta é uma descrição de exemplo do evento.</p>',
-    speakers: [],
-    timezone: 'America/Sao_Paulo'
-  };
-
-  const loading = false;
+  const { event, loading } = useEventBySlug(slug || '');
 
   const getEventStatus = (event: any) => {
     const now = new Date();
