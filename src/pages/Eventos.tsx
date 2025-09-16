@@ -10,35 +10,39 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEventsNew, getEventStatus } from '@/hooks/useEventsNew';
+import { useEvents } from '@/hooks/useEvents';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const Eventos = () => {
   const { t } = useTranslation();
-  const { events, loading } = useEventsNew();
+  const { events, loading } = useEvents();
   
-  // Debug: log events data
-  console.log('Events page - events data:', events);
-  console.log('Events page - loading state:', loading);
+  const getEventStatus = (event: any) => {
+    const now = new Date();
+    const startDate = new Date(event.inicio_at);
+    const endDate = event.fim_at ? new Date(event.fim_at) : startDate;
+
+    if (now < startDate) return 'upcoming';
+    if (now >= startDate && now <= endDate) return 'live';
+    return 'past';
+  };
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [modalidadeFilter, setModalidadeFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('upcoming');
 
-  // Using the getEventStatus from useEventsNew hook
-
   const filteredEvents = useMemo(() => {
     if (!events) return [];
 
     return events.filter((event: any) => {
-      const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.full_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.short_description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = event.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           event.descricao_richtext?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const eventStatus = getEventStatus(event);
       const matchesStatus = statusFilter === 'all' || eventStatus === statusFilter;
-      const matchesModalidade = modalidadeFilter === 'all' || event.mode === modalidadeFilter;
+      const matchesModalidade = modalidadeFilter === 'all' || event.modalidade === modalidadeFilter;
       
       // Filter by active tab
       if (activeTab === 'upcoming') {
@@ -196,20 +200,20 @@ const Eventos = () => {
 
           <TabsContent value="upcoming" className="space-y-8">
             {/* Featured Events */}
-            {events?.filter((event: any) => event.is_featured && getEventStatus(event) !== 'past').length > 0 && (
+            {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').length > 0 && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <Users className="h-6 w-6 text-civeni-blue" />
                   Eventos em Destaque
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {events?.filter((event: any) => event.is_featured && getEventStatus(event) !== 'past').map((event: any) => (
+                  {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').map((event: any) => (
                     <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-2 border-civeni-blue/20">
                       <div className="relative">
-                        {event.cover_image_url && (
+                        {event.banner_url && (
                           <img 
-                            src={event.cover_image_url} 
-                            alt={event.title}
+                            src={event.banner_url} 
+                            alt={event.titulo}
                             className="w-full h-48 object-cover"
                           />
                         )}
@@ -217,26 +221,26 @@ const Eventos = () => {
                           {getStatusBadge(event)}
                         </div>
                         <div className="absolute top-4 right-4">
-                          {getModalidadeBadge(event.mode)}
+                          {getModalidadeBadge(event.modalidade)}
                         </div>
                       </div>
                       <CardHeader>
-                        <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
+                        <CardTitle className="text-lg line-clamp-2">{event.titulo}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Calendar className="h-4 w-4" />
-                          {formatEventDate(event.start_at)}
+                          {formatEventDate(event.inicio_at)}
                         </div>
                         
-                        {event.address && (
+                        {event.endereco && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <MapPin className="h-4 w-4" />
-                            <span className="line-clamp-1">{event.address}</span>
+                            <span className="line-clamp-1">{event.endereco}</span>
                           </div>
                         )}
                         
-                        <p className="text-gray-700 text-sm line-clamp-3">{event.subtitle || event.short_description}</p>
+                        <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                         
                         <div className="pt-3">
                           <Link to={`/eventos/${event.slug}`}>

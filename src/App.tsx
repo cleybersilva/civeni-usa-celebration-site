@@ -33,7 +33,7 @@ import SessoesPoster from "./pages/SessoesPoster";
 import Manuscritos from "./pages/Manuscritos";
 import Sobre from "./pages/Sobre";
 import Eventos from "./pages/Eventos";
-import EventoDetalhesNew from "./pages/EventoDetalhesNew";
+import EventoDetalhesSimples from './pages/EventoDetalhesSimples';
 
 import './App.css';
 
@@ -73,7 +73,7 @@ function App() {
                 <Route path="/manuscritos" element={<Manuscritos />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />
-                <Route path="/eventos/:slug" element={<EventoDetalhesNew />} />
+                <Route path="/eventos/:slug" element={<EventoDetalhesSimples />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="*" element={<NotFound />} />
