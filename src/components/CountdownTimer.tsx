@@ -62,11 +62,15 @@ const CountdownTimer = () => {
   // Force reload on component mount to get fresh data
   useEffect(() => {
     const forceReload = () => {
+      console.log('Forcing content reload for CountdownTimer...');
       window.dispatchEvent(new CustomEvent('forceContentReload'));
     };
     
-    // Force reload after component mount
-    setTimeout(forceReload, 100);
+    // Force reload after component mount and every 5 seconds to ensure fresh data
+    forceReload();
+    const reloadInterval = setInterval(forceReload, 5000);
+    
+    return () => clearInterval(reloadInterval);
   }, []);
 
   // Debug para verificar se está carregando as configurações corretas

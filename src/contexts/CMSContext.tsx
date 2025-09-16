@@ -533,6 +533,10 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           endTime: eventConfigData.end_time ? eventConfigData.end_time.substring(0, 5) : '18:00'
         };
         console.log('Event config loaded from DB:', eventConfig);
+        console.log('Raw DB eventDate:', eventConfigData.event_date);
+        console.log('Formatted eventDate for context:', eventConfig.eventDate);
+      } else {
+        console.log('Using default event config - no DB data or error:', eventError);
       }
 
       // Carregar atividades do formato híbrido
