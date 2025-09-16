@@ -245,17 +245,14 @@ const Eventos = () => {
                         
                         <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                         
-                         <div className="pt-3">
-                           <Link to={`/eventos/${event.slug}`} onClick={() => {
-                             console.log('Eventos - Clicking link to:', `/eventos/${event.slug}`);
-                             console.log('Eventos - Event object:', event);
-                           }}>
-                             <Button className="w-full">
-                               Ver Detalhes
-                               <ExternalLink className="h-4 w-4 ml-2" />
-                             </Button>
-                           </Link>
-                         </div>
+                        <div className="pt-3">
+                          <Link to={`/eventos/${event.slug}`}>
+                            <Button className="w-full">
+                              Ver Detalhes
+                              <ExternalLink className="h-4 w-4 ml-2" />
+                            </Button>
+                          </Link>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -304,17 +301,14 @@ const Eventos = () => {
                       
                       <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
-                       <div className="pt-3">
-                         <Link to={`/eventos/${event.slug}`} onClick={() => {
-                           console.log('Eventos - Clicking link to:', `/eventos/${event.slug}`);
-                           console.log('Eventos - Event object:', event);
-                         }}>
-                           <Button variant="outline" className="w-full">
-                             Ver Detalhes
-                             <ExternalLink className="h-4 w-4 ml-2" />
-                           </Button>
-                         </Link>
-                       </div>
+                      <div className="pt-3">
+                        <Link to={`/eventos/${event.slug}`}>
+                          <Button variant="outline" className="w-full">
+                            Ver Detalhes
+                            <ExternalLink className="h-4 w-4 ml-2" />
+                          </Button>
+                        </Link>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -381,15 +375,12 @@ const Eventos = () => {
                       
                       <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
-                       <div className="flex gap-2 pt-3">
-                         <Link to={`/eventos/${event.slug}`} className="flex-1" onClick={() => {
-                           console.log('Eventos - Past events - Clicking link to:', `/eventos/${event.slug}`);
-                           console.log('Eventos - Past events - Event object:', event);
-                         }}>
-                           <Button variant="outline" size="sm" className="w-full">
-                             Ver Detalhes
-                           </Button>
-                         </Link>
+                      <div className="flex gap-2 pt-3">
+                        <Link to={`/eventos/${event.slug}`} className="flex-1">
+                          <Button variant="outline" size="sm" className="w-full">
+                            Ver Detalhes
+                          </Button>
+                        </Link>
                         {event.youtube_url && (
                           <Button variant="default" size="sm" asChild>
                             <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">

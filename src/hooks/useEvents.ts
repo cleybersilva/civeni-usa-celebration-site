@@ -51,6 +51,15 @@ export const useEvents = () => {
         .from('events')
         .select(`
           *,
+          event_translations(
+            titulo,
+            subtitulo,
+            descricao_richtext,
+            meta_title,
+            meta_description,
+            og_image,
+            idioma
+          ),
           event_speakers(
             ordem,
             cms_speakers(
@@ -61,6 +70,15 @@ export const useEvents = () => {
               image_url
             )
           ),
+          event_areas(
+            thematic_areas(
+              id,
+              name_pt,
+              name_en,
+              description_pt,
+              description_en
+            )
+          ),
           event_sessions(
             id,
             inicio_at,
@@ -69,6 +87,12 @@ export const useEvents = () => {
             descricao,
             speaker_id,
             sala_url,
+            ordem
+          ),
+          event_assets(
+            id,
+            asset_url,
+            caption,
             ordem
           )
         `)
@@ -82,21 +106,27 @@ export const useEvents = () => {
 
       console.log('Raw events data from database:', data);
 
-      // Transform data - use slug as title since we don't have translations table
+      // Transform data to flatten translations and filter by language
       const transformedEvents = data?.map((event: any) => {
+        const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
+        
+        // If no translation exists, use the event slug as title
         return {
           ...event,
-          titulo: event.slug.replace(/-/g, ' ').toUpperCase(),
-          subtitulo: '',
-          descricao_richtext: '',
-          meta_title: event.slug.replace(/-/g, ' ').toUpperCase(),
-          meta_description: '',
-          og_image: event.banner_url,
+          titulo: translation?.titulo || event.slug.replace(/-/g, ' ').toUpperCase(),
+          subtitulo: translation?.subtitulo || '',
+          descricao_richtext: translation?.descricao_richtext || '',
+          meta_title: translation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
+          meta_description: translation?.meta_description || '',
+          og_image: translation?.og_image || event.banner_url,
           speakers: event.event_speakers
             ?.sort((a: any, b: any) => a.ordem - b.ordem)
             ?.map((es: any) => es.cms_speakers)
             ?.filter(Boolean) || [],
+          areas: event.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
           sessions: event.event_sessions
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
+          assets: event.event_assets
             ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
         };
       }) || [];
@@ -140,16 +170,12 @@ export const useEventBySlug = (slug: string) => {
   const { toast } = useToast();
 
   const fetchEvent = async () => {
-    if (!slug) {
-      console.log('useEventBySlug - No slug provided, returning early');
-      return;
-    }
+    if (!slug) return;
     
     try {
       setLoading(true);
       
       console.log('useEventBySlug - Fetching event with slug:', slug);
-      console.log('useEventBySlug - About to query Supabase...');
       
       const { data, error } = await supabase
         .from('events')
@@ -180,7 +206,6 @@ export const useEventBySlug = (slug: string) => {
         .eq('status_publicacao', 'published')
         .single();
 
-      console.log('useEventBySlug - Supabase query completed');
       console.log('useEventBySlug - Query result:', { data, error });
 
       if (error) {
@@ -190,7 +215,6 @@ export const useEventBySlug = (slug: string) => {
 
       // Transform data
       if (data) {
-        console.log('useEventBySlug - Raw data received:', data);
         const transformedEvent = {
           ...data,
           // Use the event title directly from the events table (fallback to slug if needed)
@@ -226,7 +250,6 @@ export const useEventBySlug = (slug: string) => {
         });
       }
     } finally {
-      console.log('useEventBySlug - Setting loading to false');
       setLoading(false);
     }
   };
