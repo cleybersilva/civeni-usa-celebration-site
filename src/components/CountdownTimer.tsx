@@ -16,6 +16,10 @@ const CountdownTimer = () => {
   useEffect(() => {
     // Use counter settings from database if available
     const eventDate = content.counterSettings?.eventDate || content.eventConfig.eventDate;
+    console.log('CountdownTimer - eventDate from context:', eventDate);
+    console.log('CountdownTimer - counterSettings:', content.counterSettings);
+    console.log('CountdownTimer - eventConfig:', content.eventConfig);
+    
     if (!eventDate) return;
 
     // Prefer the configured start time (with seconds if provided)
@@ -44,7 +48,7 @@ const CountdownTimer = () => {
     const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
-  }, [content.eventConfig.eventDate, content.eventConfig.startTime, content.counterSettings?.eventDate]);
+  }, [content.eventConfig.eventDate, content.eventConfig.startTime, content.counterSettings?.eventDate, content.counterSettings?.updatedAt]);
 
   // Escutar evento personalizado para atualização
   useEffect(() => {
@@ -55,6 +59,16 @@ const CountdownTimer = () => {
     
     window.addEventListener('eventConfigUpdated', handleUpdate);
     return () => window.removeEventListener('eventConfigUpdated', handleUpdate);
+  }, []);
+
+  // Force reload on component mount to get fresh data
+  useEffect(() => {
+    const forceReload = () => {
+      window.dispatchEvent(new CustomEvent('forceContentReload'));
+    };
+    
+    // Force reload after component mount
+    setTimeout(forceReload, 100);
   }, []);
 
   // Debug para verificar se está carregando as configurações corretas

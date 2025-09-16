@@ -428,11 +428,27 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     // Detectar se estamos em contexto admin (URL contém /admin)
     const isAdminContext = window.location.pathname.includes('/admin');
-    loadContent(isAdminContext);
+    
+    // Force reload with timestamp to bypass cache
+    const forceReload = () => {
+      console.log('Forcing content reload due to date update...');
+      loadContent(isAdminContext);
+    };
+    
+    // Initial load
+    forceReload();
+    
+    // Listen for date updates
+    window.addEventListener('forceContentReload', forceReload);
+    
+    return () => {
+      window.removeEventListener('forceContentReload', forceReload);
+    };
   }, []);
 
   const loadContent = async (adminMode = false) => {
     try {
+      console.log('Loading content with fresh data...', Date.now());
       // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
       let bannerQuery = supabase
         .from('banner_slides')
@@ -582,7 +598,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           updatedBy: counterData.updated_by,
           updatedAt: counterData.updated_at
         };
+        console.log('Counter settings loaded:', counterSettings);
       }
+
+      console.log('Event config from DB:', eventConfig);
+      console.log('Counter settings from DB:', counterSettings);
 
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
