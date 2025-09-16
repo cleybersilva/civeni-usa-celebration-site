@@ -1,9 +1,11 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const AboutSection = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   
   const highlights = [
     {
@@ -62,7 +64,10 @@ const AboutSection = () => {
         </div>
         
         <div className="mt-16 text-center">
-          <button className="bg-civeni-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 font-poppins">
+          <button 
+            onClick={() => navigate('/area-tematica')}
+            className="bg-civeni-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 font-poppins"
+          >
             {t('about.learnMore')}
           </button>
         </div>
