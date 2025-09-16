@@ -65,8 +65,11 @@ const AboutSection = () => {
         
         <div className="mt-16 text-center">
           <button 
-            onClick={() => navigate('/area-tematica')}
-            className="bg-civeni-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 font-poppins"
+            onClick={() => {
+              console.log('Button clicked, navigating to /area-tematica');
+              navigate('/area-tematica');
+            }}
+            className="bg-civeni-blue text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 font-poppins cursor-pointer"
           >
             {t('about.learnMore')}
           </button>
