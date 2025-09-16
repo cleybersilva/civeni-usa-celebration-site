@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock, Users, Share2, ExternalLink, Youtube, Award, ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
@@ -7,80 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useEventBySlug } from '@/hooks/useEvents';
 
 const EventoDetalhes = () => {
-  const { slug } = useParams();
-  const [event, setEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-  const loadEvent = async () => {
-    console.log('🟡 loadEvent chamado com slug:', slug);
-    
-    if (!slug) {
-      console.log('🔴 Slug está vazio ou undefined');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('🟡 Fazendo query para slug:', slug);
-
-      // Buscar evento
-      const { data: eventData, error: eventError } = await supabase
-        .from('events')
-        .select('*')
-        .eq('slug', slug)
-        .eq('status_publicacao', 'published')
-        .single();
-
-      console.log('🟡 Resultado da query events:', { eventData, eventError });
-
-      if (eventError || !eventData) {
-        console.log('🔴 Evento não encontrado:', eventError);
-        setError('Evento não encontrado');
-        setEvent(null);
-        return;
-      }
-
-      // Buscar tradução
-      const { data: translationData, error: translationError } = await supabase
-        .from('event_translations')
-        .select('*')
-        .eq('event_id', eventData.id)
-        .eq('idioma', 'pt-BR')
-        .maybeSingle();
-
-      console.log('🟡 Resultado da query translations:', { translationData, translationError });
-
-      // Combinar dados
-      const fullEvent = {
-        ...eventData,
-        titulo: translationData?.titulo || slug?.replace(/-/g, ' ').toUpperCase() || 'Evento',
-        subtitulo: translationData?.subtitulo || '',
-        descricao_richtext: translationData?.descricao_richtext || '',
-      };
-
-      console.log('🟢 Evento carregado com sucesso:', fullEvent.titulo);
-      setEvent(fullEvent);
-    } catch (err: any) {
-      setError('Erro ao carregar evento');
-      console.error('🔴 Erro ao carregar evento:', err);
-      console.log('🔴 Slug usado na query:', slug);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-    loadEvent();
-  }, [slug]);
+  const { slug } = useParams<{ slug: string }>();
+  console.log('🔍 EventoDetalhes renderizado com slug:', slug);
+  
+  const { event, loading } = useEventBySlug(slug || '');
+  console.log('🔍 Dados do evento carregados:', event);
+  console.log('🔍 Status do loading:', loading);
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -151,6 +88,7 @@ const EventoDetalhes = () => {
     }
   };
 
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
@@ -159,6 +97,7 @@ const EventoDetalhes = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-civeni-blue mx-auto"></div>
             <p className="mt-4 text-gray-600">Carregando evento...</p>
+            <p className="text-sm text-gray-500 mt-2">Slug: {slug}</p>
           </div>
         </div>
         <Footer />
@@ -166,16 +105,20 @@ const EventoDetalhes = () => {
     );
   }
 
-  if (error || !event) {
+  // Error/Not found state
+  if (!event) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
         <Header />
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Evento não encontrado</h1>
-            <p className="text-gray-600 mb-8">O evento que você procura não existe ou foi removido.</p>
+            <p className="text-gray-600 mb-4">O evento "{slug}" não foi encontrado ou não está publicado.</p>
+            <p className="text-sm text-gray-500 mb-8">Verifique se o link está correto.</p>
             <Link to="/eventos">
-              <Button>Voltar para Eventos</Button>
+              <Button className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90">
+                Voltar para Eventos
+              </Button>
             </Link>
           </div>
         </div>
