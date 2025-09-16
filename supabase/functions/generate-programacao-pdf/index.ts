@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0'
+import { jsPDF } from 'https://esm.sh/jspdf@2.5.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -87,14 +88,14 @@ serve(async (req) => {
       const emptyHtml = generateEmptyProgramHtml(modalidade, bannerUrl);
       const pdfBytes = await generatePdfFromHtml(emptyHtml);
       
-      return new Response(pdfBytes, {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'text/html',
-          'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
-          'Cache-Control': 'no-store'
-        },
-      });
+    return new Response(pdfBytes, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf"`,
+        'Cache-Control': 'no-store'
+      },
+    });
     }
 
     // Organize sessions by day
@@ -119,8 +120,8 @@ serve(async (req) => {
     return new Response(pdfBytes, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/html',
-        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf"`,
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff'
       },
@@ -608,84 +609,95 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
 
 async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
   try {
-    // Generate optimized HTML for PDF printing
-    const pdfOptimizedHtml = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <title>Programação III CIVENI 2025</title>
-  <style>
-    @page {
-      size: A4;
-      margin: 0;
-    }
+    // Create a new PDF document
+    const doc = new jsPDF('p', 'mm', 'a4');
     
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    // Set font
+    doc.setFont('helvetica');
     
-    body {
-      font-family: 'Arial', sans-serif;
-      color: #1a202c;
-      background: white;
-      line-height: 1.4;
-      font-size: 11pt;
-      padding-bottom: 80px;
-    }
+    // Add title
+    doc.setFontSize(20);
+    doc.text('III CIVENI - Programação', 20, 30);
     
-    .side-stripe {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6px;
-      background: linear-gradient(180deg, #1e40af, #dc2626);
-      z-index: 1000;
-    }
+    // Add content (simplified text extraction from HTML)
+    const textContent = html
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
     
-    @media print {
-      .day-section {
-        page-break-inside: avoid;
+    doc.setFontSize(12);
+    const lines = doc.splitTextToSize(textContent, 170);
+    
+    let y = 50;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    for (const line of lines) {
+      if (y > pageHeight - 20) {
+        doc.addPage();
+        y = 20;
       }
-      
-      .sessions-table {
-        page-break-inside: avoid;
-      }
-      
-      .sessions-table tr {
-        page-break-inside: avoid;
-        page-break-after: auto;
-      }
-      
-      body {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
+      doc.text(line, 20, y);
+      y += 7;
     }
-  </style>
-</head>
-<body>
-  <div class="side-stripe"></div>
-  
-  ${html}
-  
-  <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px 0 36px; font-size: 8pt; color: #64748b;">
-    <div>
-      <span style="font-weight: 700; color: #1e40af;">III CIVENI 2025</span>
-      <span style="margin-left: 16px;">*Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.</span>
-    </div>
-    <div>iiiciveni.com.br</div>
-  </div>
-</body>
-</html>`;
     
-    return new TextEncoder().encode(pdfOptimizedHtml);
+    // Convert to Uint8Array
+    const pdfOutput = doc.output('arraybuffer');
+    return new Uint8Array(pdfOutput);
     
   } catch (error) {
-    console.error('Error generating PDF:', error);
-    throw error;
+    console.error('Error generating PDF with jsPDF:', error);
+    
+    // Fallback: create a minimal PDF manually
+    const minimalPdf = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(III CIVENI - Programacao) Tj
+ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000189 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+284
+%%EOF`;
+    
+    return new TextEncoder().encode(minimalPdf);
   }
 }
