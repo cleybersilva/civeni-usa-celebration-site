@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEvents } from '@/hooks/useEvents';
+import { useEventsNew, getEventStatus } from '@/hooks/useEventsNew';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const Eventos = () => {
   const { t } = useTranslation();
-  const { events, loading } = useEvents();
+  const { events, loading } = useEventsNew();
   
   // Debug: log events data
   console.log('Events page - events data:', events);
@@ -26,26 +26,19 @@ const Eventos = () => {
   const [modalidadeFilter, setModalidadeFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('upcoming');
 
-  const getEventStatus = (event: any) => {
-    const now = new Date();
-    const startDate = new Date(event.inicio_at);
-    const endDate = event.fim_at ? new Date(event.fim_at) : startDate;
-
-    if (now < startDate) return 'upcoming';
-    if (now >= startDate && now <= endDate) return 'live';
-    return 'past';
-  };
+  // Using the getEventStatus from useEventsNew hook
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
 
     return events.filter((event: any) => {
-      const matchesSearch = event.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.descricao_richtext?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           event.full_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           event.short_description?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const eventStatus = getEventStatus(event);
       const matchesStatus = statusFilter === 'all' || eventStatus === statusFilter;
-      const matchesModalidade = modalidadeFilter === 'all' || event.modalidade === modalidadeFilter;
+      const matchesModalidade = modalidadeFilter === 'all' || event.mode === modalidadeFilter;
       
       // Filter by active tab
       if (activeTab === 'upcoming') {
@@ -203,20 +196,20 @@ const Eventos = () => {
 
           <TabsContent value="upcoming" className="space-y-8">
             {/* Featured Events */}
-            {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').length > 0 && (
+            {events?.filter((event: any) => event.is_featured && getEventStatus(event) !== 'past').length > 0 && (
               <section className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <Users className="h-6 w-6 text-civeni-blue" />
                   Eventos em Destaque
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').map((event: any) => (
+                  {events?.filter((event: any) => event.is_featured && getEventStatus(event) !== 'past').map((event: any) => (
                     <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-2 border-civeni-blue/20">
                       <div className="relative">
-                        {event.banner_url && (
+                        {event.cover_image_url && (
                           <img 
-                            src={event.banner_url} 
-                            alt={event.titulo}
+                            src={event.cover_image_url} 
+                            alt={event.title}
                             className="w-full h-48 object-cover"
                           />
                         )}
@@ -224,26 +217,26 @@ const Eventos = () => {
                           {getStatusBadge(event)}
                         </div>
                         <div className="absolute top-4 right-4">
-                          {getModalidadeBadge(event.modalidade)}
+                          {getModalidadeBadge(event.mode)}
                         </div>
                       </div>
                       <CardHeader>
-                        <CardTitle className="text-lg line-clamp-2">{event.titulo}</CardTitle>
+                        <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Calendar className="h-4 w-4" />
-                          {formatEventDate(event.inicio_at)}
+                          {formatEventDate(event.start_at)}
                         </div>
                         
-                        {event.endereco && (
+                        {event.address && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <MapPin className="h-4 w-4" />
-                            <span className="line-clamp-1">{event.endereco}</span>
+                            <span className="line-clamp-1">{event.address}</span>
                           </div>
                         )}
                         
-                        <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
+                        <p className="text-gray-700 text-sm line-clamp-3">{event.subtitle || event.short_description}</p>
                         
                         <div className="pt-3">
                           <Link to={`/eventos/${event.slug}`}>
@@ -269,10 +262,10 @@ const Eventos = () => {
                 {filteredEvents.map((event: any) => (
                   <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
                     <div className="relative">
-                      {event.banner_url && (
+                      {event.cover_image_url && (
                         <img 
-                          src={event.banner_url} 
-                          alt={event.titulo}
+                          src={event.cover_image_url} 
+                          alt={event.title}
                           className="w-full h-48 object-cover"
                         />
                       )}
@@ -280,26 +273,26 @@ const Eventos = () => {
                         {getStatusBadge(event)}
                       </div>
                       <div className="absolute top-4 right-4">
-                        {getModalidadeBadge(event.modalidade)}
+                        {getModalidadeBadge(event.mode)}
                       </div>
                     </div>
                     <CardHeader>
-                      <CardTitle className="text-lg line-clamp-2">{event.titulo}</CardTitle>
+                      <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="h-4 w-4" />
-                        {formatEventDate(event.inicio_at)}
+                        {formatEventDate(event.start_at)}
                       </div>
                       
-                      {event.endereco && (
+                      {event.address && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="h-4 w-4" />
-                          <span className="line-clamp-1">{event.endereco}</span>
+                          <span className="line-clamp-1">{event.address}</span>
                         </div>
                       )}
                       
-                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
+                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitle || event.short_description}</p>
                       
                       <div className="pt-3">
                         <Link to={`/eventos/${event.slug}`}>
@@ -343,10 +336,10 @@ const Eventos = () => {
                 {filteredEvents.map((event: any) => (
                   <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-200 opacity-90">
                     <div className="relative">
-                      {event.banner_url && (
+                      {event.cover_image_url && (
                         <img 
-                          src={event.banner_url} 
-                          alt={event.titulo}
+                          src={event.cover_image_url} 
+                          alt={event.title}
                           className="w-full h-48 object-cover grayscale"
                         />
                       )}
@@ -354,26 +347,26 @@ const Eventos = () => {
                         {getStatusBadge(event)}
                       </div>
                       <div className="absolute top-4 right-4">
-                        {getModalidadeBadge(event.modalidade)}
+                        {getModalidadeBadge(event.mode)}
                       </div>
                     </div>
                     <CardHeader>
-                      <CardTitle className="text-lg line-clamp-2">{event.titulo}</CardTitle>
+                      <CardTitle className="text-lg line-clamp-2">{event.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="h-4 w-4" />
-                        {formatEventDate(event.inicio_at)}
+                        {formatEventDate(event.start_at)}
                       </div>
                       
-                      {event.endereco && (
+                      {event.address && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="h-4 w-4" />
-                          <span className="line-clamp-1">{event.endereco}</span>
+                          <span className="line-clamp-1">{event.address}</span>
                         </div>
                       )}
                       
-                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
+                      <p className="text-gray-700 text-sm line-clamp-3">{event.subtitle || event.short_description}</p>
                       
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
@@ -381,9 +374,9 @@ const Eventos = () => {
                             Ver Detalhes
                           </Button>
                         </Link>
-                        {event.youtube_url && (
+                        {event.youtube_playlist_url && (
                           <Button variant="default" size="sm" asChild>
-                            <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
+                            <a href={event.youtube_playlist_url} target="_blank" rel="noopener noreferrer">
                               Gravação
                             </a>
                           </Button>
