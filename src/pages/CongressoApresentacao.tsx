@@ -184,9 +184,6 @@ const CongressoApresentacao = () => {
                       </h2>
                     </div>
                     <div className="max-w-4xl mx-auto mb-8">
-                      <p className="text-xl md:text-2xl text-gray-600 font-medium mb-4">
-                        Congresso Internacional Multidisciplinar da VCCU
-                      </p>
                     </div>
                     
                     {/* Theme Card with Modern Styling */}
