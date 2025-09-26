@@ -87,22 +87,26 @@ const SubmissaoTrabalhos = () => {
     setIsSubmitting(true);
 
     try {
-      // First insert the submission without file info
-      const { data: submission, error: submissionError } = await supabase
-        .from('work_submissions')
-        .insert({
+      // Use the submit-work edge function for secure submission
+      const { data, error } = await supabase.functions.invoke('submit-work', {
+        body: {
           ...formData,
           submission_kind: activeTab as 'artigo' | 'consorcio'
-        })
-        .select()
-        .single();
+        }
+      });
 
-      if (submissionError) {
-        throw submissionError;
+      if (error) {
+        throw new Error(error.message || 'Erro na função de submissão');
       }
 
-      // Upload file
-      const { filePath, fileName } = await uploadFile(file, submission.id);
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro desconhecido na submissão');
+      }
+
+      const submissionId = data.id;
+
+      // Upload file after successful submission
+      const { filePath, fileName } = await uploadFile(file, submissionId);
 
       // Update submission with file info
       const { error: updateError } = await supabase
@@ -111,7 +115,7 @@ const SubmissaoTrabalhos = () => {
           file_path: filePath,
           file_name: fileName 
         })
-        .eq('id', submission.id);
+        .eq('id', submissionId);
 
       if (updateError) {
         throw updateError;

@@ -87,7 +87,7 @@ serve(async (req) => {
       const emptyHtml = generateEmptyProgramHtml(modalidade, bannerUrl);
       const pdfBytes = await generatePdfFromHtml(emptyHtml);
       
-    return new Response(pdfBytes, {
+    return new Response(new Uint8Array(pdfBytes), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/html',
@@ -116,7 +116,7 @@ serve(async (req) => {
 
     const filename = `civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf`;
     
-    return new Response(pdfBytes, {
+    return new Response(new Uint8Array(pdfBytes), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/html',
