@@ -1103,6 +1103,97 @@ export type Database = {
         }
         Relationships: []
       }
+      event_flags: {
+        Row: {
+          allow_comments: boolean | null
+          event_id: string
+          public_sync_mode: string | null
+          show_schedule_download: boolean | null
+          show_share_buttons: boolean | null
+          show_speakers: boolean | null
+          ui_theme: Json | null
+        }
+        Insert: {
+          allow_comments?: boolean | null
+          event_id: string
+          public_sync_mode?: string | null
+          show_schedule_download?: boolean | null
+          show_share_buttons?: boolean | null
+          show_speakers?: boolean | null
+          ui_theme?: Json | null
+        }
+        Update: {
+          allow_comments?: boolean | null
+          event_id?: string
+          public_sync_mode?: string | null
+          show_schedule_download?: boolean | null
+          show_share_buttons?: boolean | null
+          show_speakers?: boolean | null
+          ui_theme?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_flags_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events_new"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_media: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_id: string
+          id: string
+          is_primary: boolean | null
+          is_public: boolean | null
+          position: number | null
+          thumbnail_url: string | null
+          title: string | null
+          type: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_id: string
+          id?: string
+          is_primary?: boolean | null
+          is_public?: boolean | null
+          position?: number | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_id?: string
+          id?: string
+          is_primary?: boolean | null
+          is_public?: boolean | null
+          position?: number | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_media_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_new"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           amount_paid: number | null
@@ -1294,6 +1385,44 @@ export type Database = {
           },
         ]
       }
+      event_status_history: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          changed_field: string
+          event_id: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_field: string
+          event_id: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_field?: string
+          event_id?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_status_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_new"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_translations: {
         Row: {
           created_at: string
@@ -1416,6 +1545,132 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      events_new: {
+        Row: {
+          address: string | null
+          canonical_url: string | null
+          city: string | null
+          country: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          created_by: string | null
+          end_at: string | null
+          full_description: string | null
+          has_registration: boolean | null
+          id: string
+          is_archived: boolean | null
+          is_featured: boolean | null
+          is_public: boolean | null
+          map_url: string | null
+          mode: string
+          official_site_url: string | null
+          publish_at: string | null
+          registration_cta_label: string | null
+          registration_url: string | null
+          seo_description: string | null
+          seo_keywords: string[] | null
+          seo_title: string | null
+          short_description: string | null
+          slug: string
+          start_at: string
+          state: string | null
+          subtitle: string | null
+          thumbnail_url: string | null
+          timezone: string | null
+          title: string
+          translations: Json | null
+          unpublish_at: string | null
+          updated_at: string | null
+          updated_by: string | null
+          venue_name: string | null
+          whatsapp_group_url: string | null
+          youtube_channel_url: string | null
+          youtube_playlist_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          canonical_url?: string | null
+          city?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          end_at?: string | null
+          full_description?: string | null
+          has_registration?: boolean | null
+          id?: string
+          is_archived?: boolean | null
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          map_url?: string | null
+          mode: string
+          official_site_url?: string | null
+          publish_at?: string | null
+          registration_cta_label?: string | null
+          registration_url?: string | null
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          short_description?: string | null
+          slug: string
+          start_at: string
+          state?: string | null
+          subtitle?: string | null
+          thumbnail_url?: string | null
+          timezone?: string | null
+          title: string
+          translations?: Json | null
+          unpublish_at?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          venue_name?: string | null
+          whatsapp_group_url?: string | null
+          youtube_channel_url?: string | null
+          youtube_playlist_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          canonical_url?: string | null
+          city?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          end_at?: string | null
+          full_description?: string | null
+          has_registration?: boolean | null
+          id?: string
+          is_archived?: boolean | null
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          map_url?: string | null
+          mode?: string
+          official_site_url?: string | null
+          publish_at?: string | null
+          registration_cta_label?: string | null
+          registration_url?: string | null
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          short_description?: string | null
+          slug?: string
+          start_at?: string
+          state?: string | null
+          subtitle?: string | null
+          thumbnail_url?: string | null
+          timezone?: string | null
+          title?: string
+          translations?: Json | null
+          unpublish_at?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          venue_name?: string | null
+          whatsapp_group_url?: string | null
+          youtube_channel_url?: string | null
+          youtube_playlist_url?: string | null
         }
         Relationships: []
       }
@@ -2227,6 +2482,7 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
+          submission_kind: Database["public"]["Enums"]["submission_kind"]
           thematic_area: string
           updated_at: string
           work_title: string
@@ -2245,6 +2501,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          submission_kind?: Database["public"]["Enums"]["submission_kind"]
           thematic_area: string
           updated_at?: string
           work_title: string
@@ -2263,6 +2520,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          submission_kind?: Database["public"]["Enums"]["submission_kind"]
           thematic_area?: string
           updated_at?: string
           work_title?: string
@@ -2582,6 +2840,7 @@ export type Database = {
         | "encerramento"
         | "cerimonia"
         | "outro"
+      submission_kind: "artigo" | "consorcio"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2725,6 +2984,7 @@ export const Constants = {
         "cerimonia",
         "outro",
       ],
+      submission_kind: ["artigo", "consorcio"],
     },
   },
 } as const

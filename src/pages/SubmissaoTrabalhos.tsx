@@ -6,9 +6,11 @@ import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, FileText, CheckCircle, Users, BookOpen } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState('artigo');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -88,7 +90,10 @@ const SubmissaoTrabalhos = () => {
       // First insert the submission without file info
       const { data: submission, error: submissionError } = await supabase
         .from('work_submissions')
-        .insert([formData])
+        .insert({
+          ...formData,
+          submission_kind: activeTab as 'artigo' | 'consorcio'
+        })
         .select()
         .single();
 
@@ -177,7 +182,7 @@ const SubmissaoTrabalhos = () => {
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              Submissão de Trabalhos
+              Submissão de Artigos
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
               Compartilhe suas pesquisas e experiências no III CIVENI 2025 - 
@@ -208,165 +213,328 @@ const SubmissaoTrabalhos = () => {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-poppins">
-                Formulário de Submissão
+                Submissão de Artigos
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Preencha todos os campos obrigatórios para submeter seu trabalho ao congresso
+                Escolha o tipo de submissão e preencha todos os campos obrigatórios
               </p>
             </div>
 
             <div className="bg-white rounded-2xl shadow-xl p-8 border">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nome Completo do Autor *
-                    </label>
-                    <input
-                      type="text"
-                      name="author_name"
-                      value={formData.author_name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Instituição *
-                    </label>
-                    <input
-                      type="text"
-                      name="institution"
-                      value={formData.institution}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                    />
-                  </div>
-                </div>
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="artigo">Submissão de Artigos</TabsTrigger>
+                  <TabsTrigger value="consorcio">Submissão de Consórcio</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="artigo" className="mt-6">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Nome Completo do Autor *
+                        </label>
+                        <input
+                          type="text"
+                          name="author_name"
+                          value={formData.author_name}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Instituição *
+                        </label>
+                        <input
+                          type="text"
+                          name="institution"
+                          value={formData.institution}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    E-mail *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        E-mail *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Título do Trabalho *
-                  </label>
-                  <input
-                    type="text"
-                    name="work_title"
-                    value={formData.work_title}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Título do Trabalho *
+                      </label>
+                      <input
+                        type="text"
+                        name="work_title"
+                        value={formData.work_title}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Área Temática *
-                  </label>
-                  <select
-                    name="thematic_area"
-                    value={formData.thematic_area}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                  >
-                    <option value="">Selecione uma área temática</option>
-                    {thematicAreas.map((area) => (
-                      <option key={area} value={area}>
-                        {area}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Área Temática *
+                      </label>
+                      <select
+                        name="thematic_area"
+                        value={formData.thematic_area}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      >
+                        <option value="">Selecione uma área temática</option>
+                        {thematicAreas.map((area) => (
+                          <option key={area} value={area}>
+                            {area}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Resumo * (máximo 500 caracteres)
-                  </label>
-                  <textarea
-                    name="abstract"
-                    value={formData.abstract}
-                    onChange={handleInputChange}
-                    required
-                    maxLength={500}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                  />
-                  <div className="text-right text-sm text-gray-500 mt-1">
-                    {formData.abstract.length}/500
-                  </div>
-                </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Resumo * (máximo 500 caracteres)
+                      </label>
+                      <textarea
+                        name="abstract"
+                        value={formData.abstract}
+                        onChange={handleInputChange}
+                        required
+                        maxLength={500}
+                        rows={4}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                      <div className="text-right text-sm text-gray-500 mt-1">
+                        {formData.abstract.length}/500
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Palavras-chave * (separadas por vírgula)
-                  </label>
-                  <input
-                    type="text"
-                    name="keywords"
-                    value={formData.keywords}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="palavra1, palavra2, palavra3"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Palavras-chave * (separadas por vírgula)
+                      </label>
+                      <input
+                        type="text"
+                        name="keywords"
+                        value={formData.keywords}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="palavra1, palavra2, palavra3"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Arquivo do Trabalho * (PDF ou DOCX, máximo 10MB)
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
-                    <input
-                      type="file"
-                      onChange={handleFileChange}
-                      accept=".pdf,.docx"
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <label htmlFor="file-upload" className="cursor-pointer">
-                      {file ? (
-                        <div className="flex items-center justify-center space-x-2">
-                          <FileText className="w-6 h-6 text-civeni-blue" />
-                          <span className="text-civeni-blue font-semibold">{file.name}</span>
-                        </div>
-                      ) : (
-                        <div>
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
-                          <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 10MB</p>
-                        </div>
-                      )}
-                    </label>
-                  </div>
-                </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Arquivo do Trabalho * (PDF ou DOCX, máximo 10MB)
+                      </label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
+                        <input
+                          type="file"
+                          onChange={handleFileChange}
+                          accept=".pdf,.docx"
+                          className="hidden"
+                          id="file-upload-artigo"
+                        />
+                        <label htmlFor="file-upload-artigo" className="cursor-pointer">
+                          {file ? (
+                            <div className="flex items-center justify-center space-x-2">
+                              <FileText className="w-6 h-6 text-civeni-blue" />
+                              <span className="text-civeni-blue font-semibold">{file.name}</span>
+                            </div>
+                          ) : (
+                            <div>
+                              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                              <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
+                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 10MB</p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
 
-                <div className="pt-6">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? 'Enviando...' : 'Submeter Trabalho'}
-                  </button>
-                </div>
-              </form>
+                    <div className="pt-6">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? 'Enviando...' : 'Submeter Artigo'}
+                      </button>
+                    </div>
+                  </form>
+                </TabsContent>
+                
+                <TabsContent value="consorcio" className="mt-6">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Nome Completo do Autor *
+                        </label>
+                        <input
+                          type="text"
+                          name="author_name"
+                          value={formData.author_name}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Instituição *
+                        </label>
+                        <input
+                          type="text"
+                          name="institution"
+                          value={formData.institution}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        E-mail *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Título do Trabalho *
+                      </label>
+                      <input
+                        type="text"
+                        name="work_title"
+                        value={formData.work_title}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Área Temática *
+                      </label>
+                      <select
+                        name="thematic_area"
+                        value={formData.thematic_area}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      >
+                        <option value="">Selecione uma área temática</option>
+                        {thematicAreas.map((area) => (
+                          <option key={area} value={area}>
+                            {area}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Resumo * (máximo 500 caracteres)
+                      </label>
+                      <textarea
+                        name="abstract"
+                        value={formData.abstract}
+                        onChange={handleInputChange}
+                        required
+                        maxLength={500}
+                        rows={4}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                      <div className="text-right text-sm text-gray-500 mt-1">
+                        {formData.abstract.length}/500
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Palavras-chave * (separadas por vírgula)
+                      </label>
+                      <input
+                        type="text"
+                        name="keywords"
+                        value={formData.keywords}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="palavra1, palavra2, palavra3"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Arquivo do Trabalho * (PDF ou DOCX, máximo 10MB)
+                      </label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
+                        <input
+                          type="file"
+                          onChange={handleFileChange}
+                          accept=".pdf,.docx"
+                          className="hidden"
+                          id="file-upload-consorcio"
+                        />
+                        <label htmlFor="file-upload-consorcio" className="cursor-pointer">
+                          {file ? (
+                            <div className="flex items-center justify-center space-x-2">
+                              <FileText className="w-6 h-6 text-civeni-blue" />
+                              <span className="text-civeni-blue font-semibold">{file.name}</span>
+                            </div>
+                          ) : (
+                            <div>
+                              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                              <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
+                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 10MB</p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="pt-6">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? 'Enviando...' : 'Submeter Consórcio'}
+                      </button>
+                    </div>
+                  </form>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>

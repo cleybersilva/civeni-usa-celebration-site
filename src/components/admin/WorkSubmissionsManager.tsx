@@ -36,6 +36,7 @@ interface WorkSubmission {
   reviewed_by: string | null;
   reviewed_at: string | null;
   created_at: string;
+  submission_kind: string;
 }
 
 const WorkSubmissionsManager = () => {
@@ -45,6 +46,7 @@ const WorkSubmissionsManager = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [areaFilter, setAreaFilter] = useState('all');
+  const [kindFilter, setKindFilter] = useState('all');
   const [selectedSubmission, setSelectedSubmission] = useState<WorkSubmission | null>(null);
   const [internalNotes, setInternalNotes] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
@@ -64,7 +66,7 @@ const WorkSubmissionsManager = () => {
 
   useEffect(() => {
     filterSubmissions();
-  }, [submissions, searchTerm, statusFilter, areaFilter]);
+  }, [submissions, searchTerm, statusFilter, areaFilter, kindFilter]);
 
   const fetchSubmissions = async () => {
     try {
@@ -104,6 +106,10 @@ const WorkSubmissionsManager = () => {
 
     if (areaFilter !== 'all') {
       filtered = filtered.filter(submission => submission.thematic_area === areaFilter);
+    }
+
+    if (kindFilter !== 'all') {
+      filtered = filtered.filter(submission => submission.submission_kind === kindFilter);
     }
 
     setFilteredSubmissions(filtered);
@@ -203,7 +209,7 @@ const WorkSubmissionsManager = () => {
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
@@ -234,17 +240,28 @@ const WorkSubmissionsManager = () => {
                   <SelectItem key={area} value={area}>
                     {area}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setSearchTerm('');
-                setStatusFilter('all');
-                setAreaFilter('all');
-              }}
-            >
+                 ))}
+               </SelectContent>
+             </Select>
+             <Select value={kindFilter} onValueChange={setKindFilter}>
+               <SelectTrigger>
+                 <SelectValue placeholder="Tipo de Submissão" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="all">Todos os Tipos</SelectItem>
+                 <SelectItem value="artigo">Artigo</SelectItem>
+                 <SelectItem value="consorcio">Consórcio</SelectItem>
+               </SelectContent>
+             </Select>
+             <Button
+                variant="outline" 
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('all');
+                  setAreaFilter('all');
+                  setKindFilter('all');
+                }}
+              >
               <Filter className="w-4 h-4 mr-2" />
               Limpar Filtros
             </Button>
@@ -267,17 +284,20 @@ const WorkSubmissionsManager = () => {
                     {getStatusBadge(submission.status)}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-4">
-                    <div>
-                      <span className="font-medium">Autor:</span> {submission.author_name}
-                    </div>
-                    <div>
-                      <span className="font-medium">Instituição:</span> {submission.institution}
-                    </div>
-                    <div>
-                      <span className="font-medium">Área:</span> {submission.thematic_area}
-                    </div>
-                  </div>
+                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
+                     <div>
+                       <span className="font-medium">Autor:</span> {submission.author_name}
+                     </div>
+                     <div>
+                       <span className="font-medium">Instituição:</span> {submission.institution}
+                     </div>
+                     <div>
+                       <span className="font-medium">Área:</span> {submission.thematic_area}
+                     </div>
+                     <div>
+                       <span className="font-medium">Tipo:</span> {submission.submission_kind === 'artigo' ? 'Artigo' : 'Consórcio'}
+                     </div>
+                   </div>
 
                   <div className="text-sm text-gray-500">
                     <span className="font-medium">Submetido em:</span> {new Date(submission.created_at).toLocaleDateString('pt-BR')}
