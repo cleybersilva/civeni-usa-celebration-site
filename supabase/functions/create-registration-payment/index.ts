@@ -224,7 +224,11 @@ serve(async (req) => {
           price_data: {
             currency: currency.toLowerCase(),
             product_data: {
-              name: `${category.title_pt}${category.slug === 'participante-externo' ? '' : ` - ${lote.nome}`}`,
+              name: `${category.title_pt}${
+                category.slug === 'participante-externo' || category.slug === 'convidado' 
+                  ? '' 
+                  : ` - ${lote.nome}`
+              }`,
               description: `Inscrição para Civeni 2025 - ${fullName}`,
             },
             unit_amount: finalPrice,

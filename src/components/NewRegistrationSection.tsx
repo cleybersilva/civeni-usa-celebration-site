@@ -82,8 +82,13 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         return category.slug === 'participante-externo';
       }
       
-      // Para outros tipos de participante (aluno, convidado), mostrar apenas categorias pagas do lote vigente (exceto externo)
-      return !category.is_free && category.slug !== 'participante-externo';
+      // Para convidado, mostrar APENAS a categoria específica de convidado
+      if (formData.participantType === 'guest') {
+        return category.slug === 'convidado';
+      }
+      
+      // Para outros tipos de participante (aluno), mostrar apenas categorias pagas do lote vigente (exceto externo e convidado)
+      return !category.is_free && category.slug !== 'participante-externo' && category.slug !== 'convidado';
     });
   };
 
@@ -196,10 +201,12 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                                   ? 'GRATUITO' 
                                   : category.slug === 'participante-externo' 
                                     ? 'R$ 200,00'
-                                    : `R$ ${(loteVigente?.price_cents / 100).toFixed(2)}`
+                                    : category.slug === 'convidado'
+                                      ? 'R$ 100,00'
+                                      : `R$ ${(loteVigente?.price_cents / 100).toFixed(2)}`
                                 }
                               </span>
-                              {loteVigente && !category.is_free && category.slug !== 'participante-externo' && (
+                              {loteVigente && !category.is_free && category.slug !== 'participante-externo' && category.slug !== 'convidado' && (
                                 <span className="text-xs text-green-600 font-medium">
                                   {loteVigente.nome}
                                 </span>
@@ -207,6 +214,11 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                               {category.slug === 'participante-externo' && (
                                 <span className="text-xs text-blue-600 font-medium">
                                   Valor fixo
+                                </span>
+                              )}
+                              {category.slug === 'convidado' && (
+                                <span className="text-xs text-purple-600 font-medium">
+                                  Taxa convidado
                                 </span>
                               )}
                             </div>
@@ -246,7 +258,9 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                         ? 0 
                         : selectedCategory.slug === 'participante-externo' 
                           ? 20000 
-                          : loteVigente?.price_cents ?? 0
+                          : selectedCategory.slug === 'convidado'
+                            ? 10000
+                            : loteVigente?.price_cents ?? 0
                     } 
                   />
                 )}
