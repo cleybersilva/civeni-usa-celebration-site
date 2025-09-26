@@ -146,6 +146,81 @@ export type Database = {
         }
         Relationships: []
       }
+      certificate_attempts: {
+        Row: {
+          created_at: string | null
+          email: string
+          event_id: string
+          id: number
+          ip: unknown | null
+          matched: number
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          event_id: string
+          id?: number
+          ip?: unknown | null
+          matched: number
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          event_id?: string
+          id?: number
+          ip?: unknown | null
+          matched?: number
+        }
+        Relationships: []
+      }
+      certificate_templates: {
+        Row: {
+          background_url: string | null
+          base_colors: Json | null
+          body_html: string
+          brand: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          orientation: string | null
+          paper_size: string | null
+          updated_at: string | null
+          watermark_url: string | null
+        }
+        Insert: {
+          background_url?: string | null
+          base_colors?: Json | null
+          body_html: string
+          brand?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          orientation?: string | null
+          paper_size?: string | null
+          updated_at?: string | null
+          watermark_url?: string | null
+        }
+        Update: {
+          background_url?: string | null
+          base_colors?: Json | null
+          body_html?: string
+          brand?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          orientation?: string | null
+          paper_size?: string | null
+          updated_at?: string | null
+          watermark_url?: string | null
+        }
+        Relationships: []
+      }
       civeni_ii_2024_images: {
         Row: {
           alt_text_en: string
@@ -1124,6 +1199,75 @@ export type Database = {
         }
         Relationships: []
       }
+      event_certificates: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string | null
+          event_id: string
+          hours: string | null
+          is_enabled: boolean | null
+          issue_rule: string | null
+          issuer_name: string | null
+          issuer_role: string | null
+          issuer_signature_url: string | null
+          keywords: string[]
+          required_correct: number | null
+          template_id: string | null
+          timezone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          event_id: string
+          hours?: string | null
+          is_enabled?: boolean | null
+          issue_rule?: string | null
+          issuer_name?: string | null
+          issuer_role?: string | null
+          issuer_signature_url?: string | null
+          keywords: string[]
+          required_correct?: number | null
+          template_id?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          event_id?: string
+          hours?: string | null
+          is_enabled?: boolean | null
+          issue_rule?: string | null
+          issuer_name?: string | null
+          issuer_role?: string | null
+          issuer_signature_url?: string | null
+          keywords?: string[]
+          required_correct?: number | null
+          template_id?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_certificates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_certificates_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_config: {
         Row: {
           created_at: string
@@ -1799,6 +1943,63 @@ export type Database = {
           versioned_url?: string | null
         }
         Relationships: []
+      }
+      issued_certificates: {
+        Row: {
+          code: string
+          created_at: string | null
+          email: string
+          event_id: string | null
+          full_name: string
+          id: string
+          issued_at: string | null
+          keywords_matched: number
+          keywords_provided: string[] | null
+          pdf_url: string
+          registration_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          email: string
+          event_id?: string | null
+          full_name: string
+          id?: string
+          issued_at?: string | null
+          keywords_matched: number
+          keywords_provided?: string[] | null
+          pdf_url: string
+          registration_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          email?: string
+          event_id?: string | null
+          full_name?: string
+          id?: string
+          issued_at?: string | null
+          keywords_matched?: number
+          keywords_provided?: string[] | null
+          pdf_url?: string
+          registration_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issued_certificates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issued_certificates_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "event_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       login_attempts: {
         Row: {

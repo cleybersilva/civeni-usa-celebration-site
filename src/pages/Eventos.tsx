@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Users, Filter, Search, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Filter, Search, ExternalLink, Award } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,16 +11,38 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEvents } from '@/hooks/useEvents';
+import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const Eventos = () => {
   const { t } = useTranslation();
   const { events, loading } = useEvents();
+  const [eventCertificates, setEventCertificates] = useState<Record<string, any>>({});
   
-  // Debug: log events data
-  console.log('Events page - events data:', events);
-  console.log('Events page - loading state:', loading);
+  // Load certificate settings for events
+  React.useEffect(() => {
+    const loadCertificateSettings = async () => {
+      if (!events?.length) return;
+      
+      const eventIds = events.map(event => event.id);
+      const { data } = await supabase
+        .from('event_certificates')
+        .select('event_id, is_enabled')
+        .in('event_id', eventIds)
+        .eq('is_enabled', true);
+      
+      if (data) {
+        const certificateMap = data.reduce((acc, cert) => {
+          acc[cert.event_id] = cert;
+          return acc;
+        }, {});
+        setEventCertificates(certificateMap);
+      }
+    };
+
+    loadCertificateSettings();
+  }, [events]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [modalidadeFilter, setModalidadeFilter] = useState('all');
@@ -245,13 +267,22 @@ const Eventos = () => {
                         
                         <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                         
-                        <div className="pt-3">
-                          <Link to={`/eventos/${event.slug}`}>
+                        <div className="flex gap-2 pt-3">
+                          <Link to={`/eventos/${event.slug}`} className="flex-1">
                             <Button className="w-full">
                               Ver Detalhes
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
                           </Link>
+                          
+                          {eventCertificates[event.id] && (
+                            <Link to={`/eventos/${event.slug}/certificado`}>
+                              <Button variant="outline" size="default">
+                                <Award className="h-4 w-4 mr-2" />
+                                Certificado
+                              </Button>
+                            </Link>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -301,13 +332,22 @@ const Eventos = () => {
                       
                       <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
-                      <div className="pt-3">
-                        <Link to={`/eventos/${event.slug}`}>
+                      <div className="flex gap-2 pt-3">
+                        <Link to={`/eventos/${event.slug}`} className="flex-1">
                           <Button variant="outline" className="w-full">
                             Ver Detalhes
                             <ExternalLink className="h-4 w-4 ml-2" />
                           </Button>
                         </Link>
+                        
+                        {eventCertificates[event.id] && (
+                          <Link to={`/eventos/${event.slug}/certificado`}>
+                            <Button variant="outline" size="default">
+                              <Award className="h-4 w-4 mr-2" />
+                              Certificado
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -381,6 +421,16 @@ const Eventos = () => {
                             Ver Detalhes
                           </Button>
                         </Link>
+                        
+                        {eventCertificates[event.id] && (
+                          <Link to={`/eventos/${event.slug}/certificado`}>
+                            <Button variant="outline" size="sm">
+                              <Award className="h-4 w-4 mr-1" />
+                              Certificado
+                            </Button>
+                          </Link>
+                        )}
+                        
                         {event.youtube_url && (
                           <Button variant="default" size="sm" asChild>
                             <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">

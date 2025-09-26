@@ -36,6 +36,8 @@ import TemplatesArtigosSlides from "./pages/TemplatesArtigosSlides";
 import Sobre from "./pages/Sobre";
 import Eventos from "./pages/Eventos";
 import EventoDetalhes from "./pages/EventoDetalhes";
+import CertificadoEmissao from "./pages/CertificadoEmissao";
+import VerificarCertificado from "./pages/VerificarCertificado";
 
 import './App.css';
 
@@ -78,6 +80,8 @@ function App() {
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />
                 <Route path="/eventos/:slug" element={<EventoDetalhes />} />
+                <Route path="/eventos/:slug/certificado" element={<CertificadoEmissao />} />
+                <Route path="/certificados/verify/:code" element={<VerificarCertificado />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="*" element={<NotFound />} />
