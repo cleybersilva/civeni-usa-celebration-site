@@ -137,15 +137,13 @@ const TemplatesArtigosSlides = () => {
                     </a>
                   )}
                   {item.file_url && (
-                    <a
-                      href={getFilePreviewUrl(item.file_url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => handleManagedFilePreview(item.file_url!)}
                       className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
                     >
                       <Eye className="h-4 w-4 inline mr-1" />
                       Visualizar
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>
@@ -206,24 +204,57 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
-  const getPreviewUrl = (templateFile: string) => {
-    const fullUrl = `${window.location.origin}${templateFile}`;
-    return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fullUrl)}`;
-  };
-
   const handlePreviewClick = (templateFile: string) => {
-    const previewUrl = getPreviewUrl(templateFile);
-    window.open(previewUrl, '_blank', 'noopener,noreferrer');
+    // Garantir que a URL seja absoluta
+    const absoluteUrl = new URL(templateFile, window.location.origin).href;
+    
+    // Verificar se é arquivo Office e construir URL do viewer
+    const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(templateFile);
+    
+    if (isOfficeFile) {
+      // URL para visualização no Office Online
+      const previewUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(absoluteUrl)}`;
+      
+      // Abrir em nova janela
+      const newWindow = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=800,scrollbars=yes,resizable=yes');
+      
+      if (newWindow) {
+        newWindow.location.href = previewUrl;
+      } else {
+        // Se bloqueou popup, usar location.href
+        window.open(previewUrl, '_blank');
+      }
+    } else {
+      // Para outros arquivos, abrir diretamente
+      window.open(absoluteUrl, '_blank');
+    }
   };
 
   const getFilePreviewUrl = (fileUrl: string) => {
-    // Se é um arquivo Office, usa o Office Online viewer
+    // Verificar se é um arquivo Office
     const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(fileUrl);
+    
     if (isOfficeFile) {
+      // Para arquivos Office, usar o Office Online viewer
       return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileUrl)}`;
     }
-    // Para outros arquivos (PDF, imagens), abre diretamente
+    
+    // Para outros arquivos (PDF, imagens), abrir diretamente
     return fileUrl;
+  };
+
+  const handleManagedFilePreview = (fileUrl: string) => {
+    const previewUrl = getFilePreviewUrl(fileUrl);
+    
+    // Abrir em nova janela com configurações otimizadas
+    const newWindow = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=800,scrollbars=yes,resizable=yes');
+    
+    if (newWindow) {
+      newWindow.location.href = previewUrl;
+    } else {
+      // Fallback se o popup foi bloqueado
+      window.open(previewUrl, '_blank');
+    }
   };
 
   const renderTemplateCard = (template: any, index: number) => (
