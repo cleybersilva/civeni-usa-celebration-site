@@ -186,7 +186,7 @@ const SubmissaoTrabalhos = () => {
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              Submissão de Artigos
+              Submissão Artigos/Consórcio
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
               Compartilhe suas pesquisas e experiências no III CIVENI 2025 - 
