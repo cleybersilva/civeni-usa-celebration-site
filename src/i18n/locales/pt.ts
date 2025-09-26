@@ -13,6 +13,7 @@ export const ptTranslations = {
       oralPresentation: "Apresentação Oral Lista/Template",
       posterSessions: "Sessões de Pôster",
       manuscripts: "Envio de Vídeos",
+      templatesArticlesSlides: "Templates Artigos/Slides",
       thematicAreas: "Áreas Temáticas",
       events: "Eventos",
       speakers: "Palestrantes",
