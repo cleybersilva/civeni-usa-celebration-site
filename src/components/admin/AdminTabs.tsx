@@ -106,7 +106,20 @@ const AdminTabs = () => {
       )}
 
       <TabsContent value="eventos">
-        <SimpleEventsManager />
+        <div className="p-6">
+          <h1 className="text-3xl font-bold mb-4">Gerenciar Eventos</h1>
+          <p className="text-gray-600 mb-6">Crie e gerencie eventos, palestras e atividades</p>
+          <div className="bg-white rounded-lg border p-6">
+            <div className="text-center py-8">
+              <div className="text-6xl mb-4">📅</div>
+              <h3 className="text-xl font-semibold mb-2">Lista de Eventos</h3>
+              <p className="text-gray-500">Nenhum evento encontrado</p>
+              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                + Novo Evento
+              </button>
+            </div>
+          </div>
+        </div>
       </TabsContent>
 
       {hasPermission('inscricoes') && (
