@@ -69,21 +69,16 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
 
   // Filtrar categorias baseadas no tipo de participante
   const getFilteredCategories = () => {
-    if (!formData.participantType) return categories;
+    if (!formData.participantType) return [];
     
     return categories.filter(category => {
-      // Se é categoria gratuita para professor VCCU, só mostrar para professores
-      if (category.is_free && category.slug === 'professor-vccu-gratuito') {
-        return formData.participantType === 'professor';
+      // Para professores, mostrar APENAS a categoria gratuita VCCU
+      if (formData.participantType === 'professor') {
+        return category.is_free && category.slug === 'professor-vccu-gratuito';
       }
       
       // Para outros tipos de participante (aluno, convidado, externo), mostrar apenas categorias pagas do lote vigente
-      if (formData.participantType !== 'professor') {
-        return !category.is_free;
-      }
-      
-      // Para professores, mostrar todas as categorias
-      return true;
+      return !category.is_free;
     });
   };
 
@@ -235,7 +230,14 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 <Button 
                   type="submit" 
                   className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
-                  disabled={loading || !formData.categoryId || !formData.participantType || (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || (selectedCategory?.is_free && !formData.couponCode)}
+                  disabled={
+                    loading || 
+                    !formData.categoryId || 
+                    !formData.participantType || 
+                    (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || 
+                    (selectedCategory?.is_free && !formData.couponCode) ||
+                    (formData.participantType === 'professor' && !formData.couponCode)
+                  }
                 >
                   {loading ? t('registration.processing') : t('registration.registerNow')}
                 </Button>
