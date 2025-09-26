@@ -247,7 +247,7 @@ const CongressoComite = () => {
                               </p>
                             )}
                             
-                            <div className={`flex items-center text-sm text-muted-foreground mb-4 ${member.affiliation === 'VCCU' || member.affiliation === 'FASOL' ? 'justify-center' : ''}`}>
+                            <div className={`flex items-center text-sm text-muted-foreground mb-4 ${member.affiliation === 'VCCU' || member.affiliation === 'FASOL' || member.affiliation === 'UAL - Portugal' || member.affiliation === 'UFS, Brasil' ? 'justify-center' : ''}`}>
                               <GraduationCap className="w-4 h-4 mr-2 flex-shrink-0" />
                               <span className="line-clamp-2">{member.affiliation}</span>
                             </div>
