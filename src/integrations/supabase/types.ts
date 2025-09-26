@@ -624,60 +624,6 @@ export type Database = {
         }
         Relationships: []
       }
-      congresso_avaliadores: {
-        Row: {
-          cargo_en: string | null
-          cargo_es: string | null
-          cargo_pt: string | null
-          categoria: string
-          created_at: string
-          curriculo_url: string | null
-          email: string | null
-          especialidade: string | null
-          foto_url: string | null
-          id: string
-          instituicao: string
-          is_active: boolean
-          nome: string
-          ordem: number
-          updated_at: string
-        }
-        Insert: {
-          cargo_en?: string | null
-          cargo_es?: string | null
-          cargo_pt?: string | null
-          categoria?: string
-          created_at?: string
-          curriculo_url?: string | null
-          email?: string | null
-          especialidade?: string | null
-          foto_url?: string | null
-          id?: string
-          instituicao: string
-          is_active?: boolean
-          nome: string
-          ordem?: number
-          updated_at?: string
-        }
-        Update: {
-          cargo_en?: string | null
-          cargo_es?: string | null
-          cargo_pt?: string | null
-          categoria?: string
-          created_at?: string
-          curriculo_url?: string | null
-          email?: string | null
-          especialidade?: string | null
-          foto_url?: string | null
-          id?: string
-          instituicao?: string
-          is_active?: boolean
-          nome?: string
-          ordem?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
       congresso_comite: {
         Row: {
           cargo_en: string | null

@@ -147,13 +147,6 @@ export const createMenuItems = (
       isPriority: false
     },
     {
-      id: 'avaliadores',
-      label: t('admin.menu.evaluators', 'Avaliadores'),
-      icon: Users,
-      show: hasPermission('palestrantes') || isAdminRoot(),
-      isPriority: false
-    },
-    {
       id: 'comite',
       label: t('admin.menu.committee', 'Comissão Organizadora'),
       icon: Users,
