@@ -204,25 +204,62 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
-  const handlePreviewClick = (templateFile: string) => {
+  const checkFileExists = async (url: string): Promise<boolean> => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const handlePreviewClick = async (templateFile: string) => {
     // Garantir que a URL seja absoluta
     const absoluteUrl = new URL(templateFile, window.location.origin).href;
     
-    // Verificar se é arquivo Office e construir URL do viewer
+    // Verificar se o arquivo existe
+    const fileExists = await checkFileExists(absoluteUrl);
+    
+    if (!fileExists) {
+      alert('Arquivo não encontrado. Este template está sendo preparado e estará disponível em breve.');
+      return;
+    }
+    
+    // Verificar se é arquivo Office
     const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(templateFile);
     
     if (isOfficeFile) {
-      // URL para visualização no Office Online
-      const previewUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(absoluteUrl)}`;
+      // Múltiplos viewers como fallback
+      const viewers = [
+        `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(absoluteUrl)}`,
+        `https://docs.google.com/gview?url=${encodeURIComponent(absoluteUrl)}&embedded=true`,
+        absoluteUrl // fallback direto
+      ];
       
-      // Abrir em nova janela
-      const newWindow = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=800,scrollbars=yes,resizable=yes');
+      // Tentar o primeiro viewer
+      let viewerWorked = false;
       
-      if (newWindow) {
-        newWindow.location.href = previewUrl;
-      } else {
-        // Se bloqueou popup, usar location.href
-        window.open(previewUrl, '_blank');
+      for (const viewerUrl of viewers) {
+        try {
+          const newWindow = window.open(viewerUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+          if (newWindow) {
+            viewerWorked = true;
+            break;
+          }
+        } catch (error) {
+          console.log(`Viewer failed, trying next: ${error}`);
+        }
+      }
+      
+      if (!viewerWorked) {
+        // Último recurso - download direto
+        const link = document.createElement('a');
+        link.href = absoluteUrl;
+        link.download = templateFile.split('/').pop() || 'template';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        alert('Não foi possível abrir a pré-visualização. O arquivo foi baixado automaticamente.');
       }
     } else {
       // Para outros arquivos, abrir diretamente
@@ -230,30 +267,39 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
-  const getFilePreviewUrl = (fileUrl: string) => {
-    // Verificar se é um arquivo Office
-    const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(fileUrl);
-    
-    if (isOfficeFile) {
-      // Para arquivos Office, usar o Office Online viewer
-      return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileUrl)}`;
-    }
-    
-    // Para outros arquivos (PDF, imagens), abrir diretamente
-    return fileUrl;
-  };
-
-  const handleManagedFilePreview = (fileUrl: string) => {
-    const previewUrl = getFilePreviewUrl(fileUrl);
-    
-    // Abrir em nova janela com configurações otimizadas
-    const newWindow = window.open('', '_blank', 'noopener,noreferrer,width=1200,height=800,scrollbars=yes,resizable=yes');
-    
-    if (newWindow) {
-      newWindow.location.href = previewUrl;
-    } else {
-      // Fallback se o popup foi bloqueado
-      window.open(previewUrl, '_blank');
+  const handleManagedFilePreview = async (fileUrl: string) => {
+    try {
+      // Verificar se é arquivo Office
+      const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(fileUrl);
+      
+      if (isOfficeFile) {
+        // Múltiplos viewers modernos
+        const viewers = [
+          `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileUrl)}`,
+          `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`
+        ];
+        
+        // Tentar cada viewer
+        for (const viewerUrl of viewers) {
+          try {
+            const newWindow = window.open(viewerUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+            if (newWindow) {
+              return; // Sucesso
+            }
+          } catch (error) {
+            console.log(`Viewer failed: ${error}`);
+          }
+        }
+        
+        // Se todos falharam, abrir URL direta
+        window.open(fileUrl, '_blank');
+      } else {
+        // Para PDFs, imagens etc, abrir diretamente
+        window.open(fileUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Preview error:', error);
+      window.open(fileUrl, '_blank'); // Fallback final
     }
   };
 
