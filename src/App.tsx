@@ -20,6 +20,7 @@ import InscricaoPresencial from "./pages/InscricaoPresencial";
 import InscricaoOnline from "./pages/InscricaoOnline";
 import Palestrantes from "./pages/Palestrantes";
 import CongressoApresentacao from "./pages/CongressoApresentacao";
+import CongressoAvaliadores from "./pages/CongressoAvaliadores";
 import CongressoComite from "./pages/CongressoComite";
 import AreaTematica from "./pages/AreaTematica";
 import Contato from "./pages/Contato";
@@ -62,8 +63,9 @@ function App() {
                 <Route path="/palestrantes" element={<Palestrantes />} />
                 <Route path="/area-tematica" element={<AreaTematica />} />
                 <Route path="/contato" element={<Contato />} />
-                <Route path="/congresso/apresentacao" element={<CongressoApresentacao />} />
-                <Route path="/congresso/comite" element={<CongressoComite />} />
+            <Route path="/congresso/apresentacao" element={<CongressoApresentacao />} />
+            <Route path="/congresso/avaliadores" element={<CongressoAvaliadores />} />
+            <Route path="/congresso/comite" element={<CongressoComite />} />
                 <Route path="/inscricoes" element={<Inscricoes />} />
                 <Route path="/politicas-de-privacidade" element={<PoliticasPrivacidade />} />
                 <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />

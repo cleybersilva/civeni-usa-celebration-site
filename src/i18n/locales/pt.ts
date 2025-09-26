@@ -2,7 +2,7 @@ export const ptTranslations = {
   translation: {
     header: {
       congress: "Congresso",
-      presentation: "Apresentação",
+      evaluators: 'Avaliadores',
       committee: "Comitê",
       schedule: "Programação",
       inPerson: "Presencial",
