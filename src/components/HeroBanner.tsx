@@ -56,13 +56,28 @@ const HeroBanner = () => {
           slides.map(async (slide) => {
             // Generate cache-busting URL with updated_at timestamp
             const timestamp = slide.updatedAt ? new Date(slide.updatedAt).getTime() : Date.now();
-            const src = `${resolveAssetUrl(slide.bgImage)}?v=${timestamp}`;
+            let src = `${resolveAssetUrl(slide.bgImage)}?v=${timestamp}&cb=${Date.now()}`;
             
-            // Preload and decode the image
+            // Preload and decode the image with retry mechanism
             await new Promise<void>((resolve, reject) => {
               const img = new Image();
               img.onload = () => resolve();
-              img.onerror = () => reject(new Error(`Failed to load ${src}`));
+              img.onerror = () => {
+                // Tentativa de fallback sem query params
+                const fallbackSrc = resolveAssetUrl(slide.bgImage);
+                console.warn(`Failed to load banner image with timestamp, trying fallback:`, src, '->', fallbackSrc);
+                
+                const fallbackImg = new Image();
+                fallbackImg.onload = () => {
+                  src = fallbackSrc; // Use the working URL
+                  resolve();
+                };
+                fallbackImg.onerror = () => {
+                  console.error(`Failed to load banner image:`, slide.bgImage);
+                  reject(new Error(`Failed to load ${slide.bgImage}`));
+                };
+                fallbackImg.src = fallbackSrc;
+              };
               img.src = src;
             });
             

@@ -78,31 +78,38 @@ const VideosSection = () => {
                   loading="lazy"
                   onError={(e) => {
                     console.warn('Failed to load video thumbnail:', video.thumbnail);
-                    // Try alternative paths for cPanel
+                    const target = e.currentTarget;
+                    
+                    // Tentar URLs alternativas mais robustas
                     const fallbackPaths = [
-                      `./public/${video.thumbnail.replace(/^\/+/, '')}`,
-                      `public/${video.thumbnail.replace(/^\/+/, '')}`,
-                      video.thumbnail
+                      video.thumbnail.replace(/\.(jpg|jpeg|png|webp)$/i, '.jpg'),
+                      video.thumbnail.replace(/\.(jpg|jpeg|png|webp)$/i, '.png'),
+                      video.thumbnail.replace(/\.(jpg|jpeg|png|webp)$/i, '.webp'),
+                      '/assets/default-video-thumbnail.jpg',
+                      'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=400&h=300&q=80'
                     ];
                     
                     let pathIndex = 0;
+                    
                     const tryNextPath = () => {
                       if (pathIndex < fallbackPaths.length) {
                         const testImg = new Image();
                         testImg.onload = () => {
-                          (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                          target.src = resolveAssetUrl(fallbackPaths[pathIndex]);
                         };
                         testImg.onerror = () => {
                           pathIndex++;
                           if (pathIndex < fallbackPaths.length) {
-                            tryNextPath();
+                            setTimeout(tryNextPath, 100);
                           } else {
-                            e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTUwIDEwMFYyMDBMMjUwIDE1MEwxNTAgMTAwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K';
+                            // Último recurso: placeholder SVG melhorado
+                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTMzM0ZGIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTUwIDEwMFYyMDBMMjUwIDE1MEwxNTAgMTAwWiIgZmlsbD0iI0ZGRkZGRiIvPgo8dGV4dCB4PSIyMDAiIHk9IjI1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5WaWRlbyBUaHVtYm5haWw8L3RleHQ+Cjwvc3ZnPgo=';
                           }
                         };
                         testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
                       }
                     };
+                    
                     tryNextPath();
                   }}
                 />

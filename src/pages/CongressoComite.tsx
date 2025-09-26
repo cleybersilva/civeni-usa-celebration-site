@@ -10,6 +10,8 @@ import Footer from '@/components/Footer';
 import { useCongressoComiteByCategory } from '@/hooks/useCongressoComite';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
+import { resolveAssetUrl } from '@/utils/assetUrl';
+import { useVersionedImage } from '@/hooks/useVersionedImage';
 
 interface CommitteeMember {
   id: string;
@@ -21,6 +23,77 @@ interface CommitteeMember {
   ordem: number;
   is_active: boolean;
 }
+
+const MemberPhoto: React.FC<{ member: CommitteeMember; className?: string }> = ({ member, className }) => {
+  const { versionedUrl, isLoading, error } = useVersionedImage(
+    member.foto_url ? resolveAssetUrl(member.foto_url) : ''
+  );
+  
+  // Se não tem foto_url, mostrar placeholder diretamente
+  if (!member.foto_url) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-primary/10">
+        <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+          <span className="text-3xl font-bold text-primary">
+            {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Se está carregando, mostrar skeleton
+  if (isLoading) {
+    return (
+      <div className={`${className} bg-primary/10 animate-pulse`}>
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-24 h-24 bg-primary/20 rounded-full"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Se deu erro ou não conseguiu carregar, mostrar placeholder
+  if (error || !versionedUrl) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-primary/10">
+        <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+          <span className="text-3xl font-bold text-primary">
+            {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar a imagem carregada
+  return (
+    <img
+      src={versionedUrl}
+      alt={member.nome}
+      className={className}
+      onError={(e) => {
+        // Fallback para placeholder se a imagem falhar ao carregar
+        console.warn(`Failed to load member photo for ${member.nome}:`, versionedUrl);
+        const target = e.currentTarget;
+        target.style.display = 'none';
+        
+        // Criar e inserir o placeholder
+        const placeholder = document.createElement('div');
+        placeholder.className = 'w-full h-full flex items-center justify-center bg-primary/10';
+        placeholder.innerHTML = `
+          <div class="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+            <span class="text-3xl font-bold text-primary">
+              ${member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            </span>
+          </div>
+        `;
+        
+        target.parentElement?.appendChild(placeholder);
+      }}
+    />
+  );
+};
 
 const CongressoComite = () => {
   const { t } = useTranslation();
@@ -159,25 +232,10 @@ const CongressoComite = () => {
                           <CardContent className="p-0">
                             {/* Photo Section */}
                             <div className="relative aspect-square overflow-hidden bg-primary">
-                              {member.foto_url ? (
-                                <img
-                                  src={member.foto_url}
-                                  alt={member.nome}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                  onError={(e) => {
-                                    console.error('Error loading image:', member.foto_url);
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.nextElementSibling?.setAttribute('style', 'display: flex');
-                                  }}
-                                />
-                              ) : null}
-                              <div className={`w-full h-full flex items-center justify-center ${member.foto_url ? 'hidden' : ''}`}>
-                                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
-                                  <span className="text-3xl font-bold text-primary">
-                                    {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                  </span>
-                                </div>
-                              </div>
+                              <MemberPhoto 
+                                member={member} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
                             </div>
                             
                             {/* Info Section */}
