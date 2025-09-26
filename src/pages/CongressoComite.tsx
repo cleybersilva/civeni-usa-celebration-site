@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCongressoComiteByCategory } from '@/hooks/useCongressoComite';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CommitteeMember {
   id: string;
@@ -24,11 +25,24 @@ interface CommitteeMember {
 const CongressoComite = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('organizador');
+  const queryClient = useQueryClient();
 
-  // Fetch data from database
-  const { data: organizadorData, isLoading: isLoadingOrganizador } = useCongressoComiteByCategory('organizador');
-  const { data: cientificoData, isLoading: isLoadingCientifico } = useCongressoComiteByCategory('cientifico');
-  const { data: apoioTecnicoData, isLoading: isLoadingApoioTecnico } = useCongressoComiteByCategory('apoio_tecnico');
+  // Fetch data from database with automatic refresh
+  const { data: organizadorData, isLoading: isLoadingOrganizador, refetch: refetchOrganizador } = useCongressoComiteByCategory('organizador');
+  const { data: cientificoData, isLoading: isLoadingCientifico, refetch: refetchCientifico } = useCongressoComiteByCategory('cientifico');
+  const { data: apoioTecnicoData, isLoading: isLoadingApoioTecnico, refetch: refetchApoioTecnico } = useCongressoComiteByCategory('apoio_tecnico');
+
+  // Refresh data periodically
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['congresso-comite'] });
+      refetchOrganizador();
+      refetchCientifico();
+      refetchApoioTecnico();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [queryClient, refetchOrganizador, refetchCientifico, refetchApoioTecnico]);
 
   // Committee data organized by type
   const committeesData = {
@@ -150,16 +164,20 @@ const CongressoComite = () => {
                                   src={member.foto_url}
                                   alt={member.nome}
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  onError={(e) => {
+                                    console.error('Error loading image:', member.foto_url);
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling?.setAttribute('style', 'display: flex');
+                                  }}
                                 />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
-                                    <span className="text-3xl font-bold text-primary">
-                                      {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                    </span>
-                                  </div>
+                              ) : null}
+                              <div className={`w-full h-full flex items-center justify-center ${member.foto_url ? 'hidden' : ''}`}>
+                                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+                                  <span className="text-3xl font-bold text-primary">
+                                    {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                  </span>
                                 </div>
-                              )}
+                              </div>
                             </div>
                             
                             {/* Info Section */}
