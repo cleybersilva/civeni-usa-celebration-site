@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
 import conferenceEventImage from '@/assets/conference-event.jpg';
 import { resolveAssetUrl } from '@/utils/assetUrl';
+import { imageCacheManager } from '@/utils/imageCacheUtils';
 
 interface PreloadedSlide {
   id: string;
@@ -54,30 +55,47 @@ const HeroBanner = () => {
         
         const prepared = await Promise.all(
           slides.map(async (slide) => {
-            // Generate cache-busting URL with updated_at timestamp
+            // Generate strong cache-busting URL with image version and timestamp
+            const imageVersion = slide.imageVersion || 1;
             const timestamp = slide.updatedAt ? new Date(slide.updatedAt).getTime() : Date.now();
-            let src = `${resolveAssetUrl(slide.bgImage)}?v=${timestamp}&cb=${Date.now()}`;
+            const cacheBuster = `${timestamp}_${Math.random().toString(36).substring(2)}`;
+            let src = `${resolveAssetUrl(slide.bgImage)}?v=${imageVersion}&t=${cacheBuster}`;
+            
+            // Clear browser cache for this specific image
+            await imageCacheManager.clearImageCache(slide.bgImage);
+            await imageCacheManager.clearImageCache(resolveAssetUrl(slide.bgImage));
             
             // Preload and decode the image with retry mechanism
             await new Promise<void>((resolve, reject) => {
               const img = new Image();
-              img.onload = () => resolve();
+              
+              img.onload = () => {
+                console.log(`✅ Banner image loaded successfully:`, src);
+                resolve();
+              };
+              
               img.onerror = () => {
-                // Tentativa de fallback sem query params
+                // Fallback: try without cache busting
                 const fallbackSrc = resolveAssetUrl(slide.bgImage);
-                console.warn(`Failed to load banner image with timestamp, trying fallback:`, src, '->', fallbackSrc);
+                console.warn(`⚠️ Failed to load banner with cache buster, trying fallback:`, src, '->', fallbackSrc);
                 
                 const fallbackImg = new Image();
                 fallbackImg.onload = () => {
-                  src = fallbackSrc; // Use the working URL
+                  src = fallbackSrc;
+                  console.log(`✅ Banner fallback loaded:`, src);
                   resolve();
                 };
                 fallbackImg.onerror = () => {
-                  console.error(`Failed to load banner image:`, slide.bgImage);
-                  reject(new Error(`Failed to load ${slide.bgImage}`));
+                  console.error(`❌ Failed to load banner image completely:`, slide.bgImage);
+                  // Even on error, resolve to avoid blocking other slides
+                  src = fallbackSrc;
+                  resolve();
                 };
                 fallbackImg.src = fallbackSrc;
               };
+              
+              // Set a more aggressive cache control
+              img.crossOrigin = 'anonymous';
               img.src = src;
             });
             

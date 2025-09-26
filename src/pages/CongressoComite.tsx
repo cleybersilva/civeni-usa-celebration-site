@@ -43,9 +43,10 @@ const MemberPhoto: React.FC<{ member: CommitteeMember; className?: string }> = (
       try {
         let finalUrl = member.foto_url;
         
-        // If not base64, resolve the URL
+        // If not base64, resolve the URL with cache busting
         if (!finalUrl.startsWith('data:image/')) {
-          finalUrl = resolveAssetUrl(finalUrl);
+          finalUrl = `${resolveAssetUrl(finalUrl)}?cb=${Date.now()}&r=${Math.random()}`;
+          console.log(`🔄 Loading committee image for ${member.nome}:`, finalUrl);
         }
         
         const result = await loadOptimizedImage(finalUrl, {
