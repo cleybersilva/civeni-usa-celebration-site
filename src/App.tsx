@@ -30,7 +30,7 @@ import SejaNossoParceiro from "./pages/SejaNossoParceiro";
 import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 import ApresentacaoOral from "./pages/ApresentacaoOral";
 import SessoesPoster from "./pages/SessoesPoster";
-import Manuscritos from "./pages/Manuscritos";
+import EnvioVideos from "./pages/EnvioVideos";
 import Sobre from "./pages/Sobre";
 import Eventos from "./pages/Eventos";
 import EventoDetalhes from "./pages/EventoDetalhes";
@@ -70,7 +70,7 @@ function App() {
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
                 <Route path="/sessoes-poster" element={<SessoesPoster />} />
-                <Route path="/manuscritos" element={<Manuscritos />} />
+                <Route path="/manuscritos" element={<EnvioVideos />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />
                 <Route path="/eventos/:slug" element={<EventoDetalhes />} />

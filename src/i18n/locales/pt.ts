@@ -12,7 +12,7 @@ export const ptTranslations = {
       submissionArticleConsortium: "Submissão Artigo/Consórcio",
       oralPresentation: "Apresentação Oral Lista/Template",
       posterSessions: "Sessões de Pôster",
-      manuscripts: "Manuscritos",
+      manuscripts: "Envio de Vídeos",
       thematicAreas: "Áreas Temáticas",
       events: "Eventos",
       speakers: "Palestrantes",
@@ -213,10 +213,10 @@ export const ptTranslations = {
       noContentDescription: 'As informações sobre sessões de pôster serão publicadas em breve.',
     },
     manuscripts: {
-      title: 'Manuscritos',
-      subtitle: 'Modalidade de submissão de manuscritos para o III CIVENI 2025',
+      title: 'Envio de Vídeos',
+      subtitle: 'Modalidade de envio de vídeos para o III CIVENI 2025',
       noContent: 'Conteúdo em breve',
-      noContentDescription: 'As informações sobre manuscritos serão publicadas em breve.',
+      noContentDescription: 'As informações sobre envio de vídeos serão publicadas em breve.',
     },
   },
       userRights: {

@@ -2362,6 +2362,54 @@ export type Database = {
           },
         ]
       }
+      video_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          internal_notes: string | null
+          message: string | null
+          participant_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submission_type: string
+          updated_at: string
+          video_link: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          internal_notes?: string | null
+          message?: string | null
+          participant_type: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_type: string
+          updated_at?: string
+          video_link?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          internal_notes?: string | null
+          message?: string | null
+          participant_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_type?: string
+          updated_at?: string
+          video_link?: string | null
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           created_at: string
