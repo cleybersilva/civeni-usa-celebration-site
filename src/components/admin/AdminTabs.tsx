@@ -13,6 +13,7 @@ import ScheduleManager from './ScheduleManager';
 import RegistrationManager from './RegistrationManager';
 import FinancialDashboard from './FinancialDashboard';
 import UsersManager from './UsersManager';
+import EventsManager from './EventsManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -23,7 +24,7 @@ const AdminTabs = () => {
   const hasPermission = (resource: string) => {
     if (user.user_type === 'admin_root') return true;
     if (user.user_type === 'admin') {
-      return ['banner', 'contador', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'].includes(resource);
+      return ['banner', 'contador', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'].includes(resource);
     }
     if (user.user_type === 'design') {
       return ['banner', 'palestrantes', 'videos'].includes(resource);
@@ -52,6 +53,9 @@ const AdminTabs = () => {
         )}
         {hasPermission('cronograma') && (
           <TabsTrigger value="cronograma">Cronograma</TabsTrigger>
+        )}
+        {hasPermission('eventos') && (
+          <TabsTrigger value="eventos">Eventos</TabsTrigger>
         )}
         {hasPermission('inscricoes') && (
           <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
@@ -100,6 +104,12 @@ const AdminTabs = () => {
       {hasPermission('cronograma') && (
         <TabsContent value="cronograma">
           <ScheduleManager />
+        </TabsContent>
+      )}
+
+      {hasPermission('eventos') && (
+        <TabsContent value="eventos">
+          <EventsManager />
         </TabsContent>
       )}
 
