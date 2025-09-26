@@ -209,7 +209,7 @@ const CongressoComite = () => {
                     </h2>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+                  <div className={`grid gap-8 ${key === 'coordenacao' ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto' : 'grid-cols-1 md:grid-cols-3 max-w-3xl mx-auto'}`}>
                     {committee.members.map((member) => (
                       <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
                         <CardContent className="p-0">
