@@ -7,12 +7,14 @@ import { Users, Calendar, GraduationCap, Settings, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import cleyberPhoto from '@/assets/cleyber-gomes.jpg';
 
 interface CommitteeMember {
   id: string;
   name: string;
   role?: string;
   affiliation: string;
+  photo_url?: string;
 }
 
 const CongressoComite = () => {
@@ -132,7 +134,8 @@ const CongressoComite = () => {
         {
           id: '19',
           name: 'Cleyber Gomes da Silva',
-          affiliation: 'VCCU'
+          affiliation: 'VCCU',
+          photo_url: cleyberPhoto
         }
       ]
     }
@@ -215,13 +218,21 @@ const CongressoComite = () => {
                         <CardContent className="p-0">
                           {/* Photo Section */}
                           <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
-                            <div className="w-full h-full flex items-center justify-center">
-                              <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
-                                <span className="text-3xl font-bold text-primary">
-                                  {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                </span>
+                            {member.photo_url ? (
+                              <img
+                                src={member.photo_url}
+                                alt={member.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+                                  <span className="text-3xl font-bold text-primary">
+                                    {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                  </span>
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                           
                           {/* Info Section */}
