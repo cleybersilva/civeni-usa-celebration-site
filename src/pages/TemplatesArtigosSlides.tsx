@@ -32,16 +32,14 @@ const TemplatesArtigosSlides = () => {
   const articleTemplates = [
     {
       name: 'Template em Português (Word)',
-      file: '#',
-      downloadInfo: 'Entre em contato para obter o template',
+      file: '/templates/template_em_Português-2.docx',
       type: 'docx',
       description: 'Modelo de documento para artigos acadêmicos em português',
       category: 'article'
     },
     {
       name: 'Template - English (Word)',
-      file: '#',
-      downloadInfo: 'Contact us to get the template',
+      file: '/templates/Template_-_English-2.docx',
       type: 'docx',
       description: 'Document template for academic papers in English',
       category: 'article'
@@ -51,16 +49,14 @@ const TemplatesArtigosSlides = () => {
   const slideTemplates = [
     {
       name: 'Modelo de Slides em Português (PowerPoint)',
-      file: '#',
-      downloadInfo: 'Entre em contato para obter o template',
+      file: '/templates/MODELO_DE_SLIDES_em_Português-2.ppt',
       type: 'ppt',
       description: 'Modelo de apresentação para slides em português',
       category: 'slide'
     },
     {
       name: 'Template for Slides (PowerPoint)',
-      file: '#',
-      downloadInfo: 'Contact us to get the template',
+      file: '/templates/TEMPLATE_FOR_SLIDES-2.pptx',
       type: 'pptx',
       description: 'Presentation template for slides in English',
       category: 'slide'
@@ -246,37 +242,26 @@ const TemplatesArtigosSlides = () => {
           {template.description}
         </p>
         
-        {template.file === '#' ? (
-          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-sm text-orange-800 font-medium mb-2">
-              📋 Template em preparação
-            </p>
-            <p className="text-xs text-orange-700">
-              {template.downloadInfo}
-            </p>
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <a
-              href={template.file}
-              download
-              className="flex-1 bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 font-medium"
-            >
-              <Download className="h-4 w-4" />
-              Download
-            </a>
-            
-            <a
-              href={getPreviewUrl(template.file)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2.5 border-2 border-civeni-blue text-civeni-blue rounded-lg hover:bg-civeni-blue hover:text-white transition-all duration-300 flex items-center gap-2 font-medium"
-            >
-              <Eye className="h-4 w-4" />
-              Visualizar
-            </a>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <a
+            href={template.file}
+            download
+            className="flex-1 bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 font-medium"
+          >
+            <Download className="h-4 w-4" />
+            Download
+          </a>
+          
+          <a
+            href={getPreviewUrl(template.file)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2.5 border-2 border-civeni-blue text-civeni-blue rounded-lg hover:bg-civeni-blue hover:text-white transition-all duration-300 flex items-center gap-2 font-medium"
+          >
+            <Eye className="h-4 w-4" />
+            Visualizar
+          </a>
+        </div>
         
         <div className="p-3 bg-gradient-to-r from-blue-50 to-red-50 rounded-lg border border-blue-100">
           <div className="flex items-center gap-2">
