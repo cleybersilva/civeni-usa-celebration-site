@@ -275,20 +275,14 @@ const Eventos = () => {
                             </Button>
                           </Link>
                           
-                          <Link to={`/programacao-presencial`}>
-                            <Button variant="outline" size="default">
-                              <Calendar className="h-4 w-4 mr-2" />
-                              Ver Programação
-                            </Button>
-                          </Link>
-                          
-                          {/* Temporariamente mostrando para todos os eventos para teste */}
-                          <Link to={`/eventos/${event.slug}/certificado`}>
-                            <Button variant="outline" size="default">
-                              <Award className="h-4 w-4 mr-2" />
-                              Certificado
-                            </Button>
-                          </Link>
+                          {eventCertificates[event.id] && (
+                            <Link to={`/eventos/${event.slug}/certificado`}>
+                              <Button variant="outline" size="default">
+                                <Award className="h-4 w-4 mr-2" />
+                                Certificado
+                              </Button>
+                            </Link>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -346,20 +340,14 @@ const Eventos = () => {
                           </Button>
                         </Link>
                         
-                        <Link to={`/programacao-presencial`}>
-                          <Button variant="outline" size="default">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Ver Programação
-                          </Button>
-                        </Link>
-                        
-                        {/* Temporariamente mostrando para todos os eventos para teste */}
-                        <Link to={`/eventos/${event.slug}/certificado`}>
-                          <Button variant="outline" size="default">
-                            <Award className="h-4 w-4 mr-2" />
-                            Certificado
-                          </Button>
-                        </Link>
+                        {eventCertificates[event.id] && (
+                          <Link to={`/eventos/${event.slug}/certificado`}>
+                            <Button variant="outline" size="default">
+                              <Award className="h-4 w-4 mr-2" />
+                              Certificado
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
