@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,8 @@ import Footer from '@/components/Footer';
 import { useCongressoComiteByCategory } from '@/hooks/useCongressoComite';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryClient } from '@tanstack/react-query';
+import { resolveAssetUrl } from '@/utils/assetUrl';
+import { loadOptimizedImage, createInitials } from '@/utils/imageOptimization';
 
 interface CommitteeMember {
   id: string;
@@ -21,6 +23,123 @@ interface CommitteeMember {
   ordem: number;
   is_active: boolean;
 }
+
+const MemberPhoto: React.FC<{ member: CommitteeMember; className?: string }> = ({ member, className }) => {
+  const [imageState, setImageState] = useState<'loading' | 'success' | 'error'>('loading');
+  const [imageSrc, setImageSrc] = useState<string>('');
+  const [loadProgress, setLoadProgress] = useState(0);
+  
+  useEffect(() => {
+    if (!member.foto_url) {
+      setImageState('error');
+      return;
+    }
+
+    const loadImage = async () => {
+      setImageState('loading');
+      setImageSrc('');
+      setLoadProgress(0);
+      
+      try {
+        let finalUrl = member.foto_url;
+        
+        // If not base64, resolve the URL
+        if (!finalUrl.startsWith('data:image/')) {
+          finalUrl = resolveAssetUrl(finalUrl);
+        }
+        
+        const result = await loadOptimizedImage(finalUrl, {
+          timeout: 15000, // 15 second timeout
+          onProgress: setLoadProgress
+        });
+        
+        if (result.success) {
+          console.log(`✅ Successfully loaded image for ${member.nome}${result.size ? ` (${result.size}KB)` : ''}`);
+          setImageSrc(result.src);
+          setImageState('success');
+        } else {
+          console.error(`❌ Failed to load image for ${member.nome}:`, result.error);
+          setImageState('error');
+        }
+      } catch (error) {
+        console.error(`❌ Unexpected error loading image for ${member.nome}:`, error);
+        setImageState('error');
+      }
+    };
+
+    loadImage();
+  }, [member.foto_url, member.nome]);
+  
+  // Loading state with progress
+  if (imageState === 'loading') {
+    return (
+      <div className={`${className} bg-primary/10 flex items-center justify-center relative overflow-hidden`}>
+        <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center relative">
+          {/* Progress ring */}
+          <svg className="w-20 h-20 absolute" viewBox="0 0 42 42">
+            <circle
+              cx="21"
+              cy="21"
+              r="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="text-primary/30"
+            />
+            <circle
+              cx="21"
+              cy="21"
+              r="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeDasharray="113"
+              strokeDashoffset={113 - (loadProgress / 100) * 113}
+              className="text-primary transition-all duration-300"
+              transform="rotate(-90 21 21)"
+            />
+          </svg>
+          <span className="text-sm font-bold text-primary z-10">
+            {Math.round(loadProgress)}%
+          </span>
+        </div>
+        <div className="absolute bottom-1 left-1 right-1 text-center">
+          <div className="text-xs text-primary/70 font-medium">Carregando...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state or no image - show placeholder
+  if (imageState === 'error' || !imageSrc) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-primary/10">
+        <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+          <span className="text-3xl font-bold text-primary">
+            {createInitials(member.nome)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Success state - show the image
+  return (
+    <img
+      src={imageSrc}
+      alt={member.nome}
+      className={className}
+      loading="lazy"
+      onLoad={() => {
+        console.log(`🖼️ Image rendered successfully for ${member.nome}`);
+      }}
+      onError={(e) => {
+        console.error(`❌ Image render failed for ${member.nome}`);
+        setImageState('error');
+      }}
+    />
+  );
+};
 
 const CongressoComite = () => {
   const { t } = useTranslation();
@@ -159,25 +278,10 @@ const CongressoComite = () => {
                           <CardContent className="p-0">
                             {/* Photo Section */}
                             <div className="relative aspect-square overflow-hidden bg-primary">
-                              {member.foto_url ? (
-                                <img
-                                  src={member.foto_url}
-                                  alt={member.nome}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                  onError={(e) => {
-                                    console.error('Error loading image:', member.foto_url);
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.nextElementSibling?.setAttribute('style', 'display: flex');
-                                  }}
-                                />
-                              ) : null}
-                              <div className={`w-full h-full flex items-center justify-center ${member.foto_url ? 'hidden' : ''}`}>
-                                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
-                                  <span className="text-3xl font-bold text-primary">
-                                    {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                  </span>
-                                </div>
-                              </div>
+                              <MemberPhoto 
+                                member={member} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
                             </div>
                             
                             {/* Info Section */}

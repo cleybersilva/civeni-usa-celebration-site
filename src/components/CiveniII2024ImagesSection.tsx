@@ -118,55 +118,57 @@ const CiveniII2024ImagesSection = () => {
                       loading="lazy"
                       onError={(e) => {
                         console.warn('Failed to load CIVENI image:', image.url);
-                        // Try alternative paths for cPanel
+                        const target = e.currentTarget;
+                        
+                        // Tentar URLs alternativas mais robustas
                         const fallbackPaths = [
-                          `./public/${image.url.replace(/^\/+/, '')}`,
-                          `public/${image.url.replace(/^\/+/, '')}`,
-                          image.url
+                          image.url.replace(/\.(jpg|jpeg|png|webp)$/i, '.jpg'),
+                          image.url.replace(/\.(jpg|jpeg|png|webp)$/i, '.png'),
+                          image.url.replace(/\.(jpg|jpeg|png|webp)$/i, '.webp'),
+                          '/assets/civeni-placeholder.jpg',
+                          'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&h=600&q=80'
                         ];
                         
                         let pathIndex = 0;
+                        
                         const tryNextPath = () => {
                           if (pathIndex < fallbackPaths.length) {
                             const testImg = new Image();
                             testImg.onload = () => {
-                              (e.currentTarget as HTMLImageElement).src = resolveAssetUrl(fallbackPaths[pathIndex]);
+                              target.src = resolveAssetUrl(fallbackPaths[pathIndex]);
                             };
                             testImg.onerror = () => {
                               pathIndex++;
                               if (pathIndex < fallbackPaths.length) {
-                                tryNextPath();
+                                setTimeout(tryNextPath, 100);
                               } else {
-                                // Create fallback using safe DOM methods
+                                // Criar placeholder visual mais elegante
                                 const fallback = document.createElement('div');
-                                fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-blue-600 text-white';
+                                fallback.className = 'w-full h-64 md:h-96 lg:h-[500px] flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-red text-white';
                                 
                                 const container = document.createElement('div');
                                 container.className = 'text-center p-8';
                                 
                                 const icon = document.createElement('div');
                                 icon.className = 'text-6xl mb-4';
-                                icon.textContent = '📷';
+                                icon.textContent = '📸';
                                 
-                                const title = document.createElement('h3');
-                                title.className = 'text-xl font-semibold mb-2';
-                                title.textContent = 'II CIVENI 2024';
-                                
-                                const description = document.createElement('p');
-                                description.className = 'text-sm opacity-90';
-                                description.textContent = getAltText(image);
+                                const title = document.createElement('div');
+                                title.className = 'text-xl font-semibold';
+                                title.textContent = 'Imagem CIVENI';
                                 
                                 container.appendChild(icon);
                                 container.appendChild(title);
-                                container.appendChild(description);
                                 fallback.appendChild(container);
                                 
-                                e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
+                                target.style.display = 'none';
+                                target.parentElement?.appendChild(fallback);
                               }
                             };
                             testImg.src = resolveAssetUrl(fallbackPaths[pathIndex]);
                           }
                         };
+                        
                         tryNextPath();
                       }}
                     />
