@@ -222,7 +222,7 @@ const CongressoComite = () => {
                               <img
                                 src={member.photo_url}
                                 alt={member.name}
-                                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 p-2"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
@@ -247,7 +247,7 @@ const CongressoComite = () => {
                               </p>
                             )}
                             
-                            <div className="flex items-center justify-center text-center text-sm text-muted-foreground mb-4">
+                            <div className="flex items-center text-sm text-muted-foreground mb-4">
                               <GraduationCap className="w-4 h-4 mr-2 flex-shrink-0" />
                               <span className="line-clamp-2">{member.affiliation}</span>
                             </div>
