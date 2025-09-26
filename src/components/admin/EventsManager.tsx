@@ -25,8 +25,13 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventsManager = () => {
+  console.log('=== EventsManager: Component iniciando ===');
   const { t } = useTranslation();
+  
   const { events, loading, createEvent, updateEvent, deleteEvent } = useAdminEvents();
+  console.log('=== EventsManager: Hook useAdminEvents executado com sucesso ===');
+  console.log('Events:', events, 'Loading:', loading);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [modalidadeFilter, setModalidadeFilter] = useState('all');

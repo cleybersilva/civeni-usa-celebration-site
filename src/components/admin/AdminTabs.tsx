@@ -109,7 +109,15 @@ const AdminTabs = () => {
 
       {hasPermission('eventos') && (
         <TabsContent value="eventos">
-          <EventsManager />
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold">Gerenciar Eventos</h1>
+              <p className="text-muted-foreground mt-2">
+                Teste - Esta aba está funcionando. Carregando o EventsManager...
+              </p>
+            </div>
+            <EventsManager />
+          </div>
         </TabsContent>
       )}
 
