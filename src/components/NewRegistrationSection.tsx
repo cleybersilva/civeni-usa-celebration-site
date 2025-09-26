@@ -67,7 +67,28 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
     });
   };
 
-  const selectedCategory = categories.find(cat => cat.id === formData.categoryId);
+  // Filtrar categorias baseadas no tipo de participante
+  const getFilteredCategories = () => {
+    if (!formData.participantType) return categories;
+    
+    return categories.filter(category => {
+      // Se é categoria gratuita para professor VCCU, só mostrar para professores
+      if (category.is_free && category.slug === 'professor-vccu-gratuito') {
+        return formData.participantType === 'professor';
+      }
+      
+      // Para outros tipos de participante (aluno, convidado, externo), mostrar apenas categorias pagas do lote vigente
+      if (formData.participantType !== 'professor') {
+        return !category.is_free;
+      }
+      
+      // Para professores, mostrar todas as categorias
+      return true;
+    });
+  };
+
+  const filteredCategories = getFilteredCategories();
+  const selectedCategory = filteredCategories.find(cat => cat.id === formData.categoryId);
   const isVCCUStudent = formData.participantType === 'vccu_student';
 
   return (
@@ -141,7 +162,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
 
                 <div>
                   <Label htmlFor="participantType">Tipo de Participante</Label>
-                  <Select value={formData.participantType} onValueChange={(value) => setFormData({...formData, participantType: value, cursoId: '', turmaId: ''})}>
+                  <Select value={formData.participantType} onValueChange={(value) => setFormData({...formData, participantType: value, cursoId: '', turmaId: '', categoryId: ''})}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o tipo de participante" />
                     </SelectTrigger>
@@ -165,7 +186,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       <SelectValue placeholder={t('registration.selectCategory')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {filteredCategories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           <div className="flex justify-between w-full">
                             <span>{category.title_pt}</span>
