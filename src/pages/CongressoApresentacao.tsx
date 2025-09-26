@@ -170,9 +170,9 @@ const CongressoApresentacao = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <article className="prose prose-lg prose-slate max-w-none dark:prose-invert">
-               {pageData?.content_md ? (
+               {false ? (
                 <ReactMarkdown>
-                  {pageData.content_md}
+                  {pageData?.content_md}
                 </ReactMarkdown>
                ) : (
                 <div className="space-y-12">
