@@ -175,57 +175,127 @@ const CongressoApresentacao = () => {
                   {pageData.content_md}
                 </ReactMarkdown>
                ) : (
-                <div className="space-y-8">
-                  <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-civeni-blue mb-6 font-poppins">
-                      III CIVENI - Congresso Internacional Multidisciplinar da VCCU
-                    </h2>
-                    <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-2xl p-8 mb-8">
-                      <h3 className="text-2xl font-bold text-civeni-red mb-4 font-poppins">
-                        TEMA: Saberes em Conexão: Inovação, Justiça e Humanidade na Sociedade Contemporânea
-                      </h3>
+                <div className="space-y-12">
+                  {/* Header Section with Modern Design */}
+                  <div className="text-center mb-16">
+                    <div className="inline-block bg-gradient-to-r from-civeni-blue to-civeni-red bg-clip-text text-transparent mb-6">
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-poppins leading-tight">
+                        III CIVENI
+                      </h2>
                     </div>
-                  </div>
-                  
-                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6">
-                    <p className="text-xl text-gray-800 font-medium">
-                      No contexto da sociedade contemporânea, marcada por crises globais, desigualdades persistentes e transformações tecnológicas aceleradas, torna-se urgente repensar os modos de produção e circulação do conhecimento.
-                    </p>
-                    
-                    <p>
-                      A articulação entre <strong>saberes diversos e conectados</strong> — científicos, éticos, culturais e espirituais — revela-se fundamental para promover soluções inovadoras que estejam alinhadas não apenas à eficiência, mas à <em>justiça social</em> e ao <em>cuidado com a dignidade humana</em>.
-                    </p>
-                    
-                    <div className="bg-blue-50 border-l-4 border-civeni-blue p-6 rounded-r-lg">
-                      <p className="text-civeni-blue font-semibold mb-2">Visão Transformadora:</p>
-                      <p>
-                        A inovação não pode ser compreendida apenas como avanço técnico, mas como <strong>prática situada e comprometida com o bem comum</strong>. Unir inovação, justiça e humanidade significa construir pontes entre disciplinas, setores e povos, em busca de uma sociedade mais inclusiva.
+                    <div className="max-w-4xl mx-auto mb-8">
+                      <p className="text-xl md:text-2xl text-gray-600 font-medium mb-4">
+                        Congresso Internacional Multidisciplinar da VCCU
                       </p>
                     </div>
                     
-                    <p>
-                      O III CIVENI 2025 propõe-se a ser um espaço de <strong>diálogo interdisciplinar</strong>, onde pesquisadores, educadores, profissionais e estudantes possam compartilhar experiências, debater perspectivas e construir coletivamente caminhos para uma sociedade mais justa, humana e tecnologicamente responsável.
-                    </p>
-                    
-                    <div className="grid md:grid-cols-2 gap-6 mt-8">
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl">
-                        <h4 className="font-bold text-civeni-blue mb-3 flex items-center">
-                          <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                          Objetivo Principal
-                        </h4>
-                        <p className="text-gray-700">
-                          Promover a integração de saberes para enfrentar os desafios contemporâneos com soluções inovadoras e humanizadas.
-                        </p>
+                    {/* Theme Card with Modern Styling */}
+                    <div className="relative max-w-5xl mx-auto">
+                      <div className="absolute inset-0 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-3xl blur-xl opacity-20"></div>
+                      <div className="relative bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100">
+                        <div className="flex items-center justify-center mb-6">
+                          <div className="h-1 w-16 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                          <span className="mx-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">TEMA</span>
+                          <div className="h-1 w-16 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                        </div>
+                        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 font-poppins leading-tight">
+                          Saberes em Conexão: <span className="bg-gradient-to-r from-civeni-blue to-civeni-red bg-clip-text text-transparent">Inovação, Justiça e Humanidade</span> na Sociedade Contemporânea
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Content Sections with Modern Cards */}
+                  <div className="space-y-12">
+                    {/* Introduction Card */}
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl transform rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                      <div className="relative bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100">
+                        <div className="flex items-start space-x-4 mb-6">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-civeni-blue to-civeni-red rounded-xl flex items-center justify-center">
+                            <Globe className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold text-gray-900 mb-3">Contexto Global</h4>
+                            <p className="text-lg text-gray-700 leading-relaxed">
+                              No contexto da sociedade contemporânea, marcada por <span className="font-semibold text-civeni-blue">crises globais</span>, <span className="font-semibold text-civeni-red">desigualdades persistentes</span> e <span className="font-semibold text-purple-600">transformações tecnológicas aceleradas</span>, torna-se urgente repensar os modos de produção e circulação do conhecimento.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vision Card */}
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                      <div className="relative bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100">
+                        <div className="flex items-start space-x-4 mb-6">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                            <Brain className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold text-gray-900 mb-3">Articulação de Saberes</h4>
+                            <p className="text-lg text-gray-700 leading-relaxed">
+                              A articulação entre <span className="px-3 py-1 bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-full font-semibold">saberes diversos e conectados</span> — científicos, éticos, culturais e espirituais — revela-se fundamental para promover soluções inovadoras que estejam alinhadas não apenas à eficiência, mas à <span className="font-semibold text-civeni-blue">justiça social</span> e ao <span className="font-semibold text-civeni-red">cuidado com a dignidade humana</span>.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Innovation Philosophy Card */}
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-violet-50 rounded-3xl transform rotate-1 group-hover:rotate-0 transition-transform duration-300"></div>
+                      <div className="relative bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100">
+                        <div className="text-center">
+                          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl mb-6">
+                            <Network className="w-8 h-8 text-white" />
+                          </div>
+                          <h4 className="text-2xl font-bold text-gray-900 mb-6">Visão Transformadora da Inovação</h4>
+                          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-8">
+                            <p className="text-lg text-gray-700 leading-relaxed text-left">
+                              Sob esse horizonte, a <span className="font-bold text-civeni-blue">inovação não pode ser compreendida apenas como avanço técnico</span>, mas como <span className="font-semibold text-civeni-red">prática situada e comprometida com o bem comum</span>. 
+                            </p>
+                            <div className="mt-6 p-6 bg-white rounded-xl border-l-4 border-civeni-blue">
+                              <p className="text-lg text-gray-700 leading-relaxed">
+                                Unir <span className="font-semibold text-purple-600">inovação</span>, <span className="font-semibold text-civeni-blue">justiça</span> e <span className="font-semibold text-civeni-red">humanidade</span> significa construir pontes entre disciplinas, setores e povos, em busca de uma sociedade mais inclusiva, sensível às diferenças e orientada por valores que transcendam o utilitarismo e a exclusão.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Impact Cards Grid */}
+                    <div className="grid md:grid-cols-2 gap-8 mt-12">
+                      <div className="group relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-civeni-blue rounded-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
+                        <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100 h-full">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-civeni-blue rounded-full flex items-center justify-center mr-4">
+                              <Award className="w-5 h-5 text-white" />
+                            </div>
+                            <h4 className="text-xl font-bold text-gray-900">Objetivo Principal</h4>
+                          </div>
+                          <p className="text-gray-700 leading-relaxed">
+                            Promover a <span className="font-semibold text-civeni-blue">integração de saberes</span> para enfrentar os desafios contemporâneos com soluções inovadoras e humanizadas.
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-6 rounded-xl">
-                        <h4 className="font-bold text-civeni-blue mb-3 flex items-center">
-                          <span className="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
-                          Impacto Esperado
-                        </h4>
-                        <p className="text-gray-700">
-                          Formar uma rede global de profissionais comprometidos com a transformação social através da educação e tecnologia.
-                        </p>
+                      <div className="group relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-civeni-red to-red-500 rounded-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-300"></div>
+                        <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100 h-full">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-gradient-to-br from-civeni-red to-red-500 rounded-full flex items-center justify-center mr-4">
+                              <Users className="w-5 h-5 text-white" />
+                            </div>
+                            <h4 className="text-xl font-bold text-gray-900">Impacto Esperado</h4>
+                          </div>
+                          <p className="text-gray-700 leading-relaxed">
+                            Formar uma <span className="font-semibold text-civeni-red">rede global</span> de profissionais comprometidos com a transformação social através da educação e tecnologia.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
