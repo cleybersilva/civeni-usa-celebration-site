@@ -125,17 +125,17 @@ const Eventos = () => {
                 </button>
               </Link>
               
-              <Link to="/certificado-emissao">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <Award className="w-5 h-5" />
-                  Emitir Certificado
-                </button>
-              </Link>
-              
               <Link to="/programacao-presencial">
                 <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
                   Ver Programação
+                </button>
+              </Link>
+              
+              <Link to="/certificado-emissao">
+                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  Emitir Certificado
                 </button>
               </Link>
             </div>
