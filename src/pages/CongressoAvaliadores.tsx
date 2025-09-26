@@ -1,186 +1,302 @@
 import React from 'react';
-import { useCongressoAvaliadores } from '@/hooks/useCongressoAvaliadores';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Mail, ExternalLink, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Users, Calendar, Award, BookOpen, GraduationCap, Star, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+
+interface Evaluator {
+  id: number;
+  name: string;
+  title: string;
+  institution: string;
+  imageUrl?: string;
+}
 
 const CongressoAvaliadores = () => {
   const { t } = useTranslation();
-  const { data: avaliadores, isLoading } = useCongressoAvaliadores();
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-12">
-          <div className="text-center">Carregando avaliadores...</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Agrupar por categoria
-  const avaliadoresPorCategoria = avaliadores?.reduce((acc, avaliador) => {
-    if (!acc[avaliador.categoria]) {
-      acc[avaliador.categoria] = [];
+  const evaluators: Evaluator[] = [
+    {
+      id: 1,
+      name: 'Profª. Drª. Marta Elisete Ventura da Motta',
+      title: 'Doutora em Educação',
+      institution: 'FASOL'
+    },
+    {
+      id: 2,
+      name: 'Profa. Dra. Mariane Camargo Priesnitz',
+      title: 'Doutora em Educação',
+      institution: 'UFSM/VENI'
+    },
+    {
+      id: 3,
+      name: 'Prof. Dr. Aprigio Telles Mascarenhas Neto',
+      title: 'Doutor',
+      institution: 'FASOL/VENI'
+    },
+    {
+      id: 4,
+      name: 'Prof. Dr. Margarete Luiza Alburgeri',
+      title: 'Doutor',
+      institution: 'UALGARVE'
+    },
+    {
+      id: 5,
+      name: 'Prof. Dr. Henrique Rodrigues Lelis',
+      title: 'Doutor',
+      institution: 'VCCU'
+    },
+    {
+      id: 6,
+      name: 'Prof. Dr. Mhardoquel Geraldo Lima França',
+      title: 'Doutor',
+      institution: 'VCCU'
+    },
+    {
+      id: 7,
+      name: 'Prof. Dr. Leonardo David Quintiliano',
+      title: 'Doutor',
+      institution: 'VENI'
+    },
+    {
+      id: 8,
+      name: 'Prof. Dr. Eloy Lemos Junior',
+      title: 'Doutor',
+      institution: 'VENI'
+    },
+    {
+      id: 9,
+      name: 'Prof. Dr. Ramon Olímpio',
+      title: 'Doutor',
+      institution: 'VENI'
+    },
+    {
+      id: 10,
+      name: 'Profa. Dra Vivianne de Sousa',
+      title: 'Doutora',
+      institution: 'VENI'
+    },
+    {
+      id: 11,
+      name: 'Profa. Dra Gabriela Marcolino',
+      title: 'Doutora',
+      institution: 'VENI'
+    },
+    {
+      id: 12,
+      name: 'Profa. Dra Angela Pellegrin Ansuj',
+      title: 'Doutora em Educação',
+      institution: 'UFSM'
+    },
+    {
+      id: 13,
+      name: 'Profa. Dra Angela Isabel dos Santos Dullius',
+      title: 'Doutora em Educação',
+      institution: 'UFSM'
+    },
+    {
+      id: 14,
+      name: 'Prof. Dr. Uiliam Hahn Biegelmeyer',
+      title: 'Doutor',
+      institution: 'UCS'
     }
-    acc[avaliador.categoria].push(avaliador);
-    return acc;
-  }, {} as Record<string, typeof avaliadores>) || {};
+  ];
 
-  const categoriaLabels: Record<string, string> = {
-    'coordenador_avaliacao': 'Coordenação de Avaliação',
-    'avaliador': 'Avaliadores Principais',
-    'revisor_especialista': 'Revisores Especialistas',
-    'avaliador_junior': 'Avaliadores Juniores'
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .filter(word => word.length > 2)
+      .slice(0, 2)
+      .map(word => word[0])
+      .join('');
+  };
+
+  const getGradientColor = (index: number) => {
+    const gradients = [
+      'from-blue-500 to-indigo-600',
+      'from-green-500 to-emerald-600',
+      'from-purple-500 to-violet-600',
+      'from-red-500 to-pink-600',
+      'from-orange-500 to-amber-600',
+      'from-teal-500 to-cyan-600',
+      'from-rose-500 to-pink-600',
+      'from-indigo-500 to-purple-600'
+    ];
+    return gradients[index % gradients.length];
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-            Comissão de Avaliação
-          </h1>
-          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
-            Conheça os especialistas responsáveis pela avaliação dos trabalhos submetidos ao III CIVENI
-          </p>
-        </div>
-      </div>
-
-      {/* Avaliadores Section */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="space-y-12">
-          {Object.entries(avaliadoresPorCategoria).map(([categoria, membros]) => (
-            <section key={categoria} className="space-y-8">
-              {/* Categoria Title */}
-              <div className="text-center">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  {categoriaLabels[categoria] || categoria}
-                </h2>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 mx-auto rounded-full"></div>
-              </div>
-
-              {/* Grid de Membros */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {membros?.map((avaliador) => (
-                  <Card key={avaliador.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-white/70 backdrop-blur-sm group">
-                    <CardContent className="p-6">
-                      {/* Foto e Nome */}
-                      <div className="text-center mb-4">
-                        <div className="relative mx-auto mb-4">
-                          <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center ring-4 ring-white shadow-lg group-hover:ring-blue-300 transition-all duration-300">
-                            {avaliador.foto_url ? (
-                              <img 
-                                src={avaliador.foto_url} 
-                                alt={avaliador.nome}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <User className="w-10 h-10 text-blue-400" />
-                            )}
-                          </div>
-                        </div>
-
-                        <h3 className="text-xl font-bold text-gray-800 mb-1 group-hover:text-blue-600 transition-colors">
-                          {avaliador.nome}
-                        </h3>
-                        
-                        {avaliador.cargo_pt && (
-                          <p className="text-sm font-medium text-blue-600 mb-2">
-                            {avaliador.cargo_pt}
-                          </p>
-                        )}
-
-                        <p className="text-gray-600 font-medium mb-3">
-                          {avaliador.instituicao}
-                        </p>
-
-                        {/* Categoria Badge */}
-                        <Badge variant="secondary" className="mb-3 bg-blue-100 text-blue-700 border-blue-200">
-                          {categoriaLabels[avaliador.categoria] || avaliador.categoria}
-                        </Badge>
-                      </div>
-
-                      {/* Especialidade */}
-                      {avaliador.especialidade && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Área de Especialidade:</h4>
-                          <p className="text-sm text-gray-600 leading-relaxed">
-                            {avaliador.especialidade}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Contatos */}
-                      {(avaliador.email || avaliador.curriculo_url) && (
-                        <div className="flex justify-center gap-3 pt-4 border-t border-gray-100">
-                          {avaliador.email && (
-                            <a 
-                              href={`mailto:${avaliador.email}`}
-                              className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
-                              title={`Email: ${avaliador.email}`}
-                            >
-                              <Mail className="w-4 h-4" />
-                            </a>
-                          )}
-                          {avaliador.curriculo_url && (
-                            <a 
-                              href={avaliador.curriculo_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"
-                              title="Ver currículo"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          )}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-
-        {/* Caso não tenha avaliadores */}
-        {(!avaliadores || avaliadores.length === 0) && (
-          <div className="text-center py-16">
-            <div className="bg-white/70 backdrop-blur-sm rounded-lg p-8 max-w-md mx-auto">
-              <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                Comissão em Formação
-              </h3>
-              <p className="text-gray-600">
-                A comissão de avaliação está sendo formada. Em breve divulgaremos a lista completa dos avaliadores.
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="container mx-auto px-4 relative z-10">
+            {/* Breadcrumbs */}
+            <nav className="mb-8 text-sm">
+              <ol className="flex items-center space-x-2">
+                <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+                <li className="text-blue-200">›</li>
+                <li><Link to="/congresso/apresentacao" className="hover:text-blue-200 transition-colors">Congresso</Link></li>
+                <li className="text-blue-200">›</li>
+                <li>Avaliadores</li>
+              </ol>
+            </nav>
+            
+            <div className="text-center max-w-4xl mx-auto">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+                Avaliadores do III CIVENI 2025
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+                Conheça nossos renomados avaliadores acadêmicos que garantem a excelência e qualidade científica do Congresso Internacional Multidisciplinar
               </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/submissao-trabalhos">
+                  <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    Submeter Trabalho
+                  </button>
+                </Link>
+                
+                <Link to="/inscricoes">
+                  <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Fazer Inscrição
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
-        )}
+        </section>
 
-        {/* Informações Adicionais */}
-        <div className="mt-16 bg-white/70 backdrop-blur-sm rounded-lg p-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Sobre o Processo de Avaliação
+        {/* About Evaluation Section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-civeni-blue mb-6 font-poppins">
+                Excelência na Avaliação Científica
+              </h2>
+              <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-2xl p-8 mb-8">
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  Nosso corpo de avaliadores é composto por <strong>doutores renomados</strong> de instituições nacionais e internacionais, 
+                  garantindo que todos os trabalhos submetidos ao III CIVENI 2025 sejam avaliados com o mais alto rigor científico 
+                  e acadêmico, seguindo os padrões internacionais de pesquisa.
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                <Card className="border-0 bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Award className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-civeni-blue mb-2">Rigor Científico</h3>
+                    <p className="text-gray-600">Avaliação baseada em critérios internacionais de qualidade acadêmica</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-0 bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <GraduationCap className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-civeni-blue mb-2">Expertise Multidisciplinar</h3>
+                    <p className="text-gray-600">Doutores especializados em diversas áreas do conhecimento</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-0 bg-gradient-to-br from-purple-50 to-violet-50 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Star className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-civeni-blue mb-2">Reconhecimento Internacional</h3>
+                    <p className="text-gray-600">Avaliadores de instituições nacionais e internacionais renomadas</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Evaluators Grid Section */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl lg:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
+                Nossos Avaliadores
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Conheça os doutores que compõem nosso renomado corpo de avaliadores acadêmicos
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+              {evaluators.map((evaluator, index) => (
+                <Card key={evaluator.id} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-white relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <CardContent className="p-6 text-center relative z-10">
+                    <div className={`w-20 h-20 bg-gradient-to-br ${getGradientColor(index)} rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                      <span className="text-white font-bold text-lg">
+                        {getInitials(evaluator.name)}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 font-poppins group-hover:text-civeni-blue transition-colors leading-tight">
+                      {evaluator.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2 font-medium">
+                      {evaluator.title}
+                    </p>
+                    <p className="text-sm text-civeni-blue font-semibold">
+                      {evaluator.institution}
+                    </p>
+                    <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-3">
+                      <Star className="w-4 h-4 mr-1" />
+                      Avaliador
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-r from-civeni-blue via-civeni-blue to-civeni-red relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 font-poppins">
+              Submeta Seu Trabalho
             </h2>
-            <div className="max-w-4xl mx-auto text-gray-600 space-y-4">
-              <p>
-                A comissão de avaliação do III CIVENI é composta por especialistas renomados de diversas áreas do conhecimento, 
-                garantindo uma avaliação criteriosa e multidisciplinar dos trabalhos submetidos.
-              </p>
-              <p>
-                Todos os trabalhos são avaliados de forma duplo-cega (double-blind review), assegurando a imparcialidade 
-                e qualidade do processo de seleção.
-              </p>
+            <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Tenha seu trabalho avaliado por nosso renomado corpo de doutores e faça parte do maior congresso internacional multidisciplinar do mundo
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
+                <Link to="/submissao-trabalhos" className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Submeter Trabalho
+                </Link>
+              </Button>
+              
+              <Button asChild size="lg" className="bg-transparent text-white hover:bg-white hover:text-civeni-blue border-2 border-white px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
+                <Link to="/inscricoes" className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </Link>
+              </Button>
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
