@@ -40,7 +40,7 @@ const AdminTabs = () => {
   const canViewUsuarios = user.user_type === 'admin_root' || user.is_admin_root;
 
   return (
-    <Tabs defaultValue={canViewFinanceiro ? "financeiro" : hasPermission('banner') ? "banner" : canViewUsuarios ? "usuarios" : "palestrantes"} className="w-full">
+    <Tabs defaultValue="eventos" className="w-full">
       <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
         {canViewFinanceiro && (
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
@@ -54,9 +54,7 @@ const AdminTabs = () => {
         {hasPermission('cronograma') && (
           <TabsTrigger value="cronograma">Cronograma</TabsTrigger>
         )}
-        {hasPermission('eventos') && (
-          <TabsTrigger value="eventos">Eventos</TabsTrigger>
-        )}
+        <TabsTrigger value="eventos">Eventos</TabsTrigger>
         {hasPermission('inscricoes') && (
           <TabsTrigger value="inscricoes">Inscrições</TabsTrigger>
         )}
@@ -107,11 +105,9 @@ const AdminTabs = () => {
         </TabsContent>
       )}
 
-      {hasPermission('eventos') && (
-        <TabsContent value="eventos">
-          <SimpleEventsManager />
-        </TabsContent>
-      )}
+      <TabsContent value="eventos">
+        <SimpleEventsManager />
+      </TabsContent>
 
       {hasPermission('inscricoes') && (
         <TabsContent value="inscricoes">
