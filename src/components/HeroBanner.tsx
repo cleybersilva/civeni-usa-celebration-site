@@ -43,7 +43,9 @@ const HeroBanner = () => {
         if (preloadContainer) {
           slides.forEach(slide => {
             const timestamp = slide.updatedAt ? new Date(slide.updatedAt).getTime() : Date.now();
-            const src = `${resolveAssetUrl(slide.bgImage)}?v=${timestamp}`;
+            const src = slide.bgImage.includes('supabase.co') || slide.bgImage.startsWith('http')
+              ? `${slide.bgImage}?v=${timestamp}`
+              : `${resolveAssetUrl(slide.bgImage)}?v=${timestamp}`;
             
             const link = document.createElement('link');
             link.rel = 'preload';
@@ -59,11 +61,19 @@ const HeroBanner = () => {
             const imageVersion = slide.imageVersion || 1;
             const timestamp = slide.updatedAt ? new Date(slide.updatedAt).getTime() : Date.now();
             const cacheBuster = `${timestamp}_${Math.random().toString(36).substring(2)}`;
-            let src = `${resolveAssetUrl(slide.bgImage)}?v=${imageVersion}&t=${cacheBuster}`;
+            
+            // Handle Supabase URLs vs local assets correctly
+            let src: string;
+            if (slide.bgImage.includes('supabase.co') || slide.bgImage.startsWith('http')) {
+              // For Supabase URLs, use directly with cache busting
+              src = `${slide.bgImage}?v=${imageVersion}&t=${cacheBuster}`;
+            } else {
+              // For local assets, use resolveAssetUrl
+              src = `${resolveAssetUrl(slide.bgImage)}?v=${imageVersion}&t=${cacheBuster}`;
+            }
             
             // Clear browser cache for this specific image
             await imageCacheManager.clearImageCache(slide.bgImage);
-            await imageCacheManager.clearImageCache(resolveAssetUrl(slide.bgImage));
             
             // Preload and decode the image with retry mechanism
             await new Promise<void>((resolve, reject) => {
@@ -76,7 +86,9 @@ const HeroBanner = () => {
               
               img.onerror = () => {
                 // Fallback: try without cache busting
-                const fallbackSrc = resolveAssetUrl(slide.bgImage);
+                const fallbackSrc = slide.bgImage.includes('supabase.co') || slide.bgImage.startsWith('http') 
+                  ? slide.bgImage 
+                  : resolveAssetUrl(slide.bgImage);
                 console.warn(`⚠️ Failed to load banner with cache buster, trying fallback:`, src, '->', fallbackSrc);
                 
                 const fallbackImg = new Image();
@@ -117,7 +129,9 @@ const HeroBanner = () => {
         if (mounted) {
           const fallbackSlides = slides.map(slide => ({
             ...slide,
-            src: `${resolveAssetUrl(slide.bgImage)}?v=${slide.imageVersion || 1}`,
+            src: slide.bgImage.includes('supabase.co') || slide.bgImage.startsWith('http')
+              ? `${slide.bgImage}?v=${slide.imageVersion || 1}`
+              : `${resolveAssetUrl(slide.bgImage)}?v=${slide.imageVersion || 1}`,
             preloaded: false
           }));
           setPreloadedSlides(fallbackSlides);
