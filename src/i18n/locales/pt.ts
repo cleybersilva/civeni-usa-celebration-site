@@ -10,7 +10,7 @@ export const ptTranslations = {
       papers: "Trabalhos",
       submission: "Submissão",
       submissionArticleConsortium: "Submissão Artigo/Consórcio",
-      oralPresentation: "Apresentação Oral",
+      oralPresentation: "Apresentação Oral/Lista",
       posterSessions: "Sessões de Pôster",
       manuscripts: "Manuscritos",
       thematicAreas: "Áreas Temáticas",
@@ -201,7 +201,7 @@ export const ptTranslations = {
   },
   works: {
     oral: {
-      title: 'Apresentação Oral',
+      title: 'Apresentação Oral/Lista',
       subtitle: 'Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025',
       noContent: 'Conteúdo em breve',
       noContentDescription: 'As informações sobre apresentação oral serão publicadas em breve.',
@@ -410,7 +410,7 @@ export const ptTranslations = {
       works: {
         title: "Trabalhos",
         description: "Gerencie conteúdos de trabalhos acadêmicos",
-        oralPresentation: "Apresentação Oral",
+        oralPresentation: "Apresentação Oral/Lista",
         posterSessions: "Sessões de Pôster",
         manuscripts: "Manuscritos"
       }
