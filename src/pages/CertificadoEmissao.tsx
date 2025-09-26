@@ -198,7 +198,14 @@ const CertificadoEmissao = () => {
               </div>
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Conheça nossos próximos eventos</span>
+                <span>Conheça nossos{' '}
+                  <button 
+                    onClick={() => navigate('/eventos')} 
+                    className="font-bold underline hover:text-white transition-colors cursor-pointer"
+                  >
+                    próximos eventos
+                  </button>
+                </span>
               </div>
             </div>
 
@@ -232,14 +239,14 @@ const CertificadoEmissao = () => {
                  </div>
                </div>
                
-               {/* Botão Voltar para Eventos */}
+               {/* Botão Voltar para a Home */}
                <div className="mt-8 text-center">
                  <Button
-                   onClick={() => navigate('/eventos')}
+                   onClick={() => navigate('/')}
                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white"
                  >
                    <ArrowLeft className="h-4 w-4 mr-2" />
-                   Voltar para Eventos
+                   Voltar para a Home
                  </Button>
                </div>
              </div>
