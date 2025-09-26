@@ -158,7 +158,7 @@ const CongressoComite = () => {
                         <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
                           <CardContent className="p-0">
                             {/* Photo Section */}
-                            <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
+                            <div className="relative aspect-square overflow-hidden bg-white">
                               {member.foto_url ? (
                                 <img
                                   src={member.foto_url}
