@@ -362,7 +362,7 @@ const CertificadoEmissao = () => {
                     </div>
                   )}
 
-                  {/* Botão Principal */}
+                   {/* Botão Principal */}
                   <Button
                     type="submit"
                     disabled={!isFormValid() || loading}
@@ -379,6 +379,18 @@ const CertificadoEmissao = () => {
                   </Button>
                   
                 </form>
+                
+                {/* Botão para voltar aos eventos */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <Button
+                    type="button"
+                    onClick={() => navigate('/eventos')}
+                    variant="outline"
+                    className="w-full border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white"
+                  >
+                    Voltar para Eventos
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
