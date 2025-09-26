@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, CheckCircle, XCircle, Download } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Download, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import civeniLogo from '@/assets/civeni-2025-logo.png';
@@ -17,7 +17,7 @@ const CertificadoEmissao = () => {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
-    keywords: ['', '', '', '', '']
+    keywords: ['', '', '']
   });
 
   const [loading, setLoading] = useState(false);
@@ -229,9 +229,21 @@ const CertificadoEmissao = () => {
                     <div className="w-12 h-12 bg-civeni-blue/10 rounded"></div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+                 </div>
+               </div>
+               
+               {/* Botão Voltar para Eventos */}
+               <div className="mt-8 text-center">
+                 <Button
+                   onClick={() => navigate('/eventos')}
+                   variant="outline"
+                   className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 backdrop-blur-sm"
+                 >
+                   <ArrowLeft className="h-4 w-4 mr-2" />
+                   Voltar para Eventos
+                 </Button>
+               </div>
+             </div>
 
           {/* Coluna Direita - Formulário */}
           <div className="flex justify-center">
@@ -290,14 +302,14 @@ const CertificadoEmissao = () => {
                   <div className="bg-civeni-blue/5 p-4 rounded-lg space-y-4 border border-civeni-blue/20">
                     <div>
                       <h3 className="font-semibold text-civeni-blue mb-1">Confirmação de Presença</h3>
-                      <p className="text-xs text-civeni-blue/80 mb-3">
-                        Digite as{' '}
-                        <span className="font-medium">palavras-chave informadas</span>{' '}
-                        durante o evento.
-                      </p>
-                      <p className="text-xs text-civeni-blue font-medium">
-                        Atenção: É necessário acertar pelo menos 4 de 5 palavras.
-                      </p>
+                       <p className="text-xs text-civeni-blue/80 mb-3">
+                         Digite as{' '}
+                         <span className="font-medium">palavras-chave informadas</span>{' '}
+                         durante o evento.
+                       </p>
+                       <p className="text-xs text-civeni-blue font-medium">
+                         Atenção: É necessário acertar pelo menos 2 de 3 palavras.
+                       </p>
                     </div>
                     
                     <div className="space-y-3">
@@ -334,12 +346,12 @@ const CertificadoEmissao = () => {
                         </span>
                       </div>
                       
-                      {!result.success && typeof result.matched === 'number' && (
-                        <p className="text-xs text-red-600 mt-2">
-                          Você acertou {result.matched}/5 palavras-chave. 
-                          Mínimo necessário: {event.event_certificates?.required_correct || 4}/5.
-                        </p>
-                      )}
+                       {!result.success && typeof result.matched === 'number' && (
+                         <p className="text-xs text-red-600 mt-2">
+                           Você acertou {result.matched}/3 palavras-chave. 
+                           Mínimo necessário: {event.event_certificates?.required_correct || 2}/3.
+                         </p>
+                       )}
                       
                       {result.success && result.pdfUrl && (
                         <div className="mt-3">
