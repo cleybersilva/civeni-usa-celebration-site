@@ -27,7 +27,6 @@ import Inscricoes from "./pages/Inscricoes";
 import PoliticasPrivacidade from "./pages/PoliticasPrivacidade";
 import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
 import SejaNossoParceiro from "./pages/SejaNossoParceiro";
-import TemplatesArtigosSlides from "./pages/TemplatesArtigosSlides";
 import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 import ApresentacaoOral from "./pages/ApresentacaoOral";
 import SessoesPoster from "./pages/SessoesPoster";
@@ -72,8 +71,6 @@ function App() {
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
                 <Route path="/sessoes-poster" element={<SessoesPoster />} />
                 <Route path="/manuscritos" element={<EnvioVideos />} />
-                <Route path="/envio-videos" element={<EnvioVideos />} />
-                <Route path="/templates-artigos-slides" element={<TemplatesArtigosSlides />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />
                 <Route path="/eventos/:slug" element={<EventoDetalhes />} />
