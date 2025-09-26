@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle, Award, Calendar, User, FileText, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+interface CertificateVerification {
+  id: string;
+  full_name: string;
+  event_slug: string;
+  issued_at: string;
+  is_valid: boolean;
+  keywords_matched: number;
+  issuer_name: string;
+  issuer_role: string;
+  hours: string;
+  city: string;
+  country: string;
+}
 
 const VerificarCertificado = () => {
   const { code } = useParams();
