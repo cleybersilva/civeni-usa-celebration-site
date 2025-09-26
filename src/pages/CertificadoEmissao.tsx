@@ -148,7 +148,7 @@ const CertificadoEmissao = () => {
 
   if (eventLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-blue/80">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-red">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
@@ -156,14 +156,14 @@ const CertificadoEmissao = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-blue/80">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-red">
         <Card className="p-8 text-center">
           <XCircle className="h-16 w-16 text-civeni-red mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Evento não encontrado</h2>
           <p className="text-muted-foreground mb-4">
             O evento solicitado não foi encontrado ou não possui certificados habilitados.
           </p>
-          <Button onClick={() => navigate('/eventos')} className="bg-civeni-blue hover:bg-civeni-blue/90">
+          <Button onClick={() => navigate('/eventos')} className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white">
             Voltar para Eventos
           </Button>
         </Card>
@@ -172,7 +172,7 @@ const CertificadoEmissao = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue/80">
+    <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red">
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           
@@ -236,7 +236,7 @@ const CertificadoEmissao = () => {
           {/* Coluna Direita - Formulário */}
           <div className="flex justify-center">
             <Card className="w-full max-w-md bg-white shadow-2xl">
-              <CardHeader className="bg-civeni-blue text-white rounded-t-lg">
+              <CardHeader className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white rounded-t-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Emita seu certificado</CardTitle>
@@ -346,7 +346,7 @@ const CertificadoEmissao = () => {
                           <Button
                             type="button"
                             onClick={() => window.open(result.pdfUrl, '_blank')}
-                            className="w-full bg-civeni-green hover:bg-civeni-green/90"
+                            className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white"
                             size="sm"
                           >
                             <Download className="h-4 w-4 mr-2" />
@@ -366,7 +366,7 @@ const CertificadoEmissao = () => {
                   <Button
                     type="submit"
                     disabled={!isFormValid() || loading}
-                    className="w-full bg-civeni-blue hover:bg-civeni-blue/90 text-white font-bold py-3 text-lg"
+                    className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white font-bold py-3 text-lg"
                   >
                     {loading ? (
                       <>
