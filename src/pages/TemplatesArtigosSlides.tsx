@@ -126,16 +126,28 @@ const TemplatesArtigosSlides = () => {
                   <h3 className="font-semibold">{title || item.file_name}</h3>
                   {content && <p className="text-sm text-muted-foreground">{content}</p>}
                 </div>
-                {item.file_url && (
-                  <a
-                    href={item.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                  >
-                    {t('common.download', 'Download')}
-                  </a>
-                )}
+                <div className="flex gap-2">
+                  {item.file_url && (
+                    <a
+                      href={item.file_url}
+                      download
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                    >
+                      {t('common.download', 'Download')}
+                    </a>
+                  )}
+                  {item.file_url && (
+                    <a
+                      href={item.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
+                    >
+                      <Eye className="h-4 w-4 inline mr-1" />
+                      Visualizar
+                    </a>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -225,13 +237,15 @@ const TemplatesArtigosSlides = () => {
             Download
           </a>
           
-          <button
-            onClick={() => window.open(template.file, '_blank')}
+          <a
+            href={template.file}
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-4 py-2.5 border-2 border-civeni-blue text-civeni-blue rounded-lg hover:bg-civeni-blue hover:text-white transition-all duration-300 flex items-center gap-2 font-medium"
           >
             <Eye className="h-4 w-4" />
-            Preview
-          </button>
+            Visualizar
+          </a>
         </div>
         
         <div className="p-3 bg-gradient-to-r from-blue-50 to-red-50 rounded-lg border border-blue-100">
