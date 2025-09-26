@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Award, Download, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const CertificadoEmissao = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -22,6 +20,7 @@ const CertificadoEmissao = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [eventLoading, setEventLoading] = useState(true);
   const [result, setResult] = useState<{
     success: boolean;
     message: string;
@@ -32,9 +31,8 @@ const CertificadoEmissao = () => {
 
   const [event, setEvent] = useState<any>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const loadEvent = async () => {
-      // Se não há slug, usar um evento padrão (III CIVENI 2025)
       const eventSlug = slug || 'iii-civeni-2025';
       
       const { data, error } = await supabase
@@ -44,6 +42,7 @@ const CertificadoEmissao = () => {
           event_certificates (
             is_enabled,
             required_correct,
+            keywords,
             issuer_name,
             hours,
             city,
@@ -54,41 +53,32 @@ const CertificadoEmissao = () => {
         .eq('status_publicacao', 'published')
         .single();
 
-      if (error) {
+      if (error || !data) {
         toast({
           variant: "destructive",
           title: "Erro",
-          description: "Evento não encontrado"
+          description: "Evento não encontrado ou certificados não habilitados"
         });
-        if (!slug) {
-          // Se não tinha slug específico, não redireciona
-          console.error('Erro ao carregar evento padrão:', error);
-        } else {
-          navigate('/eventos');
-        }
+        setEventLoading(false);
         return;
       }
 
-      if (!data.event_certificates?.is_enabled) {
+      if (!data.event_certificates || !data.event_certificates.is_enabled) {
         toast({
           variant: "destructive", 
           title: "Erro",
           description: "Este evento não possui certificados habilitados"
         });
-        if (!slug) {
-          // Se não tinha slug específico, não redireciona
-          console.error('Certificados não habilitados para evento padrão');
-        } else {
-          navigate('/eventos');
-        }
+        setEventLoading(false);
         return;
       }
 
       setEvent(data);
+      setEventLoading(false);
     };
 
     loadEvent();
-  }, [slug, navigate, toast]);
+  }, [slug, toast]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -155,203 +145,237 @@ const CertificadoEmissao = () => {
            formData.keywords.every(kw => kw.trim().length > 0);
   };
 
+  if (eventLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      </div>
+    );
+  }
+
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+        <Card className="p-8 text-center">
+          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Evento não encontrado</h2>
+          <p className="text-muted-foreground mb-4">
+            O evento solicitado não foi encontrado ou não possui certificados habilitados.
+          </p>
+          <Button onClick={() => navigate('/eventos')}>
+            Voltar para Eventos
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
           
-          {/* Coluna Esquerda */}
-          <div className="space-y-8">
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl font-bold text-primary mb-4">
-                🎉 Parabéns por ter chegado ao final do evento!
+          {/* Coluna Esquerda - Conteúdo Congratulatório */}
+          <div className="text-white space-y-8">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+                Parabéns por ter chegado ao final do evento!
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Agora você pode emitir seu certificado de participação
+              <p className="text-xl text-blue-100 mb-8">
+                Agora é hora de emitir seu certificado!
               </p>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Award className="h-6 w-6 text-primary" />
-                <span>Compartilhe sua conquista no LinkedIn</span>
+              <div className="flex items-center space-x-3 text-blue-100">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span>Compartilhe no LinkedIn</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-                <span>Fique atento às próximas turmas e eventos</span>
+              <div className="flex items-center space-x-3 text-blue-100">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span>Siga a Tíexames nas redes</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <Download className="h-6 w-6 text-blue-600" />
-                <span>Baixe seu certificado em alta qualidade</span>
+              <div className="flex items-center space-x-3 text-blue-100">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span>Conheça nossas próximas turmas abertas</span>
               </div>
             </div>
 
             {/* Mock do Certificado */}
-            <Card className="p-6 bg-gradient-to-r from-primary/5 to-secondary/5">
-              <div className="aspect-[4/3] bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between">
+            <div className="mt-12">
+              <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md mx-auto transform -rotate-2 hover:rotate-0 transition-transform duration-300">
                 <div className="text-center">
-                  <div className="text-sm font-semibold text-primary mb-2">CERTIFICADO</div>
-                  <div className="text-xs text-muted-foreground">{event.slug}</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="text-xs mb-2">Certificamos que</div>
-                  <div className="font-bold text-sm">[SEU NOME AQUI]</div>
-                  <div className="text-xs mt-2">participou do evento</div>
-                  <div className="font-semibold text-xs">{event.slug}</div>
-                </div>
-                
-                <div className="flex justify-between items-end">
-                  <div className="text-xs text-center">
-                    <div className="w-16 h-4 bg-muted rounded mb-1"></div>
-                    <div>Assinatura</div>
-                  </div>
-                  <div className="w-8 h-8 bg-muted rounded"></div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Coluna Direita */}
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="text-2xl">Emita seu certificado</CardTitle>
-              <p className="text-muted-foreground">{event.slug}</p>
-            </CardHeader>
-            
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail cadastrado no evento *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-
-                {/* Nome Completo */}
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">
-                    Nome completo * 
-                    <span className="text-sm text-muted-foreground">
-                      ({formData.fullName.length}/50)
-                    </span>
-                  </Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    placeholder="Nome que aparecerá no certificado"
-                    maxLength={50}
-                    required
-                  />
-                </div>
-
-                {/* Palavras-chave */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold mb-2">Confirmação de Presença</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Digite as palavras-chave informadas durante o evento. 
-                      É necessário acertar pelo menos {event.event_certificates?.required_correct || 4} de 5 para emitir o certificado.
-                    </p>
+                  <div className="text-blue-600 font-bold text-lg mb-2">TI exames</div>
+                  <div className="text-sm text-gray-600 mb-4">CERTIFICADO DE PARTICIPAÇÃO</div>
+                  <div className="text-xs text-gray-500 mb-6">{event.slug}</div>
+                  
+                  <div className="border-t border-b border-gray-200 py-4 mb-4">
+                    <div className="text-xs text-gray-600 mb-1">Certificamos que</div>
+                    <div className="font-bold text-gray-800">[SEU NOME AQUI]</div>
+                    <div className="text-xs text-gray-600 mt-1">participou do evento</div>
                   </div>
                   
-                  <div className="grid grid-cols-1 gap-3">
-                    {formData.keywords.map((keyword, index) => (
-                      <div key={index}>
-                        <Label htmlFor={`keyword-${index}`}>
-                          Palavra-chave {index + 1} *
-                        </Label>
-                        <Input
-                          id={`keyword-${index}`}
-                          type="text"
-                          value={keyword}
-                          onChange={(e) => handleKeywordChange(index, e.target.value)}
-                          placeholder={`Digite a ${index + 1}ª palavra-chave`}
-                          required
-                        />
-                      </div>
-                    ))}
+                  <div className="flex justify-between items-end text-xs">
+                    <div>
+                      <div className="w-16 h-8 bg-blue-100 rounded mb-1"></div>
+                      <div className="text-gray-500">Assinatura</div>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-100 rounded"></div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                {/* Resultado */}
-                {result && (
-                  <Card className={`p-4 ${result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                    <div className="flex items-center space-x-2">
-                      {result.success ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-red-600" />
-                      )}
-                      <span className={result.success ? 'text-green-800' : 'text-red-800'}>
-                        {result.message}
-                      </span>
+          {/* Coluna Direita - Formulário */}
+          <div className="flex justify-center">
+            <Card className="w-full max-w-md bg-white shadow-2xl">
+              <CardHeader className="bg-blue-600 text-white rounded-t-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl">Emita seu certificado</CardTitle>
+                    <p className="text-blue-100 text-sm">{event.slug}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="bg-white text-blue-600 px-3 py-1 rounded font-bold text-sm">
+                      TI exames
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="p-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      E-mail cadastrado no evento
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="exemplo@email.com"
+                      className="border-gray-300"
+                      required
+                    />
+                  </div>
+
+                  {/* Nome Completo */}
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="text-sm font-medium">
+                      Nome completo (máx. 50 caracteres)
+                    </Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      value={formData.fullName}
+                      onChange={(e) => handleInputChange('fullName', e.target.value)}
+                      placeholder="Nome que aparecerá no certificado"
+                      maxLength={50}
+                      className="border-gray-300"
+                      required
+                    />
+                  </div>
+
+                  {/* Confirmação de Presença */}
+                  <div className="bg-blue-50 p-4 rounded-lg space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-blue-800 mb-1">Confirmação de Presença</h3>
+                      <p className="text-xs text-blue-600 mb-3">
+                        Digite as{' '}
+                        <span className="font-medium">palavras-chave informadas</span>{' '}
+                        durante a aula.
+                      </p>
+                      <p className="text-xs text-blue-600 font-medium">
+                        Atenção: É necessário acertar pelo menos 4 de 5 palavras.
+                      </p>
                     </div>
                     
-                    {!result.success && typeof result.matched === 'number' && (
-                      <p className="text-sm text-red-600 mt-2">
-                        Você acertou {result.matched}/5 palavras-chave. 
-                        Mínimo necessário: {event.event_certificates?.required_correct || 4}/5.
-                      </p>
-                    )}
-                    
-                    {result.success && result.pdfUrl && (
-                      <div className="mt-4">
-                        <Button
-                          type="button"
-                          onClick={() => window.open(result.pdfUrl, '_blank')}
-                          className="w-full"
-                        >
-                          <Download className="h-4 w-4 mr-2" />
-                          Baixar Certificado
-                        </Button>
-                        <p className="text-xs text-green-600 mt-2">
-                          Código de verificação: {result.code}
-                        </p>
-                      </div>
-                    )}
-                  </Card>
-                )}
+                    <div className="space-y-3">
+                      {formData.keywords.map((keyword, index) => (
+                        <div key={index}>
+                          <Label htmlFor={`keyword-${index}`} className="text-xs font-medium text-blue-700">
+                            Palavra-chave {index + 1}:
+                          </Label>
+                          <Input
+                            id={`keyword-${index}`}
+                            type="text"
+                            value={keyword}
+                            onChange={(e) => handleKeywordChange(index, e.target.value)}
+                            placeholder=""
+                            className="border-blue-200 text-sm"
+                            required
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-                {/* Botão */}
-                <Button
-                  type="submit"
-                  disabled={!isFormValid() || loading}
-                  className="w-full h-12 text-lg"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Processando...
-                    </>
-                  ) : (
-                    <>
-                      <Award className="h-5 w-5 mr-2" />
-                      EMITIR SEU CERTIFICADO!
-                    </>
+                  {/* Resultado */}
+                  {result && (
+                    <div className={`p-4 rounded-lg ${result.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                      <div className="flex items-center space-x-2">
+                        {result.success ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-600" />
+                        )}
+                        <span className={`text-sm ${result.success ? 'text-green-800' : 'text-red-800'}`}>
+                          {result.message}
+                        </span>
+                      </div>
+                      
+                      {!result.success && typeof result.matched === 'number' && (
+                        <p className="text-xs text-red-600 mt-2">
+                          Você acertou {result.matched}/5 palavras-chave. 
+                          Mínimo necessário: {event.event_certificates?.required_correct || 4}/5.
+                        </p>
+                      )}
+                      
+                      {result.success && result.pdfUrl && (
+                        <div className="mt-3">
+                          <Button
+                            type="button"
+                            onClick={() => window.open(result.pdfUrl, '_blank')}
+                            className="w-full bg-green-600 hover:bg-green-700"
+                            size="sm"
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Baixar Certificado
+                          </Button>
+                          {result.code && (
+                            <p className="text-xs text-green-600 mt-2 text-center">
+                              Código: {result.code}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
-                </Button>
-                
-              </form>
-            </CardContent>
-          </Card>
+
+                  {/* Botão Principal */}
+                  <Button
+                    type="submit"
+                    disabled={!isFormValid() || loading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 text-lg"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        Processando...
+                      </>
+                    ) : (
+                      'EMITA SEU CERTIFICADO!'
+                    )}
+                  </Button>
+                  
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
