@@ -173,8 +173,8 @@ const CertificadoEmissao = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
+        <div className="grid lg:grid-cols-2 gap-8 items-center max-w-7xl w-full">
           
           {/* Coluna Esquerda - Conteúdo Congratulatório */}
           <div className="text-white space-y-8">
@@ -236,8 +236,7 @@ const CertificadoEmissao = () => {
                <div className="mt-8 text-center">
                  <Button
                    onClick={() => navigate('/eventos')}
-                   variant="outline"
-                   className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30 backdrop-blur-sm"
+                   className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white"
                  >
                    <ArrowLeft className="h-4 w-4 mr-2" />
                    Voltar para Eventos
