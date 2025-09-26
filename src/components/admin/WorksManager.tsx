@@ -18,7 +18,7 @@ const WorksManager = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="apresentacao-oral" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="apresentacao-oral" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               {t('admin.works.oralPresentation')}
@@ -30,6 +30,10 @@ const WorksManager = () => {
             <TabsTrigger value="manuscritos" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               {t('admin.works.manuscripts')}
+            </TabsTrigger>
+            <TabsTrigger value="templates-artigos" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              {t('admin.works.templatesArticles')}
             </TabsTrigger>
           </TabsList>
           
@@ -51,6 +55,13 @@ const WorksManager = () => {
             <WorkContentManager 
               workType="manuscritos" 
               title="Gestão de Conteúdo - Manuscritos" 
+            />
+          </TabsContent>
+          
+          <TabsContent value="templates-artigos" className="mt-6">
+            <WorkContentManager 
+              workType="templates-artigos" 
+              title="Gestão de Conteúdo - Templates Artigos/Slides" 
             />
           </TabsContent>
         </Tabs>

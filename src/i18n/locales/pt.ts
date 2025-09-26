@@ -412,7 +412,8 @@ export const ptTranslations = {
         description: "Gerencie conteúdos de trabalhos acadêmicos",
         oralPresentation: "Apresentação Oral Lista/Template",
         posterSessions: "Sessões de Pôster",
-        manuscripts: "Manuscritos"
+        manuscripts: "Envio de Vídeos",
+        templatesArticles: "Templates Artigos/Slides"
       }
     }
   },
