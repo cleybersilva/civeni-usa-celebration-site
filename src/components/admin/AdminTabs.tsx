@@ -13,7 +13,7 @@ import ScheduleManager from './ScheduleManager';
 import RegistrationManager from './RegistrationManager';
 import FinancialDashboard from './FinancialDashboard';
 import UsersManager from './UsersManager';
-import EventsManager from './EventsManager';
+import SimpleEventsManager from './SimpleEventsManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -109,15 +109,7 @@ const AdminTabs = () => {
 
       {hasPermission('eventos') && (
         <TabsContent value="eventos">
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">Gerenciar Eventos</h1>
-              <p className="text-muted-foreground mt-2">
-                Teste - Esta aba está funcionando. Carregando o EventsManager...
-              </p>
-            </div>
-            <EventsManager />
-          </div>
+          <SimpleEventsManager />
         </TabsContent>
       )}
 
