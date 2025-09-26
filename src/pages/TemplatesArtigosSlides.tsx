@@ -138,7 +138,7 @@ const TemplatesArtigosSlides = () => {
                   )}
                   {item.file_url && (
                     <a
-                      href={item.file_url}
+                      href={getFilePreviewUrl(item.file_url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -206,6 +206,21 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
+  const getPreviewUrl = (templateFile: string) => {
+    const fullUrl = `${window.location.origin}${templateFile}`;
+    return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fullUrl)}`;
+  };
+
+  const getFilePreviewUrl = (fileUrl: string) => {
+    // Se é um arquivo Office, usa o Office Online viewer
+    const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(fileUrl);
+    if (isOfficeFile) {
+      return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileUrl)}`;
+    }
+    // Para outros arquivos (PDF, imagens), abre diretamente
+    return fileUrl;
+  };
+
   const renderTemplateCard = (template: any, index: number) => (
     <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-md hover:scale-105">
       <CardHeader className="pb-3">
@@ -238,7 +253,7 @@ const TemplatesArtigosSlides = () => {
           </a>
           
           <a
-            href={template.file}
+            href={getPreviewUrl(template.file)}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2.5 border-2 border-civeni-blue text-civeni-blue rounded-lg hover:bg-civeni-blue hover:text-white transition-all duration-300 flex items-center gap-2 font-medium"
