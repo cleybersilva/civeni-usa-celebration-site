@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WorkContentManager from './WorkContentManager';
-import { Users, Presentation, BookOpen } from 'lucide-react';
+import { Users, Presentation, BookOpen, FileText } from 'lucide-react';
 
 const WorksManager = () => {
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ const WorksManager = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="apresentacao-oral" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="apresentacao-oral" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               {t('admin.works.oralPresentation')}
@@ -30,6 +30,10 @@ const WorksManager = () => {
             <TabsTrigger value="manuscritos" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               {t('admin.works.manuscripts')}
+            </TabsTrigger>
+            <TabsTrigger value="templates-artigos-slides" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Templates Artigos/Slides
             </TabsTrigger>
           </TabsList>
           
@@ -51,6 +55,13 @@ const WorksManager = () => {
             <WorkContentManager 
               workType="manuscritos" 
               title="Gestão de Conteúdo - Manuscritos" 
+            />
+          </TabsContent>
+          
+          <TabsContent value="templates-artigos-slides" className="mt-6">
+            <WorkContentManager 
+              workType="templates-artigos-slides" 
+              title="Gestão de Conteúdo - Templates Artigos/Slides" 
             />
           </TabsContent>
         </Tabs>

@@ -31,7 +31,7 @@ interface WorkContent {
 }
 
 interface WorkContentManagerProps {
-  workType: 'apresentacao-oral' | 'sessoes-poster' | 'manuscritos';
+  workType: 'apresentacao-oral' | 'sessoes-poster' | 'manuscritos' | 'templates-artigos-slides';
   title: string;
 }
 
