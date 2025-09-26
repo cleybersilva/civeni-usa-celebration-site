@@ -211,6 +211,11 @@ const TemplatesArtigosSlides = () => {
     return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fullUrl)}`;
   };
 
+  const handlePreviewClick = (templateFile: string) => {
+    const previewUrl = getPreviewUrl(templateFile);
+    window.open(previewUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const getFilePreviewUrl = (fileUrl: string) => {
     // Se é um arquivo Office, usa o Office Online viewer
     const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(fileUrl);
@@ -252,15 +257,13 @@ const TemplatesArtigosSlides = () => {
             Download
           </a>
           
-          <a
-            href={getPreviewUrl(template.file)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => handlePreviewClick(template.file)}
             className="px-4 py-2.5 border-2 border-civeni-blue text-civeni-blue rounded-lg hover:bg-civeni-blue hover:text-white transition-all duration-300 flex items-center gap-2 font-medium"
           >
             <Eye className="h-4 w-4" />
             Visualizar
-          </a>
+          </button>
         </div>
         
         <div className="p-3 bg-gradient-to-r from-blue-50 to-red-50 rounded-lg border border-blue-100">
