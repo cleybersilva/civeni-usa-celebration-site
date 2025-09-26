@@ -33,74 +33,33 @@ function checkRateLimit(clientIP: string, email: string): boolean {
 function validateWorkSubmission(data: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
   
-  // Required fields
+  // Required fields - validações básicas apenas
   if (!data.author_name || data.author_name.trim().length < 2) {
-    errors.push('Nome do autor é obrigatório (mín. 2 caracteres)');
+    errors.push('Nome do autor é obrigatório');
   }
   
   if (!data.institution || data.institution.trim().length < 2) {
-    errors.push('Instituição é obrigatória (mín. 2 caracteres)');
+    errors.push('Instituição é obrigatória');
   }
   
   if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.push('Email válido é obrigatório');
   }
   
-  if (!data.work_title || data.work_title.trim().length < 10) {
-    errors.push('Título do trabalho é obrigatório (mín. 10 caracteres)');
+  if (!data.work_title || data.work_title.trim().length < 5) {
+    errors.push('Título do trabalho é obrigatório');
   }
   
-  if (!data.abstract || data.abstract.trim().length < 50) {
-    errors.push('Resumo é obrigatório (mín. 50 caracteres)');
+  if (!data.abstract || data.abstract.trim().length < 20) {
+    errors.push('Resumo é obrigatório');
   }
   
-  if (!data.keywords || data.keywords.trim().length < 10) {
-    errors.push('Palavras-chave são obrigatórias (mín. 10 caracteres)');
+  if (!data.keywords || data.keywords.trim().length < 5) {
+    errors.push('Palavras-chave são obrigatórias');
   }
   
   if (!data.thematic_area || data.thematic_area.trim().length < 2) {
     errors.push('Área temática é obrigatória');
-  }
-  
-  // Length limits
-  if (data.author_name && data.author_name.length > 100) errors.push('Nome do autor muito longo (máx. 100 caracteres)');
-  if (data.institution && data.institution.length > 200) errors.push('Instituição muito longa (máx. 200 caracteres)');
-  if (data.work_title && data.work_title.length > 200) errors.push('Título muito longo (máx. 200 caracteres)');
-  if (data.abstract && data.abstract.length > 5000) errors.push('Resumo muito longo (máx. 5000 caracteres)');
-  if (data.keywords && data.keywords.length > 500) errors.push('Palavras-chave muito longas (máx. 500 caracteres)');
-  if (data.thematic_area && data.thematic_area.length > 100) errors.push('Área temática muito longa (máx. 100 caracteres)');
-  
-  // Suspicious content detection
-  const suspiciousPatterns = [
-    /\b(script|javascript|vbscript|onload|onerror|eval|function|document\.)\b/gi,
-    /<[^>]*>/g, // HTML tags
-    /\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b/gi // SQL injection
-  ];
-  
-  const textFields = [data.author_name, data.institution, data.work_title, data.abstract, data.keywords, data.thematic_area];
-  
-  for (const field of textFields) {
-    if (field) {
-      for (const pattern of suspiciousPatterns) {
-        if (pattern.test(field)) {
-          errors.push('Conteúdo suspeito detectado');
-          break;
-        }
-      }
-    }
-  }
-  
-  // Email domain validation (block disposable email services)
-  const suspiciousEmailDomains = [
-    'tempmail.com', '10minutemail.com', 'guerrillamail.com', 
-    'mailinator.com', 'throwaway.email', 'fake.com', 'test.com'
-  ];
-  
-  if (data.email) {
-    const emailDomain = data.email.split('@')[1]?.toLowerCase();
-    if (suspiciousEmailDomains.includes(emailDomain)) {
-      errors.push('Por favor, utilize um email institucional válido');
-    }
   }
   
   return { isValid: errors.length === 0, errors };
@@ -108,12 +67,7 @@ function validateWorkSubmission(data: any): { isValid: boolean; errors: string[]
 
 function sanitizeText(text: string): string {
   if (!text) return '';
-  
-  return text
-    .trim()
-    .replace(/[<>\"'`{}[\]\\]/g, '') // Remove dangerous chars
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .substring(0, 5000); // Max length
+  return text.trim();
 }
 
 serve(async (req) => {
