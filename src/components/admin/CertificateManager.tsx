@@ -40,13 +40,13 @@ interface IssuedCertificate {
   code: string;
   keywords_matched: number;
   issued_at: string;
-  is_valid: boolean;
+  is_valid?: boolean | null;
   event_id: string;
   registration_id?: string;
   pdf_url?: string;
   keywords_provided?: string[];
   created_at: string;
-  verified_at?: string;
+  verified_at?: string | null;
 }
 
 const CertificateManager = () => {
@@ -133,8 +133,9 @@ const CertificateManager = () => {
     if (data) {
       setIssuedCertificates(data.map(cert => ({
         ...cert,
-        is_valid: cert.is_valid ?? true // Default to true if null
-      })));
+        is_valid: (cert as any).is_valid ?? true, // Default to true if null
+        verified_at: (cert as any).verified_at
+      } as IssuedCertificate)));
     }
   };
 
@@ -199,7 +200,7 @@ const CertificateManager = () => {
   const toggleCertificateValidity = async (certId: string, isValid: boolean) => {
     const { error } = await supabase
       .from('issued_certificates')
-      .update({ is_valid: !isValid })
+      .update({ is_valid: !isValid } as any)
       .eq('id', certId);
 
     if (error) {
