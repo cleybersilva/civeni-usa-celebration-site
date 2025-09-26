@@ -217,7 +217,7 @@ const SubmissaoTrabalhos = () => {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-poppins">
-                Submissão de Artigos
+                Submissão Artigos/Consórcio
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Escolha o tipo de submissão e preencha todos os campos obrigatórios
