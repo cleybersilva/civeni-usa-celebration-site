@@ -5,7 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, ExternalLink, Calendar, Users, BookOpen } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText, Download, ExternalLink, Calendar, Users, BookOpen, Eye } from 'lucide-react';
 import { createSafeHtml } from '@/utils/sanitizeHtml';
 
 interface WorkContent {
@@ -27,6 +28,33 @@ const ApresentacaoOral = () => {
   const { t, i18n } = useTranslation();
   const [content, setContent] = useState<WorkContent[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const templates = [
+    {
+      name: 'Template em Português (Word)',
+      file: '/templates/template_em_Português.docx',
+      type: 'docx',
+      description: 'Modelo de documento para trabalhos em português'
+    },
+    {
+      name: 'Template - English (Word)',
+      file: '/templates/Template_-_English.docx',
+      type: 'docx',
+      description: 'Document template for papers in English'
+    },
+    {
+      name: 'Modelo de Slides em Português (PowerPoint)',
+      file: '/templates/MODELO_DE_SLIDES_em_Português.ppt',
+      type: 'ppt',
+      description: 'Modelo de apresentação para slides em português'
+    },
+    {
+      name: 'Template for Slides (PowerPoint)',
+      file: '/templates/TEMPLATE_FOR_SLIDES.pptx',
+      type: 'pptx',
+      description: 'Presentation template for slides in English'
+    }
+  ];
 
   useEffect(() => {
     fetchContent();
@@ -174,13 +202,13 @@ const ApresentacaoOral = () => {
               <li className="text-blue-200">›</li>
               <li><Link to="/submissao-trabalhos" className="hover:text-blue-200 transition-colors">Trabalhos</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Apresentação Oral/Lista</li>
+              <li>Apresentação Oral Lista/Template</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              Apresentação Oral/Lista
+              Apresentação Oral Lista/Template
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
               Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025 - 
@@ -212,33 +240,107 @@ const ApresentacaoOral = () => {
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins flex items-center justify-center gap-3">
                 <Users className="w-8 h-8 text-civeni-blue" />
-                Informações sobre Apresentação Oral/Lista
+                Apresentação Oral Lista/Template
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Conheça os requisitos, formatos e orientações para apresentar seu trabalho de forma oral no congresso
               </p>
             </div>
 
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground">{t('common.loading', 'Carregando...')}</p>
-            </div>
-          ) : content.length > 0 ? (
-            content.map(renderContentItem)
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  {t('works.oral.noContent', 'Conteúdo em breve')}
-                </h3>
-                <p className="text-muted-foreground">
-                  {t('works.oral.noContentDescription', 'As informações sobre apresentação oral serão publicadas em breve.')}
-                </p>
-              </CardContent>
-            </Card>
-           )}
+            <Tabs defaultValue="lista" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger value="lista">Lista</TabsTrigger>
+                <TabsTrigger value="template">Template</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="lista">
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-4 text-muted-foreground">{t('common.loading', 'Carregando...')}</p>
+                  </div>
+                ) : content.length > 0 ? (
+                  content.map(renderContentItem)
+                ) : (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">
+                        {t('works.oral.noContent', 'Conteúdo em breve')}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {t('works.oral.noContentDescription', 'As informações sobre apresentação oral serão publicadas em breve.')}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="template">
+                <div className="grid gap-6 md:grid-cols-2">
+                  {templates.map((template, index) => (
+                    <Card key={index} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5 text-civeni-blue" />
+                          {template.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {template.description}
+                        </p>
+                        
+                        <div className="flex gap-2">
+                          <a
+                            href={template.file}
+                            download
+                            className="flex-1 bg-civeni-blue text-white px-4 py-2 rounded-md hover:bg-civeni-blue/90 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </a>
+                          
+                          <button
+                            onClick={() => window.open(template.file, '_blank')}
+                            className="px-4 py-2 border border-civeni-blue text-civeni-blue rounded-md hover:bg-civeni-blue/10 transition-colors flex items-center gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            Preview
+                          </button>
+                        </div>
+                        
+                        <div className="mt-4 p-3 bg-gray-50 rounded-md">
+                          <p className="text-xs text-gray-600">
+                            Tipo: {template.type.toUpperCase()} • 
+                            {template.type.includes('doc') ? ' Microsoft Word' : ' Microsoft PowerPoint'}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-civeni-blue" />
+                      Instruções de Uso
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+                      <li>Faça o download do template apropriado para seu trabalho</li>
+                      <li>Use o Preview para visualizar o arquivo antes do download</li>
+                      <li>Os templates em português são para trabalhos em língua portuguesa</li>
+                      <li>Os templates em inglês são para trabalhos em língua inglesa</li>
+                      <li>Siga as formatações e estruturas definidas nos templates</li>
+                      <li>Mantenha a formatação original para garantir padronização</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
