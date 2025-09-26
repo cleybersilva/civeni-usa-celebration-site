@@ -34,7 +34,8 @@ const CertificadoEmissao = () => {
 
   React.useEffect(() => {
     const loadEvent = async () => {
-      if (!slug) return;
+      // Se não há slug, usar um evento padrão (III CIVENI 2025)
+      const eventSlug = slug || 'iii-civeni-2025';
       
       const { data, error } = await supabase
         .from('events')
@@ -49,7 +50,7 @@ const CertificadoEmissao = () => {
             country
           )
         `)
-        .eq('slug', slug)
+        .eq('slug', eventSlug)
         .eq('status_publicacao', 'published')
         .single();
 
@@ -59,7 +60,12 @@ const CertificadoEmissao = () => {
           title: "Erro",
           description: "Evento não encontrado"
         });
-        navigate('/eventos');
+        if (!slug) {
+          // Se não tinha slug específico, não redireciona
+          console.error('Erro ao carregar evento padrão:', error);
+        } else {
+          navigate('/eventos');
+        }
         return;
       }
 
@@ -69,7 +75,12 @@ const CertificadoEmissao = () => {
           title: "Erro",
           description: "Este evento não possui certificados habilitados"
         });
-        navigate('/eventos');
+        if (!slug) {
+          // Se não tinha slug específico, não redireciona
+          console.error('Certificados não habilitados para evento padrão');
+        } else {
+          navigate('/eventos');
+        }
         return;
       }
 

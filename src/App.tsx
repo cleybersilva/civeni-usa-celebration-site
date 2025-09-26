@@ -81,6 +81,7 @@ function App() {
                 <Route path="/eventos" element={<Eventos />} />
                 <Route path="/eventos/:slug" element={<EventoDetalhes />} />
                 <Route path="/eventos/:slug/certificado" element={<CertificadoEmissao />} />
+                <Route path="/certificado-emissao" element={<CertificadoEmissao />} />
                 <Route path="/certificados/verify/:code" element={<VerificarCertificado />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
