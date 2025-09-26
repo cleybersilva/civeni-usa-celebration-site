@@ -24,6 +24,7 @@ import WorkSubmissionsManager from '@/components/admin/WorkSubmissionsManager';
 import WorksManager from '@/components/admin/WorksManager';
 import MidiaDigitalManager from '@/components/admin/MidiaDigitalManager';
 import CongressoManager from '@/components/admin/CongressoManager';
+import CongressoComiteManager from '@/components/admin/CongressoComiteManager';
 import ThematicAreasManager from '@/components/admin/ThematicAreasManager';
 import CounterConfigManager from '@/components/admin/CounterConfigManager';
 import EventsManager from '@/components/admin/EventsManager';
@@ -82,6 +83,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('textos') || isAdminRoot()) ? (
           <PermissionGuard resource="textos">
             <ThematicAreasManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'comite':
+        return (hasPermission('palestrantes') || isAdminRoot()) ? (
+          <PermissionGuard resource="palestrantes">
+            <CongressoComiteManager />
           </PermissionGuard>
         ) : null;
       

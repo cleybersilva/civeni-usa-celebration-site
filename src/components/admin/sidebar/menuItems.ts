@@ -147,6 +147,13 @@ export const createMenuItems = (
       isPriority: false
     },
     {
+      id: 'comite',
+      label: t('admin.menu.committee', 'Comissão Organizadora'),
+      icon: Users,
+      show: hasPermission('palestrantes') || isAdminRoot(),
+      isPriority: false
+    },
+    {
       id: 'usuarios',
       label: t('admin.menu.users', 'Usuários'),
       icon: Settings,

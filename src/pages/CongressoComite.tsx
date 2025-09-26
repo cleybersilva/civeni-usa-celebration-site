@@ -7,139 +7,48 @@ import { Users, Calendar, GraduationCap, Settings, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import cleyberPhoto from '@/assets/cleyber-gomes.jpg';
-import marcelaPhoto from '@/assets/marcela-martins.png';
+import { useCongressoComiteByCategory } from '@/hooks/useCongressoComite';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CommitteeMember {
   id: string;
-  name: string;
-  role?: string;
-  affiliation: string;
-  photo_url?: string;
+  nome: string;
+  cargo_pt?: string;
+  instituicao: string;
+  foto_url?: string;
+  categoria: 'organizador' | 'cientifico' | 'avaliacao' | 'apoio_tecnico';
+  ordem: number;
+  is_active: boolean;
 }
 
 const CongressoComite = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('coordenacao');
+  const [activeTab, setActiveTab] = useState('organizador');
+
+  // Fetch data from database
+  const { data: organizadorData, isLoading: isLoadingOrganizador } = useCongressoComiteByCategory('organizador');
+  const { data: cientificoData, isLoading: isLoadingCientifico } = useCongressoComiteByCategory('cientifico');
+  const { data: apoioTecnicoData, isLoading: isLoadingApoioTecnico } = useCongressoComiteByCategory('apoio_tecnico');
 
   // Committee data organized by type
   const committeesData = {
-    coordenacao: {
+    organizador: {
       name: 'Coordenação Geral do Evento',
       icon: Crown,
-      members: [
-        {
-          id: '1',
-          name: 'Profa. Dra. Marcela Tarciana Martins',
-          role: 'Reitora de Relações Acadêmicas',
-          affiliation: 'VCCU',
-          photo_url: marcelaPhoto
-        },
-        {
-          id: '2', 
-          name: 'Profa. Dra. Maria Emilia Camargo',
-          role: 'Reitora de Relações Internacionais',
-          affiliation: 'VCCU'
-        }
-      ]
+      members: organizadorData || [],
+      isLoading: isLoadingOrganizador
     },
     cientifico: {
       name: 'Comitê Científico',
       icon: GraduationCap,
-      members: [
-        {
-          id: '3',
-          name: 'Profa. Dra. Ana Célia Querino',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '4',
-          name: 'Prof. Dr. Eloy Lemos Júnior',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '5',
-          name: 'Profa. Dra. Esra Sipahi Döngül',
-          affiliation: 'Akasaray University, Faculty of Health Sciences'
-        },
-        {
-          id: '6',
-          name: 'Prof. Dr. Aprigio Telles Mascarenhas Neto',
-          affiliation: 'Faculdade de Direito 8 de Julho'
-        },
-        {
-          id: '7',
-          name: 'Profa. Dra. Marta Elisete Ventura da Motta',
-          affiliation: 'FASOL'
-        },
-        {
-          id: '8',
-          name: 'Prof. Dr. Henrique Rodrigues Lelis',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '9',
-          name: 'Prof. Dr. Mhardoquel Geraldo Lima França',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '10',
-          name: 'Profa. Dra. Mariane Camargo Priesnitz',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '11',
-          name: 'Profa. Dra. Margarete Luiza Alburgeri',
-          affiliation: 'UAL - Portugal'
-        },
-        {
-          id: '12',
-          name: 'Prof. Dr. Walter Priesnitz Filho',
-          affiliation: 'CTISM – UFSM, Brasil'
-        },
-        {
-          id: '13',
-          name: 'Prof. Dr. Ricardo Oliveira',
-          affiliation: 'UFS, Brasil'
-        },
-        {
-          id: '14',
-          name: 'Prof. Dr. Ramon Olímpio de Oliveira',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '15',
-          name: 'Profa. Dra. Vivianne de Sousa',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '16',
-          name: 'Profa. Dra. Gabriela Marcolino',
-          affiliation: 'VCCU'
-        }
-      ]
+      members: cientificoData || [],
+      isLoading: isLoadingCientifico
     },
-    operacional: {
+    apoio_tecnico: {
       name: 'Comitê Operacional',
       icon: Settings,
-      members: [
-        {
-          id: '17',
-          name: 'Profa. Eliete Francisca da Silva Farias',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '18',
-          name: 'Gabriely Cristina Queiroga Diniz',
-          affiliation: 'VCCU'
-        },
-        {
-          id: '19',
-          name: 'Cleyber Gomes da Silva',
-          affiliation: 'VCCU',
-          photo_url: cleyberPhoto
-        }
-      ]
+      members: apoioTecnicoData || [],
+      isLoading: isLoadingApoioTecnico
     }
   };
 
@@ -214,50 +123,67 @@ const CongressoComite = () => {
                     </h2>
                   </div>
                   
-                  <div className={`grid gap-8 place-items-center ${key === 'coordenacao' ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto' : key === 'cientifico' ? 'grid-cols-1 md:grid-cols-3 lg:grid-cols-5 max-w-6xl mx-auto' : 'grid-cols-1 md:grid-cols-3 max-w-3xl mx-auto'}`}>
-                    {committee.members.map((member) => (
-                      <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
-                        <CardContent className="p-0">
-                          {/* Photo Section */}
-                          <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
-                            {member.photo_url ? (
-                              <img
-                                src={member.photo_url}
-                                alt={member.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
-                                  <span className="text-3xl font-bold text-primary">
-                                    {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Info Section */}
-                          <div className="p-6">
-                            <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
-                              {member.name}
-                            </h3>
-                            
-                            {member.role && (
-                              <p className="text-sm font-medium text-primary mb-3 line-clamp-2">
-                                {member.role}
-                              </p>
-                            )}
-                            
-                            <div className={`flex items-center text-sm text-muted-foreground mb-4 ${member.affiliation === 'VCCU' || member.affiliation === 'FASOL' || member.affiliation === 'UAL - Portugal' || member.affiliation === 'UFS, Brasil' ? 'justify-center' : ''}`}>
-                              <GraduationCap className="w-4 h-4 mr-2 flex-shrink-0" />
-                              <span className="line-clamp-2">{member.affiliation}</span>
+                  {committee.isLoading ? (
+                    <div className={`grid gap-8 place-items-center ${key === 'organizador' ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto' : key === 'cientifico' ? 'grid-cols-1 md:grid-cols-3 lg:grid-cols-5 max-w-6xl mx-auto' : 'grid-cols-1 md:grid-cols-3 max-w-3xl mx-auto'}`}>
+                      {[...Array(key === 'cientifico' ? 8 : 3)].map((_, i) => (
+                        <Card key={i} className="overflow-hidden">
+                          <CardContent className="p-0">
+                            <Skeleton className="aspect-square w-full" />
+                            <div className="p-6">
+                              <Skeleton className="h-6 mb-2" />
+                              <Skeleton className="h-4 mb-3" />
+                              <Skeleton className="h-4" />
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={`grid gap-8 place-items-center ${key === 'organizador' ? 'grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto' : key === 'cientifico' ? 'grid-cols-1 md:grid-cols-3 lg:grid-cols-5 max-w-6xl mx-auto' : 'grid-cols-1 md:grid-cols-3 max-w-3xl mx-auto'}`}>
+                      {committee.members.map((member) => (
+                        <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
+                          <CardContent className="p-0">
+                            {/* Photo Section */}
+                            <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
+                              {member.foto_url ? (
+                                <img
+                                  src={member.foto_url}
+                                  alt={member.nome}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center">
+                                    <span className="text-3xl font-bold text-primary">
+                                      {member.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Info Section */}
+                            <div className="p-6">
+                              <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
+                                {member.nome}
+                              </h3>
+                              
+                              {member.cargo_pt && (
+                                <p className="text-sm font-medium text-primary mb-3 line-clamp-2">
+                                  {member.cargo_pt}
+                                </p>
+                              )}
+                              
+                              <div className={`flex items-center text-sm text-muted-foreground mb-4 ${member.instituicao === 'VCCU' || member.instituicao === 'FASOL' || member.instituicao === 'UAL - Portugal' || member.instituicao === 'UFS, Brasil' ? 'justify-center' : ''}`}>
+                                <GraduationCap className="w-4 h-4 mr-2 flex-shrink-0" />
+                                <span className="line-clamp-2">{member.instituicao}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
