@@ -125,7 +125,7 @@ const Eventos = () => {
                 </button>
               </Link>
               
-              <Link to="/certificado-emissao">
+              <Link to="/eventos/iii-civeni-2025/certificado">
                 <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                   <Award className="w-5 h-5" />
                   Emitir Certificado
