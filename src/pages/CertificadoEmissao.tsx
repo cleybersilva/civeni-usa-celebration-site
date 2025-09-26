@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, CheckCircle, XCircle, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import civeniLogo from '@/assets/civeni-2025-logo.png';
 
 const CertificadoEmissao = () => {
   const { slug } = useParams();
@@ -147,7 +148,7 @@ const CertificadoEmissao = () => {
 
   if (eventLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-blue/80">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
@@ -155,14 +156,14 @@ const CertificadoEmissao = () => {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-blue/80">
         <Card className="p-8 text-center">
-          <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <XCircle className="h-16 w-16 text-civeni-red mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Evento não encontrado</h2>
           <p className="text-muted-foreground mb-4">
             O evento solicitado não foi encontrado ou não possui certificados habilitados.
           </p>
-          <Button onClick={() => navigate('/eventos')}>
+          <Button onClick={() => navigate('/eventos')} className="bg-civeni-blue hover:bg-civeni-blue/90">
             Voltar para Eventos
           </Button>
         </Card>
@@ -171,7 +172,7 @@ const CertificadoEmissao = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900">
+    <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue/80">
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           
@@ -181,23 +182,23 @@ const CertificadoEmissao = () => {
               <h1 className="text-4xl lg:text-5xl font-bold mb-4">
                 Parabéns por ter chegado ao final do evento!
               </h1>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="text-xl text-white/90 mb-8">
                 Agora é hora de emitir seu certificado!
               </p>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center space-x-3 text-blue-100">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+              <div className="flex items-center space-x-3 text-white/90">
+                <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
                 <span>Compartilhe no LinkedIn</span>
               </div>
-              <div className="flex items-center space-x-3 text-blue-100">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <span>Siga a Tíexames nas redes</span>
+              <div className="flex items-center space-x-3 text-white/90">
+                <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
+                <span>Siga o CIVENI 2025 nas redes</span>
               </div>
-              <div className="flex items-center space-x-3 text-blue-100">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <span>Conheça nossas próximas turmas abertas</span>
+              <div className="flex items-center space-x-3 text-white/90">
+                <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
+                <span>Conheça nossos próximos eventos</span>
               </div>
             </div>
 
@@ -205,7 +206,12 @@ const CertificadoEmissao = () => {
             <div className="mt-12">
               <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md mx-auto transform -rotate-2 hover:rotate-0 transition-transform duration-300">
                 <div className="text-center">
-                  <div className="text-blue-600 font-bold text-lg mb-2">TI exames</div>
+                  <img 
+                    src={civeniLogo} 
+                    alt="CIVENI 2025" 
+                    className="w-16 h-auto mx-auto mb-2"
+                  />
+                  <div className="text-civeni-blue font-bold text-lg mb-2">CIVENI 2025</div>
                   <div className="text-sm text-gray-600 mb-4">CERTIFICADO DE PARTICIPAÇÃO</div>
                   <div className="text-xs text-gray-500 mb-6">{event.slug}</div>
                   
@@ -217,10 +223,10 @@ const CertificadoEmissao = () => {
                   
                   <div className="flex justify-between items-end text-xs">
                     <div>
-                      <div className="w-16 h-8 bg-blue-100 rounded mb-1"></div>
+                      <div className="w-16 h-8 bg-civeni-blue/10 rounded mb-1"></div>
                       <div className="text-gray-500">Assinatura</div>
                     </div>
-                    <div className="w-12 h-12 bg-blue-100 rounded"></div>
+                    <div className="w-12 h-12 bg-civeni-blue/10 rounded"></div>
                   </div>
                 </div>
               </div>
@@ -230,15 +236,15 @@ const CertificadoEmissao = () => {
           {/* Coluna Direita - Formulário */}
           <div className="flex justify-center">
             <Card className="w-full max-w-md bg-white shadow-2xl">
-              <CardHeader className="bg-blue-600 text-white rounded-t-lg">
+              <CardHeader className="bg-civeni-blue text-white rounded-t-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Emita seu certificado</CardTitle>
-                    <p className="text-blue-100 text-sm">{event.slug}</p>
+                    <p className="text-white/90 text-sm">{event.slug}</p>
                   </div>
                   <div className="text-right">
-                    <div className="bg-white text-blue-600 px-3 py-1 rounded font-bold text-sm">
-                      TI exames
+                    <div className="bg-white text-civeni-blue px-3 py-1 rounded font-bold text-sm">
+                      CIVENI 2025
                     </div>
                   </div>
                 </div>
@@ -281,15 +287,15 @@ const CertificadoEmissao = () => {
                   </div>
 
                   {/* Confirmação de Presença */}
-                  <div className="bg-blue-50 p-4 rounded-lg space-y-4">
+                  <div className="bg-civeni-blue/5 p-4 rounded-lg space-y-4 border border-civeni-blue/20">
                     <div>
-                      <h3 className="font-semibold text-blue-800 mb-1">Confirmação de Presença</h3>
-                      <p className="text-xs text-blue-600 mb-3">
+                      <h3 className="font-semibold text-civeni-blue mb-1">Confirmação de Presença</h3>
+                      <p className="text-xs text-civeni-blue/80 mb-3">
                         Digite as{' '}
                         <span className="font-medium">palavras-chave informadas</span>{' '}
-                        durante a aula.
+                        durante o evento.
                       </p>
-                      <p className="text-xs text-blue-600 font-medium">
+                      <p className="text-xs text-civeni-blue font-medium">
                         Atenção: É necessário acertar pelo menos 4 de 5 palavras.
                       </p>
                     </div>
@@ -297,7 +303,7 @@ const CertificadoEmissao = () => {
                     <div className="space-y-3">
                       {formData.keywords.map((keyword, index) => (
                         <div key={index}>
-                          <Label htmlFor={`keyword-${index}`} className="text-xs font-medium text-blue-700">
+                          <Label htmlFor={`keyword-${index}`} className="text-xs font-medium text-civeni-blue">
                             Palavra-chave {index + 1}:
                           </Label>
                           <Input
@@ -306,7 +312,7 @@ const CertificadoEmissao = () => {
                             value={keyword}
                             onChange={(e) => handleKeywordChange(index, e.target.value)}
                             placeholder=""
-                            className="border-blue-200 text-sm"
+                            className="border-civeni-blue/20 text-sm focus:border-civeni-blue"
                             required
                           />
                         </div>
@@ -340,14 +346,14 @@ const CertificadoEmissao = () => {
                           <Button
                             type="button"
                             onClick={() => window.open(result.pdfUrl, '_blank')}
-                            className="w-full bg-green-600 hover:bg-green-700"
+                            className="w-full bg-civeni-green hover:bg-civeni-green/90"
                             size="sm"
                           >
                             <Download className="h-4 w-4 mr-2" />
                             Baixar Certificado
                           </Button>
                           {result.code && (
-                            <p className="text-xs text-green-600 mt-2 text-center">
+                            <p className="text-xs text-civeni-green mt-2 text-center">
                               Código: {result.code}
                             </p>
                           )}
@@ -360,7 +366,7 @@ const CertificadoEmissao = () => {
                   <Button
                     type="submit"
                     disabled={!isFormValid() || loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 text-lg"
+                    className="w-full bg-civeni-blue hover:bg-civeni-blue/90 text-white font-bold py-3 text-lg"
                   >
                     {loading ? (
                       <>
