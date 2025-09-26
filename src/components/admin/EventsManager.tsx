@@ -33,6 +33,8 @@ const EventsManager = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
 
+  console.log('EventsManager rendered - events:', events, 'loading:', loading);
+
   const getEventStatus = (event: any) => {
     const now = new Date();
     const startDate = new Date(event.inicio_at);

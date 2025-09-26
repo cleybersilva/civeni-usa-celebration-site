@@ -24,13 +24,13 @@ const AdminTabs = () => {
   const hasPermission = (resource: string) => {
     if (user.user_type === 'admin_root') return true;
     if (user.user_type === 'admin') {
-      return ['banner', 'contador', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'].includes(resource);
+      return ['banner', 'contador', 'cronograma', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'].includes(resource);
     }
     if (user.user_type === 'design') {
-      return ['banner', 'palestrantes', 'videos'].includes(resource);
+      return ['banner', 'eventos', 'palestrantes', 'videos'].includes(resource);
     }
     if (user.user_type === 'editor') {
-      return ['contador', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'].includes(resource);
+      return ['contador', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'].includes(resource);
     }
     return false;
   };
