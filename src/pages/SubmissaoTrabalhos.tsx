@@ -87,6 +87,11 @@ const SubmissaoTrabalhos = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('=== SUBMITTING WORK ===');
+      console.log('Form data:', formData);
+      console.log('Active tab:', activeTab);
+      console.log('File:', file?.name, file?.type, file?.size);
+      
       // Use the submit-work edge function for secure submission
       const { data, error } = await supabase.functions.invoke('submit-work', {
         body: {
@@ -95,18 +100,26 @@ const SubmissaoTrabalhos = () => {
         }
       });
 
+      console.log('=== FUNCTION RESPONSE ===');
+      console.log('Data:', data);
+      console.log('Error:', error);
+
       if (error) {
+        console.error('Function error:', error);
         throw new Error(error.message || 'Erro na função de submissão');
       }
 
       if (!data?.success) {
+        console.error('Function returned error:', data);
         throw new Error(data?.error || 'Erro desconhecido na submissão');
       }
 
       const submissionId = data.id;
+      console.log('Submission ID:', submissionId);
 
       // Upload file after successful submission
       const { filePath, fileName } = await uploadFile(file, submissionId);
+      console.log('File uploaded:', filePath, fileName);
 
       // Update submission with file info
       const { error: updateError } = await supabase
@@ -118,6 +131,7 @@ const SubmissaoTrabalhos = () => {
         .eq('id', submissionId);
 
       if (updateError) {
+        console.error('Update error:', updateError);
         throw updateError;
       }
 
