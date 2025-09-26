@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import cleyberPhoto from '@/assets/cleyber-gomes.jpg';
+import marcelaPhoto from '@/assets/marcela-martins.png';
 
 interface CommitteeMember {
   id: string;
@@ -31,7 +32,8 @@ const CongressoComite = () => {
           id: '1',
           name: 'Profa. Dra. Marcela Tarciana Martins',
           role: 'Reitora de Relações Acadêmicas',
-          affiliation: 'VCCU'
+          affiliation: 'VCCU',
+          photo_url: marcelaPhoto
         },
         {
           id: '2', 
