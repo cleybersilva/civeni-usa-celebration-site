@@ -77,8 +77,13 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         return category.is_free && category.slug === 'professor-vccu-gratuito';
       }
       
-      // Para outros tipos de participante (aluno, convidado, externo), mostrar apenas categorias pagas do lote vigente
-      return !category.is_free;
+      // Para participante externo, mostrar APENAS a categoria específica de externo
+      if (formData.participantType === 'external') {
+        return category.slug === 'participante-externo';
+      }
+      
+      // Para outros tipos de participante (aluno, convidado), mostrar apenas categorias pagas do lote vigente (exceto externo)
+      return !category.is_free && category.slug !== 'participante-externo';
     });
   };
 
@@ -187,11 +192,21 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                             <span>{category.title_pt}</span>
                             <div className="ml-4 flex flex-col items-end">
                               <span className="font-semibold">
-                                {category.is_free ? 'GRATUITO' : `R$ ${(loteVigente?.price_cents / 100).toFixed(2)}`}
+                                {category.is_free 
+                                  ? 'GRATUITO' 
+                                  : category.slug === 'participante-externo' 
+                                    ? 'R$ 200,00'
+                                    : `R$ ${(loteVigente?.price_cents / 100).toFixed(2)}`
+                                }
                               </span>
-                              {loteVigente && !category.is_free && (
+                              {loteVigente && !category.is_free && category.slug !== 'participante-externo' && (
                                 <span className="text-xs text-green-600 font-medium">
                                   {loteVigente.nome}
+                                </span>
+                              )}
+                              {category.slug === 'participante-externo' && (
+                                <span className="text-xs text-blue-600 font-medium">
+                                  Valor fixo
                                 </span>
                               )}
                             </div>
@@ -224,7 +239,16 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 )}
 
                 {selectedCategory && (
-                  <PriceSummary selectedCategory={selectedCategory} priceCents={loteVigente?.price_cents ?? 0} />
+                  <PriceSummary 
+                    selectedCategory={selectedCategory} 
+                    priceCents={
+                      selectedCategory.is_free 
+                        ? 0 
+                        : selectedCategory.slug === 'participante-externo' 
+                          ? 20000 
+                          : loteVigente?.price_cents ?? 0
+                    } 
+                  />
                 )}
 
                 <Button 

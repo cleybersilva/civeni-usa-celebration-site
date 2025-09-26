@@ -83,7 +83,7 @@ serve(async (req) => {
     logStep("Batch found", { loteName: lote.nome, priceCents: lote.price_cents });
 
     // Validate coupon if provided
-    let finalPrice = category.is_free ? 0 : lote.price_cents;
+    let finalPrice = category.is_free ? 0 : (category.price_cents || lote.price_cents);
     let validCoupon = null;
 
     if (couponCode) {
@@ -224,7 +224,7 @@ serve(async (req) => {
           price_data: {
             currency: currency.toLowerCase(),
             product_data: {
-              name: `${category.title_pt} - ${lote.nome}`,
+              name: `${category.title_pt}${category.slug === 'participante-externo' ? '' : ` - ${lote.nome}`}`,
               description: `Inscrição para Civeni 2025 - ${fullName}`,
             },
             unit_amount: finalPrice,
