@@ -12,8 +12,11 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventDetailPage = () => {
+  console.log('=== EventDetailPage RENDERING ===');
   const { slug } = useParams();
+  console.log('=== SLUG FROM PARAMS:', slug);
   const { event, loading, error } = useEventDetails(slug || '');
+  console.log('=== HOOK RESULT - Event:', event, 'Loading:', loading, 'Error:', error);
 
   const getEventStatus = (event: any) => {
     const now = new Date();

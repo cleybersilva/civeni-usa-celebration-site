@@ -30,12 +30,15 @@ export const useEventDetails = (slug: string) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('=== useEventDetails EFFECT CALLED with slug:', slug);
     const fetchEvent = async () => {
       if (!slug) {
+        console.log('=== NO SLUG PROVIDED, setting loading to false');
         setLoading(false);
         return;
       }
 
+      console.log('=== STARTING FETCH for slug:', slug);
       try {
         setLoading(true);
         setError(null);

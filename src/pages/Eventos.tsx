@@ -251,7 +251,7 @@ const Eventos = () => {
                         
                         <div className="flex gap-2 pt-3">
                           <Link to={`/eventos/${event.slug}`} className="flex-1">
-                            <Button className="w-full">
+                            <Button className="w-full" onClick={() => console.log('=== CLICKING Ver Detalhes for slug:', event.slug)}>
                               Ver Detalhes
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
@@ -307,7 +307,7 @@ const Eventos = () => {
                       
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
-                          <Button variant="outline" className="w-full">
+                          <Button variant="outline" className="w-full" onClick={() => console.log('=== CLICKING Ver Detalhes (all events) for slug:', event.slug)}>
                             Ver Detalhes
                             <ExternalLink className="h-4 w-4 ml-2" />
                           </Button>
@@ -379,12 +379,12 @@ const Eventos = () => {
                       
                       <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
-                       <div className="flex gap-2 pt-3">
-                         <Link to={`/eventos/${event.slug}`} className="flex-1">
-                           <Button variant="outline" size="sm" className="w-full">
-                             Ver Detalhes
-                           </Button>
-                         </Link>
+                         <div className="flex gap-2 pt-3">
+                           <Link to={`/eventos/${event.slug}`} className="flex-1">
+                             <Button variant="outline" size="sm" className="w-full" onClick={() => console.log('=== CLICKING Ver Detalhes (past events) for slug:', event.slug)}>
+                               Ver Detalhes
+                             </Button>
+                           </Link>
                          
                          {event.youtube_url && (
                            <Button variant="default" size="sm" asChild>
