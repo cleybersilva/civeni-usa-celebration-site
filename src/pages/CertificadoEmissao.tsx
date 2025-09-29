@@ -220,7 +220,7 @@ const CertificadoEmissao = () => {
                   />
                   <div className="text-civeni-blue font-bold text-lg mb-2">CIVENI 2025</div>
                   <div className="text-sm text-gray-600 mb-4">CERTIFICADO DE PARTICIPAÇÃO</div>
-                  <div className="text-xs text-gray-500 mb-6">{event.slug}</div>
+                  <div className="text-xs text-gray-500 mb-6">VCCU/Civeni</div>
                   
                   <div className="border-t border-b border-gray-200 py-4 mb-4">
                     <div className="text-xs text-gray-600 mb-1">Certificamos que</div>
@@ -258,7 +258,7 @@ const CertificadoEmissao = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Emita seu certificado</CardTitle>
-                    <p className="text-white/90 text-sm">{event.slug}</p>
+                    <p className="text-white/90 text-sm">VCCU/Civeni</p>
                   </div>
                   <div className="text-right">
                     <div className="bg-white text-civeni-blue px-3 py-1 rounded font-bold text-sm">
