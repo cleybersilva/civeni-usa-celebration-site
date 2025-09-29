@@ -37,6 +37,7 @@ import Sobre from "./pages/Sobre";
 import Eventos from "./pages/Eventos";
 import EventoDetalhes from "./pages/EventoDetalhes";
 import CertificadoEmissao from "./pages/CertificadoEmissao";
+import CertificateSuccessPage from "./pages/CertificateSuccessPage";
 import VerificarCertificado from "./pages/VerificarCertificado";
 
 import './App.css';
@@ -82,6 +83,7 @@ function App() {
                 <Route path="/eventos/:slug" element={<EventoDetalhes />} />
                 <Route path="/eventos/:slug/certificado" element={<CertificadoEmissao />} />
                 <Route path="/certificado-emissao" element={<CertificadoEmissao />} />
+                <Route path="/certificado-sucesso" element={<CertificateSuccessPage />} />
                 <Route path="/certificados/verify/:code" element={<VerificarCertificado />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />

@@ -114,18 +114,26 @@ const CertificadoEmissao = () => {
 
       if (error) throw error;
 
-      setResult({
-        success: data.success,
-        message: data.message,
-        pdfUrl: data.pdfUrl,
-        matched: data.matched,
-        code: data.code
-      });
-
       if (data.success) {
-        toast({
-          title: "Sucesso!",
-          description: "Certificado emitido com sucesso!"
+        // Redirecionar para página de sucesso com dados do certificado
+        navigate('/certificado-sucesso', {
+          state: {
+            success: true,
+            message: data.message,
+            pdfUrl: data.pdfUrl,
+            matched: data.matched,
+            code: data.code,
+            fullName: formData.fullName,
+            email: formData.email,
+            eventName: event.slug
+          }
+        });
+      } else {
+        // Mostrar erro inline se não foi sucesso
+        setResult({
+          success: false,
+          message: data.message,
+          matched: data.matched
         });
       }
 
