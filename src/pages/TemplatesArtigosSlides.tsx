@@ -213,13 +213,25 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
-  const handleDownloadClick = (templateFile: string, templateName: string) => {
-    const link = document.createElement('a');
-    link.href = templateFile;
-    link.download = templateFile.split('/').pop() || templateName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadClick = async (templateFile: string, templateName: string) => {
+    try {
+      const response = await fetch(templateFile);
+      if (!response.ok) {
+        throw new Error('Arquivo não encontrado');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = templateFile.split('/').pop() || templateName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erro ao baixar arquivo:', error);
+      alert('Erro ao baixar o arquivo. Por favor, tente novamente.');
+    }
   };
 
   const handlePreviewClick = async (templateFile: string) => {
