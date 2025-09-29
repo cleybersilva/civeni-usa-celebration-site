@@ -170,7 +170,13 @@ export const useEventBySlug = (slug: string) => {
   const { toast } = useToast();
 
   const fetchEvent = async () => {
-    if (!slug) return;
+    if (!slug) {
+      console.log('useEventBySlug - No slug provided');
+      setLoading(false);
+      return;
+    }
+    
+    console.log('useEventBySlug - Fetching event with slug:', slug);
     
     try {
       setLoading(true);
@@ -229,7 +235,10 @@ export const useEventBySlug = (slug: string) => {
         `)
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
-        .single();
+        .maybeSingle();
+
+      console.log('useEventBySlug - Raw data from database:', data);
+      console.log('useEventBySlug - Database error:', error);
 
       if (error) throw error;
 
@@ -256,12 +265,16 @@ export const useEventBySlug = (slug: string) => {
             ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
         };
         
+        console.log('useEventBySlug - Transformed event:', transformedEvent);
         setEvent(transformedEvent as Event);
       } else {
+        console.log('useEventBySlug - No data found for slug:', slug);
         setEvent(null);
       }
     } catch (error: any) {
-      console.error('Error fetching event:', error);
+      console.error('useEventBySlug - Error fetching event:', error);
+      console.error('useEventBySlug - Error code:', error.code);
+      console.error('useEventBySlug - Error message:', error.message);
       setEvent(null);
       if (error.code !== 'PGRST116') { // Don't show error for "not found"
         toast({
@@ -271,6 +284,7 @@ export const useEventBySlug = (slug: string) => {
         });
       }
     } finally {
+      console.log('useEventBySlug - Setting loading to false');
       setLoading(false);
     }
   };

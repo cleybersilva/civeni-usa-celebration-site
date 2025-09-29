@@ -16,6 +16,11 @@ const EventoDetalhes = () => {
   const { slug } = useParams();
   const { t } = useTranslation();
   const { event, loading } = useEventBySlug(slug || '');
+  
+  // Debug logging
+  console.log('EventoDetalhes - slug:', slug);
+  console.log('EventoDetalhes - loading:', loading);
+  console.log('EventoDetalhes - event:', event);
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -120,6 +125,25 @@ const EventoDetalhes = () => {
     link.click();
   };
 
+  // Early return for no slug
+  if (!slug) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
+        <Header />
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">URL inválida</h1>
+            <p className="text-gray-600 mb-8">Não foi possível identificar o evento.</p>
+            <Link to="/eventos">
+              <Button>Voltar para Eventos</Button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
@@ -128,6 +152,7 @@ const EventoDetalhes = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-civeni-blue mx-auto"></div>
             <p className="mt-4 text-gray-600">Carregando evento...</p>
+            <p className="mt-2 text-sm text-gray-500">Slug: {slug}</p>
           </div>
         </div>
         <Footer />
