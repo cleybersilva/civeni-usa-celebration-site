@@ -379,12 +379,12 @@ const Eventos = () => {
                       
                       <p className="text-gray-700 text-sm line-clamp-3">{event.subtitulo}</p>
                       
-                         <div className="flex gap-2 pt-3">
-                           <Link to={`/eventos/${event.slug}`} className="flex-1">
-                             <Button variant="outline" size="sm" className="w-full">
-                               Ver Detalhes
-                             </Button>
-                           </Link>
+                       <div className="flex gap-2 pt-3">
+                         <Link to={`/eventos/${event.slug}`} className="flex-1">
+                           <Button variant="outline" size="sm" className="w-full">
+                             Ver Detalhes
+                           </Button>
+                         </Link>
                          
                          {event.youtube_url && (
                            <Button variant="default" size="sm" asChild>

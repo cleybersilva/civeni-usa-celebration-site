@@ -69,6 +69,57 @@ const EventoDetalhes = () => {
     return format(new Date(dateString), "HH:mm", { locale: ptBR });
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: event.titulo,
+          text: event.subtitulo,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
+  const generateCalendarFile = () => {
+    if (!event) return;
+    
+    const startDate = new Date(event.inicio_at);
+    const endDate = event.fim_at ? new Date(event.fim_at) : new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours default
+    
+    const formatICSDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+    
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//CIVENI//Event Calendar//PT',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@civeni.com`,
+      `DTSTAMP:${formatICSDate(new Date())}`,
+      `DTSTART:${formatICSDate(startDate)}`,
+      `DTEND:${formatICSDate(endDate)}`,
+      `SUMMARY:${event.titulo}`,
+      `DESCRIPTION:${event.subtitulo || ''}`,
+      event.endereco ? `LOCATION:${event.endereco}` : '',
+      `URL:${window.location.href}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].filter(Boolean).join('\r\n');
+    
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${event.slug}.ics`;
+    link.click();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
@@ -146,6 +197,37 @@ const EventoDetalhes = () => {
                 {event.subtitulo}
               </p>
             )}
+            
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={generateCalendarFile} variant="secondary" size="lg">
+                <Calendar className="h-5 w-5 mr-2" />
+                Adicionar ao Calendário
+              </Button>
+              
+              <Button onClick={handleShare} variant="secondary" size="lg">
+                <Share2 className="h-5 w-5 mr-2" />
+                Compartilhar
+              </Button>
+              
+              {event.youtube_url && (
+                <Button variant="secondary" size="lg" asChild>
+                  <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
+                    <Youtube className="h-5 w-5 mr-2" />
+                    {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}
+                  </a>
+                </Button>
+              )}
+              
+              {event.tem_inscricao && event.inscricao_url && !isPastEvent && (
+                <Button size="lg" className="bg-green-600 hover:bg-green-700" asChild>
+                  <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-5 w-5 mr-2" />
+                    Inscrever-se
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -224,26 +306,329 @@ const EventoDetalhes = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Media & Links */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="h-6 w-6 text-civeni-blue" />
+                  Mídia e Links
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {event.banner_url && (
+                  <div>
+                    <h4 className="font-medium mb-2">Banner do Evento</h4>
+                    <img 
+                      src={event.banner_url} 
+                      alt={`Banner - ${event.titulo}`}
+                      className="w-full max-w-md rounded-lg border"
+                    />
+                  </div>
+                )}
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  {event.youtube_url && (
+                    <div className="p-3 border rounded-lg">
+                      <h5 className="font-medium text-sm mb-2">YouTube</h5>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
+                          <Youtube className="h-4 w-4 mr-2" />
+                          {isPastEvent ? 'Ver Gravação' : 'Transmissão Ao Vivo'}
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {event.playlist_url && (
+                    <div className="p-3 border rounded-lg">
+                      <h5 className="font-medium text-sm mb-2">Playlist</h5>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={event.playlist_url} target="_blank" rel="noopener noreferrer">
+                          <Youtube className="h-4 w-4 mr-2" />
+                          Ver Playlist
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+
+                  {event.tem_inscricao && event.inscricao_url && (
+                    <div className="p-3 border rounded-lg">
+                      <h5 className="font-medium text-sm mb-2">Inscrições</h5>
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Fazer Inscrição
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {!event.youtube_url && !event.playlist_url && !event.inscricao_url && (
+                  <div className="text-center py-4 text-gray-500">
+                    <p>Nenhuma mídia ou link adicional disponível</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* SEO Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Share2 className="h-6 w-6 text-civeni-blue" />
+                  Informações SEO
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4">
+                  <div>
+                    <label className="font-medium text-sm text-gray-700">Título Meta (SEO)</label>
+                    <p className="text-gray-600 mt-1 p-2 bg-gray-50 rounded text-sm">
+                      {event.meta_title || event.titulo}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-sm text-gray-700">Descrição Meta (SEO)</label>
+                    <p className="text-gray-600 mt-1 p-2 bg-gray-50 rounded text-sm">
+                      {event.meta_description || event.subtitulo || 'Descrição não disponível'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="font-medium text-sm text-gray-700">URL do Evento</label>
+                    <p className="text-gray-600 mt-1 p-2 bg-gray-50 rounded text-sm font-mono">
+                      {window.location.origin}/eventos/{event.slug}
+                    </p>
+                  </div>
+
+                  {event.og_image && (
+                    <div>
+                      <label className="font-medium text-sm text-gray-700">Imagem Open Graph</label>
+                      <img 
+                        src={event.og_image} 
+                        alt="Open Graph"
+                        className="mt-1 max-w-xs border rounded"
+                      />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Speakers Section */}
+            {event.speakers && event.speakers.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-6 w-6 text-civeni-blue" />
+                    Palestrantes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {event.speakers.map((speaker: any) => (
+                      <div key={speaker.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                        {speaker.image_url && (
+                          <img
+                            src={speaker.image_url}
+                            alt={speaker.name}
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
+                        )}
+                        <div>
+                          <h4 className="font-semibold">{speaker.name}</h4>
+                          <p className="text-sm text-gray-600">{speaker.title}</p>
+                          <p className="text-sm text-gray-500">{speaker.institution}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Schedule/Sessions */}
+            {event.sessions && event.sessions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-6 w-6 text-civeni-blue" />
+                    Programação
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {event.sessions.map((session: any) => (
+                      <div key={session.id} className="flex gap-4 p-4 border rounded-lg">
+                        <div className="text-sm font-medium text-civeni-blue min-w-20">
+                          {formatEventTime(session.inicio_at)}
+                          {session.fim_at && ` - ${formatEventTime(session.fim_at)}`}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold mb-1">{session.titulo}</h4>
+                          {session.descricao && (
+                            <p className="text-gray-600 text-sm">{session.descricao}</p>
+                          )}
+                          {session.speaker_name && (
+                            <p className="text-civeni-blue text-sm mt-1">
+                              Palestrante: {session.speaker_name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Certificate Section - Only for past events */}
+            {isPastEvent && (
+              <Card className="border-green-200 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-800">
+                    <Award className="h-6 w-6" />
+                    Certificado
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-green-700 text-sm">
+                    Este evento já foi realizado. Se você participou, pode baixar seu certificado.
+                  </p>
+                  <div className="space-y-2">
+                    <Button className="w-full bg-green-600 hover:bg-green-700" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Baixar Certificado
+                    </Button>
+                    <p className="text-xs text-green-600">
+                      * Não use e-mail profissional. Verifique sua caixa de SPAM.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Actions Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Ações</CardTitle>
+                <CardTitle>Ações Rápidas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Link to="/eventos" className="w-full">
-                  <Button variant="outline" className="w-full">
-                    Voltar para Eventos
+                <Button onClick={generateCalendarFile} variant="outline" size="sm" className="w-full">
+                  <Download className="h-4 w-4 mr-2" />
+                  Baixar .ics
+                </Button>
+                
+                <Button onClick={handleShare} variant="outline" size="sm" className="w-full">
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Compartilhar
+                </Button>
+                
+                {event.youtube_url && (
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
+                      <Youtube className="h-4 w-4 mr-2" />
+                      YouTube
+                    </a>
                   </Button>
-                </Link>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Event Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Status e Configurações</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Status Information */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Status do Evento:</span>
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(event)}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Status de Publicação:</span>
+                    <Badge variant={event.status_publicacao === 'published' ? 'default' : 'secondary'}>
+                      {event.status_publicacao === 'published' ? 'Publicado' : 
+                       event.status_publicacao === 'draft' ? 'Rascunho' : 'Arquivado'}
+                    </Badge>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Evento em Destaque:</span>
+                    <Badge variant={event.featured ? 'default' : 'outline'}>
+                      {event.featured ? 'Sim' : 'Não'}
+                    </Badge>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Modalidade:</span>
+                    <span className="capitalize text-gray-600">{event.modalidade}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Possui Inscrições:</span>
+                    <Badge variant={event.tem_inscricao ? 'default' : 'outline'}>
+                      {event.tem_inscricao ? 'Sim' : 'Não'}
+                    </Badge>
+                  </div>
+
+                  {event.tem_inscricao && event.inscricao_url && (
+                    <div className="p-3 bg-blue-50 rounded">
+                      <span className="font-medium text-blue-800">Link de Inscrição:</span>
+                      <a 
+                        href={event.inscricao_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block text-sm text-blue-600 hover:underline mt-1 break-all"
+                      >
+                        {event.inscricao_url}
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="font-medium">Exibir Quando Passado:</span>
+                    <Badge variant={(event as any).exibir_passado ? 'default' : 'outline'}>
+                      {(event as any).exibir_passado ? 'Sim' : 'Não'}
+                    </Badge>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Technical Information */}
+                <div className="space-y-2 text-sm text-gray-600">
+                  <h4 className="font-medium text-gray-900">Informações Técnicas</h4>
+                  <div className="space-y-1">
+                    <p><span className="font-medium">Slug:</span> {event.slug}</p>
+                    <p><span className="font-medium">ID:</span> {event.id}</p>
+                    <p><span className="font-medium">Criado em:</span> {formatEventDate(event.created_at)}</p>
+                    <p><span className="font-medium">Atualizado em:</span> {formatEventDate(event.updated_at)}</p>
+                    {(event as any).created_by && (
+                      <p><span className="font-medium">Criado por:</span> {(event as any).created_by}</p>
+                    )}
+                    {(event as any).updated_by && (
+                      <p><span className="font-medium">Atualizado por:</span> {(event as any).updated_by}</p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

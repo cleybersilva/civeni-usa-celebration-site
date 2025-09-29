@@ -42,7 +42,10 @@ export const useEvents = () => {
     try {
       setLoading(true);
       
+      // Get current language from localStorage or default to 'pt-BR'
       const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
+      
+      console.log('Fetching events for public site with language:', currentLanguage);
       
       const { data, error } = await supabase
         .from('events')
@@ -56,19 +59,58 @@ export const useEvents = () => {
             meta_description,
             og_image,
             idioma
+          ),
+          event_speakers(
+            ordem,
+            cms_speakers(
+              id,
+              name,
+              title,
+              institution,
+              image_url
+            )
+          ),
+          event_areas(
+            thematic_areas(
+              id,
+              name_pt,
+              name_en,
+              description_pt,
+              description_en
+            )
+          ),
+          event_sessions(
+            id,
+            inicio_at,
+            fim_at,
+            titulo,
+            descricao,
+            speaker_id,
+            sala_url,
+            ordem
+          ),
+          event_assets(
+            id,
+            asset_url,
+            caption,
+            ordem
           )
         `)
         .eq('status_publicacao', 'published')
         .order('inicio_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching events:', error);
+        console.error('Error fetching events for public site:', error);
         throw error;
       }
 
+      console.log('Raw events data from database:', data);
+
+      // Transform data to flatten translations and filter by language
       const transformedEvents = data?.map((event: any) => {
         const translation = event.event_translations?.find((t: any) => t.idioma === currentLanguage);
         
+        // If no translation exists, use the event slug as title
         return {
           ...event,
           titulo: translation?.titulo || event.slug.replace(/-/g, ' ').toUpperCase(),
@@ -77,12 +119,19 @@ export const useEvents = () => {
           meta_title: translation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
           meta_description: translation?.meta_description || '',
           og_image: translation?.og_image || event.banner_url,
-          speakers: [],
-          areas: [],
-          sessions: [],
-          assets: []
+          speakers: event.event_speakers
+            ?.sort((a: any, b: any) => a.ordem - b.ordem)
+            ?.map((es: any) => es.cms_speakers)
+            ?.filter(Boolean) || [],
+          areas: event.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
+          sessions: event.event_sessions
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
+          assets: event.event_assets
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
         };
       }) || [];
+
+      console.log('Transformed events for public site:', transformedEvents);
 
       setEvents(transformedEvents);
     } catch (error: any) {
@@ -98,8 +147,19 @@ export const useEvents = () => {
   };
 
   useEffect(() => {
+    console.log('useEvents hook mounted, fetching events...');
     fetchEvents();
+    
+    // Log when events change
+    if (events && events.length > 0) {
+      console.log('Events loaded in useEffect:', events);
+    }
   }, []);
+
+  // Add another useEffect to log whenever events state changes
+  useEffect(() => {
+    console.log('useEvents - events state changed:', events);
+  }, [events]);
 
   return { events, loading, refetch: fetchEvents };
 };
@@ -110,51 +170,88 @@ export const useEventBySlug = (slug: string) => {
   const { toast } = useToast();
 
   const fetchEvent = async () => {
-    if (!slug) {
-      setLoading(false);
-      return;
-    }
+    if (!slug) return;
     
     try {
       setLoading(true);
       
+      // Get current language from localStorage or default to 'pt-BR'
       const currentLanguage = localStorage.getItem('i18nextLng') || 'pt-BR';
       
       const { data, error } = await supabase
         .from('events')
         .select(`
           *,
-          event_translations(
+          event_translations!inner(
             titulo,
             subtitulo,
             descricao_richtext,
             meta_title,
             meta_description,
-            og_image,
-            idioma
+            og_image
+          ),
+          event_speakers(
+            ordem,
+            cms_speakers(
+              id,
+              name,
+              title,
+              institution,
+              image_url
+            )
+          ),
+          event_areas(
+            thematic_areas(
+              id,
+              name_pt,
+              name_en,
+              description_pt,
+              description_en
+            )
+          ),
+          event_sessions(
+            id,
+            inicio_at,
+            fim_at,
+            titulo,
+            descricao,
+            speaker_id,
+            sala_url,
+            ordem
+          ),
+          event_assets(
+            id,
+            asset_url,
+            caption,
+            ordem
           )
         `)
         .eq('slug', slug)
         .eq('status_publicacao', 'published')
-        .maybeSingle();
+        .eq('event_translations.idioma', currentLanguage)
+        .single();
 
       if (error) throw error;
 
+      // Transform data to flatten translations
       if (data) {
-        const translation = data.event_translations?.find((t: any) => t.idioma === currentLanguage);
-        
         const transformedEvent = {
           ...data,
-          titulo: translation?.titulo || data.slug.replace(/-/g, ' ').toUpperCase(),
-          subtitulo: translation?.subtitulo || '',
-          descricao_richtext: translation?.descricao_richtext || '',
-          meta_title: translation?.meta_title || data.slug.replace(/-/g, ' ').toUpperCase(),
-          meta_description: translation?.meta_description || '',
-          og_image: translation?.og_image || data.banner_url,
-          speakers: [],
-          areas: [],
-          sessions: [],
-          assets: []
+          titulo: data.event_translations[0]?.titulo,
+          subtitulo: data.event_translations[0]?.subtitulo,
+          descricao_richtext: data.event_translations[0]?.descricao_richtext,
+          meta_title: data.event_translations[0]?.meta_title,
+          meta_description: data.event_translations[0]?.meta_description,
+          og_image: data.event_translations[0]?.og_image,
+          speakers: data.event_speakers
+            ?.sort((a: any, b: any) => a.ordem - b.ordem)
+            ?.map((es: any) => es.cms_speakers)
+            ?.filter(Boolean) || [],
+          areas: data.event_areas?.map((ea: any) => ea.thematic_areas)?.filter(Boolean) || [],
+          sessions: data.event_sessions
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || [],
+          assets: data.event_assets
+            ?.sort((a: any, b: any) => a.ordem - b.ordem) || []
         };
         
         setEvent(transformedEvent as Event);
@@ -164,7 +261,7 @@ export const useEventBySlug = (slug: string) => {
     } catch (error: any) {
       console.error('Error fetching event:', error);
       setEvent(null);
-      if (error.code !== 'PGRST116') {
+      if (error.code !== 'PGRST116') { // Don't show error for "not found"
         toast({
           title: 'Erro ao carregar evento',
           description: error.message,
