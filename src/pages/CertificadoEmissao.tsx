@@ -262,7 +262,7 @@ const CertificadoEmissao = () => {
                   </div>
                   <div className="text-right">
                     <div className="bg-white text-civeni-blue px-3 py-1 rounded font-bold text-sm">
-                      CIVENI 2025
+                      VCCU/Civeni
                     </div>
                   </div>
                 </div>
