@@ -32,14 +32,14 @@ const TemplatesArtigosSlides = () => {
   const articleTemplates = [
     {
       name: 'Template em Português (Word)',
-      file: '/templates/template_em_Português-2.docx',
+      file: '/templates/template_em_Português.docx',
       type: 'docx',
       description: 'Modelo de documento para artigos acadêmicos em português',
       category: 'article'
     },
     {
       name: 'Template - English (Word)',
-      file: '/templates/Template_-_English-2.docx',
+      file: '/templates/Template_-_English.docx',
       type: 'docx',
       description: 'Document template for academic papers in English',
       category: 'article'
@@ -49,14 +49,14 @@ const TemplatesArtigosSlides = () => {
   const slideTemplates = [
     {
       name: 'Modelo de Slides em Português (PowerPoint)',
-      file: '/templates/MODELO_DE_SLIDES_em_Português-2.ppt',
+      file: '/templates/MODELO_DE_SLIDES_em_Português.ppt',
       type: 'ppt',
       description: 'Modelo de apresentação para slides em português',
       category: 'slide'
     },
     {
       name: 'Template for Slides (PowerPoint)',
-      file: '/templates/TEMPLATE_FOR_SLIDES-2.pptx',
+      file: '/templates/TEMPLATE_FOR_SLIDES.pptx',
       type: 'pptx',
       description: 'Presentation template for slides in English',
       category: 'slide'
@@ -213,30 +213,33 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
+  const handleDownloadClick = (templateFile: string, templateName: string) => {
+    const link = document.createElement('a');
+    link.href = templateFile;
+    link.download = templateFile.split('/').pop() || templateName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handlePreviewClick = async (templateFile: string) => {
-    // Garantir que a URL seja absoluta
     const absoluteUrl = new URL(templateFile, window.location.origin).href;
     
-    // Verificar se o arquivo existe
     const fileExists = await checkFileExists(absoluteUrl);
     
     if (!fileExists) {
-      alert('Arquivo não encontrado. Este template está sendo preparado e estará disponível em breve.');
+      alert('Arquivo não encontrado. Por favor, tente fazer o download direto.');
       return;
     }
     
-    // Verificar se é arquivo Office
     const isOfficeFile = /\.(docx?|pptx?|xlsx?)$/i.test(templateFile);
     
     if (isOfficeFile) {
-      // Múltiplos viewers como fallback
       const viewers = [
         `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(absoluteUrl)}`,
-        `https://docs.google.com/gview?url=${encodeURIComponent(absoluteUrl)}&embedded=true`,
-        absoluteUrl // fallback direto
+        `https://docs.google.com/gview?url=${encodeURIComponent(absoluteUrl)}&embedded=true`
       ];
       
-      // Tentar o primeiro viewer
       let viewerWorked = false;
       
       for (const viewerUrl of viewers) {
@@ -252,17 +255,9 @@ const TemplatesArtigosSlides = () => {
       }
       
       if (!viewerWorked) {
-        // Último recurso - download direto
-        const link = document.createElement('a');
-        link.href = absoluteUrl;
-        link.download = templateFile.split('/').pop() || 'template';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        alert('Não foi possível abrir a pré-visualização. O arquivo foi baixado automaticamente.');
+        alert('Não foi possível abrir a pré-visualização online. Por favor, use o botão de Download.');
       }
     } else {
-      // Para outros arquivos, abrir diretamente
       window.open(absoluteUrl, '_blank');
     }
   };
@@ -325,14 +320,13 @@ const TemplatesArtigosSlides = () => {
         </p>
         
         <div className="flex gap-2">
-          <a
-            href={template.file}
-            download
+          <button
+            onClick={() => handleDownloadClick(template.file, template.name)}
             className="flex-1 bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 font-medium"
           >
             <Download className="h-4 w-4" />
             Download
-          </a>
+          </button>
           
           <button
             onClick={() => handlePreviewClick(template.file)}
