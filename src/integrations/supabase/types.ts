@@ -859,9 +859,13 @@ export type Database = {
           discount_value: number | null
           id: string
           is_active: boolean | null
+          participant_type: string | null
+          status: string | null
           updated_at: string
           usage_limit: number | null
           used_count: number | null
+          valid_from: string | null
+          valid_until: string | null
         }
         Insert: {
           category_id?: string | null
@@ -872,9 +876,13 @@ export type Database = {
           discount_value?: number | null
           id?: string
           is_active?: boolean | null
+          participant_type?: string | null
+          status?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number | null
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Update: {
           category_id?: string | null
@@ -885,9 +893,13 @@ export type Database = {
           discount_value?: number | null
           id?: string
           is_active?: boolean | null
+          participant_type?: string | null
+          status?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number | null
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: [
           {
@@ -895,6 +907,35 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "registration_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupon_redemptions: {
+        Row: {
+          coupon_id: string
+          created_at: string | null
+          email: string
+          id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string | null
+          email: string
+          id?: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupon_codes"
             referencedColumns: ["id"]
           },
         ]
@@ -3120,6 +3161,15 @@ export type Database = {
       }
       validate_coupon: {
         Args: { coupon_code: string }
+        Returns: Json
+      }
+      validate_coupon_robust: {
+        Args: {
+          p_category_id?: string
+          p_code: string
+          p_email: string
+          p_participant_type?: string
+        }
         Returns: Json
       }
       verify_admin_login_secure: {

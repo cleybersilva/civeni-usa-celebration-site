@@ -20,41 +20,38 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     couponCode: ''
   });
 
-  const validateCoupon = async (couponCode: string) => {
+  const validateCoupon = async (couponCode: string, categoryId?: string) => {
     if (!couponCode) return null;
     
     try {
-      console.log('Validating coupon:', couponCode);
+      console.log('Validating coupon with RPC:', { couponCode, formData });
       
-      const { data, error } = await supabase
-        .from('coupon_codes')
-        .select('*')
-        .ilike('code', couponCode)
-        .eq('is_active', true)
-        .maybeSingle();
+      // Usar a função RPC robusta de validação
+      const { data, error } = await supabase.rpc('validate_coupon_robust', {
+        p_code: couponCode,
+        p_email: formData.email || '',
+        p_participant_type: formData.participantType || null,
+        p_category_id: categoryId || null
+      });
       
-      console.log('Coupon query result:', { data, error });
+      console.log('Coupon RPC result:', { data, error });
       
       if (error) {
-        console.error('Coupon query error:', error);
+        console.error('Coupon RPC error:', error);
         throw error;
       }
       
       if (!data) {
-        console.log('Coupon not found or inactive');
-        return { is_valid: false };
+        console.log('No data returned from RPC');
+        return { is_valid: false, message: 'Erro ao validar cupom' };
       }
       
-      if (data.usage_limit === null || (data.used_count || 0) < data.usage_limit) {
-        console.log('Coupon is valid:', data);
-        return { is_valid: true, coupon_id: data.id, category_id: data.category_id };
-      }
-      
-      console.log('Coupon usage limit reached');
-      return { is_valid: false };
+      // Retornar resultado da validação
+      console.log('Coupon validation result:', data);
+      return data;
     } catch (error) {
       console.error('Error validating coupon:', error);
-      return { is_valid: false };
+      return { is_valid: false, message: 'Erro ao validar cupom' };
     }
   };
 
@@ -85,9 +82,11 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     try {
       let validCoupon = null;
       if (formData.couponCode) {
-        validCoupon = await validateCoupon(formData.couponCode);
+        validCoupon = await validateCoupon(formData.couponCode, formData.categoryId);
         if (!validCoupon?.is_valid) {
-          throw new Error(t('registration.errors.invalidCoupon'));
+          // Usar mensagem específica do backend
+          const errorMessage = validCoupon?.message || t('registration.errors.invalidCoupon');
+          throw new Error(errorMessage);
         }
       }
 

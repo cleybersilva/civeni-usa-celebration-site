@@ -82,60 +82,60 @@ serve(async (req) => {
 
     logStep("Batch found", { loteName: lote.nome, priceCents: lote.price_cents });
 
-    // Validate coupon if provided
+    // Validate coupon if provided using robust RPC
     let finalPrice = category.is_free ? 0 : (category.price_cents || lote.price_cents);
     let validCoupon = null;
 
     if (couponCode) {
-      logStep("Validating coupon", { couponCode });
+      logStep("Validating coupon with RPC", { couponCode, email, participantType, categoryId });
       
-      const { data: coupon, error: couponError } = await supabase
-        .from('coupon_codes')
-        .select('*')
-        .ilike('code', couponCode)
-        .eq('is_active', true)
-        .maybeSingle();
+      const { data: couponResult, error: couponError } = await supabase.rpc('validate_coupon_robust', {
+        p_code: couponCode,
+        p_email: email,
+        p_participant_type: participantType,
+        p_category_id: categoryId
+      });
 
-      logStep("Coupon query result", { found: !!coupon, error: couponError });
+      logStep("Coupon RPC result", { result: couponResult, error: couponError });
 
       if (couponError) {
-        logStep("Coupon query error", { couponError });
+        logStep("Coupon RPC error", { couponError });
         return new Response(
           JSON.stringify({ success: false, error: "Erro ao validar cupom" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
 
-      if (!coupon) {
-        logStep("Coupon not found or inactive");
+      if (!couponResult || !couponResult.is_valid) {
+        logStep("Coupon invalid", { reason: couponResult?.reason, message: couponResult?.message });
         return new Response(
-          JSON.stringify({ success: false, error: "Código de cupom inválido ou expirado" }),
+          JSON.stringify({ 
+            success: false, 
+            error: couponResult?.message || "Código de cupom inválido" 
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
         );
       }
 
-      // Check usage limit
-      if (coupon.usage_limit && (coupon.used_count || 0) >= coupon.usage_limit) {
-        logStep("Coupon usage limit exceeded");
-        return new Response(
-          JSON.stringify({ success: false, error: "Código de cupom esgotado" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-        );
-      }
-
-      validCoupon = coupon;
+      // Cupom válido - criar objeto compatível
+      validCoupon = {
+        id: couponResult.coupon_id,
+        discount_type: couponResult.discount_type,
+        discount_value: couponResult.discount_value,
+        category_id: couponResult.category_id
+      };
       
       // Apply coupon discount
-      if (coupon.discount_type === 'category_override' && coupon.category_id) {
+      if (validCoupon.discount_type === 'category_override') {
         // Override with coupon category (free for professors)
         finalPrice = 0;
-      } else if (coupon.discount_type === 'percentage') {
-        finalPrice = Math.round(finalPrice * (1 - (coupon.discount_value / 100)));
-      } else if (coupon.discount_type === 'fixed') {
-        finalPrice = Math.max(0, finalPrice - (coupon.discount_value * 100)); // Convert to cents
+      } else if (validCoupon.discount_type === 'percentage') {
+        finalPrice = Math.round(finalPrice * (1 - (validCoupon.discount_value / 100)));
+      } else if (validCoupon.discount_type === 'fixed') {
+        finalPrice = Math.max(0, finalPrice - (validCoupon.discount_value * 100)); // Convert to cents
       }
 
-      logStep("Coupon applied", { discountType: coupon.discount_type, finalPrice });
+      logStep("Coupon applied", { discountType: validCoupon.discount_type, finalPrice });
     }
 
     // Create registration record - now without FK constraint issues
@@ -171,14 +171,35 @@ serve(async (req) => {
 
     logStep("Registration created", { registrationId: registration.id });
 
-    // Update coupon usage if used
+    // Update coupon usage and register redemption if used
     if (validCoupon) {
+      // Registrar resgate para evitar reuso
+      const { error: redemptionError } = await supabase
+        .from('coupon_redemptions')
+        .insert({
+          coupon_id: validCoupon.id,
+          email: email.toLowerCase()
+        });
+      
+      if (redemptionError) {
+        logStep("Redemption registration failed", { redemptionError });
+        // Continue mesmo se falhar (pode ser duplicate key se já registrado antes)
+      }
+      
+      // Buscar o contador atual e incrementar
+      const { data: currentCoupon } = await supabase
+        .from('coupon_codes')
+        .select('used_count')
+        .eq('id', validCoupon.id)
+        .single();
+      
+      // Incrementar contador de uso
       await supabase
         .from('coupon_codes')
-        .update({ used_count: (validCoupon.used_count || 0) + 1 })
+        .update({ used_count: (currentCoupon?.used_count || 0) + 1 })
         .eq('id', validCoupon.id);
       
-      logStep("Coupon usage updated");
+      logStep("Coupon usage updated and redemption registered");
     }
 
     // If free registration, send confirmation and return success
