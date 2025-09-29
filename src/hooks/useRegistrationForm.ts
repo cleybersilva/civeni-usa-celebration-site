@@ -20,17 +20,27 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     couponCode: ''
   });
 
-  const validateCoupon = async (couponCode: string, categoryId?: string) => {
+  const validateCoupon = async (
+    couponCode: string, 
+    email: string,
+    participantType: string,
+    categoryId: string
+  ) => {
     if (!couponCode) return null;
     
     try {
-      console.log('Validating coupon with RPC:', { couponCode, formData });
+      console.log('Validating coupon with robust RPC:', { 
+        couponCode, 
+        email, 
+        participantType, 
+        categoryId 
+      });
       
-      // Usar a função RPC robusta de validação
+      // Usar a função RPC robusta de validação com normalização
       const { data, error } = await supabase.rpc('validate_coupon_robust', {
         p_code: couponCode,
-        p_email: formData.email || '',
-        p_participant_type: formData.participantType || null,
+        p_email: email.trim().toLowerCase(),
+        p_participant_type: participantType || null,
         p_category_id: categoryId || null
       });
       
@@ -38,7 +48,7 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
       
       if (error) {
         console.error('Coupon RPC error:', error);
-        throw error;
+        return { is_valid: false, message: 'Erro ao validar cupom' };
       }
       
       if (!data) {
@@ -46,7 +56,7 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         return { is_valid: false, message: 'Erro ao validar cupom' };
       }
       
-      // Retornar resultado da validação
+      // Retornar resultado da validação com mensagens específicas
       console.log('Coupon validation result:', data);
       return data;
     } catch (error) {
@@ -82,9 +92,14 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     try {
       let validCoupon = null;
       if (formData.couponCode) {
-        validCoupon = await validateCoupon(formData.couponCode, formData.categoryId);
+        validCoupon = await validateCoupon(
+          formData.couponCode,
+          formData.email,
+          formData.participantType,
+          formData.categoryId
+        );
         if (!validCoupon?.is_valid) {
-          // Usar mensagem específica do backend
+          // Usar mensagem específica e granular do backend
           const errorMessage = validCoupon?.message || t('registration.errors.invalidCoupon');
           throw new Error(errorMessage);
         }
