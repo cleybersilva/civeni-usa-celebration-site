@@ -87,17 +87,29 @@ serve(async (req) => {
     let validCoupon = null;
 
     if (couponCode) {
+      logStep("Validating coupon", { couponCode });
+      
       const { data: coupon, error: couponError } = await supabase
         .from('coupon_codes')
         .select('*')
-        .eq('code', couponCode)
+        .ilike('code', couponCode)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
-      if (couponError || !coupon) {
-        logStep("Invalid coupon", { couponError });
+      logStep("Coupon query result", { found: !!coupon, error: couponError });
+
+      if (couponError) {
+        logStep("Coupon query error", { couponError });
         return new Response(
-          JSON.stringify({ success: false, error: "Código de cupom inválido" }),
+          JSON.stringify({ success: false, error: "Erro ao validar cupom" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+
+      if (!coupon) {
+        logStep("Coupon not found or inactive");
+        return new Response(
+          JSON.stringify({ success: false, error: "Código de cupom inválido ou expirado" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
         );
       }
