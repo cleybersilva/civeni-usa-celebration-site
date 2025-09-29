@@ -313,7 +313,7 @@ const TemplatesArtigosSlides = () => {
   const renderTemplateCard = (template: any, index: number) => (
     <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-md hover:scale-105">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-3 text-lg">
+        <CardTitle className="flex flex-col items-center justify-center gap-3 text-lg text-center">
           <div className="p-2 bg-gradient-to-br from-civeni-blue to-civeni-red rounded-lg text-white">
             {template.category === 'article' ? (
               <FileText className="h-5 w-5" />
@@ -413,9 +413,9 @@ const TemplatesArtigosSlides = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins flex items-center justify-center gap-3">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins flex flex-col items-center justify-center gap-3">
                 <FileText className="w-8 h-8 text-civeni-blue" />
-                Templates Artigos/Slides
+                <span>Bem-vindos aos Templates</span>
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Baixe os modelos padronizados para artigos acadêmicos e apresentações. 
@@ -451,9 +451,9 @@ const TemplatesArtigosSlides = () => {
                 
                 <Card className="bg-gradient-to-r from-blue-50 to-red-50 border-blue-200">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-civeni-blue">
+                    <CardTitle className="flex flex-col items-center justify-center gap-2 text-civeni-blue text-center">
                       <BookOpen className="h-5 w-5" />
-                      Instruções para Templates de Artigos
+                      <span>Instruções para Templates de Artigos</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -481,9 +481,9 @@ const TemplatesArtigosSlides = () => {
                 
                 <Card className="bg-gradient-to-r from-blue-50 to-red-50 border-blue-200">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-civeni-blue">
+                    <CardTitle className="flex flex-col items-center justify-center gap-2 text-civeni-blue text-center">
                       <BookOpen className="h-5 w-5" />
-                      Instruções para Templates de Slides
+                      <span>Instruções para Templates de Slides</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
