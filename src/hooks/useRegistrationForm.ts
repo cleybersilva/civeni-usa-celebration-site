@@ -24,19 +24,33 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     if (!couponCode) return null;
     
     try {
+      console.log('Validating coupon:', couponCode);
+      
       const { data, error } = await supabase
         .from('coupon_codes')
         .select('*')
-        .eq('code', couponCode)
+        .ilike('code', couponCode)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
+      console.log('Coupon query result:', { data, error });
       
-      if (data && (data.usage_limit === null || (data.used_count || 0) < data.usage_limit)) {
+      if (error) {
+        console.error('Coupon query error:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.log('Coupon not found or inactive');
+        return { is_valid: false };
+      }
+      
+      if (data.usage_limit === null || (data.used_count || 0) < data.usage_limit) {
+        console.log('Coupon is valid:', data);
         return { is_valid: true, coupon_id: data.id, category_id: data.category_id };
       }
       
+      console.log('Coupon usage limit reached');
       return { is_valid: false };
     } catch (error) {
       console.error('Error validating coupon:', error);
