@@ -1,22 +1,21 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Users, Share2, ExternalLink, Youtube, Award, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Calendar, MapPin, Clock, Users, Share2, Download, ExternalLink, Youtube, Award } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useEventDetails } from '@/hooks/useEventDetails';
+import { useEventBySlug } from '@/hooks/useEvents';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-const EventDetailPage = () => {
-  console.log('=== EventDetailPage RENDERING ===');
+const EventoDetalhes = () => {
   const { slug } = useParams();
-  console.log('=== SLUG FROM PARAMS:', slug);
-  const { event, loading, error } = useEventDetails(slug || '');
-  console.log('=== HOOK RESULT - Event:', event, 'Loading:', loading, 'Error:', error);
+  const { t } = useTranslation();
+  const { event, loading } = useEventBySlug(slug || '');
 
   const getEventStatus = (event: any) => {
     const now = new Date();
@@ -70,43 +69,6 @@ const EventDetailPage = () => {
     return format(new Date(dateString), "HH:mm", { locale: ptBR });
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: event?.titulo,
-          text: event?.subtitulo,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-    }
-  };
-
-  if (!slug) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
-        <Header />
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">URL inválida</h1>
-            <p className="text-gray-600 mb-8">Não foi possível identificar o evento.</p>
-            <Link to="/eventos">
-              <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para Eventos
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
@@ -115,28 +77,6 @@ const EventDetailPage = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-civeni-blue mx-auto"></div>
             <p className="mt-4 text-gray-600">Carregando evento...</p>
-            <p className="mt-2 text-sm text-gray-500">Slug: {slug}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
-        <Header />
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-red-600 mb-4">Erro ao carregar evento</h1>
-            <p className="text-gray-600 mb-8">{error}</p>
-            <Link to="/eventos">
-              <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para Eventos
-              </Button>
-            </Link>
           </div>
         </div>
         <Footer />
@@ -152,12 +92,8 @@ const EventDetailPage = () => {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Evento não encontrado</h1>
             <p className="text-gray-600 mb-8">O evento que você procura não existe ou foi removido.</p>
-            <p className="text-sm text-gray-500 mb-4">Slug procurado: {slug}</p>
             <Link to="/eventos">
-              <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para Eventos
-              </Button>
+              <Button>Voltar para Eventos</Button>
             </Link>
           </div>
         </div>
@@ -210,32 +146,6 @@ const EventDetailPage = () => {
                 {event.subtitulo}
               </p>
             )}
-            
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
-              <Button onClick={handleShare} variant="secondary" size="lg">
-                <Share2 className="h-5 w-5 mr-2" />
-                Compartilhar
-              </Button>
-              
-              {event.youtube_url && (
-                <Button variant="secondary" size="lg" asChild>
-                  <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-5 w-5 mr-2" />
-                    {isPastEvent ? 'Ver Gravação' : 'Assistir Ao Vivo'}
-                  </a>
-                </Button>
-              )}
-              
-              {event.tem_inscricao && event.inscricao_url && !isPastEvent && (
-                <Button size="lg" className="bg-green-600 hover:bg-green-700" asChild>
-                  <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-5 w-5 mr-2" />
-                    Inscrever-se
-                  </a>
-                </Button>
-              )}
-            </div>
           </div>
         </div>
       </section>
@@ -314,111 +224,10 @@ const EventDetailPage = () => {
                 )}
               </CardContent>
             </Card>
-
-            {/* Media & Links */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="h-6 w-6 text-civeni-blue" />
-                  Mídia e Links
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {event.banner_url && (
-                  <div>
-                    <h4 className="font-medium mb-2">Banner do Evento</h4>
-                    <img 
-                      src={event.banner_url} 
-                      alt={`Banner - ${event.titulo}`}
-                      className="w-full max-w-md rounded-lg border"
-                    />
-                  </div>
-                )}
-
-                <div className="grid gap-3 md:grid-cols-2">
-                  {event.youtube_url && (
-                    <div className="p-3 border rounded-lg">
-                      <h5 className="font-medium text-sm mb-2">YouTube</h5>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
-                          <Youtube className="h-4 w-4 mr-2" />
-                          {isPastEvent ? 'Ver Gravação' : 'Transmissão Ao Vivo'}
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-
-                  {event.playlist_url && (
-                    <div className="p-3 border rounded-lg">
-                      <h5 className="font-medium text-sm mb-2">Playlist</h5>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={event.playlist_url} target="_blank" rel="noopener noreferrer">
-                          <Youtube className="h-4 w-4 mr-2" />
-                          Ver Playlist
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-
-                  {event.tem_inscricao && event.inscricao_url && (
-                    <div className="p-3 border rounded-lg">
-                      <h5 className="font-medium text-sm mb-2">Inscrições</h5>
-                      <Button variant="outline" size="sm" className="w-full" asChild>
-                        <a href={event.inscricao_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Fazer Inscrição
-                        </a>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {!event.youtube_url && !event.playlist_url && !event.inscricao_url && (
-                  <div className="text-center py-4 text-gray-500">
-                    <p>Nenhuma mídia ou link adicional disponível</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Quick Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Informações Rápidas</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Status do Evento</p>
-                  {getStatusBadge(event)}
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Data:</span>
-                    <span className="text-sm font-medium">{formatEventDate(event.inicio_at)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Modalidade:</span>
-                    <span className="text-sm font-medium capitalize">{event.modalidade}</span>
-                  </div>
-                  
-                  {event.endereco && (
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Local:</span>
-                      <span className="text-sm font-medium text-right">{event.endereco}</span>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Actions */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Ações</CardTitle>
@@ -426,19 +235,9 @@ const EventDetailPage = () => {
               <CardContent className="space-y-3">
                 <Link to="/eventos" className="w-full">
                   <Button variant="outline" className="w-full">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
                     Voltar para Eventos
                   </Button>
                 </Link>
-                
-                {isPastEvent && (
-                  <Link to={`/eventos/${event.slug}/certificado`} className="w-full">
-                    <Button className="w-full bg-green-600 hover:bg-green-700">
-                      <Award className="h-4 w-4 mr-2" />
-                      Baixar Certificado
-                    </Button>
-                  </Link>
-                )}
               </CardContent>
             </Card>
           </div>
@@ -450,4 +249,4 @@ const EventDetailPage = () => {
   );
 };
 
-export default EventDetailPage;
+export default EventoDetalhes;

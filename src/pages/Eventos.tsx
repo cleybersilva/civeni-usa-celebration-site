@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEvents } from '@/hooks/useEventDetails';
+import { useEvents } from '@/hooks/useEvents';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -251,7 +251,7 @@ const Eventos = () => {
                         
                         <div className="flex gap-2 pt-3">
                           <Link to={`/eventos/${event.slug}`} className="flex-1">
-                            <Button className="w-full" onClick={() => console.log('=== CLICKING Ver Detalhes for slug:', event.slug)}>
+                            <Button className="w-full">
                               Ver Detalhes
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
@@ -307,7 +307,7 @@ const Eventos = () => {
                       
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
-                          <Button variant="outline" className="w-full" onClick={() => console.log('=== CLICKING Ver Detalhes (all events) for slug:', event.slug)}>
+                          <Button variant="outline" className="w-full">
                             Ver Detalhes
                             <ExternalLink className="h-4 w-4 ml-2" />
                           </Button>
@@ -381,7 +381,7 @@ const Eventos = () => {
                       
                          <div className="flex gap-2 pt-3">
                            <Link to={`/eventos/${event.slug}`} className="flex-1">
-                             <Button variant="outline" size="sm" className="w-full" onClick={() => console.log('=== CLICKING Ver Detalhes (past events) for slug:', event.slug)}>
+                             <Button variant="outline" size="sm" className="w-full">
                                Ver Detalhes
                              </Button>
                            </Link>

@@ -35,7 +35,7 @@ import EnvioVideos from "./pages/EnvioVideos";
 import TemplatesArtigosSlides from "./pages/TemplatesArtigosSlides";
 import Sobre from "./pages/Sobre";
 import Eventos from "./pages/Eventos";
-import EventDetailPage from "./pages/EventDetailPage";
+import EventoDetalhes from "./pages/EventoDetalhes";
 import CertificadoEmissao from "./pages/CertificadoEmissao";
 import VerificarCertificado from "./pages/VerificarCertificado";
 
@@ -79,7 +79,7 @@ function App() {
                 <Route path="/templates-artigos-slides" element={<TemplatesArtigosSlides />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />
-                <Route path="/eventos/:slug" element={<EventDetailPage />} />
+                <Route path="/eventos/:slug" element={<EventoDetalhes />} />
                 <Route path="/eventos/:slug/certificado" element={<CertificadoEmissao />} />
                 <Route path="/certificado-emissao" element={<CertificadoEmissao />} />
                 <Route path="/certificados/verify/:code" element={<VerificarCertificado />} />
