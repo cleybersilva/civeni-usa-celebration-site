@@ -32,8 +32,8 @@ const TemplatesArtigosSlides = () => {
   const articleTemplates = [
     {
       name: 'Template em Português (Word)',
-      file: '/templates/template_em_Português.docx',
-      type: 'docx',
+      file: '/templates/template_em_Português.doc',
+      type: 'doc',
       description: 'Modelo de documento para artigos acadêmicos em português',
       category: 'article'
     },
