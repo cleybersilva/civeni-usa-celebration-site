@@ -129,9 +129,10 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
             </h3>
 
             {session.description && (
-              <p className="text-muted-foreground text-sm mb-3 leading-relaxed">
-                {session.description}
-              </p>
+              <div 
+                className="text-muted-foreground text-sm mb-3 leading-relaxed prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: session.description }}
+              />
             )}
 
             <div className="flex flex-wrap gap-2 mb-4">
