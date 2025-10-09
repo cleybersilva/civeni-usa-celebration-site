@@ -19,11 +19,19 @@ const RegistrationSuccess = () => {
   }, [sessionId]);
 
   const verifyPayment = async () => {
+    if (!sessionId) return;
+    
     try {
       setLoading(true);
-      await supabase.functions.invoke('verify-payment', {
+      const { data, error } = await supabase.functions.invoke('verify-payment', {
         body: { session_id: sessionId }
       });
+      
+      if (error) {
+        console.error('Payment verification error:', error);
+      } else {
+        console.log('Payment verified successfully:', data);
+      }
     } catch (error) {
       console.error('Payment verification failed:', error);
     } finally {

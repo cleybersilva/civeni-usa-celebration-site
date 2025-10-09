@@ -270,8 +270,8 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/registration-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/registration-canceled`,
+      success_url: `${req.headers.get("origin")}/registration/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/registration/canceled`,
       metadata: {
         registration_id: registration.id,
         participant_email: email,
