@@ -1,48 +1,17 @@
-import conferenceImage from '@/assets/conference-event.jpg';
-import { useCMS } from '@/contexts/CMSContext';
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCMS } from '@/contexts/CMSContext';
+
 
 const HeroBanner = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   
   // Filtrar apenas slides ativos para exibição pública
   const slides = content.bannerSlides
     .filter(slide => slide.id && slide.id !== 'new') // Filtrar slides válidos
-    .sort((a, b) => a.order - b.order)
-    .map(slide => ({
-      ...slide,
-      bgImage: getValidImageUrl(slide.bgImage, slide.id)
-    }));
-
-  // Função para obter URL válida da imagem com fallback
-  function getValidImageUrl(originalUrl: string, slideId: string): string {
-    // Se houve erro anterior com esta imagem, usar fallback
-    if (imageErrors[slideId]) {
-      return conferenceImage;
-    }
-    
-    // Corrigir URLs conhecidas problemáticas
-    if (originalUrl?.includes('src/assets/')) {
-      return conferenceImage;
-    }
-    
-    // Se a URL está no formato /assets/, corrigir para absoluto
-    if (originalUrl?.startsWith('/assets/')) {
-      return conferenceImage; // Use local asset como fallback
-    }
-    
-    // Retornar URL original se parece válida
-    return originalUrl || conferenceImage;
-  }
-  
-  // Lidar com erros de carregamento de imagem
-  const handleImageError = (slideId: string) => {
-    setImageErrors(prev => ({ ...prev, [slideId]: true }));
-  };
+    .sort((a, b) => a.order - b.order);
 
   // Auto-rotate slides
   useEffect(() => {
@@ -59,28 +28,17 @@ const HeroBanner = () => {
   if (slides.length === 0) {
     return (
       <section className="relative h-screen overflow-hidden bg-gradient-to-br from-civeni-blue to-blue-800">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${conferenceImage})` }}
-        />
-        <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 flex items-center justify-center h-full">
           <div className="text-center text-white max-w-4xl px-4">
             <h1 className="text-5xl md:text-7xl font-bold font-poppins mb-6">
-              III CIVENI 2025
+              CIVENI 2025
             </h1>
             <p className="text-xl md:text-2xl mb-4">
-              Congresso Internacional Multidisciplinar
+              Congresso Internacional Virtual de Enfermagem
             </p>
             <p className="text-lg md:text-xl mb-8">
-              Celebration, Florida • 8-10 Dezembro 2025
+              Carregando banner...
             </p>
-            <a 
-              href="/inscricoes"
-              className="bg-civeni-red text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 font-poppins"
-            >
-              Inscreva-se Agora
-            </a>
           </div>
         </div>
       </section>
@@ -104,13 +62,6 @@ const HeroBanner = () => {
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat'
             }}
-          />
-          {/* Adicionar img element para detectar erros */}
-          <img
-            src={slide.bgImage}
-            alt=""
-            style={{ display: 'none' }}
-            onError={() => handleImageError(slide.id)}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
           

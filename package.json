@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node copy-templates.cjs && vite build",
-    "build:dev": "node copy-templates.cjs && vite build --mode development",
-    "copy-templates": "node copy-templates.cjs",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
   },

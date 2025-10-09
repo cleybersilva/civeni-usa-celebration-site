@@ -1,21 +1,13 @@
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
-import { createSafeHtml } from '@/utils/sanitizeHtml';
-import { BookOpen, Download, ExternalLink, Eye, FileIcon, FileText, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-
-interface TemplateItem {
-  name: string;
-  file: string;
-  type: string;
-  description: string;
-  category: string;
-}
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText, Download, ExternalLink, Users, BookOpen, Eye, FileIcon } from 'lucide-react';
+import { createSafeHtml } from '@/utils/sanitizeHtml';
 
 interface WorkContent {
   id: string;
@@ -40,14 +32,14 @@ const TemplatesArtigosSlides = () => {
   const articleTemplates = [
     {
       name: 'Template em Português (Word)',
-      file: '/templates/template em Português.doc',
-      type: 'doc',
+      file: '/templates/template_em_Português.docx',
+      type: 'docx',
       description: 'Modelo de documento para artigos acadêmicos em português',
       category: 'article'
     },
     {
       name: 'Template - English (Word)',
-      file: '/templates/Template - English.docx',
+      file: '/templates/Template_-_English.docx',
       type: 'docx',
       description: 'Document template for academic papers in English',
       category: 'article'
@@ -223,70 +215,27 @@ const TemplatesArtigosSlides = () => {
 
   const handleDownloadClick = async (templateFile: string, templateName: string) => {
     try {
-      // Codificar a URL corretamente para caracteres especiais
-      const encodedFile = encodeURI(templateFile);
-      
-      const response = await fetch(encodedFile, {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-      
+      const response = await fetch(templateFile);
       if (!response.ok) {
-        throw new Error(`Arquivo não encontrado: ${response.status}`);
+        throw new Error('Arquivo não encontrado');
       }
-      
-      // Garantir que o blob seja criado com o tipo correto
-      const contentType = response.headers.get('content-type') || 'application/octet-stream';
       const blob = await response.blob();
-      
-      // Criar um novo blob com o tipo correto se necessário
-      const finalBlob = new Blob([blob], { type: contentType });
-      
-      // Usar o nome original do arquivo
-      const fileName = templateFile.split('/').pop() || templateName;
-      
-      // Criar e configurar o link de download
-      const url = window.URL.createObjectURL(finalBlob);
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = fileName;
-      link.style.display = 'none';
-      
-      // Adicionar ao DOM, clicar e remover
+      link.download = templateFile.split('/').pop() || templateName;
       document.body.appendChild(link);
       link.click();
-      
-      // Cleanup com delay para garantir que o download iniciou
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-      
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Erro ao baixar arquivo:', error);
-      
-      // Fallback: tentar download direto
-      try {
-        const link = document.createElement('a');
-        link.href = encodeURI(templateFile);
-        link.download = templateFile.split('/').pop() || templateName;
-        link.target = '_blank';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (fallbackError) {
-        alert('Erro ao baixar o arquivo. Por favor, tente novamente ou entre em contato com o suporte.');
-      }
+      alert('Erro ao baixar o arquivo. Por favor, tente novamente.');
     }
   };
 
   const handlePreviewClick = async (templateFile: string) => {
-    // Codificar a URL corretamente para caracteres especiais
-    const encodedFile = encodeURI(templateFile);
-    const absoluteUrl = new URL(encodedFile, window.location.origin).href;
+    const absoluteUrl = new URL(templateFile, window.location.origin).href;
     
     const fileExists = await checkFileExists(absoluteUrl);
     
@@ -361,7 +310,7 @@ const TemplatesArtigosSlides = () => {
     }
   };
 
-  const renderTemplateCard = (template: TemplateItem, index: number) => (
+  const renderTemplateCard = (template: any, index: number) => (
     <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-md hover:scale-105">
       <CardHeader className="pb-3">
         <CardTitle className="flex flex-col items-center justify-center gap-3 text-lg text-center">
