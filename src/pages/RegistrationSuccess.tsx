@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { CheckCircle, ArrowLeft, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 
 const RegistrationSuccess = () => {
-  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [loading, setLoading] = useState(false);
@@ -40,36 +38,53 @@ const RegistrationSuccess = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-20">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-center mb-4">
-                <CheckCircle className="w-16 h-16 text-green-500" />
+    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
+      <div className="container mx-auto">
+        <div className="max-w-2xl mx-auto">
+          <Card className="border-0 shadow-lg">
+            <CardContent className="pt-12 pb-8 px-8 space-y-8">
+              {/* Success Icon */}
+              <div className="flex justify-center">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center">
+                    <CheckCircle className="w-16 h-16 text-green-500 fill-green-500" strokeWidth={2} />
+                  </div>
+                </div>
               </div>
-              <CardTitle className="text-2xl text-civeni-blue">
-                🎉 Inscrição Realizada com Sucesso!
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-lg text-gray-700">
-                Parabéns! Sua inscrição no Civeni 2025 foi confirmada.
-              </p>
+
+              {/* Title */}
+              <div className="text-center space-y-3">
+                <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
+                  🎉 Inscrição Realizada com Sucesso!
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  Parabéns! Sua inscrição no Civeni 2025 foi confirmada.
+                </p>
+              </div>
               
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <Mail className="w-5 h-5 text-green-600 mx-auto mb-2" />
-                <p className="text-sm text-green-700">
+              {/* Info Box */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6 space-y-3">
+                <div className="flex justify-center">
+                  <Mail className="w-6 h-6 text-green-600" />
+                </div>
+                <p className="text-center text-green-700 font-medium">
                   Você receberá confirmação por e-mail, WhatsApp e SMS em breve.
                 </p>
               </div>
 
-              <Button asChild className="bg-civeni-blue hover:bg-blue-700">
-                <Link to="/">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Voltar ao Início
-                </Link>
-              </Button>
+              {/* Back Button */}
+              <div className="flex justify-center pt-4">
+                <Button 
+                  asChild 
+                  size="lg"
+                  className="bg-[hsl(210,100%,25%)] hover:bg-[hsl(210,100%,20%)] text-white px-8"
+                >
+                  <Link to="/">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar ao Início
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

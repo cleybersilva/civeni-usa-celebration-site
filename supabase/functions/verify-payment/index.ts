@@ -90,6 +90,17 @@ serve(async (req) => {
     );
 
     if (session.payment_status === 'paid') {
+      // Get registration details for email
+      const { data: registration, error: regError } = await supabaseClient
+        .from('event_registrations')
+        .select('id, email, full_name, category_id')
+        .eq('stripe_session_id', session_id)
+        .single();
+
+      if (regError) {
+        console.error('Failed to fetch registration:', regError);
+      }
+
       // Update registration status in event_registrations table
       const { error } = await supabaseClient
         .from('event_registrations')
@@ -111,6 +122,32 @@ serve(async (req) => {
             headers: { ...corsHeaders, "Content-Type": "application/json" }
           }
         );
+      }
+
+      // Send confirmation email
+      if (registration) {
+        try {
+          // Get category name
+          const { data: category } = await supabaseClient
+            .from('event_category')
+            .select('title_pt')
+            .eq('id', registration.category_id)
+            .single();
+
+          await supabaseClient.functions.invoke('send-registration-confirmation', {
+            body: {
+              email: registration.email,
+              fullName: registration.full_name,
+              registrationId: registration.id,
+              categoryName: category?.title_pt || 'Categoria',
+              isFree: false
+            }
+          });
+          console.log('Confirmation email sent successfully');
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+          // Don't fail the request if email fails
+        }
       }
 
       return new Response(JSON.stringify({ 
