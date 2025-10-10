@@ -32,14 +32,14 @@ const TemplatesArtigosSlides = () => {
   const articleTemplates = [
     {
       name: 'Template em Português (Word)',
-      file: '/templates/template_em_Português.doc',
-      type: 'doc',
+      file: '/templates/template_em_portugues.docx',
+      type: 'docx',
       description: 'Modelo de documento para artigos acadêmicos em português',
       category: 'article'
     },
     {
       name: 'Template - English (Word)',
-      file: '/templates/Template_English.docx',
+      file: '/templates/template_English.docx',
       type: 'docx',
       description: 'Document template for academic papers in English',
       category: 'article'
@@ -49,14 +49,14 @@ const TemplatesArtigosSlides = () => {
   const slideTemplates = [
     {
       name: 'Modelo de Slides em Português (PowerPoint)',
-      file: '/templates/MODELO_DE_SLIDES_Português.ppt',
-      type: 'ppt',
+      file: '/templates/modelo_de_slides_portugues.pptx',
+      type: 'pptx',
       description: 'Modelo de apresentação para slides em português',
       category: 'slide'
     },
     {
       name: 'Template for Slides (PowerPoint)',
-      file: '/templates/TEMPLATE_FOR_SLIDES.pptx',
+      file: '/templates/template_for_slides.pptx',
       type: 'pptx',
       description: 'Presentation template for slides in English',
       category: 'slide'
