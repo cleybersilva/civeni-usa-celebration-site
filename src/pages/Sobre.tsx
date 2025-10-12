@@ -118,7 +118,7 @@ const Sobre = () => {
                 <Link to="/inscricoes">Inscrições</Link>
               </Button>
               <Button asChild variant="outline" className="border-civeni-red text-civeni-red hover:bg-civeni-red hover:text-white">
-                <a href="/us/contact/">Contato</a>
+                <Link to="/contato">Contato</Link>
               </Button>
             </div>
           </section>
