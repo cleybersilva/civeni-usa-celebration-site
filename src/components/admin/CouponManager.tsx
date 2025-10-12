@@ -10,13 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, Tag, Percent, DollarSign } from 'lucide-react';
 import { useCoupons, Coupon } from '@/hooks/useCoupons';
-import { useRegistrationCategories } from '@/hooks/useRegistrationCategories';
+import { useParticipantTypes } from '@/hooks/useParticipantTypes';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
 const CouponManager = () => {
   const { coupons, loading, createCoupon, updateCoupon, deleteCoupon } = useCoupons();
-  const { categories } = useRegistrationCategories();
+  const { participantTypes } = useParticipantTypes();
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -151,8 +151,7 @@ const CouponManager = () => {
     } else if (coupon.discount_type === 'fixed_amount' && coupon.discount_value) {
       return `R$ ${coupon.discount_value.toFixed(2)}`;
     } else if (coupon.discount_type === 'category_override') {
-      const category = categories.find(cat => cat.id === coupon.category_id);
-      return category ? category.category_name : 'Categoria não encontrada';
+      return 'Categoria Específica';
     }
     return '-';
   };
@@ -269,23 +268,17 @@ const CouponManager = () => {
               {formData.discount_type === 'category_override' && (
                 <div>
                   <Label htmlFor="category_id" className="block text-sm font-medium mb-2">
-                    Categoria de Destino
+                    ID da Categoria de Destino
                   </Label>
-                  <Select
+                  <Input
+                    id="category_id"
                     value={formData.category_id}
-                    onValueChange={(value) => setFormData({...formData, category_id: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.category_name} - {category.is_exempt ? 'GRATUITO' : `R$ ${category.price_brl.toFixed(2)}`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+                    placeholder="Cole o ID da categoria aqui"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Para cupons gratuitos, deixe em branco e configure 100% de desconto
+                  </p>
                 </div>
               )}
 
