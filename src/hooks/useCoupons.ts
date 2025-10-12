@@ -9,9 +9,13 @@ export interface Coupon {
   discount_type: 'percentage' | 'fixed_amount' | 'category_override';
   discount_value: number | null;
   category_id: string | null;
+  participant_type: string | null;
   is_active: boolean;
   usage_limit: number | null;
   used_count: number | null;
+  status: string;
+  valid_from: string | null;
+  valid_until: string | null;
   created_at: string;
   updated_at: string;
 }

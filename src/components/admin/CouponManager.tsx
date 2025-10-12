@@ -26,8 +26,12 @@ const CouponManager = () => {
     discount_type: 'percentage' as 'percentage' | 'fixed_amount' | 'category_override',
     discount_value: '',
     category_id: '',
+    participant_type: '',
     is_active: true,
-    usage_limit: ''
+    usage_limit: '',
+    status: 'active',
+    valid_from: '',
+    valid_until: ''
   });
 
   const resetForm = () => {
@@ -37,8 +41,12 @@ const CouponManager = () => {
       discount_type: 'percentage',
       discount_value: '',
       category_id: '',
+      participant_type: '',
       is_active: true,
-      usage_limit: ''
+      usage_limit: '',
+      status: 'active',
+      valid_from: '',
+      valid_until: ''
     });
     setEditingCoupon(null);
   };
@@ -52,8 +60,12 @@ const CouponManager = () => {
       discount_type: formData.discount_type,
       discount_value: formData.discount_value ? parseFloat(formData.discount_value) : null,
       category_id: formData.category_id || null,
+      participant_type: formData.participant_type || null,
       is_active: formData.is_active,
-      usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null
+      usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
+      status: formData.status || 'active',
+      valid_from: formData.valid_from || null,
+      valid_until: formData.valid_until || null
     };
 
     let result;
@@ -68,7 +80,8 @@ const CouponManager = () => {
       resetForm();
       alert(editingCoupon ? 'Cupom atualizado com sucesso!' : 'Cupom criado com sucesso!');
     } else {
-      alert('Erro ao salvar cupom. Tente novamente.');
+      console.error('Erro ao salvar cupom:', result.error);
+      alert(`Erro ao salvar cupom: ${result.error?.message || 'Tente novamente.'}`);
     }
   };
 
@@ -80,8 +93,12 @@ const CouponManager = () => {
       discount_type: coupon.discount_type,
       discount_value: coupon.discount_value?.toString() || '',
       category_id: coupon.category_id || '',
+      participant_type: (coupon as any).participant_type || '',
       is_active: coupon.is_active,
-      usage_limit: coupon.usage_limit?.toString() || ''
+      usage_limit: coupon.usage_limit?.toString() || '',
+      status: (coupon as any).status || 'active',
+      valid_from: (coupon as any).valid_from || '',
+      valid_until: (coupon as any).valid_until || ''
     });
     setIsDialogOpen(true);
   };
@@ -273,6 +290,53 @@ const CouponManager = () => {
               )}
 
               <div>
+                <Label htmlFor="participant_type" className="block text-sm font-medium mb-2">
+                  Tipo de Participante (opcional)
+                </Label>
+                <Select
+                  value={formData.participant_type}
+                  onValueChange={(value) => setFormData({...formData, participant_type: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os participantes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos os participantes</SelectItem>
+                    <SelectItem value="professor">Professor(a)</SelectItem>
+                    <SelectItem value="palestrante">Palestrante</SelectItem>
+                    <SelectItem value="convidado">Convidado(a)</SelectItem>
+                    <SelectItem value="estudante">Estudante</SelectItem>
+                    <SelectItem value="profissional">Profissional</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="valid_from" className="block text-sm font-medium mb-2">
+                    Válido de (opcional)
+                  </Label>
+                  <Input
+                    id="valid_from"
+                    type="datetime-local"
+                    value={formData.valid_from}
+                    onChange={(e) => setFormData({...formData, valid_from: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="valid_until" className="block text-sm font-medium mb-2">
+                    Válido até (opcional)
+                  </Label>
+                  <Input
+                    id="valid_until"
+                    type="datetime-local"
+                    value={formData.valid_until}
+                    onChange={(e) => setFormData({...formData, valid_until: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div>
                 <Label htmlFor="usage_limit" className="block text-sm font-medium mb-2">
                   Limite de Uso (opcional)
                 </Label>
@@ -284,6 +348,25 @@ const CouponManager = () => {
                   onChange={(e) => setFormData({...formData, usage_limit: e.target.value})}
                   placeholder="Ex: 100"
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="status" className="block text-sm font-medium mb-2">
+                  Status do Cupom
+                </Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => setFormData({...formData, status: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="inactive">Inativo</SelectItem>
+                    <SelectItem value="expired">Expirado</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center space-x-2">
