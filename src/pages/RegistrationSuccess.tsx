@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, ArrowLeft, Mail } from 'lucide-react';
+import { ArrowLeft, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
+import civeniLogo from '@/assets/civeni-2025-logo.png';
 
 const RegistrationSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -43,12 +44,14 @@ const RegistrationSuccess = () => {
         <div className="max-w-2xl mx-auto">
           <Card className="border-0 shadow-lg">
             <CardContent className="pt-12 pb-8 px-8 space-y-8">
-              {/* Success Icon */}
+              {/* CIVENI Logo */}
               <div className="flex justify-center">
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center">
-                    <CheckCircle className="w-16 h-16 text-green-500 fill-green-500" strokeWidth={2} />
-                  </div>
+                  <img 
+                    src={civeniLogo} 
+                    alt="CIVENI 2025" 
+                    className="h-32 w-auto object-contain"
+                  />
                 </div>
               </div>
 
