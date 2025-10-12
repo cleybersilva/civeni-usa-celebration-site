@@ -12,6 +12,7 @@ import { NewRegistrationSectionProps } from '@/types/registration';
 import { useLotes } from '@/hooks/useLotes';
 import { usePublicEventCategories } from '@/hooks/usePublicEventCategories';
 import { useRegistrationForm } from '@/hooks/useRegistrationForm';
+import { useParticipantTypes } from '@/hooks/useParticipantTypes';
 import { getCategoryName } from '@/utils/registrationUtils';
 import LoteInfo from './registration/LoteInfo';
 import VCCUFields from './registration/VCCUFields';
@@ -21,6 +22,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
   const { t, i18n } = useTranslation();
   const { loteVigente, loading: loteLoading } = useLotes();
   const { categories } = usePublicEventCategories();
+  const { participantTypes } = useParticipantTypes();
   const { formData, setFormData, loading, error, handleSubmit } = useRegistrationForm(registrationType);
 
   if (loteLoading) {
@@ -73,8 +75,13 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
     
     return categories.filter(category => {
       // Para professores, mostrar APENAS a categoria gratuita VCCU
-      if (formData.participantType === 'professor') {
+      if (formData.participantType === 'Professor(a)') {
         return category.is_free && category.slug === 'professor-vccu-gratuito';
+      }
+      
+      // Para palestrantes, mostrar APENAS a categoria gratuita de palestrantes
+      if (formData.participantType === 'Palestrantes') {
+        return category.is_free && category.slug === 'palestrantes-vccu-gratuito';
       }
       
       // Para participante externo, mostrar APENAS a categoria específica de externo
@@ -175,7 +182,11 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       <SelectItem value="vccu_student">Aluno(a) VCCU</SelectItem>
                       <SelectItem value="guest">Convidado(a)</SelectItem>
                       <SelectItem value="external">Participante Externo</SelectItem>
-                      <SelectItem value="professor">Professor(a)</SelectItem>
+                      {participantTypes.filter(pt => pt.is_active).map((pt) => (
+                        <SelectItem key={pt.id} value={pt.type_name}>
+                          {pt.type_name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -268,14 +279,14 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 <Button 
                   type="submit" 
                   className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
-                  disabled={
-                    loading || 
-                    !formData.categoryId || 
-                    !formData.participantType || 
-                    (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || 
-                    (selectedCategory?.is_free && !formData.couponCode) ||
-                    (formData.participantType === 'professor' && !formData.couponCode)
-                  }
+                    disabled={
+                      loading || 
+                      !formData.categoryId || 
+                      !formData.participantType || 
+                      (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || 
+                      (selectedCategory?.is_free && !formData.couponCode) ||
+                      ((formData.participantType === 'Professor(a)' || formData.participantType === 'Palestrantes') && !formData.couponCode)
+                    }
                 >
                   {loading ? t('registration.processing') : t('registration.registerNow')}
                 </Button>
