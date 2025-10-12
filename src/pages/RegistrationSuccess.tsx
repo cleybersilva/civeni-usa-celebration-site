@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import civeniLogo from '@/assets/civeni-2025-logo.png';
+import conferenceImage from '@/assets/conference-event.jpg';
 
 const RegistrationSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -39,8 +40,15 @@ const RegistrationSuccess = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
-      <div className="container mx-auto">
+    <div className="min-h-screen relative flex items-center justify-center py-12 px-4 bg-gradient-to-br from-civeni-blue to-civeni-red">
+      <div className="absolute inset-0">
+        <img 
+          src={conferenceImage} 
+          alt="Evento de Conferência" 
+          className="w-full h-full object-cover opacity-20"
+        />
+      </div>
+      <div className="container mx-auto relative z-10">
         <div className="max-w-2xl mx-auto">
           <Card className="border-0 shadow-lg">
             <CardContent className="pt-12 pb-8 px-8 space-y-8">
