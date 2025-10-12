@@ -148,16 +148,7 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         
         if (data.payment_required === false) {
           console.log("Free registration completed");
-          alert('Inscrição gratuita realizada com sucesso!');
-          setFormData({ 
-            email: '', 
-            fullName: '', 
-            participantType: '',
-            categoryId: '', 
-            cursoId: '',
-            turmaId: '',
-            couponCode: '' 
-          });
+          window.location.href = '/registration/success';
         } else if (data.url) {
           console.log("=== REDIRECTING TO STRIPE ===");
           console.log("URL received:", data.url);
