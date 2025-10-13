@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Upload, FileText, CheckCircle, Users, BookOpen } from 'lucide-react';
+import { Upload, FileText, Users, BookOpen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('artigo');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     author_name: '',
     institution: '',
@@ -121,8 +121,8 @@ const SubmissaoTrabalhos = () => {
         throw updateError;
       }
 
-      setIsSubmitted(true);
       toast.success('Trabalho submetido com sucesso!');
+      navigate('/work-submission/success');
 
     } catch (error: any) {
       console.error('Error submitting work:', error);
@@ -131,39 +131,6 @@ const SubmissaoTrabalhos = () => {
       setIsSubmitting(false);
     }
   };
-
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
-        <Header />
-        
-        <main className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="bg-green-50 rounded-2xl p-8 mb-8">
-                <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                <h1 className="text-3xl font-bold text-green-800 mb-4">
-                  Trabalho Submetido com Sucesso!
-                </h1>
-                <p className="text-green-700 text-lg mb-6">
-                  Seu trabalho foi recebido e está sendo analisado pela nossa equipe. 
-                  Você receberá um e-mail de confirmação em breve.
-                </p>
-                <button
-                  onClick={() => window.location.href = '/area-tematica'}
-                  className="bg-civeni-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Voltar às Áreas Temáticas
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-        
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
