@@ -87,6 +87,8 @@ const SubmissaoTrabalhos = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('Submitting work with data:', { ...formData, submission_kind: activeTab });
+      
       // Use the submit-work edge function for secure submission
       const { data, error } = await supabase.functions.invoke('submit-work', {
         body: {
@@ -95,18 +97,28 @@ const SubmissaoTrabalhos = () => {
         }
       });
 
+      console.log('Edge function response:', { data, error });
+
       if (error) {
-        throw new Error(error.message || 'Erro na função de submissão');
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Erro ao comunicar com o servidor');
       }
 
-      if (!data?.success) {
-        throw new Error(data?.error || 'Erro desconhecido na submissão');
+      if (!data) {
+        throw new Error('Resposta inválida do servidor');
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Erro ao processar submissão');
       }
 
       const submissionId = data.id;
+      console.log('Submission created with ID:', submissionId);
 
       // Upload file after successful submission
+      console.log('Uploading file:', file.name);
       const { filePath, fileName } = await uploadFile(file, submissionId);
+      console.log('File uploaded:', { filePath, fileName });
 
       // Update submission with file info
       const { error: updateError } = await supabase
@@ -118,15 +130,18 @@ const SubmissaoTrabalhos = () => {
         .eq('id', submissionId);
 
       if (updateError) {
-        throw updateError;
+        console.error('Error updating submission with file info:', updateError);
+        throw new Error('Erro ao anexar arquivo à submissão');
       }
 
+      console.log('Submission completed successfully');
       toast.success('Trabalho submetido com sucesso!');
       navigate('/work-submission/success');
 
     } catch (error: any) {
       console.error('Error submitting work:', error);
-      toast.error('Erro ao submeter trabalho. Tente novamente.');
+      const errorMessage = error.message || 'Erro ao submeter trabalho. Tente novamente.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
