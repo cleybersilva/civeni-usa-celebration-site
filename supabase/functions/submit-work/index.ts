@@ -1,11 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 // Rate limiting for work submissions
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -151,6 +154,60 @@ serve(async (req) => {
     }
 
     console.log(`[SUBMIT-WORK] Submission ${data.id} created successfully`);
+
+    // Send notification email
+    try {
+      const submissionType = sanitizedData.submission_kind === 'artigo' ? 'Artigo' : 'Consórcio';
+      
+      await resend.emails.send({
+        from: "CIVENI <noreply@civeni.com>",
+        to: ["contact@civeni.com"],
+        subject: `Nova Submissão de ${submissionType} - ${sanitizedData.work_title}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #1e40af;">Nova Submissão Recebida</h2>
+            
+            <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #374151; margin-top: 0;">Tipo de Submissão</h3>
+              <p style="font-size: 16px; color: #1f2937;"><strong>${submissionType}</strong></p>
+            </div>
+
+            <div style="background-color: #fff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+              <h3 style="color: #374151;">Dados do Autor</h3>
+              <p><strong>Nome:</strong> ${sanitizedData.author_name}</p>
+              <p><strong>Instituição:</strong> ${sanitizedData.institution}</p>
+              <p><strong>E-mail:</strong> ${sanitizedData.email}</p>
+              
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+              
+              <h3 style="color: #374151;">Dados do Trabalho</h3>
+              <p><strong>Título:</strong> ${sanitizedData.work_title}</p>
+              <p><strong>Área Temática:</strong> ${sanitizedData.thematic_area}</p>
+              
+              <h4 style="color: #374151;">Resumo</h4>
+              <p style="white-space: pre-wrap;">${sanitizedData.abstract}</p>
+              
+              <h4 style="color: #374151;">Palavras-chave</h4>
+              <p>${sanitizedData.keywords}</p>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background-color: #eff6ff; border-radius: 8px;">
+              <p style="margin: 0; color: #1e40af;">
+                <strong>ID da Submissão:</strong> ${data.id}
+              </p>
+              <p style="margin: 10px 0 0 0; color: #1e40af;">
+                Acesse o painel administrativo para revisar e gerenciar esta submissão.
+              </p>
+            </div>
+          </div>
+        `,
+      });
+      
+      console.log(`[SUBMIT-WORK] Notification email sent for submission ${data.id}`);
+    } catch (emailError) {
+      console.error('[SUBMIT-WORK] Error sending notification email:', emailError);
+      // Don't fail the submission if email fails
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 

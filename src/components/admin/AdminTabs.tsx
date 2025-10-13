@@ -14,6 +14,7 @@ import RegistrationManager from './RegistrationManager';
 import FinancialDashboard from './FinancialDashboard';
 import UsersManager from './UsersManager';
 import SimpleEventsManager from './SimpleEventsManager';
+import WorkSubmissionsManager from './WorkSubmissionsManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -24,13 +25,13 @@ const AdminTabs = () => {
   const hasPermission = (resource: string) => {
     if (user.user_type === 'admin_root') return true;
     if (user.user_type === 'admin') {
-      return ['banner', 'contador', 'cronograma', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'].includes(resource);
+      return ['banner', 'contador', 'cronograma', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos', 'trabalhos'].includes(resource);
     }
     if (user.user_type === 'design') {
       return ['banner', 'eventos', 'palestrantes', 'videos'].includes(resource);
     }
     if (user.user_type === 'editor') {
-      return ['contador', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'].includes(resource);
+      return ['contador', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos', 'trabalhos'].includes(resource);
     }
     return false;
   };
@@ -41,7 +42,7 @@ const AdminTabs = () => {
 
   return (
     <Tabs defaultValue="eventos" className="w-full">
-      <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
+      <TabsList className="grid w-full grid-cols-6 lg:grid-cols-13">
         {canViewFinanceiro && (
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
         )}
@@ -72,6 +73,9 @@ const AdminTabs = () => {
         )}
         {hasPermission('textos') && (
           <TabsTrigger value="textos">Textos</TabsTrigger>
+        )}
+        {hasPermission('trabalhos') && (
+          <TabsTrigger value="trabalhos">Trabalhos</TabsTrigger>
         )}
         {canViewUsuarios && (
           <TabsTrigger value="usuarios">Usuários</TabsTrigger>
@@ -155,6 +159,12 @@ const AdminTabs = () => {
       {hasPermission('textos') && (
         <TabsContent value="textos">
           <SiteTextsManager />
+        </TabsContent>
+      )}
+
+      {hasPermission('trabalhos') && (
+        <TabsContent value="trabalhos">
+          <WorkSubmissionsManager />
         </TabsContent>
       )}
 
