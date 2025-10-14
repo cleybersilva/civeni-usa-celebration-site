@@ -94,6 +94,9 @@ const SubmissaoTrabalhos = () => {
         body: {
           ...formData,
           submission_kind: activeTab as 'artigo' | 'consorcio'
+        },
+        headers: {
+          'Content-Type': 'application/json'
         }
       });
 
