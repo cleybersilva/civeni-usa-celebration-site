@@ -89,7 +89,33 @@ serve(async (req) => {
   const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   
   try {
-    const body = await req.json();
+    // Check if body exists and is not empty
+    const text = await req.text();
+    if (!text || text.trim() === '') {
+      console.error('[SUBMIT-WORK] Empty request body');
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Dados da requisição estão vazios' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+
+    let body;
+    try {
+      body = JSON.parse(text);
+    } catch (parseError) {
+      console.error('[SUBMIT-WORK] Invalid JSON:', parseError);
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Formato de dados inválido' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+
     const { email } = body;
     
     if (!checkRateLimit(clientIP, email || 'no-email')) {

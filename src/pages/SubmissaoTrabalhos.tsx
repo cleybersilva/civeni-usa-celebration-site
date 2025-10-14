@@ -89,15 +89,33 @@ const SubmissaoTrabalhos = () => {
     try {
       console.log('Submitting work with data:', { ...formData, submission_kind: activeTab });
       
+      // Validate all required fields
+      const submissionData = {
+        author_name: formData.author_name?.trim() || '',
+        institution: formData.institution?.trim() || '',
+        email: formData.email?.trim() || '',
+        work_title: formData.work_title?.trim() || '',
+        abstract: formData.abstract?.trim() || '',
+        keywords: formData.keywords?.trim() || '',
+        thematic_area: formData.thematic_area?.trim() || '',
+        submission_kind: activeTab as 'artigo' | 'consorcio'
+      };
+
+      // Final validation
+      if (!submissionData.author_name || !submissionData.institution || 
+          !submissionData.email || !submissionData.work_title || 
+          !submissionData.abstract || !submissionData.keywords || 
+          !submissionData.thematic_area) {
+        toast.error('Por favor, preencha todos os campos obrigatórios');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('Validated submission data:', submissionData);
+      
       // Use the submit-work edge function for secure submission
       const { data, error } = await supabase.functions.invoke('submit-work', {
-        body: {
-          ...formData,
-          submission_kind: activeTab as 'artigo' | 'consorcio'
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        body: submissionData
       });
 
       console.log('Edge function response:', { data, error });
