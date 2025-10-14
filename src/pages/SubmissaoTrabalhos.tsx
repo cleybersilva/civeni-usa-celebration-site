@@ -51,29 +51,13 @@ const SubmissaoTrabalhos = () => {
         return;
       }
       
-      if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+      if (selectedFile.size > 10 * 1024 * 1024) {
         toast.error('O arquivo deve ter no máximo 10MB');
         return;
       }
       
       setFile(selectedFile);
     }
-  };
-
-  const uploadFile = async (file: File, submissionId: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${submissionId}.${fileExt}`;
-    const filePath = `${submissionId}/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from('work-submissions')
-      .upload(filePath, file);
-
-    if (error) {
-      throw error;
-    }
-
-    return { filePath, fileName };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,33 +71,48 @@ const SubmissaoTrabalhos = () => {
     setIsSubmitting(true);
 
     try {
-      console.log('Submitting work with data:', { ...formData, submission_kind: activeTab });
-      
-      // Validate all required fields
-      const submissionData = {
-        author_name: formData.author_name?.trim() || '',
-        institution: formData.institution?.trim() || '',
-        email: formData.email?.trim() || '',
-        work_title: formData.work_title?.trim() || '',
-        abstract: formData.abstract?.trim() || '',
-        keywords: formData.keywords?.trim() || '',
-        thematic_area: formData.thematic_area?.trim() || '',
-        submission_kind: activeTab as 'artigo' | 'consorcio'
-      };
+      // Step 1: Upload file first
+      console.log('Uploading file:', file.name);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `submissions/${fileName}`;
 
-      // Final validation
-      if (!submissionData.author_name || !submissionData.institution || 
-          !submissionData.email || !submissionData.work_title || 
-          !submissionData.abstract || !submissionData.keywords || 
-          !submissionData.thematic_area) {
-        toast.error('Por favor, preencha todos os campos obrigatórios');
-        setIsSubmitting(false);
-        return;
+      const { error: uploadError } = await supabase.storage
+        .from('work-submissions')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Erro ao fazer upload do arquivo');
       }
 
-      console.log('Validated submission data:', submissionData);
-      
-      // Use the submit-work edge function for secure submission
+      console.log('File uploaded successfully:', filePath);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('work-submissions')
+        .getPublicUrl(filePath);
+
+      // Step 2: Submit form data with file info
+      const submissionData = {
+        author_name: formData.author_name.trim(),
+        institution: formData.institution.trim(),
+        email: formData.email.trim(),
+        work_title: formData.work_title.trim(),
+        abstract: formData.abstract.trim(),
+        keywords: formData.keywords.trim(),
+        thematic_area: formData.thematic_area.trim(),
+        submission_kind: activeTab,
+        file_url: publicUrl,
+        file_name: file.name,
+        file_size: file.size
+      };
+
+      console.log('Submitting to edge function:', submissionData);
+
       const { data, error } = await supabase.functions.invoke('submit-work', {
         body: submissionData
       });
@@ -121,38 +120,11 @@ const SubmissaoTrabalhos = () => {
       console.log('Edge function response:', { data, error });
 
       if (error) {
-        console.error('Edge function error:', error);
         throw new Error(error.message || 'Erro ao comunicar com o servidor');
       }
 
-      if (!data) {
-        throw new Error('Resposta inválida do servidor');
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || 'Erro ao processar submissão');
-      }
-
-      const submissionId = data.id;
-      console.log('Submission created with ID:', submissionId);
-
-      // Upload file after successful submission
-      console.log('Uploading file:', file.name);
-      const { filePath, fileName } = await uploadFile(file, submissionId);
-      console.log('File uploaded:', { filePath, fileName });
-
-      // Update submission with file info
-      const { error: updateError } = await supabase
-        .from('work_submissions')
-        .update({ 
-          file_path: filePath,
-          file_name: fileName 
-        })
-        .eq('id', submissionId);
-
-      if (updateError) {
-        console.error('Error updating submission with file info:', updateError);
-        throw new Error('Erro ao anexar arquivo à submissão');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao processar submissão');
       }
 
       console.log('Submission completed successfully');
@@ -161,8 +133,7 @@ const SubmissaoTrabalhos = () => {
 
     } catch (error: any) {
       console.error('Error submitting work:', error);
-      const errorMessage = error.message || 'Erro ao submeter trabalho. Tente novamente.';
-      toast.error(errorMessage);
+      toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -436,7 +407,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Título do Trabalho *
+                        Título do Consórcio *
                       </label>
                       <input
                         type="text"
@@ -470,7 +441,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Resumo * (máximo 500 caracteres)
+                        Descrição do Consórcio * (máximo 500 caracteres)
                       </label>
                       <textarea
                         name="abstract"
@@ -503,7 +474,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Arquivo do Trabalho * (PDF ou DOCX, máximo 10MB)
+                        Proposta do Consórcio * (PDF ou DOCX, máximo 10MB)
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
                         <input

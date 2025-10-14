@@ -10,10 +10,10 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-// Rate limiting for work submissions
+// Rate limiting
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 300000; // 5 minutes
-const RATE_LIMIT_MAX = 3; // max 3 submissions per window
+const RATE_LIMIT_MAX = 3;
 
 function checkRateLimit(clientIP: string, email: string): boolean {
   const now = Date.now();
@@ -33,44 +33,23 @@ function checkRateLimit(clientIP: string, email: string): boolean {
   return true;
 }
 
-function validateWorkSubmission(data: any): { isValid: boolean; errors: string[] } {
+function validateSubmission(data: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
   
-  // Required fields - validações básicas apenas
-  if (!data.author_name || data.author_name.trim().length < 2) {
-    errors.push('Nome do autor é obrigatório');
-  }
-  
-  if (!data.institution || data.institution.trim().length < 2) {
-    errors.push('Instituição é obrigatória');
-  }
-  
-  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+  if (!data.author_name?.trim()) errors.push('Nome do autor é obrigatório');
+  if (!data.institution?.trim()) errors.push('Instituição é obrigatória');
+  if (!data.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.push('Email válido é obrigatório');
   }
-  
-  if (!data.work_title || data.work_title.trim().length < 5) {
-    errors.push('Título do trabalho é obrigatório');
-  }
-  
-  if (!data.abstract || data.abstract.trim().length < 20) {
-    errors.push('Resumo é obrigatório');
-  }
-  
-  if (!data.keywords || data.keywords.trim().length < 5) {
-    errors.push('Palavras-chave são obrigatórias');
-  }
-  
-  if (!data.thematic_area || data.thematic_area.trim().length < 2) {
-    errors.push('Área temática é obrigatória');
+  if (!data.work_title?.trim()) errors.push('Título do trabalho é obrigatório');
+  if (!data.abstract?.trim()) errors.push('Resumo é obrigatório');
+  if (!data.keywords?.trim()) errors.push('Palavras-chave são obrigatórias');
+  if (!data.thematic_area?.trim()) errors.push('Área temática é obrigatória');
+  if (!data.submission_kind || !['artigo', 'consorcio'].includes(data.submission_kind)) {
+    errors.push('Tipo de submissão inválido');
   }
   
   return { isValid: errors.length === 0, errors };
-}
-
-function sanitizeText(text: string): string {
-  if (!text) return '';
-  return text.trim();
 }
 
 serve(async (req) => {

@@ -29,8 +29,9 @@ interface WorkSubmission {
   abstract: string;
   keywords: string;
   thematic_area: string;
-  file_path: string | null;
+  file_url: string | null;
   file_name: string | null;
+  file_size: number | null;
   status: string;
   internal_notes: string | null;
   reviewed_by: string | null;
@@ -140,30 +141,6 @@ const WorkSubmissionsManager = () => {
       toast.error('Erro ao atualizar submissão');
     } finally {
       setIsUpdating(false);
-    }
-  };
-
-  const downloadFile = async (filePath: string, fileName: string) => {
-    try {
-      const { data, error } = await supabase.storage
-        .from('work-submissions')
-        .download(filePath);
-
-      if (error) {
-        throw error;
-      }
-
-      const url = URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error: any) {
-      console.error('Error downloading file:', error);
-      toast.error('Erro ao baixar arquivo');
     }
   };
 
@@ -365,11 +342,11 @@ const WorkSubmissionsManager = () => {
                             <p className="mt-1 text-sm text-gray-900">{selectedSubmission.keywords}</p>
                           </div>
 
-                          {selectedSubmission.file_path && (
+                          {selectedSubmission.file_url && (
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">Arquivo</label>
                               <Button
-                                onClick={() => downloadFile(selectedSubmission.file_path!, selectedSubmission.file_name!)}
+                                onClick={() => window.open(selectedSubmission.file_url!, '_blank')}
                                 className="flex items-center gap-2"
                               >
                                 <Download className="w-4 h-4" />
@@ -421,11 +398,11 @@ const WorkSubmissionsManager = () => {
                     </DialogContent>
                   </Dialog>
 
-                  {submission.file_path && (
+                  {submission.file_url && (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => downloadFile(submission.file_path!, submission.file_name!)}
+                      onClick={() => window.open(submission.file_url!, '_blank')}
                     >
                       <Download className="w-4 h-4 mr-1" />
                       Baixar

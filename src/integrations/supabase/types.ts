@@ -2818,7 +2818,8 @@ export type Database = {
           created_at: string
           email: string
           file_name: string | null
-          file_path: string | null
+          file_size: number | null
+          file_url: string | null
           id: string
           institution: string
           internal_notes: string | null
@@ -2837,7 +2838,8 @@ export type Database = {
           created_at?: string
           email: string
           file_name?: string | null
-          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
           id?: string
           institution: string
           internal_notes?: string | null
@@ -2856,7 +2858,8 @@ export type Database = {
           created_at?: string
           email?: string
           file_name?: string | null
-          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
           id?: string
           institution?: string
           internal_notes?: string | null
