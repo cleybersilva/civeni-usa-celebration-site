@@ -7,6 +7,7 @@ interface AdminUser {
   email: string;
   user_type: 'admin' | 'editor' | 'viewer' | 'design' | 'admin_root';
   is_admin_root?: boolean;
+  roles?: string[]; // Server-validated roles from user_roles table
 }
 
 interface LoginResponse {
@@ -103,11 +104,20 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
       const loginResponse = data as unknown as LoginResponse & { session_token?: string };
 
       if (loginResponse && loginResponse.success && loginResponse.user && loginResponse.session_token) {
+        // Fetch server-validated roles
+        const rolesResult = await supabase.rpc('check_user_role_secure', {
+          user_email: email,
+          session_token: loginResponse.session_token
+        });
+
+        const rolesData = rolesResult.data as any;
+        
         const adminUser: AdminUser = {
           id: loginResponse.user.user_id,
           email: loginResponse.user.email,
           user_type: loginResponse.user.user_type as AdminUser['user_type'],
-          is_admin_root: loginResponse.user.user_type === 'admin_root'
+          is_admin_root: rolesData?.is_admin_root || loginResponse.user.user_type === 'admin_root',
+          roles: rolesData?.roles || [] // Server-validated roles
         };
         
         setUser(adminUser);
@@ -175,20 +185,26 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const hasPermission = (resource: string) => {
     if (!user) return false;
     
-    // Admin Root tem acesso total
-    if (user.user_type === 'admin_root' || user.is_admin_root) {
+    // SECURITY: Use server-validated roles from user_roles table
+    const serverRoles = user.roles || [];
+    
+    // Admin Root has full access
+    if (serverRoles.includes('admin_root') || user.is_admin_root) {
       return true;
     }
     
-    // Definir permissões por categoria
-    const permissions = {
+    // Define permissions by role using server-validated data
+    const permissions: Record<string, string[]> = {
       admin: ['banner', 'contador', 'copyright', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'],
       design: ['banner', 'palestrantes', 'videos'],
       editor: ['contador', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'],
-      viewer: ['read'] // Apenas visualização
+      viewer: ['read']
     };
 
-    return permissions[user.user_type]?.includes(resource) || false;
+    // Check if any of the user's server-validated roles grant access to the resource
+    return serverRoles.some(role => 
+      permissions[role]?.includes(resource)
+    );
   };
 
   const isAdminRoot = () => {

@@ -2658,6 +2658,38 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_submissions: {
         Row: {
           created_at: string
@@ -2960,6 +2992,10 @@ export type Database = {
         Args: { permission_type: string; resource: string; user_email: string }
         Returns: boolean
       }
+      check_user_role_secure: {
+        Args: { session_token: string; user_email: string }
+        Returns: Json
+      }
       cleanup_expired_sessions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -3051,6 +3087,13 @@ export type Database = {
       get_stable_asset_url: {
         Args: { bucket_name: string; file_path: string }
         Returns: string
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_email: string
+        }
+        Returns: boolean
       }
       is_admin_root_user: {
         Args: { user_email: string }
@@ -3182,6 +3225,7 @@ export type Database = {
     }
     Enums: {
       admin_user_type: "admin" | "editor" | "viewer" | "design" | "admin_root"
+      app_role: "admin" | "editor" | "viewer" | "design" | "admin_root"
       civeni_modality: "presencial" | "online" | "hibrido"
       civeni_session_type:
         | "credenciamento"
@@ -3325,6 +3369,7 @@ export const Constants = {
   public: {
     Enums: {
       admin_user_type: ["admin", "editor", "viewer", "design", "admin_root"],
+      app_role: ["admin", "editor", "viewer", "design", "admin_root"],
       civeni_modality: ["presencial", "online", "hibrido"],
       civeni_session_type: [
         "credenciamento",
