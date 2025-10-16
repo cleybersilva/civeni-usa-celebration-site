@@ -33,6 +33,14 @@ function checkRateLimit(clientIP: string, email: string): boolean {
   return true;
 }
 
+function sanitizeText(text: string): string {
+  return text
+    .trim()
+    .replace(/[<>]/g, '') // Remove HTML tags
+    .replace(/['\";]/g, '') // Remove quotes and semicolons
+    .substring(0, 5000); // Limit length
+}
+
 function validateSubmission(data: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
   
@@ -108,7 +116,7 @@ serve(async (req) => {
     }
 
     // Validate submission data
-    const validation = validateWorkSubmission(body);
+    const validation = validateSubmission(body);
     if (!validation.isValid) {
       return new Response(JSON.stringify({ 
         success: false, 
