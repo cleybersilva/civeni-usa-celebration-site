@@ -401,7 +401,7 @@ const TransmissaoAoVivo = () => {
                 Veja as perguntas mais comuns sobre a transmissão.
               </p>
               <Button variant="outline" asChild>
-                <a href={transmission.faq_url || '#faq'}>Ver FAQ</a>
+                <Link to="/transmissao-ao-vivo/faq">Ver FAQ</Link>
               </Button>
             </Card>
           </TabsContent>
