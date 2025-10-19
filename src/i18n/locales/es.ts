@@ -444,15 +444,45 @@ export const esTranslations = {
         enrolledOnly: "Solo Inscriptos",
         roomsTitle: "Salas de Presentación (Google Meet)",
         roomsDescription: "Accede a las salas virtuales (inscripción requerida)",
-        faqTitle: "FAQ y Soporte",
-        badges: { live: "EN VIVO", scheduled: "PROGRAMADO", ended: "FINALIZADO" },
-        types: { opening: "Apertura", conference: "Conferencia", lecture: "Conferencia", roundtable: "Mesa Redonda", oral: "Presentación Oral", break: "Descanso", registration: "Acreditación", other: "Otros" },
-        tabs: { live: "En Vivo", schedule: "Programación", rooms: "Salas (Meet)", faq: "FAQ y Soporte" },
+        faqTitle: "Preguntas Frecuentes",
+        badges: { 
+          live: "EN VIVO", 
+          scheduled: "PROGRAMADO", 
+          ended: "FINALIZADO" 
+        },
+        types: { 
+          opening: "Apertura", 
+          conference: "Conferencia", 
+          lecture: "Conferencia", 
+          roundtable: "Mesa Redonda", 
+          oral: "Presentación Oral", 
+          break: "Descanso", 
+          registration: "Acreditación", 
+          other: "Otros" 
+        },
+        tabs: { 
+          live: "En Vivo", 
+          schedule: "Programación", 
+          rooms: "Salas (Meet)", 
+          faq: "FAQ y Soporte" 
+        },
         faq: {
-          tech: { title: "Requisitos Técnicos", answer: "Conexión estable, navegador actualizado" },
-          access: { title: "Cómo Acceder", answer: "Login requerido para salas Meet" },
-          recording: { title: "Grabaciones", answer: "Disponible en el canal de YouTube" },
-          support: { title: "Soporte", answer: "suporte@civeni.org" }
+          tech: { 
+            title: "¿Cuáles son los requisitos técnicos?", 
+            answer: "Necesitas un navegador actualizado (Chrome, Firefox, Safari o Edge) y una conexión a internet estable de al menos 5 Mbps para la mejor experiencia." 
+          },
+          access: { 
+            title: "¿Cómo accedo a las transmisiones?", 
+            answer: "Las transmisiones en vivo son públicas y se pueden acceder directamente en esta página. Para acceder a las salas de reunión, necesitas estar inscrito en el evento." 
+          },
+          recording: { 
+            title: "¿Las sesiones serán grabadas?", 
+            answer: "Sí, todas las sesiones principales serán grabadas y estarán disponibles posteriormente en el canal oficial de YouTube de CIVENI." 
+          },
+          support: { 
+            title: "Necesito soporte técnico. ¿Qué hago?", 
+            answer: "Contacta con nuestro equipo de soporte a través del email suporte@civeni.org o por WhatsApp disponible en la página de contacto." 
+          }
         }
       }
     }

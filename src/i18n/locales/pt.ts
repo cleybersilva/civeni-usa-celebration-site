@@ -512,11 +512,46 @@ export const ptTranslations = {
       enrolledOnly: "Inscritos",
       roomsTitle: "Salas Meet",
       roomsDescription: "Requer inscrição",
-      faqTitle: "FAQ",
-      badges: { live: "AO VIVO", scheduled: "AGENDADO", ended: "ENCERRADO" },
-      types: { opening: "Abertura", conference: "Conferência", lecture: "Palestra", roundtable: "Mesa", oral: "Oral", break: "Intervalo", registration: "Credenciamento", other: "Outros" },
-      tabs: { live: "Ao Vivo", schedule: "Programação", rooms: "Salas", faq: "FAQ" },
-      faq: { tech: { title: "Requisitos", answer: "Navegador atualizado" }, access: { title: "Acesso", answer: "Login necessário" }, recording: { title: "Gravações", answer: "Disponível no YouTube" }, support: { title: "Suporte", answer: "suporte@civeni.org" } }
+      faqTitle: "Perguntas Frequentes",
+      badges: { 
+        live: "AO VIVO", 
+        scheduled: "AGENDADO", 
+        ended: "ENCERRADO" 
+      },
+      types: { 
+        opening: "Abertura", 
+        conference: "Conferência", 
+        lecture: "Palestra", 
+        roundtable: "Mesa", 
+        oral: "Oral", 
+        break: "Intervalo", 
+        registration: "Credenciamento", 
+        other: "Outros" 
+      },
+      tabs: { 
+        live: "Ao Vivo", 
+        schedule: "Programação", 
+        rooms: "Salas", 
+        faq: "FAQ" 
+      },
+      faq: { 
+        tech: { 
+          title: "Quais são os requisitos técnicos?", 
+          answer: "Você precisa de um navegador atualizado (Chrome, Firefox, Safari ou Edge) e uma conexão de internet estável de pelo menos 5 Mbps para melhor experiência." 
+        }, 
+        access: { 
+          title: "Como acesso as transmissões?", 
+          answer: "As transmissões ao vivo são públicas e podem ser acessadas diretamente nesta página. Para acessar as salas de reunião, você precisa estar inscrito no evento." 
+        }, 
+        recording: { 
+          title: "As sessões serão gravadas?", 
+          answer: "Sim, todas as sessões principais serão gravadas e disponibilizadas posteriormente no canal oficial do YouTube do CIVENI." 
+        }, 
+        support: { 
+          title: "Preciso de suporte técnico. O que faço?", 
+          answer: "Entre em contato com nossa equipe de suporte através do email suporte@civeni.org ou pelo WhatsApp disponível na página de contato." 
+        } 
+      }
     }
   }
 };

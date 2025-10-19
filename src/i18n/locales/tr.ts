@@ -444,15 +444,45 @@ export const trTranslations = {
         enrolledOnly: "Sadece Kayıtlı",
         roomsTitle: "Sunum Odaları (Google Meet)",
         roomsDescription: "Sanal odalara erişim (kayıt gerekli)",
-        faqTitle: "SSS ve Destek",
-        badges: { live: "CANLI", scheduled: "PLANLI", ended: "BİTTİ" },
-        types: { opening: "Açılış", conference: "Konferans", lecture: "Ders", roundtable: "Yuvarlak Masa", oral: "Sözlü Sunum", break: "Ara", registration: "Kayıt", other: "Diğer" },
-        tabs: { live: "Canlı", schedule: "Program", rooms: "Odalar (Meet)", faq: "SSS ve Destek" },
+        faqTitle: "Sık Sorulan Sorular",
+        badges: { 
+          live: "CANLI", 
+          scheduled: "PLANLI", 
+          ended: "BİTTİ" 
+        },
+        types: { 
+          opening: "Açılış", 
+          conference: "Konferans", 
+          lecture: "Ders", 
+          roundtable: "Yuvarlak Masa", 
+          oral: "Sözlü Sunum", 
+          break: "Ara", 
+          registration: "Kayıt", 
+          other: "Diğer" 
+        },
+        tabs: { 
+          live: "Canlı", 
+          schedule: "Program", 
+          rooms: "Odalar (Meet)", 
+          faq: "SSS ve Destek" 
+        },
         faq: {
-          tech: { title: "Teknik Gereksinimler", answer: "Kararlı internet, güncel tarayıcı" },
-          access: { title: "Nasıl Erişilir", answer: "Meet odaları için giriş gerekli" },
-          recording: { title: "Kayıtlar", answer: "YouTube kanalında mevcut" },
-          support: { title: "Destek", answer: "suporte@civeni.org" }
+          tech: { 
+            title: "Teknik gereksinimler nelerdir?", 
+            answer: "En iyi deneyim için güncel bir tarayıcıya (Chrome, Firefox, Safari veya Edge) ve en az 5 Mbps kararlı internet bağlantısına ihtiyacınız var." 
+          },
+          access: { 
+            title: "Yayınlara nasıl erişirim?", 
+            answer: "Canlı yayınlar herkese açıktır ve bu sayfadan doğrudan erişilebilir. Toplantı odalarına erişmek için etkinliğe kayıtlı olmanız gerekir." 
+          },
+          recording: { 
+            title: "Oturumlar kaydedilecek mi?", 
+            answer: "Evet, tüm ana oturumlar kaydedilecek ve daha sonra CIVENI'nin resmi YouTube kanalında kullanıma sunulacaktır." 
+          },
+          support: { 
+            title: "Teknik desteğe ihtiyacım var. Ne yapmalıyım?", 
+            answer: "Destek ekibimizle suporte@civeni.org e-posta adresi üzerinden veya iletişim sayfasında bulunan WhatsApp üzerinden iletişime geçin." 
+          }
         }
       }
     }
