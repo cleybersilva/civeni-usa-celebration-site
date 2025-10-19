@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from 'react';
-import './i18n/config';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n/config';
 import { CMSProvider } from './contexts/CMSContext';
 import { SecurityProvider } from './components/SecurityProvider';
 
@@ -49,13 +50,14 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SecurityProvider>
-          <CMSProvider>
-            <Toaster />
-            <Router>
-              <Suspense fallback={<div>Loading...</div>}>
-              <Routes>
+      <I18nextProvider i18n={i18n}>
+        <TooltipProvider>
+          <SecurityProvider>
+            <CMSProvider>
+              <Toaster />
+              <Router>
+                <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
@@ -92,13 +94,14 @@ function App() {
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="/work-submission/success" element={<WorkSubmissionSuccess />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </Router>
-        </CMSProvider>
-      </SecurityProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+                </Routes>
+              </Suspense>
+            </Router>
+          </CMSProvider>
+        </SecurityProvider>
+      </TooltipProvider>
+      </I18nextProvider>
+    </QueryClientProvider>
   );
 }
 
