@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -319,9 +319,9 @@ const TransmissaoAoVivo = () => {
                         </p>
                       )}
                       <Button size="sm" variant="outline" className="w-full" asChild>
-                        <a href={`/transmissao-ao-vivo/${tx.slug}`}>
+                        <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
                           Detalhes
-                        </a>
+                        </Link>
                       </Button>
                     </Card>
                   ))}
