@@ -61,10 +61,10 @@ const Transmissao = () => {
   return (
     <>
       {/* SEO Meta Tags */}
-      <title>{t('transmission.pageTitle')} | CIVENI 2025</title>
-      <meta name="description" content={t('transmission.pageDescription')} />
-      <meta property="og:title" content={`${t('transmission.pageTitle')} | CIVENI 2025`} />
-      <meta property="og:description" content={t('transmission.pageDescription')} />
+      <title>{t('events.transmission.pageTitle')} | CIVENI 2025</title>
+      <meta name="description" content={t('events.transmission.pageDescription')} />
+      <meta property="og:title" content={`${t('events.transmission.pageTitle')} | CIVENI 2025`} />
+      <meta property="og:description" content={t('events.transmission.pageDescription')} />
       <meta property="og:type" content="website" />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
@@ -85,13 +85,13 @@ const Transmissao = () => {
             
             <div className="text-center max-w-4xl mx-auto">
               <Badge className="mb-4 bg-white/20 text-white border-white/30">
-                {t('transmission.subtitle')}
+                {t('events.transmission.subtitle')}
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-                {t('transmission.title')}
+                {t('events.transmission.title')}
               </h1>
               <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-                {t('transmission.description')}
+                {t('events.transmission.description')}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -105,13 +105,13 @@ const Transmissao = () => {
                 <a href="https://youtube.com/@CiveniUSA2025" target="_blank" rel="noopener noreferrer">
                   <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                     <Youtube className="w-5 h-5" />
-                    {t('transmission.ctaWatch')}
+                    {t('events.transmission.ctaWatch')}
                   </button>
                 </a>
               </div>
               
               <p className="text-sm text-blue-100 pt-6">
-                {t('transmission.timezoneInfo')}
+                {t('events.transmission.timezoneInfo')}
               </p>
             </div>
           </div>
@@ -124,15 +124,15 @@ const Transmissao = () => {
               <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
                 <TabsTrigger value="live" className="gap-2">
                   <Youtube className="w-4 h-4" />
-                  {t('transmission.tabs.live')}
+                  {t('events.transmission.tabs.live')}
                 </TabsTrigger>
                 <TabsTrigger value="schedule" className="gap-2">
                   <Calendar className="w-4 h-4" />
-                  {t('transmission.tabs.schedule')}
+                  {t('events.transmission.tabs.schedule')}
                 </TabsTrigger>
                 <TabsTrigger value="faq" className="gap-2">
                   <HelpCircle className="w-4 h-4" />
-                  {t('transmission.tabs.faq')}
+                  {t('events.transmission.tabs.faq')}
                 </TabsTrigger>
               </TabsList>
 
@@ -145,7 +145,7 @@ const Transmissao = () => {
                   
                   {/* Upcoming Streams */}
                   <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">{t('transmission.upcomingStreams')}</h3>
+                    <h3 className="text-xl font-semibold">{t('events.transmission.upcomingStreams')}</h3>
                     {upcomingLoading ? (
                       <div className="space-y-3">
                         {[1, 2, 3].map((i) => (
@@ -171,14 +171,14 @@ const Transmissao = () => {
                             </p>
                             <Button size="sm" variant="ghost" className="w-full text-xs gap-2">
                               <Youtube className="w-3 h-3" />
-                              {t('transmission.setReminder')}
+                              {t('events.transmission.setReminder')}
                             </Button>
                           </Card>
                         ))}
                       </div>
                     ) : (
                       <Card className="p-6 text-center text-muted-foreground">
-                        <p className="text-sm">{t('transmission.noUpcoming')}</p>
+                        <p className="text-sm">{t('events.transmission.noUpcoming')}</p>
                       </Card>
                     )}
                   </div>
@@ -193,7 +193,7 @@ const Transmissao = () => {
                       variant={selectedDay === undefined ? 'default' : 'outline'}
                       onClick={() => setSelectedDay(undefined)}
                     >
-                      {t('transmission.all')}
+                      {t('events.transmission.all')}
                     </Button>
                     {[1, 2, 3].map((day) => (
                       <Button
@@ -201,7 +201,7 @@ const Transmissao = () => {
                         variant={selectedDay === day ? 'default' : 'outline'}
                         onClick={() => setSelectedDay(day)}
                       >
-                        {t('transmission.day')} {day}
+                        {t('events.transmission.day')} {day}
                       </Button>
                     ))}
                   </div>
@@ -256,7 +256,7 @@ const Transmissao = () => {
                               <Button size="sm" variant="outline" className="gap-2" asChild>
                                 <a href={item.meet_room_link} target="_blank" rel="noopener noreferrer">
                                   <MapPin className="w-4 h-4" />
-                                  {t('transmission.joinRoom')}
+                                  {t('events.transmission.joinRoom')}
                                   <ExternalLink className="w-3 h-3" />
                                 </a>
                               </Button>
@@ -268,7 +268,7 @@ const Transmissao = () => {
                   </div>
                 ) : (
                   <Card className="p-12 text-center">
-                    <p className="text-muted-foreground">{t('transmission.noSessions')}</p>
+                    <p className="text-muted-foreground">{t('events.transmission.noSessions')}</p>
                   </Card>
                 )}
               </TabsContent>
@@ -287,7 +287,7 @@ const Transmissao = () => {
                     </div>
                   ) : faqItems && faqItems.length > 0 ? (
                     <div className="prose dark:prose-invert max-w-none space-y-6">
-                      <h2 className="text-3xl font-bold mb-8">{t('transmission.faqTitle')}</h2>
+                      <h2 className="text-3xl font-bold mb-8">{t('events.transmission.faqTitle')}</h2>
                       
                       {faqItems.map((item) => (
                         <div key={item.id} className="border-b border-gray-200 pb-6 last:border-0">
