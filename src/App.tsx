@@ -40,6 +40,7 @@ import EventoDetalhes from "./pages/EventoDetalhes";
 import CertificadoEmissao from "./pages/CertificadoEmissao";
 import CertificateSuccessPage from "./pages/CertificateSuccessPage";
 import VerificarCertificado from "./pages/VerificarCertificado";
+import Transmissao from "./pages/Transmissao";
 
 import './App.css';
 
@@ -57,8 +58,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
-                <Route path="/programacao-online" element={<ScheduleOnline />} />
+        <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
+        <Route path="/programacao-online" element={<ScheduleOnline />} />
+        <Route path="/transmissao" element={<Transmissao />} />
                 {/* Keep legacy routes for backward compatibility */}
                 <Route path="/cronograma-presencial" element={<ScheduleInPerson />} />
                 <Route path="/cronograma-online" element={<ScheduleOnline />} />
