@@ -79,7 +79,7 @@ const Transmissao = () => {
               <ol className="flex items-center space-x-2">
                 <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
                 <li className="text-blue-200">›</li>
-                <li>{t('transmission.title')}</li>
+                <li>{t('events.transmission.title')}</li>
               </ol>
             </nav>
             

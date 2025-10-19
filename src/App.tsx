@@ -28,7 +28,7 @@ import AreaTematica from "./pages/AreaTematica";
 import Contato from "./pages/Contato";
 import Inscricoes from "./pages/Inscricoes";
 import PoliticasPrivacidade from "./pages/PoliticasPrivacidade";
-import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
+
 import SejaNossoParceiro from "./pages/SejaNossoParceiro";
 import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 import ApresentacaoOral from "./pages/ApresentacaoOral";
@@ -76,7 +76,7 @@ function App() {
             <Route path="/congresso/comite" element={<CongressoComite />} />
                 <Route path="/inscricoes" element={<Inscricoes />} />
                 <Route path="/politicas-de-privacidade" element={<PoliticasPrivacidade />} />
-                <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />
+                <Route path="/transmissao-ao-vivo" element={<Transmissao />} />
                 <Route path="/seja-nosso-parceiro" element={<SejaNossoParceiro />} />
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
