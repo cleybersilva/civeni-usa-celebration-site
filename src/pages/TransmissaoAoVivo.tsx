@@ -284,17 +284,15 @@ const TransmissaoAoVivo = () => {
                 <p className="text-muted-foreground mb-4">
                   A transmissão ainda não começou ou não há replay disponível.
                 </p>
-                {transmission.channel_handle && (
-                  <Button variant="outline" asChild>
-                    <a
-                      href={`https://www.youtube.com/${transmission.channel_handle}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Visite o canal
-                    </a>
-                  </Button>
-                )}
+                <Button variant="outline" asChild>
+                  <a
+                    href="https://www.youtube.com/@veniuniversity"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visite o canal
+                  </a>
+                </Button>
               </Card>
             )}
 
@@ -333,7 +331,7 @@ const TransmissaoAoVivo = () => {
                     Sem próximas transmissões agendadas
                   </p>
                   <Button variant="outline" asChild>
-                    <a href={`https://www.youtube.com/${transmission.channel_handle}`} target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                       Veja o canal no YouTube
                     </a>
                   </Button>
