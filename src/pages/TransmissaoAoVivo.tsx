@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock } from 'lucide-react';
+import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -156,52 +156,60 @@ const TransmissaoAoVivo = () => {
       <Header />
 
       {/* Hero Banner with Gradient */}
-      <section
-        className="relative py-24 px-4 overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, ${transmission.banner_from} 0%, ${transmission.banner_to} 100%)`,
-        }}
-      >
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
         <div className="absolute inset-0 bg-black/20" />
-        <div className="container mx-auto relative z-10 text-white">
-          <div className="max-w-3xl">
-            {subtitle && (
-              <p className="text-lg opacity-90 mb-2 font-medium">{subtitle}</p>
-            )}
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><a href="/" className="hover:text-blue-200 transition-colors">Home</a></li>
+              <li className="text-blue-200">›</li>
+              <li><a href="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</a></li>
+              <li className="text-blue-200">›</li>
+              <li>Transmissão ao Vivo</li>
+            </ol>
+          </nav>
+          
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              {title}
+            </h1>
             {description && (
-              <p className="text-xl opacity-90 mb-8">{description}</p>
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+                {description}
+              </p>
             )}
             
-            <div className="flex flex-wrap gap-4 items-center mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               {primaryCTA && (
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  asChild={!!primaryCTA.external}
-                  onClick={!primaryCTA.external ? () => {
-                    document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
-                  } : undefined}
-                >
-                  {primaryCTA.external ? (
-                    <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
+                primaryCTA.external ? (
+                  <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
+                    <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                       {primaryCTA.icon}
                       {primaryCTA.label}
-                    </a>
-                  ) : (
-                    <>
-                      {primaryCTA.icon}
-                      {primaryCTA.label}
-                    </>
-                  )}
-                </Button>
+                    </button>
+                  </a>
+                ) : (
+                  <button 
+                    onClick={() => {
+                      document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
+                  >
+                    {primaryCTA.icon}
+                    {primaryCTA.label}
+                  </button>
+                )
               )}
-              <Button size="lg" variant="outline" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-                <a href="/inscricoes">Inscrições</a>
-              </Button>
+              <a href="/inscricoes">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
+              </a>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex flex-wrap gap-4 items-center justify-center">
               {statusBadge}
               {timezoneText && (
                 <div className="flex items-center gap-2 text-sm opacity-80">
