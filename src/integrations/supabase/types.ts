@@ -2789,6 +2789,129 @@ export type Database = {
         }
         Relationships: []
       }
+      transmission_faq: {
+        Row: {
+          answer: Json
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          order_index: number | null
+          question: Json
+          updated_at: string | null
+        }
+        Insert: {
+          answer?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          question?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          question?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transmission_schedule: {
+        Row: {
+          created_at: string | null
+          date: string
+          day: number
+          end_time: string | null
+          id: string
+          is_active: boolean | null
+          meet_room_link: string | null
+          modality: string | null
+          order_index: number | null
+          speaker: string | null
+          start_time: string
+          stream_id: string | null
+          topic: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          day: number
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          meet_room_link?: string | null
+          modality?: string | null
+          order_index?: number | null
+          speaker?: string | null
+          start_time: string
+          stream_id?: string | null
+          topic?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          day?: number
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          meet_room_link?: string | null
+          modality?: string | null
+          order_index?: number | null
+          speaker?: string | null
+          start_time?: string
+          stream_id?: string | null
+          topic?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transmission_streams: {
+        Row: {
+          created_at: string | null
+          description: Json | null
+          id: string
+          is_active: boolean | null
+          is_live: boolean | null
+          order_index: number | null
+          scheduled_date: string | null
+          title: Json
+          updated_at: string | null
+          youtube_channel_handle: string | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_live?: boolean | null
+          order_index?: number | null
+          scheduled_date?: string | null
+          title?: Json
+          updated_at?: string | null
+          youtube_channel_handle?: string | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_live?: boolean | null
+          order_index?: number | null
+          scheduled_date?: string | null
+          title?: Json
+          updated_at?: string | null
+          youtube_channel_handle?: string | null
+          youtube_video_id?: string | null
+        }
+        Relationships: []
+      }
       transmissoes_live: {
         Row: {
           created_at: string
