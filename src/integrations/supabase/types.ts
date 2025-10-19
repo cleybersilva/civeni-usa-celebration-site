@@ -2138,6 +2138,48 @@ export type Database = {
         }
         Relationships: []
       }
+      meet_rooms: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          meet_url: string | null
+          moderators: string[] | null
+          name: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          meet_url?: string | null
+          moderators?: string[] | null
+          name: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          meet_url?: string | null
+          moderators?: string[] | null
+          name?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
       participant_types: {
         Row: {
           created_at: string
@@ -2512,6 +2554,94 @@ export type Database = {
         }
         Relationships: []
       }
+      sessions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          day: number
+          end_at: string
+          id: string
+          language: string | null
+          location: string | null
+          materials: Json | null
+          meet_room_id: string | null
+          speakers: Json | null
+          start_at: string
+          status: string | null
+          stream_id: string | null
+          timezone: string | null
+          title: Json
+          track: string
+          type: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          day: number
+          end_at: string
+          id?: string
+          language?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_at: string
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json
+          track: string
+          type: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          day?: number
+          end_at?: string
+          id?: string
+          language?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_at?: string
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json
+          track?: string
+          type?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "public_meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_config: {
         Row: {
           config_key: string
@@ -2536,6 +2666,72 @@ export type Database = {
           description?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      streams: {
+        Row: {
+          channel_handle: string | null
+          channel_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: Json | null
+          end_at: string | null
+          fallback_priority: number | null
+          id: string
+          is_fallback: boolean | null
+          language: string | null
+          start_at: string | null
+          status: string
+          thumbnail_url: string | null
+          timezone: string | null
+          title: Json
+          updated_at: string | null
+          visibility: string | null
+          youtube_playlist_id: string | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          channel_handle?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: Json | null
+          end_at?: string | null
+          fallback_priority?: number | null
+          id?: string
+          is_fallback?: boolean | null
+          language?: string | null
+          start_at?: string | null
+          status?: string
+          thumbnail_url?: string | null
+          timezone?: string | null
+          title?: Json
+          updated_at?: string | null
+          visibility?: string | null
+          youtube_playlist_id?: string | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          channel_handle?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: Json | null
+          end_at?: string | null
+          fallback_priority?: number | null
+          id?: string
+          is_fallback?: boolean | null
+          language?: string | null
+          start_at?: string | null
+          status?: string
+          thumbnail_url?: string | null
+          timezone?: string | null
+          title?: Json
+          updated_at?: string | null
+          visibility?: string | null
+          youtube_playlist_id?: string | null
+          youtube_video_id?: string | null
         }
         Relationships: []
       }
@@ -2908,6 +3104,36 @@ export type Database = {
       }
     }
     Views: {
+      public_meet_rooms: {
+        Row: {
+          capacity: number | null
+          id: string | null
+          moderators: string[] | null
+          name: string | null
+          notes: string | null
+          status: string | null
+          visibility: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          id?: string | null
+          moderators?: string[] | null
+          name?: string | null
+          notes?: string | null
+          status?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          id?: string | null
+          moderators?: string[] | null
+          name?: string | null
+          notes?: string | null
+          status?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
       v_lote_atual: {
         Row: {
           ativo: boolean | null
@@ -2920,6 +3146,79 @@ export type Database = {
           updated_at: string | null
         }
         Relationships: []
+      }
+      v_sessions_front: {
+        Row: {
+          day: number | null
+          end_et: string | null
+          id: string | null
+          location: string | null
+          materials: Json | null
+          meet_room_id: string | null
+          speakers: Json | null
+          start_et: string | null
+          status: string | null
+          stream_id: string | null
+          timezone: string | null
+          title: Json | null
+          track: string | null
+          type: string | null
+        }
+        Insert: {
+          day?: number | null
+          end_et?: string | null
+          id?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_et?: string | null
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json | null
+          track?: string | null
+          type?: string | null
+        }
+        Update: {
+          day?: number | null
+          end_et?: string | null
+          id?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_et?: string | null
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json | null
+          track?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "public_meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -3204,6 +3503,10 @@ export type Database = {
       update_registration_secure: {
         Args: { registration_id: string; updates: Json }
         Returns: Json
+      }
+      user_is_enrolled: {
+        Args: { uid: string }
+        Returns: boolean
       }
       validate_coupon: {
         Args: { coupon_code: string }
