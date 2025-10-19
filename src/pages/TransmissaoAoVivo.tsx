@@ -318,8 +318,10 @@ const TransmissaoAoVivo = () => {
                           })}
                         </p>
                       )}
-                      <Button size="sm" variant="outline" className="w-full">
-                        Detalhes
+                      <Button size="sm" variant="outline" className="w-full" asChild>
+                        <a href={`/transmissao-ao-vivo/${tx.slug}`}>
+                          Detalhes
+                        </a>
                       </Button>
                     </Card>
                   ))}

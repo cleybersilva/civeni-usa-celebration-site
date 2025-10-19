@@ -42,6 +42,7 @@ import CertificadoEmissao from "./pages/CertificadoEmissao";
 import CertificateSuccessPage from "./pages/CertificateSuccessPage";
 import VerificarCertificado from "./pages/VerificarCertificado";
 import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
+import TransmissaoDetalhes from "./pages/TransmissaoDetalhes";
 
 import './App.css';
 
@@ -76,6 +77,7 @@ function App() {
                 <Route path="/inscricoes" element={<Inscricoes />} />
                 <Route path="/politicas-de-privacidade" element={<PoliticasPrivacidade />} />
                 <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />
+                <Route path="/transmissao-ao-vivo/:slug" element={<TransmissaoDetalhes />} />
                 <Route path="/seja-nosso-parceiro" element={<SejaNossoParceiro />} />
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
