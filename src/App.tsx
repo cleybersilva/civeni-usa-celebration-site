@@ -41,7 +41,7 @@ import EventoDetalhes from "./pages/EventoDetalhes";
 import CertificadoEmissao from "./pages/CertificadoEmissao";
 import CertificateSuccessPage from "./pages/CertificateSuccessPage";
 import VerificarCertificado from "./pages/VerificarCertificado";
-import Transmissao from "./pages/Transmissao";
+import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
 
 import './App.css';
 
@@ -62,7 +62,6 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
         <Route path="/programacao-online" element={<ScheduleOnline />} />
-        <Route path="/transmissao" element={<Transmissao />} />
                 {/* Keep legacy routes for backward compatibility */}
                 <Route path="/cronograma-presencial" element={<ScheduleInPerson />} />
                 <Route path="/cronograma-online" element={<ScheduleOnline />} />
@@ -76,7 +75,7 @@ function App() {
             <Route path="/congresso/comite" element={<CongressoComite />} />
                 <Route path="/inscricoes" element={<Inscricoes />} />
                 <Route path="/politicas-de-privacidade" element={<PoliticasPrivacidade />} />
-                <Route path="/transmissao-ao-vivo" element={<Transmissao />} />
+                <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />
                 <Route path="/seja-nosso-parceiro" element={<SejaNossoParceiro />} />
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />

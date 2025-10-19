@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import DynamicLivePlayer from '@/components/transmission/DynamicLivePlayer';
 import { useTransmissionSchedule, useTransmissionFAQ, useUpcomingStreams } from '@/hooks/useTransmissionStreamData';
 
-const Transmissao = () => {
+const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
   const [selectedDay, setSelectedDay] = useState<number | undefined>(undefined);
 
@@ -318,4 +318,4 @@ const Transmissao = () => {
   );
 };
 
-export default Transmissao;
+export default TransmissaoAoVivo;
