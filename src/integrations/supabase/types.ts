@@ -2819,6 +2819,54 @@ export type Database = {
         }
         Relationships: []
       }
+      transmission_rooms: {
+        Row: {
+          created_at: string
+          id: string
+          is_live: boolean | null
+          meet_url: string
+          name: Json
+          ord: number | null
+          transmission_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_live?: boolean | null
+          meet_url: string
+          name?: Json
+          ord?: number | null
+          transmission_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_live?: boolean | null
+          meet_url?: string
+          name?: Json
+          ord?: number | null
+          transmission_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transmission_rooms_transmission_id_fkey"
+            columns: ["transmission_id"]
+            isOneToOne: false
+            referencedRelation: "transmissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transmission_rooms_transmission_id_fkey"
+            columns: ["transmission_id"]
+            isOneToOne: false
+            referencedRelation: "transmissions_upcoming"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transmission_schedule: {
         Row: {
           created_at: string | null
@@ -2908,6 +2956,75 @@ export type Database = {
           title?: Json
           updated_at?: string | null
           youtube_channel_handle?: string | null
+          youtube_video_id?: string | null
+        }
+        Relationships: []
+      }
+      transmissions: {
+        Row: {
+          badge_label: Json | null
+          banner_from: string | null
+          banner_to: string | null
+          channel_handle: string | null
+          created_at: string
+          description: Json | null
+          end_at: string | null
+          faq_url: string | null
+          id: string
+          is_public: boolean
+          rooms_url: string | null
+          schedule_url: string | null
+          slug: string
+          start_at: string | null
+          status: Database["public"]["Enums"]["transmission_status"]
+          subtitle: Json | null
+          timezone: string
+          title: Json
+          updated_at: string
+          youtube_video_id: string | null
+        }
+        Insert: {
+          badge_label?: Json | null
+          banner_from?: string | null
+          banner_to?: string | null
+          channel_handle?: string | null
+          created_at?: string
+          description?: Json | null
+          end_at?: string | null
+          faq_url?: string | null
+          id?: string
+          is_public?: boolean
+          rooms_url?: string | null
+          schedule_url?: string | null
+          slug?: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["transmission_status"]
+          subtitle?: Json | null
+          timezone?: string
+          title?: Json
+          updated_at?: string
+          youtube_video_id?: string | null
+        }
+        Update: {
+          badge_label?: Json | null
+          banner_from?: string | null
+          banner_to?: string | null
+          channel_handle?: string | null
+          created_at?: string
+          description?: Json | null
+          end_at?: string | null
+          faq_url?: string | null
+          id?: string
+          is_public?: boolean
+          rooms_url?: string | null
+          schedule_url?: string | null
+          slug?: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["transmission_status"]
+          subtitle?: Json | null
+          timezone?: string
+          title?: Json
+          updated_at?: string
           youtube_video_id?: string | null
         }
         Relationships: []
@@ -3254,6 +3371,31 @@ export type Database = {
           notes?: string | null
           status?: string | null
           visibility?: string | null
+        }
+        Relationships: []
+      }
+      transmissions_upcoming: {
+        Row: {
+          badge_label: Json | null
+          banner_from: string | null
+          banner_to: string | null
+          channel_handle: string | null
+          created_at: string | null
+          description: Json | null
+          end_at: string | null
+          faq_url: string | null
+          id: string | null
+          is_public: boolean | null
+          rooms_url: string | null
+          schedule_url: string | null
+          slug: string | null
+          start_at: string | null
+          status: Database["public"]["Enums"]["transmission_status"] | null
+          subtitle: Json | null
+          timezone: string | null
+          title: Json | null
+          updated_at: string | null
+          youtube_video_id: string | null
         }
         Relationships: []
       }
@@ -3667,6 +3809,7 @@ export type Database = {
         | "cerimonia"
         | "outro"
       submission_kind: "artigo" | "consorcio"
+      transmission_status: "scheduled" | "live" | "ended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3812,6 +3955,7 @@ export const Constants = {
         "outro",
       ],
       submission_kind: ["artigo", "consorcio"],
+      transmission_status: ["scheduled", "live", "ended"],
     },
   },
 } as const

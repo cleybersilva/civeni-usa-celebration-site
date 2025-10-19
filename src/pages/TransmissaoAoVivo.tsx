@@ -1,320 +1,407 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { Youtube, Calendar, HelpCircle, Users, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { Helmet } from 'react-helmet';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import DynamicLivePlayer from '@/components/transmission/DynamicLivePlayer';
-import { useTransmissionSchedule, useTransmissionFAQ, useUpcomingStreams } from '@/hooks/useTransmissionStreamData';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  useTransmission,
+  useTransmissionRooms,
+  useUpcomingTransmissions,
+  pickLang,
+  formatTimezone,
+} from '@/hooks/useTransmission';
 
 const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
-  const [selectedDay, setSelectedDay] = useState<number | undefined>(undefined);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const locale = i18n.language;
 
-  const { data: schedule, isLoading: scheduleLoading } = useTransmissionSchedule(selectedDay);
-  const { data: faqItems, isLoading: faqLoading } = useTransmissionFAQ();
-  const { data: upcomingStreams, isLoading: upcomingLoading } = useUpcomingStreams(3);
+  // Parse active tab from hash
+  const hash = location.hash.replace('#', '') || 'ao-vivo';
+  const [activeTab, setActiveTab] = useState(hash);
 
-  const getLocalized = (obj: Record<string, string> | undefined) => {
-    if (!obj) return '';
-    return obj[i18n.language] || obj.pt || '';
+  // Fetch data
+  const { data: transmission, isLoading: txLoading } = useTransmission();
+  const { data: rooms = [], isLoading: roomsLoading } = useTransmissionRooms(transmission?.id);
+  const { data: upcoming = [], isLoading: upcomingLoading } = useUpcomingTransmissions();
+
+  // Sync hash with active tab
+  useEffect(() => {
+    const hashValue = location.hash.replace('#', '') || 'ao-vivo';
+    setActiveTab(hashValue);
+  }, [location.hash]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`#${value}`, { replace: true });
   };
 
-  const formatDateTime = (dateStr: string, timeStr?: string | null) => {
-    const date = new Date(dateStr);
-    if (timeStr) {
-      const [hours, minutes] = timeStr.split(':');
-      date.setHours(parseInt(hours), parseInt(minutes));
+  // Extracted localized values
+  const title = pickLang(transmission?.title, locale);
+  const subtitle = pickLang(transmission?.subtitle, locale);
+  const description = pickLang(transmission?.description, locale);
+  const badgeLabel = pickLang(transmission?.badge_label, locale);
+
+  // Status badge logic
+  const statusBadge = useMemo(() => {
+    if (!transmission) return null;
+    const now = new Date();
+    const startAt = transmission.start_at ? new Date(transmission.start_at) : null;
+
+    if (transmission.status === 'live') {
+      return <Badge className="bg-red-600 text-white animate-pulse">🔴 AO VIVO</Badge>;
     }
-    return date.toLocaleString(i18n.language, {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
-  const formatTime = (timeStr: string) => {
-    const [hours, minutes] = timeStr.split(':');
-    const date = new Date();
-    date.setHours(parseInt(hours), parseInt(minutes));
-    return date.toLocaleTimeString(i18n.language, {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+    if (transmission.status === 'scheduled' && startAt && startAt > now) {
+      const diff = startAt.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return <Badge variant="outline">Começa em {hours}h {minutes}min</Badge>;
+    }
 
-  const getModalityBadge = (modality: string) => {
-    const colors = {
-      online: 'bg-blue-100 text-blue-800',
-      presencial: 'bg-green-100 text-green-800',
-      hibrido: 'bg-purple-100 text-purple-800'
-    };
-    return colors[modality as keyof typeof colors] || colors.hibrido;
-  };
+    if (transmission.status === 'ended' && badgeLabel) {
+      return <Badge variant="secondary">{badgeLabel}</Badge>;
+    }
 
-  return (
-    <>
-      {/* SEO Meta Tags */}
-      <title>{t('events.transmission.pageTitle')} | CIVENI 2025</title>
-      <meta name="description" content={t('events.transmission.pageDescription')} />
-      <meta property="og:title" content={`${t('events.transmission.pageTitle')} | CIVENI 2025`} />
-      <meta property="og:description" content={t('events.transmission.pageDescription')} />
-      <meta property="og:type" content="website" />
-      
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
+    return null;
+  }, [transmission, badgeLabel]);
+
+  // CTA buttons logic
+  const primaryCTA = useMemo(() => {
+    if (!transmission) return null;
+
+    if (transmission.status === 'live') {
+      return {
+        label: 'Assistir agora',
+        href: '#player',
+        icon: <Play className="w-4 h-4" />,
+      };
+    }
+
+    if (transmission.status === 'scheduled') {
+      return {
+        label: 'Definir lembrete',
+        href: `https://www.youtube.com/${transmission.channel_handle}/live`,
+        icon: <Calendar className="w-4 h-4" />,
+        external: true,
+      };
+    }
+
+    if (transmission.status === 'ended' && transmission.youtube_video_id) {
+      return {
+        label: 'Assistir replay',
+        href: '#player',
+        icon: <Video className="w-4 h-4" />,
+      };
+    }
+
+    return null;
+  }, [transmission]);
+
+  // Timezone text
+  const timezoneText = useMemo(() => {
+    if (!transmission) return '';
+    const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const userLabel = formatTimezone(userTZ);
+    const eventLabel = formatTimezone(transmission.timezone);
+    return `Horários em ${userLabel} • Local: ${eventLabel}`;
+  }, [transmission]);
+
+  if (txLoading) {
+    return (
+      <div className="min-h-screen bg-background">
         <Header />
-        
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="container mx-auto px-4 relative z-10">
-            {/* Breadcrumbs */}
-            <nav className="mb-8 text-sm">
-              <ol className="flex items-center space-x-2">
-                <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
-                <li className="text-blue-200">›</li>
-                <li>{t('events.transmission.title')}</li>
-              </ol>
-            </nav>
-            
-            <div className="text-center max-w-4xl mx-auto">
-              <Badge className="mb-4 bg-white/20 text-white border-white/30">
-                {t('events.transmission.subtitle')}
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-                {t('events.transmission.title')}
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-                {t('events.transmission.description')}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/inscricoes">
-                  <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    {t('registration.title')}
-                  </button>
-                </Link>
-                
-                <a href="https://youtube.com/@CiveniUSA2025" target="_blank" rel="noopener noreferrer">
-                  <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                    <Youtube className="w-5 h-5" />
-                    {t('events.transmission.ctaWatch')}
-                  </button>
-                </a>
-              </div>
-              
-              <p className="text-sm text-blue-100 pt-6">
-                {t('events.transmission.timezoneInfo')}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Main Content */}
-        <main className="py-20" id="live-section">
-          <div className="container mx-auto px-4">
-            <Tabs defaultValue="live" className="space-y-8">
-              <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
-                <TabsTrigger value="live" className="gap-2">
-                  <Youtube className="w-4 h-4" />
-                  {t('events.transmission.tabs.live')}
-                </TabsTrigger>
-                <TabsTrigger value="schedule" className="gap-2">
-                  <Calendar className="w-4 h-4" />
-                  {t('events.transmission.tabs.schedule')}
-                </TabsTrigger>
-                <TabsTrigger value="faq" className="gap-2">
-                  <HelpCircle className="w-4 h-4" />
-                  {t('events.transmission.tabs.faq')}
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Live Tab */}
-              <TabsContent value="live" className="space-y-8">
-                <div className="grid lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2">
-                    <DynamicLivePlayer />
-                  </div>
-                  
-                  {/* Upcoming Streams */}
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">{t('events.transmission.upcomingStreams')}</h3>
-                    {upcomingLoading ? (
-                      <div className="space-y-3">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
-                        ))}
-                      </div>
-                    ) : upcomingStreams && upcomingStreams.length > 0 ? (
-                      <div className="space-y-3">
-                        {upcomingStreams.map((stream) => (
-                          <Card key={stream.id} className="p-4 space-y-2">
-                            <div className="flex items-start justify-between gap-2">
-                              <h4 className="font-medium text-sm leading-tight flex-1">
-                                {getLocalized(stream.title)}
-                              </h4>
-                              {stream.scheduled_date && (
-                                <Badge variant="outline" className="text-xs">
-                                  {formatDateTime(stream.scheduled_date)}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground line-clamp-2">
-                              {getLocalized(stream.description)}
-                            </p>
-                            <Button size="sm" variant="ghost" className="w-full text-xs gap-2">
-                              <Youtube className="w-3 h-3" />
-                              {t('events.transmission.setReminder')}
-                            </Button>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <Card className="p-6 text-center text-muted-foreground">
-                        <p className="text-sm">{t('events.transmission.noUpcoming')}</p>
-                      </Card>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-
-              {/* Schedule Tab */}
-              <TabsContent value="schedule" className="space-y-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex gap-2 flex-wrap">
-                    <Button
-                      variant={selectedDay === undefined ? 'default' : 'outline'}
-                      onClick={() => setSelectedDay(undefined)}
-                    >
-                      {t('events.transmission.all')}
-                    </Button>
-                    {[1, 2, 3].map((day) => (
-                      <Button
-                        key={day}
-                        variant={selectedDay === day ? 'default' : 'outline'}
-                        onClick={() => setSelectedDay(day)}
-                      >
-                        {t('events.transmission.day')} {day}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {scheduleLoading ? (
-                  <div className="grid gap-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
-                    ))}
-                  </div>
-                ) : schedule && schedule.length > 0 ? (
-                  <div className="grid gap-4">
-                    {schedule.map((item) => (
-                      <Card key={item.id} className="p-6 hover:shadow-lg transition-shadow">
-                        <div className="flex flex-col md:flex-row md:items-start gap-4">
-                          <div className="flex-shrink-0">
-                            <Badge className={getModalityBadge(item.modality)}>
-                              {item.modality.toUpperCase()}
-                            </Badge>
-                          </div>
-                          
-                          <div className="flex-1 space-y-2">
-                            <h3 className="text-lg font-bold text-gray-900">
-                              {getLocalized(item.topic)}
-                            </h3>
-                            
-                            {item.speaker && (
-                              <p className="text-sm text-gray-600 flex items-center gap-2">
-                                <Users className="w-4 h-4" />
-                                {item.speaker}
-                              </p>
-                            )}
-                            
-                            <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                {formatTime(item.start_time)}
-                                {item.end_time && ` - ${formatTime(item.end_time)}`}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                {new Date(item.date).toLocaleDateString(i18n.language, {
-                                  weekday: 'short',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </span>
-                            </div>
-
-                            {item.meet_room_link && (
-                              <Button size="sm" variant="outline" className="gap-2" asChild>
-                                <a href={item.meet_room_link} target="_blank" rel="noopener noreferrer">
-                                  <MapPin className="w-4 h-4" />
-                                  {t('events.transmission.joinRoom')}
-                                  <ExternalLink className="w-3 h-3" />
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="p-12 text-center">
-                    <p className="text-muted-foreground">{t('events.transmission.noSessions')}</p>
-                  </Card>
-                )}
-              </TabsContent>
-
-              {/* FAQ Tab */}
-              <TabsContent value="faq">
-                <Card className="p-8">
-                  {faqLoading ? (
-                    <div className="space-y-6">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="space-y-2">
-                          <div className="h-6 bg-muted animate-pulse rounded w-3/4" />
-                          <div className="h-16 bg-muted animate-pulse rounded" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : faqItems && faqItems.length > 0 ? (
-                    <div className="prose dark:prose-invert max-w-none space-y-6">
-                      <h2 className="text-3xl font-bold mb-8">{t('events.transmission.faqTitle')}</h2>
-                      
-                      {faqItems.map((item) => (
-                        <div key={item.id} className="border-b border-gray-200 pb-6 last:border-0">
-                          <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                            {getLocalized(item.question)}
-                          </h3>
-                          <p className="text-gray-700 leading-relaxed">
-                            {getLocalized(item.answer)}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <HelpCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                      <p>Nenhuma pergunta frequente cadastrada ainda.</p>
-                    </div>
-                  )}
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </main>
-        
+        <div className="container mx-auto px-4 py-16">
+          <Skeleton className="h-64 w-full mb-8" />
+          <Skeleton className="h-96 w-full" />
+        </div>
         <Footer />
       </div>
-    </>
+    );
+  }
+
+  if (!transmission) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4">Transmissão não encontrada</h1>
+          <p className="text-muted-foreground mb-8">
+            Não há transmissão disponível no momento.
+          </p>
+          <Button onClick={() => navigate('/')}>Voltar ao início</Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{title} — III CIVENI 2025</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${title} — III CIVENI 2025`} />
+        <meta property="og:description" content={description} />
+      </Helmet>
+
+      <Header />
+
+      {/* Hero Banner with Gradient */}
+      <section
+        className="relative py-24 px-4 overflow-hidden"
+        style={{
+          background: `linear-gradient(135deg, ${transmission.banner_from} 0%, ${transmission.banner_to} 100%)`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="container mx-auto relative z-10 text-white">
+          <div className="max-w-3xl">
+            {subtitle && (
+              <p className="text-lg opacity-90 mb-2 font-medium">{subtitle}</p>
+            )}
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
+            {description && (
+              <p className="text-xl opacity-90 mb-8">{description}</p>
+            )}
+            
+            <div className="flex flex-wrap gap-4 items-center mb-6">
+              {primaryCTA && (
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  asChild={!!primaryCTA.external}
+                  onClick={!primaryCTA.external ? () => {
+                    document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
+                  } : undefined}
+                >
+                  {primaryCTA.external ? (
+                    <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
+                      {primaryCTA.icon}
+                      {primaryCTA.label}
+                    </a>
+                  ) : (
+                    <>
+                      {primaryCTA.icon}
+                      {primaryCTA.label}
+                    </>
+                  )}
+                </Button>
+              )}
+              <Button size="lg" variant="outline" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <a href="/inscricoes">Inscrições</a>
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-4 items-center">
+              {statusBadge}
+              {timezoneText && (
+                <div className="flex items-center gap-2 text-sm opacity-80">
+                  <Clock className="w-4 h-4" />
+                  <span>{timezoneText}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tabs Section */}
+      <section className="container mx-auto px-4 py-12">
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsTrigger value="ao-vivo" className="flex items-center gap-2">
+              <Play className="w-4 h-4" />
+              Ao vivo
+            </TabsTrigger>
+            <TabsTrigger value="agenda" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Agenda
+            </TabsTrigger>
+            <TabsTrigger value="salas" className="flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              Salas
+            </TabsTrigger>
+            <TabsTrigger value="faq" className="flex items-center gap-2">
+              <HelpCircle className="w-4 h-4" />
+              FAQ
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="ao-vivo" className="space-y-8">
+            {/* YouTube Player */}
+            {transmission.youtube_video_id ? (
+              <div id="player" className="space-y-4">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${transmission.youtube_video_id}?autoplay=0&rel=0`}
+                    title={title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    className="w-full h-full"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Canal: {transmission.channel_handle}
+                  </p>
+                  <Button variant="ghost" size="sm" asChild>
+                    <a
+                      href={`https://www.youtube.com/${transmission.channel_handle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Abrir no YouTube
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Card className="p-12 text-center">
+                <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2">Nenhum vídeo disponível</h3>
+                <p className="text-muted-foreground mb-4">
+                  A transmissão ainda não começou ou não há replay disponível.
+                </p>
+                {transmission.channel_handle && (
+                  <Button variant="outline" asChild>
+                    <a
+                      href={`https://www.youtube.com/${transmission.channel_handle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Visite o canal
+                    </a>
+                  </Button>
+                )}
+              </Card>
+            )}
+
+            {/* Upcoming Transmissions */}
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Próximas transmissões</h2>
+              {upcomingLoading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-32" />
+                  ))}
+                </div>
+              ) : upcoming.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {upcoming.map((tx) => (
+                    <Card key={tx.id} className="p-4">
+                      <h3 className="font-semibold mb-2">{pickLang(tx.title, locale)}</h3>
+                      {tx.start_at && (
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {new Date(tx.start_at).toLocaleString(locale, {
+                            dateStyle: 'medium',
+                            timeStyle: 'short',
+                          })}
+                        </p>
+                      )}
+                      <Button size="sm" variant="outline" className="w-full">
+                        Detalhes
+                      </Button>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-8 text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-muted-foreground mb-4">
+                    Sem próximas transmissões agendadas
+                  </p>
+                  <Button variant="outline" asChild>
+                    <a href={`https://www.youtube.com/${transmission.channel_handle}`} target="_blank" rel="noopener noreferrer">
+                      Veja o canal no YouTube
+                    </a>
+                  </Button>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="agenda">
+            <Card className="p-8 text-center">
+              <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-xl font-semibold mb-2">Programação completa</h3>
+              <p className="text-muted-foreground mb-6">
+                Veja a agenda completa do evento na programação online.
+              </p>
+              <Button asChild>
+                <a href={transmission.schedule_url || '/programacao-online'}>
+                  Ver programação
+                </a>
+              </Button>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="salas">
+            {roomsLoading ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {[1, 2].map((i) => (
+                  <Skeleton key={i} className="h-32" />
+                ))}
+              </div>
+            ) : rooms.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {rooms.map((room) => (
+                  <Card key={room.id} className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="font-semibold text-lg">
+                        {pickLang(room.name, locale)}
+                      </h3>
+                      {room.is_live && (
+                        <Badge className="bg-red-600 text-white">Ao vivo</Badge>
+                      )}
+                    </div>
+                    <Button className="w-full" asChild>
+                      <a href={room.meet_url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Entrar na sala
+                      </a>
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <Video className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">Nenhuma sala disponível no momento</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="faq">
+            <Card className="p-8 text-center">
+              <HelpCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-xl font-semibold mb-2">Perguntas frequentes</h3>
+              <p className="text-muted-foreground mb-6">
+                Veja as perguntas mais comuns sobre a transmissão.
+              </p>
+              <Button variant="outline" asChild>
+                <a href={transmission.faq_url || '#faq'}>Ver FAQ</a>
+              </Button>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </section>
+
+      <Footer />
+    </div>
   );
 };
 

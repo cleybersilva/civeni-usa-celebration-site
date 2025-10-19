@@ -1,23 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { Calendar, Clock, Users } from 'lucide-react';
-import { useCurrentStream, useCurrentSession } from '@/hooks/useTransmissionData';
+import { Calendar, Clock } from 'lucide-react';
+import { useTransmission, pickLang } from '@/hooks/useTransmission';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 
 const LivePlayer = () => {
   const { t, i18n } = useTranslation();
-  const { data: stream, isLoading: streamLoading } = useCurrentStream();
-  const { data: session } = useCurrentSession();
+  const { data: stream, isLoading: streamLoading } = useTransmission();
 
-  const getTitle = (titleObj: Record<string, string> | undefined) => {
-    if (!titleObj) return '';
-    return titleObj[i18n.language] || titleObj.pt || '';
-  };
-
-  const getDescription = (descObj: Record<string, string> | undefined) => {
-    if (!descObj) return '';
-    return descObj[i18n.language] || descObj.pt || '';
-  };
+  const title = pickLang(stream?.title, i18n.language);
+  const description = pickLang(stream?.description, i18n.language);
 
   const formatTime = (isoString: string | null, timezone: string) => {
     if (!isoString) return '';
@@ -58,7 +50,7 @@ const LivePlayer = () => {
           <iframe
             className="w-full h-full"
             src={`https://www.youtube.com/embed/${videoId}?autoplay=${isLive ? 1 : 0}&cc_load_policy=1`}
-            title={getTitle(stream?.title)}
+            title={title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
@@ -90,7 +82,7 @@ const LivePlayer = () => {
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold">
-                {stream ? getTitle(stream.title) : t('transmission.noStreamTitle')}
+                {stream ? title : t('transmission.noStreamTitle')}
               </h2>
               {stream && (
                 <Badge variant={isLive ? 'destructive' : isScheduled ? 'default' : 'secondary'}>
@@ -101,7 +93,7 @@ const LivePlayer = () => {
               )}
             </div>
             <p className="text-muted-foreground">
-              {stream ? getDescription(stream.description) : t('transmission.noStreamDesc')}
+              {stream ? description : t('transmission.noStreamDesc')}
             </p>
           </div>
         </div>
@@ -113,12 +105,6 @@ const LivePlayer = () => {
               <Clock className="w-4 h-4" />
               <span>{formatTime(stream.start_at, stream.timezone)}</span>
             </div>
-            {session && (
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                <span>{getTitle(session.title)}</span>
-              </div>
-            )}
           </div>
         )}
 
