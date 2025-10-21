@@ -16,7 +16,20 @@ const RATE_LIMIT_WINDOW = 300000; // 5 minutes
 const RATE_LIMIT_MAX = 3;
 
 function checkRateLimit(clientIP: string, email: string): boolean {
-  // Temporariamente desabilitado para diagnóstico
+  const now = Date.now();
+  const key = `${clientIP}:${email}`;
+  const current = rateLimitMap.get(key);
+  
+  if (!current || now > current.resetTime) {
+    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (current.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  current.count++;
   return true;
 }
 

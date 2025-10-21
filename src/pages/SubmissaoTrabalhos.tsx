@@ -1,24 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Upload, FileText, Users, BookOpen } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useThematicAreas } from '@/hooks/useThematicAreas';
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
-import { BookOpen, FileText, Upload, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
-import { useThematicAreas } from '@/hooks/useThematicAreas';
-=======
-import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +8,6 @@ import { toast } from 'sonner';
 import { Upload, FileText, Users, BookOpen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useThematicAreas } from '@/hooks/useThematicAreas';
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
@@ -53,8 +34,6 @@ const SubmissaoTrabalhos = () => {
     }));
   };
 
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
-  const handleSubmit = async (e: React.FormEvent) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
@@ -75,9 +54,6 @@ const SubmissaoTrabalhos = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-=======
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
-  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!file) {
@@ -85,120 +61,6 @@ const SubmissaoTrabalhos = () => {
       return;
     }
 
-    // Validação adicional dos campos obrigatórios
-    const requiredFields = {
-      author_name: 'Nome do autor',
-      institution: 'Instituição',
-      email: 'E-mail',
-      work_title: 'Título do trabalho',
-      abstract: 'Resumo',
-      keywords: 'Palavras-chave',
-      thematic_area: 'Área temática'
-    };
-
-    for (const [field, label] of Object.entries(requiredFields)) {
-      const value = formData[field as keyof typeof formData];
-      if (!value || value.trim().length === 0) {
-        toast.error(`${label} é obrigatório`);
-        return;
-      }
-    }
-
-    // Validação específica de e-mail
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error('Por favor, insira um e-mail válido');
-      return;
-    }
-
-    // Validação de tamanho mínimo
-    if (formData.work_title.trim().length < 5) {
-      toast.error('Título do trabalho deve ter pelo menos 5 caracteres');
-      return;
-    }
-
-    if (formData.abstract.trim().length < 20) {
-      toast.error('Resumo deve ter pelo menos 20 caracteres');
-      return;
-    }
-
-      // Step 1: Upload file first
-      console.log('Uploading file:', file.name);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `submissions/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('work-submissions')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw new Error('Erro ao fazer upload do arquivo');
-      }
-
-      console.log('File uploaded successfully:', filePath);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('work-submissions')
-        .getPublicUrl(filePath);
-
-      // Step 2: Submit form data with file info
-      const submissionData = {
-        author_name: formData.author_name.trim(),
-        institution: formData.institution.trim(),
-        email: formData.email.trim(),
-        work_title: formData.work_title.trim(),
-        abstract: formData.abstract.trim(),
-        keywords: formData.keywords.trim(),
-        thematic_area: formData.thematic_area.trim(),
-        submission_kind: activeTab,
-        file_url: publicUrl,
-        file_name: file.name,
-        file_size: file.size
-      };
-
-      console.log('Submitting to edge function:', submissionData);
-
-      const { data, error } = await supabase.functions.invoke('submit-work', {
-        body: submissionData
-      });
-
-      console.log('Edge function response:', { data, error });
-
-      if (error) {
-        throw new Error(error.message || 'Erro ao comunicar com o servidor');
-      }
-
-      if (!data?.success) {
-        throw new Error(data?.error || 'Erro ao processar submissão');
-      }
-
-      console.log('Submission completed successfully');
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
-      toast.success('Trabalho submetido com sucesso!');
-      navigate('/work-submission/success');
-
-<<<<<<< HEAD
-    } catch (err) {
-      console.error('Erro na submissão:', err);
-      
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error('Erro ao submeter trabalho. Tente novamente.');
-      }
-    } catch (error: any) {
-      console.error('Error submitting work:', error);
-      toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
-    } finally {
-      setIsSubmitting(false);
-    }
     setIsSubmitting(true);
 
     try {
@@ -265,85 +127,6 @@ const SubmissaoTrabalhos = () => {
     } catch (error: any) {
       console.error('Error submitting work:', error);
       toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
-    } finally {
-      setIsSubmitting(false);
-    }
-=======
-      // Step 1: Upload file first
-      console.log('Uploading file:', file.name);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `submissions/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('work-submissions')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw new Error('Erro ao fazer upload do arquivo');
-      }
-
-      console.log('File uploaded successfully:', filePath);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('work-submissions')
-        .getPublicUrl(filePath);
-
-      // Step 2: Submit form data with file info
-      const submissionData = {
-        author_name: formData.author_name.trim(),
-        institution: formData.institution.trim(),
-        email: formData.email.trim(),
-        work_title: formData.work_title.trim(),
-        abstract: formData.abstract.trim(),
-        keywords: formData.keywords.trim(),
-        thematic_area: formData.thematic_area.trim(),
-        submission_kind: activeTab,
-        file_url: publicUrl,
-        file_name: file.name,
-        file_size: file.size
-      };
-
-      console.log('Submitting to edge function:', submissionData);
-
-      const { data, error } = await supabase.functions.invoke('submit-work', {
-        body: submissionData
-      });
-
-      console.log('Edge function response:', { data, error });
-
-      if (error) {
-        throw new Error(error.message || 'Erro ao comunicar com o servidor');
-      }
-
-      if (!data?.success) {
-        throw new Error(data?.error || 'Erro ao processar submissão');
-      }
-
-      console.log('Submission completed successfully');
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
-      toast.success('Trabalho submetido com sucesso!');
-      navigate('/work-submission/success');
-
-<<<<<<< HEAD
-    } catch (err) {
-      console.error('Erro na submissão:', err);
-      
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error('Erro ao submeter trabalho. Tente novamente.');
-      }
-=======
-    } catch (error: any) {
-      console.error('Error submitting work:', error);
-      toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
->>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
     } finally {
       setIsSubmitting(false);
     }
