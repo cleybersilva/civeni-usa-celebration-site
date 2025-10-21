@@ -7,12 +7,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, FileText, Users, BookOpen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useThematicAreas } from '@/hooks/useThematicAreas';
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('artigo');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { thematicAreas, isLoading: isLoadingAreas, getLocalizedContent } = useThematicAreas();
   const [formData, setFormData] = useState({
     author_name: '',
     institution: '',
@@ -23,15 +25,6 @@ const SubmissaoTrabalhos = () => {
     thematic_area: ''
   });
   const [file, setFile] = useState<File | null>(null);
-
-  const thematicAreas = [
-    "Educação e Tecnologia",
-    "Metodologias Inovadoras", 
-    "Formação Docente",
-    "Educação Global",
-    "Neuroeducação",
-    "Educação Digital"
-  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -274,14 +267,20 @@ const SubmissaoTrabalhos = () => {
                         value={formData.thematic_area}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        disabled={isLoadingAreas}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue disabled:opacity-50"
                       >
-                        <option value="">Selecione uma área temática</option>
-                        {thematicAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area}
-                          </option>
-                        ))}
+                        <option value="">
+                          {isLoadingAreas ? 'Carregando...' : 'Selecione uma área temática'}
+                        </option>
+                        {thematicAreas?.map((area) => {
+                          const { name } = getLocalizedContent(area);
+                          return (
+                            <option key={area.id} value={name}>
+                              {name}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
@@ -428,14 +427,20 @@ const SubmissaoTrabalhos = () => {
                         value={formData.thematic_area}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        disabled={isLoadingAreas}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue disabled:opacity-50"
                       >
-                        <option value="">Selecione uma área temática</option>
-                        {thematicAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area}
-                          </option>
-                        ))}
+                        <option value="">
+                          {isLoadingAreas ? 'Carregando...' : 'Selecione uma área temática'}
+                        </option>
+                        {thematicAreas?.map((area) => {
+                          const { name } = getLocalizedContent(area);
+                          return (
+                            <option key={area.id} value={name}>
+                              {name}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
