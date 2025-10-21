@@ -1,18 +1,39 @@
+import { Link, useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Upload, FileText, Users, BookOpen } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useThematicAreas } from '@/hooks/useThematicAreas';
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
-import { BookOpen, CheckCircle, FileText, Upload, Users } from 'lucide-react';
+import { BookOpen, FileText, Upload, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import { useThematicAreas } from '@/hooks/useThematicAreas';
+=======
+import { Link, useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Upload, FileText, Users, BookOpen } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useThematicAreas } from '@/hooks/useThematicAreas';
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('artigo');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { thematicAreas, isLoading: isLoadingAreas, getLocalizedContent } = useThematicAreas();
   const [formData, setFormData] = useState({
     author_name: '',
     institution: '',
@@ -24,15 +45,6 @@ const SubmissaoTrabalhos = () => {
   });
   const [file, setFile] = useState<File | null>(null);
 
-  const thematicAreas = [
-    "Educação e Tecnologia",
-    "Metodologias Inovadoras", 
-    "Formação Docente",
-    "Educação Global",
-    "Neuroeducação",
-    "Educação Digital"
-  ];
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -41,6 +53,8 @@ const SubmissaoTrabalhos = () => {
     }));
   };
 
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
+  const handleSubmit = async (e: React.FormEvent) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
@@ -51,7 +65,7 @@ const SubmissaoTrabalhos = () => {
         return;
       }
       
-      if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+      if (selectedFile.size > 10 * 1024 * 1024) {
         toast.error('O arquivo deve ter no máximo 10MB');
         return;
       }
@@ -60,23 +74,9 @@ const SubmissaoTrabalhos = () => {
     }
   };
 
-  const uploadFile = async (file: File, submissionId: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${submissionId}.${fileExt}`;
-    const filePath = `${submissionId}/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from('work-submissions')
-      .upload(filePath, file);
-
-    if (error) {
-      console.error('Erro no upload:', error);
-      throw error;
-    }
-
-    return { filePath, fileName };
-  };
-
+  const handleSubmit = async (e: React.FormEvent) => {
+=======
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -122,53 +122,68 @@ const SubmissaoTrabalhos = () => {
       return;
     }
 
-    setIsSubmitting(true);
+      // Step 1: Upload file first
+      console.log('Uploading file:', file.name);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `submissions/${fileName}`;
 
-    try {
-      console.log('=== SUBMISSÃO INICIADA ===');
-      
-      // Inserir diretamente na tabela (bypass da edge function problemática)
-      const { data: submissionData, error: insertError } = await supabase
-        .from('work_submissions')
-        .insert([{
-          author_name: formData.author_name.trim(),
-          institution: formData.institution.trim(),
-          email: formData.email.toLowerCase().trim(),
-          work_title: formData.work_title.trim(),
-          abstract: formData.abstract.trim(),
-          keywords: formData.keywords.trim(),
-          thematic_area: formData.thematic_area,
-          submission_kind: activeTab as 'artigo' | 'consorcio',
-          status: 'pending'
-        }])
-        .select()
-        .single();
+      const { error: uploadError } = await supabase.storage
+        .from('work-submissions')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (insertError) {
-        console.error('Erro na inserção:', insertError);
-        throw new Error(`Erro ao salvar submissão: ${insertError.message}`);
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Erro ao fazer upload do arquivo');
       }
 
-      const submissionId = submissionData.id;
-      console.log('Submissão criada:', submissionId);
+      console.log('File uploaded successfully:', filePath);
 
-      // Upload do arquivo
-      const { filePath, fileName } = await uploadFile(file, submissionId);
-      console.log('Arquivo enviado:', { filePath, fileName });
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('work-submissions')
+        .getPublicUrl(filePath);
 
-      // Atualizar com informações do arquivo
-      const { error: updateError } = await supabase
-        .from('work_submissions')
-        .update({ file_path: filePath, file_name: fileName })
-        .eq('id', submissionId);
+      // Step 2: Submit form data with file info
+      const submissionData = {
+        author_name: formData.author_name.trim(),
+        institution: formData.institution.trim(),
+        email: formData.email.trim(),
+        work_title: formData.work_title.trim(),
+        abstract: formData.abstract.trim(),
+        keywords: formData.keywords.trim(),
+        thematic_area: formData.thematic_area.trim(),
+        submission_kind: activeTab,
+        file_url: publicUrl,
+        file_name: file.name,
+        file_size: file.size
+      };
 
-      if (updateError) {
-        console.warn('Não foi possível atualizar arquivo, mas submissão foi criada');
+      console.log('Submitting to edge function:', submissionData);
+
+      const { data, error } = await supabase.functions.invoke('submit-work', {
+        body: submissionData
+      });
+
+      console.log('Edge function response:', { data, error });
+
+      if (error) {
+        throw new Error(error.message || 'Erro ao comunicar com o servidor');
       }
 
-      setIsSubmitted(true);
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao processar submissão');
+      }
+
+      console.log('Submission completed successfully');
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
       toast.success('Trabalho submetido com sucesso!');
+      navigate('/work-submission/success');
 
+<<<<<<< HEAD
     } catch (err) {
       console.error('Erro na submissão:', err);
       
@@ -177,43 +192,162 @@ const SubmissaoTrabalhos = () => {
       } else {
         toast.error('Erro ao submeter trabalho. Tente novamente.');
       }
+    } catch (error: any) {
+      console.error('Error submitting work:', error);
+      toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
+    } finally {
+      setIsSubmitting(false);
+    }
+    setIsSubmitting(true);
+
+    try {
+      // Step 1: Upload file first
+      console.log('Uploading file:', file.name);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `submissions/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('work-submissions')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Erro ao fazer upload do arquivo');
+      }
+
+      console.log('File uploaded successfully:', filePath);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('work-submissions')
+        .getPublicUrl(filePath);
+
+      // Step 2: Submit form data with file info
+      const submissionData = {
+        author_name: formData.author_name.trim(),
+        institution: formData.institution.trim(),
+        email: formData.email.trim(),
+        work_title: formData.work_title.trim(),
+        abstract: formData.abstract.trim(),
+        keywords: formData.keywords.trim(),
+        thematic_area: formData.thematic_area.trim(),
+        submission_kind: activeTab,
+        file_url: publicUrl,
+        file_name: file.name,
+        file_size: file.size
+      };
+
+      console.log('Submitting to edge function:', submissionData);
+
+      const { data, error } = await supabase.functions.invoke('submit-work', {
+        body: submissionData
+      });
+
+      console.log('Edge function response:', { data, error });
+
+      if (error) {
+        throw new Error(error.message || 'Erro ao comunicar com o servidor');
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao processar submissão');
+      }
+
+      console.log('Submission completed successfully');
+      toast.success('Trabalho submetido com sucesso!');
+      navigate('/work-submission/success');
+
+    } catch (error: any) {
+      console.error('Error submitting work:', error);
+      toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+=======
+      // Step 1: Upload file first
+      console.log('Uploading file:', file.name);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `submissions/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('work-submissions')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error('Erro ao fazer upload do arquivo');
+      }
+
+      console.log('File uploaded successfully:', filePath);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('work-submissions')
+        .getPublicUrl(filePath);
+
+      // Step 2: Submit form data with file info
+      const submissionData = {
+        author_name: formData.author_name.trim(),
+        institution: formData.institution.trim(),
+        email: formData.email.trim(),
+        work_title: formData.work_title.trim(),
+        abstract: formData.abstract.trim(),
+        keywords: formData.keywords.trim(),
+        thematic_area: formData.thematic_area.trim(),
+        submission_kind: activeTab,
+        file_url: publicUrl,
+        file_name: file.name,
+        file_size: file.size
+      };
+
+      console.log('Submitting to edge function:', submissionData);
+
+      const { data, error } = await supabase.functions.invoke('submit-work', {
+        body: submissionData
+      });
+
+      console.log('Edge function response:', { data, error });
+
+      if (error) {
+        throw new Error(error.message || 'Erro ao comunicar com o servidor');
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao processar submissão');
+      }
+
+      console.log('Submission completed successfully');
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
+      toast.success('Trabalho submetido com sucesso!');
+      navigate('/work-submission/success');
+
+<<<<<<< HEAD
+    } catch (err) {
+      console.error('Erro na submissão:', err);
+      
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error('Erro ao submeter trabalho. Tente novamente.');
+      }
+=======
+    } catch (error: any) {
+      console.error('Error submitting work:', error);
+      toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
+>>>>>>> ea32deeee3e64bc8c449bf06aa8426db6c100ac4
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
-        <Header />
-        
-        <main className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="bg-green-50 rounded-2xl p-8 mb-8">
-                <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                <h1 className="text-3xl font-bold text-green-800 mb-4">
-                  Trabalho Submetido com Sucesso!
-                </h1>
-                <p className="text-green-700 text-lg mb-6">
-                  Seu trabalho foi recebido e está sendo analisado pela nossa equipe. 
-                  Você receberá um e-mail de confirmação em breve.
-                </p>
-                <button
-                  onClick={() => window.location.href = '/area-tematica'}
-                  className="bg-civeni-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Voltar às Áreas Temáticas
-                </button>
-              </div>
-            </div>
-          </div>
-        </main>
-        
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
@@ -350,14 +484,20 @@ const SubmissaoTrabalhos = () => {
                         value={formData.thematic_area}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        disabled={isLoadingAreas}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue disabled:opacity-50"
                       >
-                        <option value="">Selecione uma área temática</option>
-                        {thematicAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area}
-                          </option>
-                        ))}
+                        <option value="">
+                          {isLoadingAreas ? 'Carregando...' : 'Selecione uma área temática'}
+                        </option>
+                        {thematicAreas?.map((area) => {
+                          const { name } = getLocalizedContent(area);
+                          return (
+                            <option key={area.id} value={name}>
+                              {name}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
@@ -483,7 +623,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Título do Trabalho *
+                        Título do Consórcio *
                       </label>
                       <input
                         type="text"
@@ -504,20 +644,26 @@ const SubmissaoTrabalhos = () => {
                         value={formData.thematic_area}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        disabled={isLoadingAreas}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue disabled:opacity-50"
                       >
-                        <option value="">Selecione uma área temática</option>
-                        {thematicAreas.map((area) => (
-                          <option key={area} value={area}>
-                            {area}
-                          </option>
-                        ))}
+                        <option value="">
+                          {isLoadingAreas ? 'Carregando...' : 'Selecione uma área temática'}
+                        </option>
+                        {thematicAreas?.map((area) => {
+                          const { name } = getLocalizedContent(area);
+                          return (
+                            <option key={area.id} value={name}>
+                              {name}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Resumo * (máximo 500 caracteres)
+                        Descrição do Consórcio * (máximo 500 caracteres)
                       </label>
                       <textarea
                         name="abstract"
@@ -550,7 +696,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Arquivo do Trabalho * (PDF ou DOCX, máximo 10MB)
+                        Proposta do Consórcio * (PDF ou DOCX, máximo 10MB)
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
                         <input

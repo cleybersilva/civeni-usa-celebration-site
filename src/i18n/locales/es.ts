@@ -411,6 +411,79 @@ export const esTranslations = {
         oralPresentation: "Presentación Oral",
         posterSessions: "Sesiones de Póster",
         manuscripts: "Manuscritos"
+      },
+      transmission: {
+        pageTitle: "Transmisión Oficial — CIVENI 2025 (Florida)",
+        pageDescription: "Sigue en vivo las transmisiones del III CIVENI 2025",
+        title: "Transmisión Oficial — CIVENI 2025 (Florida)",
+        subtitle: "YouTube en vivo + Salas de Presentación (Meet)",
+        description: "Sigue todas las transmisiones en vivo del III CIVENI 2025",
+        ctaWatch: "Ver Ahora (YouTube)",
+        ctaRooms: "Salas de Presentación Oral",
+        timezoneInfo: "Horarios en Florida (ET) y Fortaleza (BRT)",
+        noStream: "No hay transmisión en este momento",
+        noStreamTitle: "Espera la próxima transmisión",
+        noStreamDesc: "Consulta nuestra programación",
+        channel: "Canal",
+        live: "EN VIVO",
+        online: "En línea",
+        inPerson: "Presencial",
+        all: "Todas",
+        day: "Día",
+        upcomingStreams: "Próximas Transmisiones",
+        setReminder: "Establecer Recordatorio",
+        noUpcoming: "No hay transmisiones programadas",
+        noSessions: "No se encontraron sesiones",
+        noRooms: "No hay salas disponibles",
+        watchLive: "Ver en Vivo",
+        joinRoom: "Entrar a la Sala",
+        waitingToStart: "Esperando Inicio",
+        capacity: "Capacidad",
+        moderators: "Moderadores",
+        staffOnly: "Solo Personal",
+        enrolledOnly: "Solo Inscriptos",
+        roomsTitle: "Salas de Presentación (Google Meet)",
+        roomsDescription: "Accede a las salas virtuales (inscripción requerida)",
+        faqTitle: "Preguntas Frecuentes",
+        badges: { 
+          live: "EN VIVO", 
+          scheduled: "PROGRAMADO", 
+          ended: "FINALIZADO" 
+        },
+        types: { 
+          opening: "Apertura", 
+          conference: "Conferencia", 
+          lecture: "Conferencia", 
+          roundtable: "Mesa Redonda", 
+          oral: "Presentación Oral", 
+          break: "Descanso", 
+          registration: "Acreditación", 
+          other: "Otros" 
+        },
+        tabs: { 
+          live: "En Vivo", 
+          schedule: "Programación", 
+          rooms: "Salas (Meet)", 
+          faq: "FAQ y Soporte" 
+        },
+        faq: {
+          tech: { 
+            title: "¿Cuáles son los requisitos técnicos?", 
+            answer: "Necesitas un navegador actualizado (Chrome, Firefox, Safari o Edge) y una conexión a internet estable de al menos 5 Mbps para la mejor experiencia." 
+          },
+          access: { 
+            title: "¿Cómo accedo a las transmisiones?", 
+            answer: "Las transmisiones en vivo son públicas y se pueden acceder directamente en esta página. Para acceder a las salas de reunión, necesitas estar inscrito en el evento." 
+          },
+          recording: { 
+            title: "¿Las sesiones serán grabadas?", 
+            answer: "Sí, todas las sesiones principales serán grabadas y estarán disponibles posteriormente en el canal oficial de YouTube de CIVENI." 
+          },
+          support: { 
+            title: "Necesito soporte técnico. ¿Qué hago?", 
+            answer: "Contacta con nuestro equipo de soporte a través del email suporte@civeni.org o por WhatsApp disponible en la página de contacto." 
+          }
+        }
       }
     }
   },

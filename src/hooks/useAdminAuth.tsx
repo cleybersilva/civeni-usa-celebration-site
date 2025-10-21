@@ -7,6 +7,7 @@ interface AdminUser {
   email: string;
   user_type: 'admin' | 'editor' | 'viewer' | 'design' | 'admin_root';
   is_admin_root?: boolean;
+  roles?: string[]; // Server-validated roles
 }
 
 interface LoginResponse {
@@ -20,7 +21,7 @@ interface LoginResponse {
 }
 
 interface SessionData {
-  user: AdminUser;
+  user: Omit<AdminUser, 'roles'>; // Don't store roles in localStorage
   timestamp: number;
   expires: number;
   session_token?: string;
@@ -41,54 +42,76 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const [user, setUser] = useState<AdminUser | null>(null);
   const [sessionToken, setSessionToken] = useState<string | undefined>(undefined);
 
+  // Fetch roles from server
+  const fetchUserRoles = async (email: string, token: string): Promise<string[]> => {
+    try {
+      const { data, error } = await supabase.rpc('check_user_role_secure', {
+        user_email: email,
+        session_token: token
+      });
+
+      if (error || !data) {
+        console.error('Failed to fetch user roles:', error);
+        return [];
+      }
+
+      const roleData = data as unknown as { success: boolean; roles: string[]; is_admin_root: boolean };
+      return roleData.success ? roleData.roles : [];
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     // Check for valid session
     const savedSession = localStorage.getItem('adminSession');
     if (savedSession) {
       try {
         const sessionData: SessionData = JSON.parse(savedSession);
-        if (sessionData.expires > Date.now()) {
-          setUser(sessionData.user);
-          setSessionToken(sessionData.session_token);
-          // Set the current user email for RLS policies when restoring session
-          if (sessionData.session_token) {
-            (async () => {
-              try {
-                const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
-                  user_email: sessionData.user.email,
-                  session_token: sessionData.session_token
-                });
-                if (!setEmailResult.data) {
-                  console.error('Failed to restore secure session, clearing storage');
-                  localStorage.removeItem('adminSession');
-                  setUser(null);
-                }
-              } catch (error) {
-                console.error('Error setting user email for RLS:', error);
+        if (sessionData.expires > Date.now() && sessionData.session_token) {
+          // Restore session and fetch roles from server
+          (async () => {
+            try {
+              const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
+                user_email: sessionData.user.email,
+                session_token: sessionData.session_token
+              });
+
+              if (!setEmailResult.data) {
+                console.error('Failed to restore secure session, clearing storage');
                 localStorage.removeItem('adminSession');
                 setUser(null);
+                return;
               }
-            })();
-          } else {
-            // Legacy session without token, clear it
-            localStorage.removeItem('adminSession');
-          }
+
+              // Fetch roles from server
+              const roles = await fetchUserRoles(sessionData.user.email, sessionData.session_token);
+              
+              setUser({
+                ...sessionData.user,
+                roles
+              });
+              setSessionToken(sessionData.session_token);
+            } catch (error) {
+              console.error('Error restoring session:', error);
+              localStorage.removeItem('adminSession');
+              setUser(null);
+            }
+          })();
         } else {
-          // Session expired, clear it
+          // Session expired
           localStorage.removeItem('adminSession');
-          localStorage.removeItem('adminUser'); // Clean up old format too
         }
       } catch (error) {
         console.error('Invalid session data:', error);
         localStorage.removeItem('adminSession');
-        localStorage.removeItem('adminUser');
       }
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      // Use the secure admin login function from Supabase
       const { data, error } = await supabase.rpc('temp_admin_login_secure', {
         user_email: email,
         user_password: password
@@ -99,21 +122,9 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
         return { success: false, error: 'Erro ao fazer login' };
       }
 
-      // Type assertion for the response data
       const loginResponse = data as unknown as LoginResponse & { session_token?: string };
 
       if (loginResponse && loginResponse.success && loginResponse.user && loginResponse.session_token) {
-        const adminUser: AdminUser = {
-          id: loginResponse.user.user_id,
-          email: loginResponse.user.email,
-          user_type: loginResponse.user.user_type as AdminUser['user_type'],
-          is_admin_root: loginResponse.user.user_type === 'admin_root'
-        };
-        
-        setUser(adminUser);
-        setSessionToken(loginResponse.session_token);
-        
-        // Set the current user email for RLS policies using secure method
         const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
           user_email: email,
           session_token: loginResponse.session_token
@@ -123,12 +134,31 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           console.error('Failed to set secure user email');
           return { success: false, error: 'Erro de autenticação' };
         }
+
+        // Fetch roles from server
+        const roles = await fetchUserRoles(email, loginResponse.session_token);
         
-        // Store session with expiration (4 hours) and token - aligned with server-side TTL
-        const sessionData = {
-          user: adminUser,
+        const adminUser: AdminUser = {
+          id: loginResponse.user.user_id,
+          email: loginResponse.user.email,
+          user_type: loginResponse.user.user_type as AdminUser['user_type'],
+          is_admin_root: loginResponse.user.user_type === 'admin_root',
+          roles
+        };
+        
+        setUser(adminUser);
+        setSessionToken(loginResponse.session_token);
+        
+        // Store session WITHOUT roles (roles fetched from server on each load)
+        const sessionData: SessionData = {
+          user: {
+            id: adminUser.id,
+            email: adminUser.email,
+            user_type: adminUser.user_type,
+            is_admin_root: adminUser.is_admin_root
+          },
           timestamp: Date.now(),
-          expires: Date.now() + (4 * 60 * 60 * 1000), // 4 hours - matches server session
+          expires: Date.now() + (4 * 60 * 60 * 1000),
           session_token: loginResponse.session_token
         };
         
@@ -145,13 +175,11 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
 
   const logout = async () => {
     try {
-      // Get current session data to check for token
       const savedSession = localStorage.getItem('adminSession');
       if (savedSession && user) {
         try {
           const sessionData: SessionData = JSON.parse(savedSession);
           if (sessionData.session_token) {
-            // Revoke session server-side
             await supabase.rpc('revoke_admin_session', {
               user_email: user.email,
               session_token: sessionData.session_token
@@ -159,40 +187,46 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
           }
         } catch (error) {
           console.error('Failed to revoke session server-side:', error);
-          // Continue with logout even if server-side revocation fails
         }
       }
       
       setUser(null);
       setSessionToken(undefined);
       localStorage.removeItem('adminSession');
-      localStorage.removeItem('adminUser'); // Clean up old format too
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
-  const hasPermission = (resource: string) => {
+  const hasPermission = (resource: string): boolean => {
     if (!user) return false;
     
-    // Admin Root tem acesso total
-    if (user.user_type === 'admin_root' || user.is_admin_root) {
+    // Admin Root has access to everything (use server-validated roles)
+    if (user.is_admin_root || user.roles?.includes('admin_root')) {
       return true;
     }
     
-    // Definir permissões por categoria
-    const permissions = {
+    // If no roles loaded yet, deny access (they'll load on next render)
+    if (!user.roles || user.roles.length === 0) {
+      return false;
+    }
+    
+    // Define permissions per role (UI-level only, RLS still enforces server-side)
+    const permissions: Record<string, string[]> = {
       admin: ['banner', 'contador', 'copyright', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'],
       design: ['banner', 'palestrantes', 'videos'],
       editor: ['contador', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'],
-      viewer: ['read'] // Apenas visualização
+      viewer: ['read']
     };
 
-    return permissions[user.user_type]?.includes(resource) || false;
+    // Check if any of the user's server-validated roles grant access
+    return user.roles?.some(role => 
+      permissions[role as keyof typeof permissions]?.includes(resource)
+    ) || false;
   };
 
   const isAdminRoot = () => {
-    return user?.user_type === 'admin_root' || user?.is_admin_root === true;
+    return user?.is_admin_root === true || user?.roles?.includes('admin_root') || false;
   };
 
   return (

@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense } from 'react';
-import './i18n/config';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n/config';
 import { CMSProvider } from './contexts/CMSContext';
 import { SecurityProvider } from './components/SecurityProvider';
 
@@ -15,6 +16,7 @@ import ScheduleInPerson from "./pages/ScheduleInPerson";
 import ScheduleOnline from "./pages/ScheduleOnline";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import RegistrationCanceled from "./pages/RegistrationCanceled";
+import WorkSubmissionSuccess from "./pages/WorkSubmissionSuccess";
 import NotFound from "./pages/NotFound";
 import InscricaoPresencial from "./pages/InscricaoPresencial";
 import InscricaoOnline from "./pages/InscricaoOnline";
@@ -26,7 +28,7 @@ import AreaTematica from "./pages/AreaTematica";
 import Contato from "./pages/Contato";
 import Inscricoes from "./pages/Inscricoes";
 import PoliticasPrivacidade from "./pages/PoliticasPrivacidade";
-import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
+
 import SejaNossoParceiro from "./pages/SejaNossoParceiro";
 import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 import ApresentacaoOral from "./pages/ApresentacaoOral";
@@ -39,6 +41,9 @@ import EventoDetalhes from "./pages/EventoDetalhes";
 import CertificadoEmissao from "./pages/CertificadoEmissao";
 import CertificateSuccessPage from "./pages/CertificateSuccessPage";
 import VerificarCertificado from "./pages/VerificarCertificado";
+import TransmissaoAoVivo from "./pages/TransmissaoAoVivo";
+import TransmissaoDetalhes from "./pages/TransmissaoDetalhes";
+import TransmissaoFAQ from "./pages/TransmissaoFAQ";
 
 import './App.css';
 
@@ -47,17 +52,18 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SecurityProvider>
-          <CMSProvider>
-            <Toaster />
-            <Router>
-              <Suspense fallback={<div>Loading...</div>}>
-              <Routes>
+      <I18nextProvider i18n={i18n}>
+        <TooltipProvider>
+          <SecurityProvider>
+            <CMSProvider>
+              <Toaster />
+              <Router>
+                <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
-                <Route path="/programacao-online" element={<ScheduleOnline />} />
+        <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
+        <Route path="/programacao-online" element={<ScheduleOnline />} />
                 {/* Keep legacy routes for backward compatibility */}
                 <Route path="/cronograma-presencial" element={<ScheduleInPerson />} />
                 <Route path="/cronograma-online" element={<ScheduleOnline />} />
@@ -71,7 +77,9 @@ function App() {
             <Route path="/congresso/comite" element={<CongressoComite />} />
                 <Route path="/inscricoes" element={<Inscricoes />} />
                 <Route path="/politicas-de-privacidade" element={<PoliticasPrivacidade />} />
-                <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />
+          <Route path="/transmissao-ao-vivo" element={<TransmissaoAoVivo />} />
+          <Route path="/transmissao-ao-vivo/:slug" element={<TransmissaoDetalhes />} />
+          <Route path="/transmissao-ao-vivo/faq" element={<TransmissaoFAQ />} />
                 <Route path="/seja-nosso-parceiro" element={<SejaNossoParceiro />} />
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
@@ -87,14 +95,16 @@ function App() {
                 <Route path="/certificados/verify/:code" element={<VerificarCertificado />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
+                <Route path="/work-submission/success" element={<WorkSubmissionSuccess />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </Router>
-        </CMSProvider>
-      </SecurityProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+                </Routes>
+              </Suspense>
+            </Router>
+          </CMSProvider>
+        </SecurityProvider>
+      </TooltipProvider>
+      </I18nextProvider>
+    </QueryClientProvider>
   );
 }
 

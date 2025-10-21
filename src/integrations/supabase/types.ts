@@ -2138,6 +2138,48 @@ export type Database = {
         }
         Relationships: []
       }
+      meet_rooms: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          meet_url: string | null
+          moderators: string[] | null
+          name: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          meet_url?: string | null
+          moderators?: string[] | null
+          name: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          meet_url?: string | null
+          moderators?: string[] | null
+          name?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
       participant_types: {
         Row: {
           created_at: string
@@ -2512,6 +2554,94 @@ export type Database = {
         }
         Relationships: []
       }
+      sessions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          day: number
+          end_at: string
+          id: string
+          language: string | null
+          location: string | null
+          materials: Json | null
+          meet_room_id: string | null
+          speakers: Json | null
+          start_at: string
+          status: string | null
+          stream_id: string | null
+          timezone: string | null
+          title: Json
+          track: string
+          type: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          day: number
+          end_at: string
+          id?: string
+          language?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_at: string
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json
+          track: string
+          type: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          day?: number
+          end_at?: string
+          id?: string
+          language?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_at?: string
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json
+          track?: string
+          type?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "public_meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_config: {
         Row: {
           config_key: string
@@ -2536,6 +2666,72 @@ export type Database = {
           description?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      streams: {
+        Row: {
+          channel_handle: string | null
+          channel_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: Json | null
+          end_at: string | null
+          fallback_priority: number | null
+          id: string
+          is_fallback: boolean | null
+          language: string | null
+          start_at: string | null
+          status: string
+          thumbnail_url: string | null
+          timezone: string | null
+          title: Json
+          updated_at: string | null
+          visibility: string | null
+          youtube_playlist_id: string | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          channel_handle?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: Json | null
+          end_at?: string | null
+          fallback_priority?: number | null
+          id?: string
+          is_fallback?: boolean | null
+          language?: string | null
+          start_at?: string | null
+          status?: string
+          thumbnail_url?: string | null
+          timezone?: string | null
+          title?: Json
+          updated_at?: string | null
+          visibility?: string | null
+          youtube_playlist_id?: string | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          channel_handle?: string | null
+          channel_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: Json | null
+          end_at?: string | null
+          fallback_priority?: number | null
+          id?: string
+          is_fallback?: boolean | null
+          language?: string | null
+          start_at?: string | null
+          status?: string
+          thumbnail_url?: string | null
+          timezone?: string | null
+          title?: Json
+          updated_at?: string | null
+          visibility?: string | null
+          youtube_playlist_id?: string | null
+          youtube_video_id?: string | null
         }
         Relationships: []
       }
@@ -2590,6 +2786,246 @@ export type Database = {
           name_tr?: string | null
           order_index?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      transmission_faq: {
+        Row: {
+          answer: Json
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          order_index: number | null
+          question: Json
+          updated_at: string | null
+        }
+        Insert: {
+          answer?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          question?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          question?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transmission_rooms: {
+        Row: {
+          created_at: string
+          id: string
+          is_live: boolean | null
+          meet_url: string
+          name: Json
+          ord: number | null
+          transmission_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_live?: boolean | null
+          meet_url: string
+          name?: Json
+          ord?: number | null
+          transmission_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_live?: boolean | null
+          meet_url?: string
+          name?: Json
+          ord?: number | null
+          transmission_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transmission_rooms_transmission_id_fkey"
+            columns: ["transmission_id"]
+            isOneToOne: false
+            referencedRelation: "transmissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transmission_rooms_transmission_id_fkey"
+            columns: ["transmission_id"]
+            isOneToOne: false
+            referencedRelation: "transmissions_upcoming"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transmission_schedule: {
+        Row: {
+          created_at: string | null
+          date: string
+          day: number
+          end_time: string | null
+          id: string
+          is_active: boolean | null
+          meet_room_link: string | null
+          modality: string | null
+          order_index: number | null
+          speaker: string | null
+          start_time: string
+          stream_id: string | null
+          topic: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          day: number
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          meet_room_link?: string | null
+          modality?: string | null
+          order_index?: number | null
+          speaker?: string | null
+          start_time: string
+          stream_id?: string | null
+          topic?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          day?: number
+          end_time?: string | null
+          id?: string
+          is_active?: boolean | null
+          meet_room_link?: string | null
+          modality?: string | null
+          order_index?: number | null
+          speaker?: string | null
+          start_time?: string
+          stream_id?: string | null
+          topic?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transmission_streams: {
+        Row: {
+          created_at: string | null
+          description: Json | null
+          id: string
+          is_active: boolean | null
+          is_live: boolean | null
+          order_index: number | null
+          scheduled_date: string | null
+          title: Json
+          updated_at: string | null
+          youtube_channel_handle: string | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_live?: boolean | null
+          order_index?: number | null
+          scheduled_date?: string | null
+          title?: Json
+          updated_at?: string | null
+          youtube_channel_handle?: string | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_live?: boolean | null
+          order_index?: number | null
+          scheduled_date?: string | null
+          title?: Json
+          updated_at?: string | null
+          youtube_channel_handle?: string | null
+          youtube_video_id?: string | null
+        }
+        Relationships: []
+      }
+      transmissions: {
+        Row: {
+          badge_label: Json | null
+          banner_from: string | null
+          banner_to: string | null
+          channel_handle: string | null
+          created_at: string
+          description: Json | null
+          end_at: string | null
+          faq_url: string | null
+          id: string
+          is_public: boolean
+          rooms_url: string | null
+          schedule_url: string | null
+          slug: string
+          start_at: string | null
+          status: Database["public"]["Enums"]["transmission_status"]
+          subtitle: Json | null
+          timezone: string
+          title: Json
+          updated_at: string
+          youtube_video_id: string | null
+        }
+        Insert: {
+          badge_label?: Json | null
+          banner_from?: string | null
+          banner_to?: string | null
+          channel_handle?: string | null
+          created_at?: string
+          description?: Json | null
+          end_at?: string | null
+          faq_url?: string | null
+          id?: string
+          is_public?: boolean
+          rooms_url?: string | null
+          schedule_url?: string | null
+          slug?: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["transmission_status"]
+          subtitle?: Json | null
+          timezone?: string
+          title?: Json
+          updated_at?: string
+          youtube_video_id?: string | null
+        }
+        Update: {
+          badge_label?: Json | null
+          banner_from?: string | null
+          banner_to?: string | null
+          channel_handle?: string | null
+          created_at?: string
+          description?: Json | null
+          end_at?: string | null
+          faq_url?: string | null
+          id?: string
+          is_public?: boolean
+          rooms_url?: string | null
+          schedule_url?: string | null
+          slug?: string
+          start_at?: string | null
+          status?: Database["public"]["Enums"]["transmission_status"]
+          subtitle?: Json | null
+          timezone?: string
+          title?: Json
+          updated_at?: string
+          youtube_video_id?: string | null
         }
         Relationships: []
       }
@@ -2654,6 +3090,38 @@ export type Database = {
             columns: ["id_curso"]
             isOneToOne: false
             referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
             referencedColumns: ["id"]
           },
         ]
@@ -2818,7 +3286,8 @@ export type Database = {
           created_at: string
           email: string
           file_name: string | null
-          file_path: string | null
+          file_size: number | null
+          file_url: string | null
           id: string
           institution: string
           internal_notes: string | null
@@ -2837,7 +3306,8 @@ export type Database = {
           created_at?: string
           email: string
           file_name?: string | null
-          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
           id?: string
           institution: string
           internal_notes?: string | null
@@ -2856,7 +3326,8 @@ export type Database = {
           created_at?: string
           email?: string
           file_name?: string | null
-          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
           id?: string
           institution?: string
           internal_notes?: string | null
@@ -2873,6 +3344,61 @@ export type Database = {
       }
     }
     Views: {
+      public_meet_rooms: {
+        Row: {
+          capacity: number | null
+          id: string | null
+          moderators: string[] | null
+          name: string | null
+          notes: string | null
+          status: string | null
+          visibility: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          id?: string | null
+          moderators?: string[] | null
+          name?: string | null
+          notes?: string | null
+          status?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          id?: string | null
+          moderators?: string[] | null
+          name?: string | null
+          notes?: string | null
+          status?: string | null
+          visibility?: string | null
+        }
+        Relationships: []
+      }
+      transmissions_upcoming: {
+        Row: {
+          badge_label: Json | null
+          banner_from: string | null
+          banner_to: string | null
+          channel_handle: string | null
+          created_at: string | null
+          description: Json | null
+          end_at: string | null
+          faq_url: string | null
+          id: string | null
+          is_public: boolean | null
+          rooms_url: string | null
+          schedule_url: string | null
+          slug: string | null
+          start_at: string | null
+          status: Database["public"]["Enums"]["transmission_status"] | null
+          subtitle: Json | null
+          timezone: string | null
+          title: Json | null
+          updated_at: string | null
+          youtube_video_id: string | null
+        }
+        Relationships: []
+      }
       v_lote_atual: {
         Row: {
           ativo: boolean | null
@@ -2885,6 +3411,79 @@ export type Database = {
           updated_at: string | null
         }
         Relationships: []
+      }
+      v_sessions_front: {
+        Row: {
+          day: number | null
+          end_et: string | null
+          id: string | null
+          location: string | null
+          materials: Json | null
+          meet_room_id: string | null
+          speakers: Json | null
+          start_et: string | null
+          status: string | null
+          stream_id: string | null
+          timezone: string | null
+          title: Json | null
+          track: string | null
+          type: string | null
+        }
+        Insert: {
+          day?: number | null
+          end_et?: string | null
+          id?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_et?: string | null
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json | null
+          track?: string | null
+          type?: string | null
+        }
+        Update: {
+          day?: number | null
+          end_et?: string | null
+          id?: string | null
+          location?: string | null
+          materials?: Json | null
+          meet_room_id?: string | null
+          speakers?: Json | null
+          start_et?: string | null
+          status?: string | null
+          stream_id?: string | null
+          timezone?: string | null
+          title?: Json | null
+          track?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_meet_room_id_fkey"
+            columns: ["meet_room_id"]
+            isOneToOne: false
+            referencedRelation: "public_meet_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -2956,6 +3555,10 @@ export type Database = {
       check_user_permission: {
         Args: { permission_type: string; resource: string; user_email: string }
         Returns: boolean
+      }
+      check_user_role_secure: {
+        Args: { session_token: string; user_email: string }
+        Returns: Json
       }
       cleanup_expired_sessions: {
         Args: Record<PropertyKey, never>
@@ -3048,6 +3651,13 @@ export type Database = {
       get_stable_asset_url: {
         Args: { bucket_name: string; file_path: string }
         Returns: string
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_email: string
+        }
+        Returns: boolean
       }
       is_admin_root_user: {
         Args: { user_email: string }
@@ -3159,6 +3769,10 @@ export type Database = {
         Args: { registration_id: string; updates: Json }
         Returns: Json
       }
+      user_is_enrolled: {
+        Args: { uid: string }
+        Returns: boolean
+      }
       validate_coupon: {
         Args: { coupon_code: string }
         Returns: Json
@@ -3179,6 +3793,7 @@ export type Database = {
     }
     Enums: {
       admin_user_type: "admin" | "editor" | "viewer" | "design" | "admin_root"
+      app_role: "admin" | "editor" | "viewer" | "design" | "admin_root"
       civeni_modality: "presencial" | "online" | "hibrido"
       civeni_session_type:
         | "credenciamento"
@@ -3194,6 +3809,7 @@ export type Database = {
         | "cerimonia"
         | "outro"
       submission_kind: "artigo" | "consorcio"
+      transmission_status: "scheduled" | "live" | "ended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3322,6 +3938,7 @@ export const Constants = {
   public: {
     Enums: {
       admin_user_type: ["admin", "editor", "viewer", "design", "admin_root"],
+      app_role: ["admin", "editor", "viewer", "design", "admin_root"],
       civeni_modality: ["presencial", "online", "hibrido"],
       civeni_session_type: [
         "credenciamento",
@@ -3338,6 +3955,7 @@ export const Constants = {
         "outro",
       ],
       submission_kind: ["artigo", "consorcio"],
+      transmission_status: ["scheduled", "live", "ended"],
     },
   },
 } as const

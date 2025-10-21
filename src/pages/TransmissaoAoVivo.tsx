@@ -1,289 +1,414 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Clock, Users, AlertCircle, Lock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-interface TransmissaoLive {
-  id: string;
-  titulo: string;
-  descricao?: string;
-  url_embed: string;
-  data_hora_inicio?: string;
-  status: string;
-}
+import { Helmet } from 'react-helmet';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  useTransmission,
+  useTransmissionRooms,
+  useUpcomingTransmissions,
+  pickLang,
+  formatTimezone,
+} from '@/hooks/useTransmission';
 
 const TransmissaoAoVivo = () => {
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const [transmissao, setTransmissao] = useState<TransmissaoLive | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasAccess, setHasAccess] = useState(false);
-  const [timeToStart, setTimeToStart] = useState<string>('');
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const locale = i18n.language;
 
+  // Parse active tab from hash
+  const hash = location.hash.replace('#', '') || 'ao-vivo';
+  const [activeTab, setActiveTab] = useState(hash);
+
+  // Fetch data
+  const { data: transmission, isLoading: txLoading } = useTransmission();
+  const { data: rooms = [], isLoading: roomsLoading } = useTransmissionRooms(transmission?.id);
+  const { data: upcoming = [], isLoading: upcomingLoading } = useUpcomingTransmissions();
+
+  // Sync hash with active tab
   useEffect(() => {
-    checkAccess();
-    loadActiveTransmission();
-  }, []);
+    const hashValue = location.hash.replace('#', '') || 'ao-vivo';
+    setActiveTab(hashValue);
+  }, [location.hash]);
 
-  useEffect(() => {
-    if (transmissao?.data_hora_inicio) {
-      const interval = setInterval(() => {
-        const now = new Date().getTime();
-        const startTime = new Date(transmissao.data_hora_inicio!).getTime();
-        const distance = startTime - now;
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`#${value}`, { replace: true });
+  };
 
-        if (distance > 0) {
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-          
-          setTimeToStart(`${hours}h ${minutes}m ${seconds}s`);
-        } else {
-          setTimeToStart('');
-        }
-      }, 1000);
+  // Extracted localized values
+  const title = pickLang(transmission?.title, locale);
+  const subtitle = pickLang(transmission?.subtitle, locale);
+  const description = pickLang(transmission?.description, locale);
+  const badgeLabel = pickLang(transmission?.badge_label, locale);
 
-      return () => clearInterval(interval);
+  // Status badge logic
+  const statusBadge = useMemo(() => {
+    if (!transmission) return null;
+    const now = new Date();
+    const startAt = transmission.start_at ? new Date(transmission.start_at) : null;
+
+    if (transmission.status === 'live') {
+      return <Badge className="bg-red-600 text-white animate-pulse">🔴 AO VIVO</Badge>;
     }
-  }, [transmissao]);
 
-  const checkAccess = async () => {
-    try {
-      // Simular verificação de acesso - você pode implementar a lógica real aqui
-      // Verificando se o usuário tem uma inscrição paga válida
-      const { data: registrations, error } = await supabase
-        .from('event_registrations')
-        .select('*')
-        .eq('payment_status', 'completed')
-        .limit(1);
-
-      if (error) throw error;
-      
-      // Por enquanto, permitir acesso se houver pelo menos uma inscrição paga no sistema
-      setHasAccess(registrations && registrations.length > 0);
-    } catch (error) {
-      console.error('Error checking access:', error);
-      setHasAccess(false);
+    if (transmission.status === 'scheduled' && startAt && startAt > now) {
+      const diff = startAt.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return <Badge variant="outline">Começa em {hours}h {minutes}min</Badge>;
     }
-  };
 
-  const loadActiveTransmission = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('transmissoes_live')
-        .select('*')
-        .eq('status', 'ativo')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      setTransmissao(data);
-    } catch (error) {
-      console.error('Error loading transmission:', error);
-      toast({
-        title: "Erro",
-        description: "Erro ao carregar transmissão",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    if (transmission.status === 'ended' && badgeLabel) {
+      return <Badge variant="secondary">{badgeLabel}</Badge>;
     }
-  };
 
-  const extractYouTubeId = (url: string) => {
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[7].length === 11) ? match[7] : null;
-  };
+    return null;
+  }, [transmission, badgeLabel]);
 
-  const isLive = () => {
-    if (!transmissao?.data_hora_inicio) return true;
-    const now = new Date().getTime();
-    const startTime = new Date(transmissao.data_hora_inicio).getTime();
-    return now >= startTime;
-  };
+  // CTA buttons logic
+  const primaryCTA = useMemo(() => {
+    if (!transmission) return null;
 
-  if (loading) {
+    if (transmission.status === 'live') {
+      return {
+        label: 'Assistir agora',
+        href: '#player',
+        icon: <Play className="w-4 h-4" />,
+      };
+    }
+
+    if (transmission.status === 'scheduled') {
+      return {
+        label: 'Definir lembrete',
+        href: `https://www.youtube.com/${transmission.channel_handle}/live`,
+        icon: <Calendar className="w-4 h-4" />,
+        external: true,
+      };
+    }
+
+    if (transmission.status === 'ended' && transmission.youtube_video_id) {
+      return {
+        label: 'Assistir replay',
+        href: '#player',
+        icon: <Video className="w-4 h-4" />,
+      };
+    }
+
+    return null;
+  }, [transmission]);
+
+  // Timezone text
+  const timezoneText = useMemo(() => {
+    if (!transmission) return '';
+    const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const userLabel = formatTimezone(userTZ);
+    const eventLabel = formatTimezone(transmission.timezone);
+    return `Horários em ${userLabel} • Local: ${eventLabel}`;
+  }, [transmission]);
+
+  if (txLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue-dark flex items-center justify-center">
-        <div className="text-white text-xl">Carregando...</div>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16">
+          <Skeleton className="h-64 w-full mb-8" />
+          <Skeleton className="h-96 w-full" />
+        </div>
+        <Footer />
       </div>
     );
   }
 
-  if (!hasAccess) {
+  if (!transmission) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue-dark flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardHeader className="text-center">
-            <Lock className="h-12 w-12 mx-auto mb-4 text-civeni-blue" />
-            <CardTitle className="text-xl">Acesso Restrito</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Esta transmissão é exclusiva para participantes pagantes do III CIVENI 2025.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Faça login com sua conta de participante para acessar o conteúdo.
-            </p>
-            <Button 
-              onClick={() => window.location.href = '/inscricoes'}
-              className="w-full"
-            >
-              Ver Ingressos
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!transmissao) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue-dark flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardHeader className="text-center">
-            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-yellow-500" />
-            <CardTitle className="text-xl">Nenhuma Transmissão Ativa</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-muted-foreground mb-4">
-              Não há transmissões ao vivo no momento.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Verifique a programação do evento para os próximos horários.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4">Transmissão não encontrada</h1>
+          <p className="text-muted-foreground mb-8">
+            Não há transmissão disponível no momento.
+          </p>
+          <Button onClick={() => navigate('/')}>Voltar ao início</Button>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-blue-dark p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">Transmissão Ao Vivo</h1>
-          <p className="text-civeni-blue-light">III CIVENI 2025</p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{title} — III CIVENI 2025</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={`${title} — III CIVENI 2025`} />
+        <meta property="og:description" content={description} />
+      </Helmet>
 
-        <div className="grid gap-6 lg:grid-cols-4">
-          {/* Player Principal */}
-          <div className="lg:col-span-3">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                {isLive() ? (
-                  <div className="aspect-video w-full">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${extractYouTubeId(transmissao.url_embed)}?autoplay=1`}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full"
-                    />
-                  </div>
+      <Header />
+
+      {/* Hero Banner with Gradient */}
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><a href="/" className="hover:text-blue-200 transition-colors">Home</a></li>
+              <li className="text-blue-200">›</li>
+              <li><a href="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</a></li>
+              <li className="text-blue-200">›</li>
+              <li>Transmissão ao Vivo</li>
+            </ol>
+          </nav>
+          
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              {title}
+            </h1>
+            {description && (
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+                {description}
+              </p>
+            )}
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+              {primaryCTA && (
+                primaryCTA.external ? (
+                  <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
+                    <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                      {primaryCTA.icon}
+                      {primaryCTA.label}
+                    </button>
+                  </a>
                 ) : (
-                  <div className="aspect-video w-full bg-gray-900 flex items-center justify-center text-white">
-                    <div className="text-center">
-                      <Clock className="h-16 w-16 mx-auto mb-4 text-civeni-blue" />
-                      <h3 className="text-xl font-semibold mb-2">Transmissão em Breve</h3>
-                      {timeToStart && (
-                        <p className="text-lg">
-                          Inicia em: <span className="font-mono font-bold">{timeToStart}</span>
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Informações da Transmissão */}
-            <Card className="mt-4">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">{transmissao.titulo}</CardTitle>
-                  <Badge variant="default" className="bg-red-500">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                      {isLive() ? 'AO VIVO' : 'EM BREVE'}
-                    </div>
-                  </Badge>
-                </div>
-              </CardHeader>
-              {transmissao.descricao && (
-                <CardContent>
-                  <p className="text-muted-foreground">{transmissao.descricao}</p>
-                </CardContent>
+                  <button 
+                    onClick={() => {
+                      document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
+                  >
+                    {primaryCTA.icon}
+                    {primaryCTA.label}
+                  </button>
+                )
               )}
-            </Card>
-          </div>
+              <a href="/inscricoes">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Fazer Inscrição
+                </button>
+              </a>
+            </div>
 
-          {/* Sidebar */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Participantes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-civeni-blue">
-                    {Math.floor(Math.random() * 500) + 100}
-                  </div>
-                  <p className="text-sm text-muted-foreground">visualizando agora</p>
+            <div className="flex flex-wrap gap-4 items-center justify-center">
+              {statusBadge}
+              {timezoneText && (
+                <div className="flex items-center gap-2 text-sm opacity-80">
+                  <Clock className="w-4 h-4" />
+                  <span>{timezoneText}</span>
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {transmissao.data_hora_inicio && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    Horário
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold">
-                      {new Date(transmissao.data_hora_inicio).toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
-                    <p className="text-sm text-muted-foreground">Horário de Brasília</p>
-                  </div>
-                </CardContent>
+      {/* Tabs Section */}
+      <section className="container mx-auto px-4 py-12">
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsTrigger value="ao-vivo" className="flex items-center gap-2">
+              <Play className="w-4 h-4" />
+              Ao vivo
+            </TabsTrigger>
+            <TabsTrigger value="agenda" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Agenda
+            </TabsTrigger>
+            <TabsTrigger value="salas" className="flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              Salas
+            </TabsTrigger>
+            <TabsTrigger value="faq" className="flex items-center gap-2">
+              <HelpCircle className="w-4 h-4" />
+              FAQ
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="ao-vivo" className="space-y-8">
+            {/* YouTube Player */}
+            {transmission.youtube_video_id ? (
+              <div id="player" className="space-y-4">
+                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${transmission.youtube_video_id}?autoplay=0&rel=0`}
+                    title={title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    className="w-full h-full"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Canal: {transmission.channel_handle}
+                  </p>
+                  <Button variant="ghost" size="sm" asChild>
+                    <a
+                      href={`https://www.youtube.com/${transmission.channel_handle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Abrir no YouTube
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Card className="p-12 text-center">
+                <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-xl font-semibold mb-2">Nenhum vídeo disponível</h3>
+                <p className="text-muted-foreground mb-4">
+                  A transmissão ainda não começou ou não há replay disponível.
+                </p>
+                <Button variant="outline" asChild>
+                  <a
+                    href="https://www.youtube.com/@veniuniversity"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visite o canal
+                  </a>
+                </Button>
               </Card>
             )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Sobre o Evento</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground space-y-2">
-                <p>
-                  O III CIVENI 2025 é o principal encontro de profissionais da área de ciências humanas e tecnologia.
-                </p>
-                <p>
-                  Esta transmissão é exclusiva para participantes inscritos no evento.
-                </p>
-              </CardContent>
+            {/* Upcoming Transmissions */}
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Próximas transmissões</h2>
+              {upcomingLoading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-32" />
+                  ))}
+                </div>
+              ) : upcoming.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {upcoming.map((tx) => (
+                    <Card key={tx.id} className="p-4">
+                      <h3 className="font-semibold mb-2">{pickLang(tx.title, locale)}</h3>
+                      {tx.start_at && (
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {new Date(tx.start_at).toLocaleString(locale, {
+                            dateStyle: 'medium',
+                            timeStyle: 'short',
+                          })}
+                        </p>
+                      )}
+                      <Button size="sm" variant="outline" className="w-full" asChild>
+                        <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
+                          Detalhes
+                        </Link>
+                      </Button>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-8 text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-muted-foreground mb-4">
+                    Sem próximas transmissões agendadas
+                  </p>
+                  <Button variant="outline" asChild>
+                    <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
+                      Veja o canal no YouTube
+                    </a>
+                  </Button>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="agenda">
+            <Card className="p-8 text-center">
+              <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-xl font-semibold mb-2">Programação completa</h3>
+              <p className="text-muted-foreground mb-6">
+                Veja a agenda completa do evento na programação online.
+              </p>
+              <Button asChild>
+                <a href={transmission.schedule_url || '/programacao-online'}>
+                  Ver programação
+                </a>
+              </Button>
             </Card>
-          </div>
-        </div>
-      </div>
+          </TabsContent>
+
+          <TabsContent value="salas">
+            {roomsLoading ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {[1, 2].map((i) => (
+                  <Skeleton key={i} className="h-32" />
+                ))}
+              </div>
+            ) : rooms.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {rooms.map((room) => (
+                  <Card key={room.id} className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="font-semibold text-lg">
+                        {pickLang(room.name, locale)}
+                      </h3>
+                      {room.is_live && (
+                        <Badge className="bg-red-600 text-white">Ao vivo</Badge>
+                      )}
+                    </div>
+                    <Button className="w-full" asChild>
+                      <a href={room.meet_url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Entrar na sala
+                      </a>
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <Video className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">Nenhuma sala disponível no momento</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="faq">
+            <Card className="p-8 text-center">
+              <HelpCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-xl font-semibold mb-2">Perguntas frequentes</h3>
+              <p className="text-muted-foreground mb-6">
+                Veja as perguntas mais comuns sobre a transmissão.
+              </p>
+              <Button variant="outline" asChild>
+                <Link to="/transmissao-ao-vivo/faq">Ver FAQ</Link>
+              </Button>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </section>
+
+      <Footer />
     </div>
   );
 };

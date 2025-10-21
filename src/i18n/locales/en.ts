@@ -411,6 +411,79 @@ export const enTranslations = {
         oralPresentation: "Oral Presentation",
         posterSessions: "Poster Sessions",
         manuscripts: "Manuscripts"
+      },
+      transmission: {
+        pageTitle: "Official Broadcast — CIVENI 2025 (Florida)",
+        pageDescription: "Watch live broadcasts from III CIVENI 2025",
+        title: "Official Broadcast — CIVENI 2025 (Florida)",
+        subtitle: "YouTube Live + Presentation Rooms (Meet)",
+        description: "Follow all live broadcasts from III CIVENI 2025",
+        ctaWatch: "Watch Now (YouTube)",
+        ctaRooms: "Oral Presentation Rooms",
+        timezoneInfo: "Times shown in Florida (ET) and Fortaleza (BRT)",
+        noStream: "No live stream at the moment",
+        noStreamTitle: "Wait for the next broadcast",
+        noStreamDesc: "Check our schedule below",
+        channel: "Channel",
+        live: "LIVE",
+        online: "Online",
+        inPerson: "In Person",
+        all: "All",
+        day: "Day",
+        upcomingStreams: "Upcoming Broadcasts",
+        setReminder: "Set Reminder",
+        noUpcoming: "No scheduled broadcasts",
+        noSessions: "No sessions found for this day",
+        noRooms: "No rooms available",
+        watchLive: "Watch Live",
+        joinRoom: "Join Room",
+        waitingToStart: "Waiting to Start",
+        capacity: "Capacity",
+        moderators: "Moderators",
+        staffOnly: "Staff Only",
+        enrolledOnly: "Enrolled Only",
+        roomsTitle: "Presentation Rooms (Google Meet)",
+        roomsDescription: "Access virtual rooms (registration required)",
+        faqTitle: "Frequently Asked Questions",
+        badges: { 
+          live: "LIVE", 
+          scheduled: "SCHEDULED", 
+          ended: "ENDED" 
+        },
+        types: { 
+          opening: "Opening", 
+          conference: "Conference", 
+          lecture: "Lecture", 
+          roundtable: "Roundtable", 
+          oral: "Oral Presentation", 
+          break: "Break", 
+          registration: "Registration", 
+          other: "Other" 
+        },
+        tabs: { 
+          live: "Live", 
+          schedule: "Schedule", 
+          rooms: "Rooms (Meet)", 
+          faq: "FAQ & Support" 
+        },
+        faq: { 
+          tech: { 
+            title: "What are the technical requirements?", 
+            answer: "You need an updated browser (Chrome, Firefox, Safari or Edge) and a stable internet connection of at least 5 Mbps for the best experience." 
+          },
+          access: { 
+            title: "How do I access the broadcasts?", 
+            answer: "Live broadcasts are public and can be accessed directly on this page. To access meeting rooms, you need to be registered for the event." 
+          },
+          recording: { 
+            title: "Will sessions be recorded?", 
+            answer: "Yes, all main sessions will be recorded and made available later on CIVENI's official YouTube channel." 
+          },
+          support: { 
+            title: "I need technical support. What should I do?", 
+            answer: "Contact our support team via email at suporte@civeni.org or through WhatsApp available on the contact page." 
+          }
+        }
       }
     }
   },

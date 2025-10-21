@@ -30,6 +30,9 @@ import CounterConfigManager from '@/components/admin/CounterConfigManager';
 import EventsManager from '@/components/admin/EventsManager';
 import CiveniProgramManager from '@/components/admin/CiveniProgramManager';
 import CiveniOnlineProgramManager from '@/components/admin/CiveniOnlineProgramManager';
+import TransmissionStreamsManager from '@/components/admin/TransmissionStreamsManager';
+import TransmissionScheduleManager from '@/components/admin/TransmissionScheduleManager';
+import TransmissionFAQManager from '@/components/admin/TransmissionFAQManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -199,7 +202,11 @@ const AdminDashboardContent = () => {
       case 'transmissao-live':
         return (hasPermission('transmissao') || isAdminRoot()) ? (
           <PermissionGuard resource="transmissao">
-            <TransmissaoLiveManager />
+            <div className="space-y-8">
+              <TransmissionStreamsManager />
+              <TransmissionScheduleManager />
+              <TransmissionFAQManager />
+            </div>
           </PermissionGuard>
         ) : null;
       
