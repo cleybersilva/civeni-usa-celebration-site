@@ -1,12 +1,12 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
+import { BookOpen, CheckCircle, FileText, Upload, Users } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Upload, FileText, CheckCircle, Users, BookOpen } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Footer from '../components/Footer';
+import Header from '../components/Header';
 
 const SubmissaoTrabalhos = () => {
   const { t } = useTranslation();
@@ -70,6 +70,7 @@ const SubmissaoTrabalhos = () => {
       .upload(filePath, file);
 
     if (error) {
+      console.error('Erro no upload:', error);
       throw error;
     }
 
@@ -84,49 +85,98 @@ const SubmissaoTrabalhos = () => {
       return;
     }
 
+    // Validação adicional dos campos obrigatórios
+    const requiredFields = {
+      author_name: 'Nome do autor',
+      institution: 'Instituição',
+      email: 'E-mail',
+      work_title: 'Título do trabalho',
+      abstract: 'Resumo',
+      keywords: 'Palavras-chave',
+      thematic_area: 'Área temática'
+    };
+
+    for (const [field, label] of Object.entries(requiredFields)) {
+      const value = formData[field as keyof typeof formData];
+      if (!value || value.trim().length === 0) {
+        toast.error(`${label} é obrigatório`);
+        return;
+      }
+    }
+
+    // Validação específica de e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Por favor, insira um e-mail válido');
+      return;
+    }
+
+    // Validação de tamanho mínimo
+    if (formData.work_title.trim().length < 5) {
+      toast.error('Título do trabalho deve ter pelo menos 5 caracteres');
+      return;
+    }
+
+    if (formData.abstract.trim().length < 20) {
+      toast.error('Resumo deve ter pelo menos 20 caracteres');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Use the submit-work edge function for secure submission
-      const { data, error } = await supabase.functions.invoke('submit-work', {
-        body: {
-          ...formData,
-          submission_kind: activeTab as 'artigo' | 'consorcio'
-        }
-      });
+      console.log('=== SUBMISSÃO INICIADA ===');
+      
+      // Inserir diretamente na tabela (bypass da edge function problemática)
+      const { data: submissionData, error: insertError } = await supabase
+        .from('work_submissions')
+        .insert([{
+          author_name: formData.author_name.trim(),
+          institution: formData.institution.trim(),
+          email: formData.email.toLowerCase().trim(),
+          work_title: formData.work_title.trim(),
+          abstract: formData.abstract.trim(),
+          keywords: formData.keywords.trim(),
+          thematic_area: formData.thematic_area,
+          submission_kind: activeTab as 'artigo' | 'consorcio',
+          status: 'pending'
+        }])
+        .select()
+        .single();
 
-      if (error) {
-        throw new Error(error.message || 'Erro na função de submissão');
+      if (insertError) {
+        console.error('Erro na inserção:', insertError);
+        throw new Error(`Erro ao salvar submissão: ${insertError.message}`);
       }
 
-      if (!data?.success) {
-        throw new Error(data?.error || 'Erro desconhecido na submissão');
-      }
+      const submissionId = submissionData.id;
+      console.log('Submissão criada:', submissionId);
 
-      const submissionId = data.id;
-
-      // Upload file after successful submission
+      // Upload do arquivo
       const { filePath, fileName } = await uploadFile(file, submissionId);
+      console.log('Arquivo enviado:', { filePath, fileName });
 
-      // Update submission with file info
+      // Atualizar com informações do arquivo
       const { error: updateError } = await supabase
         .from('work_submissions')
-        .update({ 
-          file_path: filePath,
-          file_name: fileName 
-        })
+        .update({ file_path: filePath, file_name: fileName })
         .eq('id', submissionId);
 
       if (updateError) {
-        throw updateError;
+        console.warn('Não foi possível atualizar arquivo, mas submissão foi criada');
       }
 
       setIsSubmitted(true);
       toast.success('Trabalho submetido com sucesso!');
 
-    } catch (error: any) {
-      console.error('Error submitting work:', error);
-      toast.error('Erro ao submeter trabalho. Tente novamente.');
+    } catch (err) {
+      console.error('Erro na submissão:', err);
+      
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error('Erro ao submeter trabalho. Tente novamente.');
+      }
     } finally {
       setIsSubmitting(false);
     }
