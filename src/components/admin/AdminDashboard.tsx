@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database } from 'lucide-react';
+import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StripeFilters } from './stripe/StripeFilters';
 import { RevenueChart } from './stripe/RevenueChart';
@@ -30,6 +30,7 @@ const AdminDashboard = () => {
   const [syncing, setSyncing] = useState(false);
 
   const { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh } = useStripeDashboard(filters.range);
+  const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -79,6 +80,38 @@ const AdminDashboard = () => {
       });
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleDeleteCustomer = async (email: string) => {
+    if (!confirm(`Tem certeza que deseja excluir todos os registros de ${email}?`)) {
+      return;
+    }
+
+    setDeletingCustomer(email);
+    try {
+      const { error } = await supabase
+        .from('event_registrations')
+        .delete()
+        .eq('email', email);
+
+      if (error) throw error;
+
+      toast({
+        title: "Registros excluídos!",
+        description: `Todos os registros de ${email} foram removidos`,
+      });
+
+      refresh();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast({
+        title: "Erro ao excluir",
+        description: "Não foi possível excluir os registros",
+        variant: "destructive"
+      });
+    } finally {
+      setDeletingCustomer(null);
     }
   };
 
@@ -266,6 +299,7 @@ const AdminDashboard = () => {
                         <th className="text-right p-3 font-medium">Total gasto</th>
                         <th className="text-center p-3 font-medium">Pagamentos</th>
                         <th className="text-right p-3 font-medium">Reembolsos</th>
+                        <th className="text-center p-3 font-medium">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -308,6 +342,21 @@ const AdminDashboard = () => {
                           <td className="p-3 text-center">{customer.pagamentos}</td>
                           <td className="p-3 text-right font-medium">
                             {formatCurrency(customer.reembolsos_valor || 0)}
+                          </td>
+                          <td className="p-3 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteCustomer(customer.email)}
+                              disabled={deletingCustomer === customer.email}
+                              className="hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              {deletingCustomer === customer.email ? (
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
                           </td>
                         </tr>
                       ))}
