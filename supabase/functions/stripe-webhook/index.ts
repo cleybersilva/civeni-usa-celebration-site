@@ -74,20 +74,27 @@ serve(async (req) => {
     // Metadata enriquecido com informações de lote e cupom
     const metadata = data.metadata ?? {};
     
+    // Adicionar email ao metadata para facilitar lookup
+    if (email) {
+      metadata.email = email;
+    }
+    
     // Tentar enriquecer metadata com dados de event_registrations se tivermos email
     if (email) {
       const { data: registration } = await supabaseClient
         .from('event_registrations')
-        .select('category_name, coupon_code, batch_id')
+        .select('category_name, coupon_code, batch_id, lote_id')
         .eq('email', email)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (registration) {
         metadata.lot_code = registration.category_name || metadata.lot_code;
+        metadata.category_name = registration.category_name || metadata.category_name;
         metadata.coupon_code = registration.coupon_code || metadata.coupon_code;
         metadata.batch_id = registration.batch_id || metadata.batch_id;
+        metadata.lote_id = registration.lote_id || metadata.lote_id;
       }
     }
 

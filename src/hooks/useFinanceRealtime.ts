@@ -82,12 +82,19 @@ export const useFinanceRealtime = (range: string = '30d') => {
 
   const fetchBreakdowns = useCallback(async () => {
     try {
+      console.log('🔄 Fetching breakdowns for range:', range);
+      
       // Buscar breakdown por lote
       const { data: lotData, error: lotError } = await supabase.functions.invoke('finance-breakdown', {
         body: { by: 'lot', range }
       });
 
-      if (lotError) throw lotError;
+      if (lotError) {
+        console.error('❌ Error fetching lot breakdown:', lotError);
+        throw lotError;
+      }
+      
+      console.log('✅ Lot breakdown data:', lotData?.data);
       setLotBreakdown(lotData?.data || []);
 
       // Buscar breakdown por cupom
@@ -95,7 +102,12 @@ export const useFinanceRealtime = (range: string = '30d') => {
         body: { by: 'coupon', range }
       });
 
-      if (couponError) throw couponError;
+      if (couponError) {
+        console.error('❌ Error fetching coupon breakdown:', couponError);
+        throw couponError;
+      }
+      
+      console.log('✅ Coupon breakdown data:', couponData?.data);
       setCouponBreakdown(couponData?.data || []);
     } catch (error) {
       console.error('Error fetching breakdowns:', error);
@@ -127,6 +139,8 @@ export const useFinanceRealtime = (range: string = '30d') => {
 
   // Configurar realtime para stripe_payments e event_registrations
   useEffect(() => {
+    console.log('🔌 Setting up real-time subscriptions...');
+    
     const paymentsChannel = supabase
       .channel('stripe_payments_changes')
       .on(
@@ -136,10 +150,11 @@ export const useFinanceRealtime = (range: string = '30d') => {
           schema: 'public',
           table: 'stripe_payments'
         },
-        () => {
-          console.log('💰 Stripe payment updated - refreshing dashboard');
+        (payload) => {
+          console.log('💰 Stripe payment updated:', payload);
           // Debounce: aguardar 500ms antes de atualizar
           setTimeout(() => {
+            console.log('🔄 Refreshing dashboard due to payment change...');
             refreshAll();
           }, 500);
         }
@@ -155,9 +170,10 @@ export const useFinanceRealtime = (range: string = '30d') => {
           schema: 'public',
           table: 'event_registrations'
         },
-        () => {
-          console.log('📝 Registration updated - refreshing dashboard');
+        (payload) => {
+          console.log('📝 Registration updated:', payload);
           setTimeout(() => {
+            console.log('🔄 Refreshing dashboard due to registration change...');
             refreshAll();
           }, 500);
         }
@@ -165,6 +181,7 @@ export const useFinanceRealtime = (range: string = '30d') => {
       .subscribe();
 
     return () => {
+      console.log('🔌 Cleaning up real-time subscriptions...');
       supabase.removeChannel(paymentsChannel);
       supabase.removeChannel(registrationsChannel);
     };
