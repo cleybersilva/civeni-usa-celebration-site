@@ -58,7 +58,7 @@ const AdminDashboard = () => {
         body: {
           since: filters.customFrom?.toISOString(),
           until: filters.customTo?.toISOString(),
-          resources: ['payment_intents', 'charges', 'refunds', 'payouts']
+          resources: ['payment_intents', 'charges', 'refunds', 'payouts', 'customers']
         }
       });
 

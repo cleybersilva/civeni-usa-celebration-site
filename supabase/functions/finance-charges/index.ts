@@ -33,8 +33,8 @@ serve(async (req) => {
       .select(`
         *,
         stripe_balance_transactions(fee, net),
-        stripe_payment_intents(metadata),
-        event_registrations!left(full_name, email)
+        stripe_payment_intents(metadata, customer_id),
+        stripe_customers(email, name)
       `)
       .order('created_utc', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -52,7 +52,7 @@ serve(async (req) => {
     const formatted = (charges || []).map(charge => {
       const bt = charge.stripe_balance_transactions;
       const pi = charge.stripe_payment_intents;
-      const reg = charge.event_registrations;
+      const customer = charge.stripe_customers;
       
       // Converter timestamp para BRT
       const createdDate = new Date(charge.created_utc);
@@ -62,8 +62,8 @@ serve(async (req) => {
         id: charge.id,
         payment_intent_id: charge.payment_intent_id,
         data_hora_brt: brtDate.toISOString().replace('T', ' ').substring(0, 19),
-        participante: reg?.full_name || reg?.email || pi?.metadata?.email || 'N/A',
-        email: reg?.email || pi?.metadata?.email,
+        participante: customer?.name || pi?.metadata?.full_name || pi?.metadata?.email || customer?.email || 'N/A',
+        email: customer?.email || pi?.metadata?.email || 'N/A',
         valor_bruto: charge.amount / 100,
         taxa: (bt?.fee || charge.fee_amount || 0) / 100,
         valor_liquido: (bt?.net || charge.net_amount || (charge.amount - (bt?.fee || charge.fee_amount || 0))) / 100,
