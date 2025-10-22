@@ -1505,6 +1505,10 @@ export type Database = {
           payment_method: string | null
           payment_status: string | null
           payment_type: string | null
+          stripe_charge_id: string | null
+          stripe_checkout_session_id: string | null
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           turma_id: string | null
           updated_at: string
@@ -1526,6 +1530,10 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string | null
           payment_type?: string | null
+          stripe_charge_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           turma_id?: string | null
           updated_at?: string
@@ -1547,6 +1555,10 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string | null
           payment_type?: string | null
+          stripe_charge_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           turma_id?: string | null
           updated_at?: string
@@ -2807,6 +2819,285 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_balance_transactions: {
+        Row: {
+          amount: number | null
+          available_on_utc: string | null
+          created_utc: string
+          currency: string | null
+          fee: number | null
+          id: string
+          net: number | null
+          reporting_category: string | null
+          source_id: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          available_on_utc?: string | null
+          created_utc: string
+          currency?: string | null
+          fee?: number | null
+          id: string
+          net?: number | null
+          reporting_category?: string | null
+          source_id?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          available_on_utc?: string | null
+          created_utc?: string
+          currency?: string | null
+          fee?: number | null
+          id?: string
+          net?: number | null
+          reporting_category?: string | null
+          source_id?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stripe_charges: {
+        Row: {
+          amount: number | null
+          balance_txn_id: string | null
+          brand: string | null
+          captured: boolean | null
+          card_country: string | null
+          created_utc: string
+          currency: string | null
+          exp_month: number | null
+          exp_year: number | null
+          failure_code: string | null
+          failure_message: string | null
+          fee_amount: number | null
+          fee_currency: string | null
+          funding: string | null
+          id: string
+          last4: string | null
+          net_amount: number | null
+          outcome_type: string | null
+          paid: boolean | null
+          payment_intent_id: string | null
+          receipt_url: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          balance_txn_id?: string | null
+          brand?: string | null
+          captured?: boolean | null
+          card_country?: string | null
+          created_utc: string
+          currency?: string | null
+          exp_month?: number | null
+          exp_year?: number | null
+          failure_code?: string | null
+          failure_message?: string | null
+          fee_amount?: number | null
+          fee_currency?: string | null
+          funding?: string | null
+          id: string
+          last4?: string | null
+          net_amount?: number | null
+          outcome_type?: string | null
+          paid?: boolean | null
+          payment_intent_id?: string | null
+          receipt_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          balance_txn_id?: string | null
+          brand?: string | null
+          captured?: boolean | null
+          card_country?: string | null
+          created_utc?: string
+          currency?: string | null
+          exp_month?: number | null
+          exp_year?: number | null
+          failure_code?: string | null
+          failure_message?: string | null
+          fee_amount?: number | null
+          fee_currency?: string | null
+          funding?: string | null
+          id?: string
+          last4?: string | null
+          net_amount?: number | null
+          outcome_type?: string | null
+          paid?: boolean | null
+          payment_intent_id?: string | null
+          receipt_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stripe_checkout_sessions: {
+        Row: {
+          amount_total: number | null
+          created_utc: string
+          currency: string | null
+          customer_id: string | null
+          id: string
+          metadata: Json | null
+          mode: string | null
+          payment_intent_id: string | null
+          status: string | null
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_utc: string
+          currency?: string | null
+          customer_id?: string | null
+          id: string
+          metadata?: Json | null
+          mode?: string | null
+          payment_intent_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_utc?: string
+          currency?: string | null
+          customer_id?: string | null
+          id?: string
+          metadata?: Json | null
+          mode?: string | null
+          payment_intent_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      stripe_disputes: {
+        Row: {
+          amount: number | null
+          charge_id: string | null
+          closed_utc: string | null
+          created_utc: string
+          currency: string | null
+          evidence_due_by: string | null
+          id: string
+          reason: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          charge_id?: string | null
+          closed_utc?: string | null
+          created_utc: string
+          currency?: string | null
+          evidence_due_by?: string | null
+          id: string
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          charge_id?: string | null
+          closed_utc?: string | null
+          created_utc?: string
+          currency?: string | null
+          evidence_due_by?: string | null
+          id?: string
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stripe_events: {
+        Row: {
+          api_version: string | null
+          created_utc: string
+          error: string | null
+          id: string
+          payload_json: Json | null
+          processed_at: string | null
+          received_at: string | null
+          status: string | null
+          type: string
+        }
+        Insert: {
+          api_version?: string | null
+          created_utc: string
+          error?: string | null
+          id: string
+          payload_json?: Json | null
+          processed_at?: string | null
+          received_at?: string | null
+          status?: string | null
+          type: string
+        }
+        Update: {
+          api_version?: string | null
+          created_utc?: string
+          error?: string | null
+          id?: string
+          payload_json?: Json | null
+          processed_at?: string | null
+          received_at?: string | null
+          status?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      stripe_payment_intents: {
+        Row: {
+          amount: number | null
+          amount_received: number | null
+          confirmation_method: string | null
+          created_utc: string
+          currency: string | null
+          customer_id: string | null
+          id: string
+          latest_charge_id: string | null
+          metadata: Json | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          amount_received?: number | null
+          confirmation_method?: string | null
+          created_utc: string
+          currency?: string | null
+          customer_id?: string | null
+          id: string
+          latest_charge_id?: string | null
+          metadata?: Json | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          amount_received?: number | null
+          confirmation_method?: string | null
+          created_utc?: string
+          currency?: string | null
+          customer_id?: string | null
+          id?: string
+          latest_charge_id?: string | null
+          metadata?: Json | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       stripe_payments: {
         Row: {
           amount_fee_cents: number | null
@@ -2858,6 +3149,75 @@ export type Database = {
           stripe_object_id?: string
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      stripe_payouts: {
+        Row: {
+          amount: number | null
+          arrival_date_utc: string | null
+          balance_txn_id: string | null
+          created_utc: string
+          currency: string | null
+          id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          arrival_date_utc?: string | null
+          balance_txn_id?: string | null
+          created_utc: string
+          currency?: string | null
+          id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          arrival_date_utc?: string | null
+          balance_txn_id?: string | null
+          created_utc?: string
+          currency?: string | null
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stripe_refunds: {
+        Row: {
+          amount: number | null
+          charge_id: string | null
+          created_utc: string
+          currency: string | null
+          id: string
+          payment_intent_id: string | null
+          reason: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          charge_id?: string | null
+          created_utc: string
+          currency?: string | null
+          id: string
+          payment_intent_id?: string | null
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          charge_id?: string | null
+          created_utc?: string
+          currency?: string | null
+          id?: string
+          payment_intent_id?: string | null
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -3558,6 +3918,69 @@ export type Database = {
           title: Json | null
           updated_at: string | null
           youtube_video_id: string | null
+        }
+        Relationships: []
+      }
+      v_fin_coupons_lotes: {
+        Row: {
+          cupom: string | null
+          currency: string | null
+          lote: string | null
+          qtd: number | null
+          receita_bruta: number | null
+          receita_liquida: number | null
+        }
+        Relationships: []
+      }
+      v_fin_funnel: {
+        Row: {
+          charges_succeeded: number | null
+          taxa_conversao: number | null
+          total_intents: number | null
+          total_sessions: number | null
+        }
+        Relationships: []
+      }
+      v_fin_heatmap_hora: {
+        Row: {
+          hora: number | null
+          qtd_transacoes: number | null
+          receita_liquida: number | null
+        }
+        Relationships: []
+      }
+      v_fin_kpis: {
+        Row: {
+          bruto: number | null
+          currency: string | null
+          intents_unicos: number | null
+          liquido: number | null
+          nao_pagos: number | null
+          pagos: number | null
+          taxas: number | null
+          ticket_medio: number | null
+        }
+        Relationships: []
+      }
+      v_fin_por_bandeira: {
+        Row: {
+          bandeira: string | null
+          currency: string | null
+          funding: string | null
+          qtd: number | null
+          receita_bruta: number | null
+          receita_liquida: number | null
+        }
+        Relationships: []
+      }
+      v_fin_receita_diaria: {
+        Row: {
+          currency: string | null
+          dia: string | null
+          receita_bruta: number | null
+          receita_liquida: number | null
+          taxas: number | null
+          transacoes: number | null
         }
         Relationships: []
       }
