@@ -2,44 +2,115 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStripeDashboard } from '@/hooks/useStripeDashboard';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { StripeFilters } from './stripe/StripeFilters';
+import { RevenueChart } from './stripe/RevenueChart';
+import { BrandChart } from './stripe/BrandChart';
+import { FunnelChart } from './stripe/FunnelChart';
+import { ChargesTable } from './stripe/ChargesTable';
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
-  const [range, setRange] = useState('30d');
-  const { summary, timeseries, byBrand, funnel, charges, loading, refresh } = useStripeDashboard(range);
+  const { toast } = useToast();
+  const [filters, setFilters] = useState({
+    range: '30d',
+    status: 'all',
+    lote: '',
+    cupom: '',
+    brand: 'all',
+    customFrom: undefined,
+    customTo: undefined
+  });
+  const [syncing, setSyncing] = useState(false);
+
+  const { summary, timeseries, byBrand, funnel, charges, loading, refresh } = useStripeDashboard(filters.range);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      range: '30d',
+      status: 'all',
+      lote: '',
+      cupom: '',
+      brand: 'all',
+      customFrom: undefined,
+      customTo: undefined
+    });
+  };
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-sync', {
+        body: {
+          since: filters.customFrom?.toISOString(),
+          until: filters.customTo?.toISOString(),
+          resources: ['payment_intents', 'charges', 'refunds', 'payouts']
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Sincronização concluída!",
+        description: `${data.synced} registros sincronizados do Stripe`,
+      });
+
+      refresh();
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast({
+        title: "Erro na sincronização",
+        description: "Não foi possível sincronizar dados do Stripe",
+        variant: "destructive"
+      });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Dashboard Financeiro Stripe</h2>
-          <p className="text-muted-foreground">Espelho em tempo real • Civeni 2025</p>
+          <p className="text-muted-foreground flex items-center gap-2">
+            <Badge variant="secondary" className="animate-pulse">LIVE</Badge>
+            Espelho em tempo real • Civeni 2025
+          </p>
         </div>
         <div className="flex gap-2">
-          <Select value={range} onValueChange={setRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">7 dias</SelectItem>
-              <SelectItem value="30d">30 dias</SelectItem>
-              <SelectItem value="90d">90 dias</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={refresh} disabled={loading} size="icon" variant="outline">
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <Button onClick={handleSync} disabled={syncing} variant="outline">
+            <Database className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+            Sincronizar
+          </Button>
+          <Button onClick={refresh} disabled={loading} variant="outline">
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Atualizar
           </Button>
         </div>
       </div>
+
+      {/* Filtros */}
+      <StripeFilters 
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+      />
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -49,8 +120,13 @@ const AdminDashboard = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary?.liquido || 0)}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-green-600">
+              {formatCurrency(summary?.liquido || 0)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Bruto: {formatCurrency(summary?.bruto || 0)}
+            </p>
+            <p className="text-xs text-red-500">
               Taxas: {formatCurrency(summary?.taxas || 0)}
             </p>
           </CardContent>
@@ -64,6 +140,9 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">{summary?.pagos || 0}</div>
             <p className="text-xs text-muted-foreground">
+              Não pagas: {summary?.naoPagos || 0}
+            </p>
+            <p className="text-xs text-green-600 font-medium">
               Conversão: {summary?.taxaConversao || '0'}%
             </p>
           </CardContent>
@@ -76,88 +155,81 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(summary?.ticketMedio || 0)}</div>
-            <p className="text-xs text-muted-foreground">Por transação</p>
+            <p className="text-xs text-muted-foreground">Por transação confirmada</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Alertas</CardTitle>
+            <CardTitle className="text-sm font-medium">Alertas & Disputas</CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summary?.disputas || 0}</div>
+            <div className="text-2xl font-bold text-yellow-600">{summary?.disputas || 0}</div>
             <p className="text-xs text-muted-foreground">
+              Reembolsos: {summary?.reembolsos || 0}
+            </p>
+            <p className="text-xs text-red-500">
               Falhas: {summary?.falhas || 0}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="transacoes">
+      {/* Próximo Payout */}
+      {summary?.proximoPayout && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Próximo Payout</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {formatCurrency(summary.proximoPayout.valor)}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Data prevista</p>
+                <p className="text-lg font-medium">
+                  {new Date(summary.proximoPayout.data).toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Gráficos */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <RevenueChart data={timeseries} loading={loading} />
+        <BrandChart data={byBrand} loading={loading} />
+      </div>
+
+      <FunnelChart data={funnel} loading={loading} />
+
+      {/* Tabs */}
+      <Tabs defaultValue="tabela">
         <TabsList>
-          <TabsTrigger value="transacoes">Transações</TabsTrigger>
-          <TabsTrigger value="bandeiras">Por Bandeira</TabsTrigger>
-          <TabsTrigger value="funil">Funil</TabsTrigger>
+          <TabsTrigger value="tabela">Tabela Detalhada</TabsTrigger>
+          <TabsTrigger value="analises">Análises</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="transacoes" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Últimas Transações</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {charges.slice(0, 10).map((charge: any) => (
-                  <div key={charge.id} className="flex justify-between items-center p-2 border-b">
-                    <div>
-                      <p className="font-medium">{charge.participante}</p>
-                      <p className="text-xs text-muted-foreground">{charge.data_hora_brt}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold">{formatCurrency(charge.valor_liquido)}</p>
-                      <p className="text-xs text-muted-foreground">{charge.bandeira} {charge.last4}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="tabela">
+          <ChargesTable data={charges} loading={loading} />
         </TabsContent>
 
-        <TabsContent value="bandeiras">
+        <TabsContent value="analises">
           <Card>
             <CardHeader>
-              <CardTitle>Receita por Bandeira</CardTitle>
+              <CardTitle>Análises Avançadas</CardTitle>
             </CardHeader>
-            <CardContent>
-              {byBrand.map((item: any) => (
-                <div key={`${item.bandeira}-${item.funding}`} className="flex justify-between py-2 border-b">
-                  <span>{item.bandeira} ({item.funding})</span>
-                  <span className="font-bold">{formatCurrency(item.receita_liquida)}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="funil">
-          <Card>
-            <CardHeader>
-              <CardTitle>Funil de Conversão</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {funnel?.steps?.map((step: any) => (
-                <div key={step.step} className="py-2">
-                  <div className="flex justify-between mb-1">
-                    <span>{step.step}</span>
-                    <span>{step.count} ({step.percentage}%)</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-primary h-2 rounded-full" style={{ width: `${step.percentage}%` }} />
-                  </div>
-                </div>
-              ))}
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Visualize tendências, padrões e insights detalhados das transações.
+              </p>
+              <Button variant="outline" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Exportar Relatório (CSV)
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
