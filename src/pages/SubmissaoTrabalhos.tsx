@@ -79,7 +79,8 @@ const SubmissaoTrabalhos = () => {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        throw new Error('Erro ao fazer upload do arquivo');
+        const errorMsg = uploadError.message || 'Erro ao fazer upload do arquivo';
+        throw new Error(`Erro ao fazer upload: ${errorMsg}`);
       }
 
       console.log('File uploaded successfully:', filePath);
