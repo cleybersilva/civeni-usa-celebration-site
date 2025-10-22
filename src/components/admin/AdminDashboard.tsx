@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStripeDashboard } from '@/hooks/useStripeDashboard';
 import { supabase } from '@/integrations/supabase/client';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import { ChargesTable } from './stripe/ChargesTable';
 const AdminDashboard = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { user, sessionToken } = useAdminAuth();
   const [filters, setFilters] = useState({
     range: '30d',
     status: 'all',
@@ -88,9 +90,32 @@ const AdminDashboard = () => {
       return;
     }
 
+    if (!user || !sessionToken) {
+      toast({
+        title: "Erro de autenticação",
+        description: "Você precisa estar autenticado como admin root",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setDeletingCustomer(email);
     try {
       console.log('🗑️ Tentando excluir registros de:', email);
+      console.log('👤 Usuário atual:', user.email);
+      console.log('🔑 Session token presente:', !!sessionToken);
+      
+      // Garantir que o email do usuário está configurado no contexto
+      const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
+        user_email: user.email,
+        session_token: sessionToken
+      });
+
+      if (!setEmailResult.data) {
+        throw new Error('Falha ao configurar contexto de usuário');
+      }
+
+      console.log('✅ Contexto de usuário configurado');
       
       const { data, error, count } = await supabase
         .from('event_registrations')
