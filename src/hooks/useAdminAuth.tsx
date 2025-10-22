@@ -213,9 +213,9 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
     
     // Define permissions per role (UI-level only, RLS still enforces server-side)
     const permissions: Record<string, string[]> = {
-      admin: ['banner', 'contador', 'copyright', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos'],
+      admin: ['banner', 'contador', 'copyright', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos', 'eventos'],
       design: ['banner', 'palestrantes', 'videos'],
-      editor: ['contador', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos'],
+      editor: ['contador', 'cronograma', 'inscricoes', 'cupons', 'local', 'online', 'parceiros', 'textos', 'eventos'],
       viewer: ['read']
     };
 
