@@ -41,6 +41,11 @@ serve(async (req) => {
     
     if (chargesError) throw chargesError;
 
+    // Buscar reembolsos
+    const { data: refunds } = await supabaseClient
+      .from('stripe_refunds')
+      .select('charge_id, amount');
+
     // Agrupar por email dos metadados
     const customersMap = new Map();
     
@@ -55,9 +60,12 @@ serve(async (req) => {
           total_gasto: 0,
           pagamentos: 0,
           reembolsos: 0,
+          reembolsos_valor: 0,
           primeiro_pagamento: pi.created_utc,
           ultimo_pagamento: pi.created_utc,
-          payment_methods: new Set()
+          payment_methods: new Set(),
+          card_brand: null,
+          last4: null
         });
       }
       
@@ -84,14 +92,32 @@ serve(async (req) => {
       if (charge.status === 'succeeded' && charge.paid) {
         customer.total_gasto += charge.amount / 100;
         customer.pagamentos += 1;
-      }
-      
-      if (charge.refunded) {
-        customer.reembolsos += 1;
+        
+        // Pegar informações do cartão do primeiro pagamento bem-sucedido
+        if (!customer.card_brand && charge.brand) {
+          customer.card_brand = charge.brand;
+          customer.last4 = charge.last4;
+        }
       }
       
       if (charge.brand) {
         customer.payment_methods.add(charge.brand);
+      }
+    });
+
+    // Calcular reembolsos
+    refunds?.forEach(refund => {
+      const charge = charges?.find(c => c.id === refund.charge_id);
+      if (!charge) return;
+      
+      const pi = paymentIntents?.find(p => p.id === charge.payment_intent_id);
+      if (!pi) return;
+      
+      const email = pi.metadata?.email || pi.metadata?.customer_email || 'N/A';
+      const customer = customersMap.get(email);
+      if (customer) {
+        customer.reembolsos += 1;
+        customer.reembolsos_valor += refund.amount / 100;
       }
     });
 
@@ -114,25 +140,31 @@ serve(async (req) => {
     // Aplicar paginação
     customers = customers.slice(offset, offset + limit);
 
-    // Formatar dados para BRT
+    // Formatar dados para BRT com formato brasileiro
     const formatted = customers.map((customer, index) => {
       const createdDate = new Date(customer.primeiro_pagamento);
       const brtDate = new Date(createdDate.getTime() - 3 * 60 * 60 * 1000);
       
-      const lastPaymentDate = new Date(customer.ultimo_pagamento);
-      const lastPaymentBRT = new Date(lastPaymentDate.getTime() - 3 * 60 * 60 * 1000)
-        .toISOString().replace('T', ' ').substring(0, 19);
+      // Formatar data no estilo brasileiro: "22 de out. 07:42"
+      const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+      const day = brtDate.getDate();
+      const month = months[brtDate.getMonth()];
+      const hours = String(brtDate.getHours()).padStart(2, '0');
+      const minutes = String(brtDate.getMinutes()).padStart(2, '0');
+      const formattedDate = `${day} de ${month}. ${hours}:${minutes}`;
 
       return {
         id: `virtual_${offset + index}`,
         nome: customer.name,
         email: customer.email,
+        card_brand: customer.card_brand,
+        last4: customer.last4,
         forma_pagamento_padrao: Array.from(customer.payment_methods).join(', ') || 'Não definida',
-        criado: brtDate.toISOString().replace('T', ' ').substring(0, 19),
+        criado: formattedDate,
         total_gasto: customer.total_gasto,
         pagamentos: customer.pagamentos,
         reembolsos: customer.reembolsos,
-        ultimo_pagamento: lastPaymentBRT,
+        reembolsos_valor: customer.reembolsos_valor,
         stripe_link: `https://dashboard.stripe.com/payments?email=${encodeURIComponent(customer.email)}`
       };
     });

@@ -243,7 +243,7 @@ const AdminDashboard = () => {
         <TabsContent value="customers">
           <Card>
             <CardHeader>
-              <CardTitle>Clientes do Stripe</CardTitle>
+              <CardTitle>Clientes</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -256,51 +256,58 @@ const AdminDashboard = () => {
                     <p className="text-muted-foreground">Nenhum cliente encontrado</p>
                   </div>
                 ) : (
-                  <table className="w-full">
+                  <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Nome</th>
-                        <th className="text-left p-2">Email</th>
-                        <th className="text-left p-2">Forma de Pagamento</th>
-                        <th className="text-left p-2">Criado</th>
-                        <th className="text-right p-2">Total Gasto</th>
-                        <th className="text-center p-2">Pagamentos</th>
-                        <th className="text-center p-2">Reembolsos</th>
-                        <th className="text-right p-2">Ações</th>
+                      <tr className="border-b text-xs text-muted-foreground">
+                        <th className="text-left p-3 font-medium">Nome</th>
+                        <th className="text-left p-3 font-medium">E-mail</th>
+                        <th className="text-left p-3 font-medium">Forma de pagamento padrão</th>
+                        <th className="text-left p-3 font-medium">Criado</th>
+                        <th className="text-right p-3 font-medium">Total gasto</th>
+                        <th className="text-center p-3 font-medium">Pagamentos</th>
+                        <th className="text-right p-3 font-medium">Reembolsos</th>
                       </tr>
                     </thead>
                     <tbody>
                       {customers.map((customer: any) => (
-                        <tr key={customer.id} className="border-b hover:bg-muted/50">
-                          <td className="p-2 font-medium">{customer.nome}</td>
-                          <td className="p-2 text-sm text-muted-foreground">{customer.email}</td>
-                          <td className="p-2 text-sm">{customer.forma_pagamento_padrao}</td>
-                          <td className="p-2 text-sm">{customer.criado}</td>
-                          <td className="p-2 text-right font-bold text-green-600">
+                        <tr key={customer.id} className="border-b hover:bg-muted/30 transition-colors">
+                          <td className="p-3">
+                            <div className="font-medium">{customer.nome}</div>
+                            <div className="text-xs text-muted-foreground">Convidado</div>
+                          </td>
+                          <td className="p-3 text-muted-foreground">
+                            <a 
+                              href={customer.stripe_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="hover:text-primary hover:underline"
+                            >
+                              {customer.email}
+                            </a>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              {customer.card_brand && (
+                                <>
+                                  <CreditCard className="h-4 w-4" />
+                                  <span className="font-medium">{customer.card_brand}</span>
+                                  {customer.last4 && (
+                                    <span className="text-muted-foreground">•••• {customer.last4}</span>
+                                  )}
+                                </>
+                              )}
+                              {!customer.card_brand && (
+                                <span className="text-muted-foreground">Não definida</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-3 text-muted-foreground">{customer.criado}</td>
+                          <td className="p-3 text-right font-medium">
                             {formatCurrency(customer.total_gasto)}
                           </td>
-                          <td className="p-2 text-center">
-                            <Badge variant="secondary">{customer.pagamentos}</Badge>
-                          </td>
-                          <td className="p-2 text-center">
-                            <Badge variant={customer.reembolsos > 0 ? "destructive" : "outline"}>
-                              {customer.reembolsos}
-                            </Badge>
-                          </td>
-                          <td className="p-2 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              asChild
-                            >
-                              <a 
-                                href={customer.stripe_link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                              >
-                                Ver no Stripe
-                              </a>
-                            </Button>
+                          <td className="p-3 text-center">{customer.pagamentos}</td>
+                          <td className="p-3 text-right font-medium">
+                            {formatCurrency(customer.reembolsos_valor || 0)}
                           </td>
                         </tr>
                       ))}
