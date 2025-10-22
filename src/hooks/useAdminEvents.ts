@@ -3,153 +3,124 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuth } from './useAdminAuth';
 
+interface AdminEvent {
+  id: string;
+  slug: string;
+  inicio_at: string;
+  fim_at?: string;
+  timezone: string;
+  modalidade: 'online' | 'presencial' | 'hibrido';
+  endereco?: string;
+  banner_url?: string;
+  youtube_url?: string;
+  playlist_url?: string;
+  tem_inscricao: boolean;
+  inscricao_url?: string;
+  featured: boolean;
+  status_publicacao: string;
+  created_at: string;
+  updated_at: string;
+  // From translations
+  titulo?: string;
+  subtitulo?: string;
+  descricao_richtext?: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: string;
+  // Related data
+  speakers?: any[];
+  event_translations?: any[];
+}
+
 export const useAdminEvents = () => {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<AdminEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
   const { user, sessionToken } = useAdminAuth();
 
   console.log('=== useAdminEvents: Hook initialized ===');
-  console.log('User:', user?.email, 'Has session token:', !!sessionToken);
 
   const fetchEvents = async () => {
     console.log('=== fetchEvents: Starting ===');
     
-    // Timeout controller
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
     try {
       setLoading(true);
       setError(null);
       
-      // Set admin context before querying
+      // Set admin context
       if (user && sessionToken) {
         console.log('=== Setting admin context ===');
-        const { error: contextError } = await supabase.rpc('set_current_user_email_secure', {
+        await supabase.rpc('set_current_user_email_secure', {
           user_email: user.email,
           session_token: sessionToken
         });
-        
-        if (contextError) {
-          console.error('Error setting admin context:', contextError);
-        } else {
-          console.log('=== Admin context set successfully ===');
-        }
       }
       
-      // First, fetch all events
-      console.log('=== Fetching events from database ===');
-      const { data: eventsData, error: eventsError } = await supabase
+      // Fetch ALL events with translations and speakers - same structure as useEvents
+      console.log('=== Fetching events with translations ===');
+      const { data, error: fetchError } = await supabase
         .from('events')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (eventsError) {
-        console.error('=== Error fetching events ===', eventsError);
-        throw eventsError;
-      }
-
-      console.log('=== Events fetched successfully ===', eventsData?.length || 0, 'events');
-
-      if (!eventsData || eventsData.length === 0) {
-        console.log('No events found');
-        setEvents([]);
-        setLoading(false);
-        return;
-      }
-
-      // Then fetch translations for these events
-      const eventIds = eventsData.map(e => e.id);
-      console.log('=== Fetching translations for', eventIds.length, 'events ===');
-      
-      const { data: translationsData, error: translationsError } = await supabase
-        .from('event_translations')
-        .select('*')
-        .in('event_id', eventIds);
-
-      if (translationsError) {
-        console.error('Error fetching translations:', translationsError);
-      } else {
-        console.log('=== Translations fetched ===', translationsData?.length || 0, 'translations');
-      }
-
-      // Fetch speakers for these events
-      console.log('=== Fetching speakers ===');
-      const { data: speakersData, error: speakersError } = await supabase
-        .from('event_speakers')
         .select(`
-          *,
-          cms_speakers(
-            id,
-            name,
-            title,
-            institution
+          id,
+          slug,
+          inicio_at,
+          fim_at,
+          timezone,
+          modalidade,
+          endereco,
+          banner_url,
+          youtube_url,
+          playlist_url,
+          tem_inscricao,
+          inscricao_url,
+          featured,
+          status_publicacao,
+          created_at,
+          updated_at,
+          event_translations(
+            titulo,
+            subtitulo,
+            descricao_richtext,
+            meta_title,
+            meta_description,
+            og_image,
+            idioma
+          ),
+          event_speakers(
+            ordem,
+            cms_speakers(
+              id,
+              name,
+              title,
+              institution
+            )
           )
         `)
-        .in('event_id', eventIds)
-        .order('ordem', { ascending: true });
+        .order('created_at', { ascending: false });
 
-      if (speakersError) {
-        console.error('Error fetching speakers:', speakersError);
-      } else {
-        console.log('=== Speakers fetched ===', speakersData?.length || 0, 'speaker relations');
+      if (fetchError) {
+        console.error('=== Error fetching events ===', fetchError);
+        throw fetchError;
       }
 
-      // Combine the data
-      console.log('=== Combining data ===');
-      const data = eventsData.map(event => ({
-        ...event,
-        event_translations: translationsData?.filter(t => t.event_id === event.id) || [],
-        event_speakers: speakersData?.filter(s => s.event_id === event.id) || []
-      }));
+      console.log('=== Events fetched successfully ===', data?.length || 0, 'events');
 
-      console.log('Admin events fetched:', data);
-
-      // Ensure all events have Portuguese translations
-      if (data && user) {
-        for (const event of data) {
-          const ptTranslation = event.event_translations?.find((t: any) => t.idioma === 'pt-BR');
-          
-          if (!ptTranslation) {
-            console.log(`Creating missing translation for event: ${event.slug}`);
-            
-            // Create default translation
-            const defaultTitle = event.slug.replace(/-/g, ' ').toUpperCase();
-            const { error: translationError } = await supabase
-              .from('event_translations')
-              .insert({
-                event_id: event.id,
-                idioma: 'pt-BR',
-                titulo: defaultTitle,
-                subtitulo: 'Evento do III CIVENI 2025',
-                descricao_richtext: `Participe do ${defaultTitle}, um evento importante do III CIVENI 2025.`,
-                meta_title: defaultTitle,
-                meta_description: `Participe do ${defaultTitle} - III CIVENI 2025`
-              });
-
-            if (translationError) {
-              console.error('Error creating translation:', translationError);
-            } else {
-              console.log(`Translation created for: ${defaultTitle}`);
-              // Refetch to get the complete translation data
-            }
-          }
-        }
-      }
-
-      // Transform data to flatten translations
+      // Transform data - flatten translations for PT-BR
       const transformedEvents = data?.map((event: any) => {
         const ptTranslation = event.event_translations?.find((t: any) => t.idioma === 'pt-BR');
+        
         return {
           ...event,
-          titulo: ptTranslation?.titulo || event.slug,
-          subtitulo: ptTranslation?.subtitulo,
-          descricao_richtext: ptTranslation?.descricao_richtext,
-          meta_title: ptTranslation?.meta_title,
-          meta_description: ptTranslation?.meta_description,
-          og_image: ptTranslation?.og_image,
+          titulo: ptTranslation?.titulo || event.slug.replace(/-/g, ' ').toUpperCase(),
+          subtitulo: ptTranslation?.subtitulo || '',
+          descricao_richtext: ptTranslation?.descricao_richtext || '',
+          meta_title: ptTranslation?.meta_title || event.slug.replace(/-/g, ' ').toUpperCase(),
+          meta_description: ptTranslation?.meta_description || '',
+          og_image: ptTranslation?.og_image || event.banner_url,
           speakers: event.event_speakers
             ?.sort((a: any, b: any) => a.ordem - b.ordem)
             ?.map((es: any) => es.cms_speakers)
@@ -157,25 +128,18 @@ export const useAdminEvents = () => {
         };
       }) || [];
 
-      console.log('Transformed admin events:', transformedEvents);
-      console.log('=== Setting events state with', transformedEvents.length, 'events ===');
-
+      console.log('=== Transformed events ===', transformedEvents.length, 'events ready');
       setEvents(transformedEvents);
+      
     } catch (error: any) {
       console.error('=== ERRO AO CARREGAR EVENTOS ===', error);
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      });
       
       const errorMessage = error.name === 'AbortError' 
         ? 'Tempo limite excedido ao carregar eventos'
         : error.message || 'Erro ao carregar eventos';
       
       setError(new Error(errorMessage));
-      setEvents([]); // Set empty array on error
+      setEvents([]);
       
       toast({
         title: 'Erro ao carregar eventos',
@@ -185,7 +149,7 @@ export const useAdminEvents = () => {
     } finally {
       clearTimeout(timeoutId);
       setLoading(false);
-      console.log('=== fetchEvents: Completed, loading set to false ===');
+      console.log('=== fetchEvents: Completed ===');
     }
   };
 
@@ -200,65 +164,48 @@ export const useAdminEvents = () => {
     }
 
     try {
-      console.log('Creating event with data:', eventData);
+      console.log('=== Creating event ===', eventData);
       
-      // Create the event first
+      // Use RPC function to create event
       const { data, error } = await supabase.rpc('admin_upsert_event', {
         event_data: eventData,
         user_email: user.email,
         session_token: sessionToken
       });
 
-      if (error) {
-        console.error('Error from admin_upsert_event:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Event created successfully:', data);
+      console.log('=== Event created ===', data);
 
-      let eventId = null;
-      if (typeof data === 'object' && data && 'id' in data) {
-        eventId = (data as any).id;
-      }
+      // Get event ID
+      const eventId = typeof data === 'object' && data && 'id' in data ? (data as any).id : null;
 
-      // Create translation if provided and we have an event ID
+      // Create PT-BR translation if provided
       if (eventData.translation && eventId) {
-        const translationData = {
-          ...eventData.translation,
-          event_id: eventId
-        };
-
-        console.log('Creating translation with data:', translationData);
-
         const { error: translationError } = await supabase
           .from('event_translations')
-          .upsert(translationData, {
+          .upsert({
+            ...eventData.translation,
+            event_id: eventId,
+            idioma: 'pt-BR'
+          }, {
             onConflict: 'event_id,idioma'
           });
 
         if (translationError) {
-          console.error('Error creating translation:', translationError);
-          // Don't fail the entire operation, just log the error
-          toast({
-            title: 'Aviso',
-            description: 'Evento criado mas houve problema na tradução. Edite o evento para corrigir.',
-            variant: 'default'
-          });
-        } else {
-          console.log('Translation created successfully');
+          console.error('Translation error:', translationError);
         }
       }
 
       toast({
-        title: 'Evento criado com sucesso',
-        description: `O evento "${eventData.translation?.titulo || eventData.slug}" foi criado e está disponível no site.`
+        title: 'Evento criado',
+        description: 'O evento foi criado com sucesso'
       });
       
-      // Refresh events list
       await fetchEvents();
       return true;
     } catch (error: any) {
-      console.error('Error creating event:', error);
+      console.error('=== Error creating event ===', error);
       toast({
         title: 'Erro ao criar evento',
         description: error.message,
@@ -279,6 +226,8 @@ export const useAdminEvents = () => {
     }
 
     try {
+      console.log('=== Updating event ===', eventId, eventData);
+      
       const { data, error } = await supabase.rpc('admin_upsert_event', {
         event_data: { ...eventData, id: eventId },
         user_email: user.email,
@@ -287,31 +236,32 @@ export const useAdminEvents = () => {
 
       if (error) throw error;
 
-      // If translation data is provided, update it
+      // Update PT-BR translation if provided
       if (eventData.translation) {
         const { error: translationError } = await supabase
           .from('event_translations')
           .upsert({
             ...eventData.translation,
-            event_id: eventId
+            event_id: eventId,
+            idioma: 'pt-BR'
           }, {
             onConflict: 'event_id,idioma'
           });
 
         if (translationError) {
-          console.error('Error updating translation:', translationError);
+          console.error('Translation error:', translationError);
         }
       }
 
       toast({
-        title: 'Evento atualizado com sucesso',
-        description: 'As alterações foram salvas.'
+        title: 'Evento atualizado',
+        description: 'As alterações foram salvas'
       });
       
       await fetchEvents();
       return true;
     } catch (error: any) {
-      console.error('Error updating event:', error);
+      console.error('=== Error updating event ===', error);
       toast({
         title: 'Erro ao atualizar evento',
         description: error.message,
@@ -332,6 +282,8 @@ export const useAdminEvents = () => {
     }
 
     try {
+      console.log('=== Deleting event ===', eventId);
+      
       const { data, error } = await supabase.rpc('admin_delete_event', {
         event_id: eventId,
         user_email: user.email,
@@ -340,18 +292,15 @@ export const useAdminEvents = () => {
 
       if (error) throw error;
 
-      if (data && typeof data === 'object' && 'success' in data && (data as any).success) {
-        toast({
-          title: 'Evento deletado com sucesso',
-          description: 'O evento foi removido permanentemente.'
-        });
-        await fetchEvents();
-        return true;
-      } else {
-        throw new Error((data as any)?.error || 'Erro desconhecido');
-      }
+      toast({
+        title: 'Evento deletado',
+        description: 'O evento foi removido'
+      });
+      
+      await fetchEvents();
+      return true;
     } catch (error: any) {
-      console.error('Error deleting event:', error);
+      console.error('=== Error deleting event ===', error);
       toast({
         title: 'Erro ao deletar evento',
         description: error.message,
@@ -363,6 +312,7 @@ export const useAdminEvents = () => {
 
   useEffect(() => {
     if (user) {
+      console.log('=== useAdminEvents: Fetching on user change ===');
       fetchEvents();
     }
   }, [user]);
