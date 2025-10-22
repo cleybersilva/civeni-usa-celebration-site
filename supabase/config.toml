@@ -32,3 +32,15 @@ verify_jwt = false
 
 [functions.verify-certificate]
 verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.finance-kpis]
+verify_jwt = true
+
+[functions.finance-series]
+verify_jwt = true
+
+[functions.finance-breakdown]
+verify_jwt = true

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Shield } from 'lucide-react';
 import StatsCards from './dashboard/StatsCards';
 import ActionsCard from './dashboard/ActionsCard';
@@ -12,12 +13,13 @@ import RegistrationCharts from './dashboard/RegistrationCharts';
 import RevenueCharts from './dashboard/RevenueCharts';
 import RegistrationReports from './dashboard/RegistrationReports';
 import { useFinancialData } from './dashboard/hooks/useFinancialData';
-import { useChartData } from './dashboard/hooks/useChartData';
+import { useFinanceRealtime } from '@/hooks/useFinanceRealtime';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const FinancialDashboard = () => {
   const { t } = useTranslation();
   const { user } = useAdminAuth();
+  const [range, setRange] = useState('30d');
   
   // Only admin_root can access financial data
   if (user?.user_type !== 'admin_root') {
@@ -42,16 +44,19 @@ const FinancialDashboard = () => {
   } = useFinancialData();
 
   const {
-    registrationCharts,
-    revenueCharts,
-    loading: chartsLoading,
-    fetchChartData
-  } = useChartData();
+    kpis,
+    registrationSeries,
+    revenueSeries,
+    lotBreakdown,
+    couponBreakdown,
+    loading: realtimeLoading,
+    refreshAll
+  } = useFinanceRealtime(range);
 
   useEffect(() => {
     refreshData();
-    fetchChartData();
-  }, [refreshData, fetchChartData]);
+    refreshAll();
+  }, [range, refreshData, refreshAll]);
 
   if (loading) {
     return (
@@ -61,15 +66,60 @@ const FinancialDashboard = () => {
     );
   }
 
+  // Transformar dados do realtime para formato dos gráficos
+  const dailyRegistrations = registrationSeries.map((d, i) => ({
+    name: new Date(d.date).toLocaleDateString('pt-BR', { weekday: 'short' }),
+    inscricoes: d.value,
+    periodo: d.date
+  }));
+
+  const dailyRevenue = revenueSeries.map((d, i) => ({
+    name: new Date(d.date).toLocaleDateString('pt-BR', { weekday: 'short' }),
+    faturamento: d.value,
+    periodo: d.date
+  }));
+
+  const batchRegistrations = lotBreakdown.slice(0, 5).map(b => ({
+    name: b.category,
+    inscricoes: b.payments,
+    periodo: b.category
+  }));
+
+  const batchRevenue = lotBreakdown.slice(0, 5).map(b => ({
+    name: b.category,
+    faturamento: b.net,
+    periodo: b.category
+  }));
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex-shrink-0 space-y-6 p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-semibold">Dashboard Financeiro em Tempo Real</h3>
+            <p className="text-sm text-muted-foreground">
+              Dados sincronizados com Stripe • Atualização automática
+            </p>
+          </div>
+          <Select value={range} onValueChange={setRange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Últimos 7 dias</SelectItem>
+              <SelectItem value="30d">Últimos 30 dias</SelectItem>
+              <SelectItem value="90d">Últimos 90 dias</SelectItem>
+              <SelectItem value="all">Todos os períodos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
         <StatsCards stats={stats} />
         <ActionsCard 
           onGenerateReport={generateDailyReport}
           onRefreshData={() => {
             refreshData();
-            fetchChartData();
+            refreshAll();
           }}
         />
       </div>
@@ -90,14 +140,14 @@ const FinancialDashboard = () => {
                 <div className="p-6 space-y-8">
                   <div className="w-full">
                     <h3 className="text-xl font-semibold mb-6">{t('admin.dashboard.registrationCharts', 'Gráficos de Inscrições')}</h3>
-                    {chartsLoading ? (
+                    {realtimeLoading ? (
                       <div className="text-center py-8">{t('admin.dashboard.loadingCharts', 'Carregando gráficos...')}</div>
                     ) : (
                       <div className="w-full">
                         <RegistrationCharts
-                          dailyData={registrationCharts.daily}
-                          weeklyData={registrationCharts.weekly}
-                          batchData={registrationCharts.batch}
+                          dailyData={dailyRegistrations}
+                          weeklyData={[]}
+                          batchData={batchRegistrations}
                         />
                       </div>
                     )}
@@ -105,14 +155,14 @@ const FinancialDashboard = () => {
                   
                   <div className="w-full">
                     <h3 className="text-xl font-semibold mb-6">{t('admin.dashboard.revenueCharts', 'Gráficos de Faturamento')}</h3>
-                    {chartsLoading ? (
+                    {realtimeLoading ? (
                       <div className="text-center py-8">{t('admin.dashboard.loadingCharts', 'Carregando gráficos...')}</div>
                     ) : (
                       <div className="w-full">
                         <RevenueCharts
-                          dailyData={revenueCharts.daily}
-                          weeklyData={revenueCharts.weekly}
-                          batchData={revenueCharts.batch}
+                          dailyData={dailyRevenue}
+                          weeklyData={[]}
+                          batchData={batchRevenue}
                         />
                       </div>
                     )}
