@@ -6,6 +6,7 @@ import { useAdminAuth } from './useAdminAuth';
 export const useAdminEvents = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
   const { user, sessionToken } = useAdminAuth();
 
@@ -14,8 +15,14 @@ export const useAdminEvents = () => {
 
   const fetchEvents = async () => {
     console.log('=== fetchEvents: Starting ===');
+    
+    // Timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    
     try {
       setLoading(true);
+      setError(null);
       
       // Set admin context before querying
       if (user && sessionToken) {
@@ -162,12 +169,21 @@ export const useAdminEvents = () => {
         details: error.details,
         hint: error.hint
       });
+      
+      const errorMessage = error.name === 'AbortError' 
+        ? 'Tempo limite excedido ao carregar eventos'
+        : error.message || 'Erro ao carregar eventos';
+      
+      setError(new Error(errorMessage));
+      setEvents([]); // Set empty array on error
+      
       toast({
         title: 'Erro ao carregar eventos',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
       console.log('=== fetchEvents: Completed, loading set to false ===');
     }
@@ -354,6 +370,7 @@ export const useAdminEvents = () => {
   return {
     events,
     loading,
+    error,
     createEvent,
     updateEvent,
     deleteEvent,

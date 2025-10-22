@@ -17,10 +17,13 @@ import {
   StarOff,
   Copy,
   Download,
-  ExternalLink
+  ExternalLink,
+  AlertCircle
 } from 'lucide-react';
 import { useAdminEvents } from '@/hooks/useAdminEvents';
 import { EventFormDialog } from './EventFormDialog';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { SkeletonList } from '@/components/SkeletonList';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -29,10 +32,11 @@ const EventsManager = () => {
   const { t } = useTranslation();
   
   console.log('=== EventsManager: Calling useAdminEvents hook ===');
-  const { events, loading, createEvent, updateEvent, deleteEvent } = useAdminEvents();
+  const { events, loading, error, createEvent, updateEvent, deleteEvent, refetch } = useAdminEvents();
   console.log('=== EventsManager: Hook returned ===', { 
     eventsCount: events?.length || 0, 
     loading,
+    error,
     eventsData: events 
   });
   
@@ -146,22 +150,26 @@ const EventsManager = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {t('admin.events.title', 'Gerenciar Eventos')}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {t('admin.events.description', 'Crie e gerencie eventos, palestras e atividades')}
-          </p>
+    <ErrorBoundary 
+      onReset={refetch}
+      fallbackTitle="Erro ao carregar Eventos"
+    >
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">
+              {t('admin.events.title', 'Gerenciar Eventos')}
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              {t('admin.events.description', 'Crie e gerencie eventos, palestras e atividades')}
+            </p>
+          </div>
+          <Button onClick={() => setShowCreateDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Evento
+          </Button>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Evento
-        </Button>
-      </div>
 
       {/* Filters */}
       <Card>
@@ -219,11 +227,19 @@ const EventsManager = () => {
       {/* Events List */}
       <div className="grid gap-4">
         {loading ? (
+          <SkeletonList count={3} />
+        ) : error ? (
           <Card>
             <CardContent className="p-6">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                <p className="mt-2 text-muted-foreground">Carregando eventos...</p>
+              <div className="text-center space-y-4">
+                <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+                <div>
+                  <p className="font-medium">Erro ao carregar eventos</p>
+                  <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
+                </div>
+                <Button onClick={refetch} variant="outline">
+                  Tentar novamente
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -384,7 +400,8 @@ const EventsManager = () => {
           title="Editar Evento"
         />
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 
