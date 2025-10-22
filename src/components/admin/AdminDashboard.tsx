@@ -90,10 +90,10 @@ const AdminDashboard = () => {
       return;
     }
 
-    if (!user || !sessionToken) {
+    if (!user) {
       toast({
         title: "Erro de autenticação",
-        description: "Você precisa estar autenticado como admin root",
+        description: "Você precisa estar autenticado",
         variant: "destructive"
       });
       return;
@@ -102,40 +102,29 @@ const AdminDashboard = () => {
     setDeletingCustomer(email);
     try {
       console.log('🗑️ Tentando excluir registros de:', email);
-      console.log('👤 Usuário atual:', user.email);
-      console.log('🔑 Session token presente:', !!sessionToken);
       
-      // Garantir que o email do usuário está configurado no contexto
-      const setEmailResult = await supabase.rpc('set_current_user_email_secure', {
-        user_email: user.email,
-        session_token: sessionToken
+      // Chamar a Edge Function para fazer a exclusão com service role
+      const { data, error } = await supabase.functions.invoke('delete-customer-registrations', {
+        body: { email }
       });
 
-      if (!setEmailResult.data) {
-        throw new Error('Falha ao configurar contexto de usuário');
-      }
-
-      console.log('✅ Contexto de usuário configurado');
-      
-      const { data, error, count } = await supabase
-        .from('event_registrations')
-        .delete()
-        .eq('email', email)
-        .select();
-
-      console.log('🗑️ Resultado da exclusão:', { data, error, count });
+      console.log('🗑️ Resultado da exclusão:', { data, error });
 
       if (error) {
         console.error('❌ Erro na exclusão:', error);
         throw error;
       }
 
+      if (!data.success) {
+        throw new Error(data.error || 'Erro ao excluir registros');
+      }
+
       toast({
         title: "Registros excluídos!",
-        description: `${data?.length || 0} registro(s) de ${email} foram removidos`,
+        description: `${data.deleted_count} registro(s) de ${email} foram removidos`,
       });
 
-      // Aguardar um pouco antes de atualizar para garantir que o banco atualizou
+      // Aguardar um pouco antes de atualizar
       setTimeout(() => {
         refresh();
       }, 500);
