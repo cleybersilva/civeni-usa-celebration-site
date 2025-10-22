@@ -2366,6 +2366,24 @@ export type Database = {
         }
         Relationships: []
       }
+      refresh_queue: {
+        Row: {
+          id: number
+          kind: string
+          queued_at: string | null
+        }
+        Insert: {
+          id?: number
+          kind: string
+          queued_at?: string | null
+        }
+        Update: {
+          id?: number
+          kind?: string
+          queued_at?: string | null
+        }
+        Relationships: []
+      }
       registration_access_logs: {
         Row: {
           access_type: string
@@ -2786,6 +2804,60 @@ export type Database = {
           visibility?: string | null
           youtube_playlist_id?: string | null
           youtube_video_id?: string | null
+        }
+        Relationships: []
+      }
+      stripe_payments: {
+        Row: {
+          amount_fee_cents: number | null
+          amount_gross_cents: number
+          amount_net_cents: number | null
+          created_at: string
+          currency: string
+          customer_id: string | null
+          email: string | null
+          event_id: string
+          id: string
+          metadata: Json | null
+          occurred_at: string
+          status: string
+          stripe_object_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount_fee_cents?: number | null
+          amount_gross_cents: number
+          amount_net_cents?: number | null
+          created_at?: string
+          currency: string
+          customer_id?: string | null
+          email?: string | null
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          occurred_at: string
+          status: string
+          stripe_object_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amount_fee_cents?: number | null
+          amount_gross_cents?: number
+          amount_net_cents?: number | null
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          email?: string | null
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          occurred_at?: string
+          status?: string
+          stripe_object_id?: string
+          type?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3398,6 +3470,42 @@ export type Database = {
       }
     }
     Views: {
+      mv_conversion: {
+        Row: {
+          conversion_ratio: number | null
+          day: string | null
+        }
+        Relationships: []
+      }
+      mv_registrations_daily: {
+        Row: {
+          day: string | null
+          paid: number | null
+          refunded: number | null
+          started_or_submitted: number | null
+          total: number | null
+        }
+        Relationships: []
+      }
+      mv_revenue_by_lot_coupon: {
+        Row: {
+          coupon_code: string | null
+          gross_cents: number | null
+          lot_code: string | null
+          net_cents: number | null
+          payments: number | null
+        }
+        Relationships: []
+      }
+      mv_revenue_daily: {
+        Row: {
+          day: string | null
+          gross_cents: number | null
+          net_cents: number | null
+          payments: number | null
+        }
+        Relationships: []
+      }
       public_meet_rooms: {
         Row: {
           capacity: number | null
