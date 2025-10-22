@@ -152,7 +152,7 @@ export type Database = {
           email: string
           event_id: string
           id: number
-          ip: unknown | null
+          ip: unknown
           matched: number
         }
         Insert: {
@@ -160,7 +160,7 @@ export type Database = {
           email: string
           event_id: string
           id?: number
-          ip?: unknown | null
+          ip?: unknown
           matched: number
         }
         Update: {
@@ -168,7 +168,7 @@ export type Database = {
           email?: string
           event_id?: string
           id?: number
-          ip?: unknown | null
+          ip?: unknown
           matched?: number
         }
         Relationships: []
@@ -2217,7 +2217,7 @@ export type Database = {
           email: string | null
           first_attempt_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           last_attempt_at: string
         }
         Insert: {
@@ -2226,7 +2226,7 @@ export type Database = {
           email?: string | null
           first_attempt_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           last_attempt_at?: string
         }
         Update: {
@@ -2235,7 +2235,7 @@ export type Database = {
           email?: string | null
           first_attempt_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           last_attempt_at?: string
         }
         Relationships: []
@@ -3560,14 +3560,8 @@ export type Database = {
         Args: { session_token: string; user_email: string }
         Returns: Json
       }
-      cleanup_expired_sessions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_login_attempts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_sessions: { Args: never; Returns: undefined }
+      cleanup_old_login_attempts: { Args: never; Returns: undefined }
       create_admin_user: {
         Args: {
           user_email: string
@@ -3590,28 +3584,16 @@ export type Database = {
         Args: { category: Json; session_token: string; user_email: string }
         Returns: Json
       }
-      delete_admin_user: {
-        Args: { user_id: string }
-        Returns: Json
-      }
+      delete_admin_user: { Args: { user_id: string }; Returns: Json }
       delete_admin_user_secure: {
         Args: { admin_email: string; session_token: string; user_id: string }
         Returns: Json
       }
-      generate_daily_report: {
-        Args: { report_date?: string }
-        Returns: Json
-      }
-      get_current_admin_user_email: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_from_jwt: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_daily_report: { Args: { report_date?: string }; Returns: Json }
+      get_current_admin_user_email: { Args: never; Returns: string }
+      get_current_user_from_jwt: { Args: never; Returns: string }
       get_partner_applications_summary: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           company_name: string
           contact_name_masked: string
@@ -3644,10 +3626,7 @@ export type Database = {
         Args: { registration_id: string }
         Returns: Json
       }
-      get_registration_stats_secure: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_registration_stats_secure: { Args: never; Returns: Json }
       get_stable_asset_url: {
         Args: { bucket_name: string; file_path: string }
         Returns: string
@@ -3659,16 +3638,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin_root_user: {
-        Args: { user_email: string }
-        Returns: boolean
-      }
-      is_current_user_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin_root_user: { Args: { user_email: string }; Returns: boolean }
+      is_current_user_admin: { Args: never; Returns: boolean }
       list_admin_users: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           email: string
@@ -3700,10 +3673,7 @@ export type Database = {
         Args: { email_input: string; user_email: string }
         Returns: string
       }
-      request_password_reset: {
-        Args: { user_email: string }
-        Returns: boolean
-      }
+      request_password_reset: { Args: { user_email: string }; Returns: boolean }
       revoke_admin_session: {
         Args: { session_token: string; user_email: string }
         Returns: Json
@@ -3769,14 +3739,8 @@ export type Database = {
         Args: { registration_id: string; updates: Json }
         Returns: Json
       }
-      user_is_enrolled: {
-        Args: { uid: string }
-        Returns: boolean
-      }
-      validate_coupon: {
-        Args: { coupon_code: string }
-        Returns: Json
-      }
+      user_is_enrolled: { Args: { uid: string }; Returns: boolean }
+      validate_coupon: { Args: { coupon_code: string }; Returns: Json }
       validate_coupon_robust: {
         Args: {
           p_category_id?: string

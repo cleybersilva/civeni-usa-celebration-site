@@ -56,6 +56,7 @@ function validateSubmission(data: any): { isValid: boolean; errors: string[] } {
   if (!data.submission_kind || !['artigo', 'consorcio'].includes(data.submission_kind)) {
     errors.push('Tipo de submissão inválido');
   }
+  if (!data.file_url?.trim()) errors.push('Arquivo é obrigatório');
   
   return { isValid: errors.length === 0, errors };
 }
@@ -145,6 +146,9 @@ serve(async (req) => {
       thematic_area: sanitizeText(body.thematic_area),
       submission_kind: body.submission_kind || 'artigo', // Add submission_kind
       status: 'pending', // Always set to pending
+      file_url: body.file_url || null,
+      file_name: body.file_name || null,
+      file_size: body.file_size || null,
     };
 
     console.log(`[SUBMIT-WORK] Processing submission from ${sanitizedData.email}`);
