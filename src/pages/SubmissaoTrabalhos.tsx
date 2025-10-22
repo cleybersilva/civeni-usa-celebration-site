@@ -74,6 +74,7 @@ const SubmissaoTrabalhos = () => {
       const filePath = `submissions/${fileName}`;
 
       console.log('📂 Caminho do arquivo no storage:', filePath);
+      console.log('🔐 Tentando upload para bucket: work-submissions');
 
       const { error: uploadError, data: uploadData } = await supabase.storage
         .from('work-submissions')
