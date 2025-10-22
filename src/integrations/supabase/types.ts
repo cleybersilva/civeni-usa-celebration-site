@@ -2870,6 +2870,7 @@ export type Database = {
           card_country: string | null
           created_utc: string
           currency: string | null
+          customer_id: string | null
           exp_month: number | null
           exp_year: number | null
           failure_code: string | null
@@ -2895,6 +2896,7 @@ export type Database = {
           card_country?: string | null
           created_utc: string
           currency?: string | null
+          customer_id?: string | null
           exp_month?: number | null
           exp_year?: number | null
           failure_code?: string | null
@@ -2920,6 +2922,7 @@ export type Database = {
           card_country?: string | null
           created_utc?: string
           currency?: string | null
+          customer_id?: string | null
           exp_month?: number | null
           exp_year?: number | null
           failure_code?: string | null
@@ -2937,7 +2940,22 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "stripe_charges_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "stripe_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stripe_charges_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_fin_customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stripe_checkout_sessions: {
         Row: {
@@ -2978,6 +2996,57 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           url?: string | null
+        }
+        Relationships: []
+      }
+      stripe_customers: {
+        Row: {
+          balance: number | null
+          created_utc: string
+          currency: string | null
+          default_source: string | null
+          delinquent: boolean | null
+          description: string | null
+          discount: Json | null
+          email: string | null
+          id: string
+          invoice_prefix: string | null
+          metadata: Json | null
+          name: string | null
+          phone: string | null
+          updated_utc: string | null
+        }
+        Insert: {
+          balance?: number | null
+          created_utc: string
+          currency?: string | null
+          default_source?: string | null
+          delinquent?: boolean | null
+          description?: string | null
+          discount?: Json | null
+          email?: string | null
+          id: string
+          invoice_prefix?: string | null
+          metadata?: Json | null
+          name?: string | null
+          phone?: string | null
+          updated_utc?: string | null
+        }
+        Update: {
+          balance?: number | null
+          created_utc?: string
+          currency?: string | null
+          default_source?: string | null
+          delinquent?: boolean | null
+          description?: string | null
+          discount?: Json | null
+          email?: string | null
+          id?: string
+          invoice_prefix?: string | null
+          metadata?: Json | null
+          name?: string | null
+          phone?: string | null
+          updated_utc?: string | null
         }
         Relationships: []
       }
@@ -3929,6 +3998,20 @@ export type Database = {
           qtd: number | null
           receita_bruta: number | null
           receita_liquida: number | null
+        }
+        Relationships: []
+      }
+      v_fin_customers: {
+        Row: {
+          created_utc: string | null
+          email: string | null
+          forma_pagamento_padrao: string | null
+          id: string | null
+          name: string | null
+          total_gasto: number | null
+          total_pagamentos: number | null
+          total_reembolsos: number | null
+          ultimo_pagamento: string | null
         }
         Relationships: []
       }

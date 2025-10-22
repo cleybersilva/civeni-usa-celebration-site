@@ -22,6 +22,7 @@ export const useStripeDashboard = (range: string = '30d') => {
   const [byBrand, setByBrand] = useState<any[]>([]);
   const [funnel, setFunnel] = useState<any>(null);
   const [charges, setCharges] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -34,7 +35,7 @@ export const useStripeDashboard = (range: string = '30d') => {
 
       console.log('🔄 Fetching Stripe dashboard data...', { from, to, range });
 
-      const [summaryRes, timeseriesRes, brandRes, funnelRes, chargesRes] = await Promise.all([
+      const [summaryRes, timeseriesRes, brandRes, funnelRes, chargesRes, customersRes] = await Promise.all([
         supabase.functions.invoke('finance-summary', { 
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
@@ -65,6 +66,12 @@ export const useStripeDashboard = (range: string = '30d') => {
         }).then(res => {
           console.log('💰 Charges response:', res);
           return res;
+        }),
+        supabase.functions.invoke('finance-customers', {
+          method: 'GET'
+        }).then(res => {
+          console.log('👥 Customers response:', res);
+          return res;
         })
       ]);
 
@@ -79,6 +86,7 @@ export const useStripeDashboard = (range: string = '30d') => {
       if (brandRes.data) setByBrand(brandRes.data.data || brandRes.data || []);
       if (funnelRes.data) setFunnel(funnelRes.data);
       if (chargesRes.data) setCharges(chargesRes.data.data || chargesRes.data || []);
+      if (customersRes.data) setCustomers(customersRes.data.data || customersRes.data || []);
 
     } catch (error) {
       console.error('❌ Error fetching dashboard:', error);
@@ -111,5 +119,5 @@ export const useStripeDashboard = (range: string = '30d') => {
     };
   }, [fetchAll]);
 
-  return { summary, timeseries, byBrand, funnel, charges, loading, refresh: fetchAll };
+  return { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh: fetchAll };
 };

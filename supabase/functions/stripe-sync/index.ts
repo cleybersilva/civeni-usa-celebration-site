@@ -23,7 +23,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { since, until, resources = ['payment_intents', 'charges', 'refunds', 'payouts'] } = await req.json();
+    const { since, until, resources = ['payment_intents', 'charges', 'refunds', 'payouts', 'customers'] } = await req.json();
 
     console.log(`🔄 Stripe sync requested: since=${since}, until=${until}, resources=${resources.join(',')}`);
 
@@ -202,6 +202,53 @@ serve(async (req) => {
       console.log(`✅ Synced ${payoutCount} payouts`);
     }
 
+    // Sync Customers
+    if (resources.includes('customers')) {
+      console.log('👤 Syncing customers...');
+      let hasMore = true;
+      let startingAfter: string | undefined;
+      let customerCount = 0;
+
+      while (hasMore) {
+        const params: any = { limit: 100 };
+        if (sinceTimestamp) params.created = { gte: sinceTimestamp };
+        if (untilTimestamp) params.created = { ...params.created, lte: untilTimestamp };
+        if (startingAfter) params.starting_after = startingAfter;
+
+        const customers = await stripe.customers.list(params);
+
+        for (const customer of customers.data) {
+          await supabaseClient.from('stripe_customers').upsert({
+            id: customer.id,
+            email: customer.email,
+            name: customer.name,
+            phone: customer.phone,
+            description: customer.description,
+            metadata: customer.metadata || {},
+            default_source: customer.default_source,
+            invoice_prefix: customer.invoice_prefix,
+            balance: customer.balance || 0,
+            currency: customer.currency?.toUpperCase() || 'BRL',
+            delinquent: customer.delinquent || false,
+            discount: customer.discount,
+            created_utc: new Date(customer.created * 1000).toISOString(),
+            updated_utc: new Date().toISOString()
+          }, { onConflict: 'id', ignoreDuplicates: false });
+
+          customerCount++;
+        }
+
+        hasMore = customers.has_more;
+        if (hasMore && customers.data.length > 0) {
+          startingAfter = customers.data[customers.data.length - 1].id;
+        }
+      }
+
+      results.resources.customers = customerCount;
+      results.synced += customerCount;
+      console.log(`✅ Synced ${customerCount} customers`);
+    }
+
     console.log(`🎉 Sync completed: ${results.synced} total records`);
 
     return new Response(JSON.stringify(results), {
@@ -248,6 +295,7 @@ async function syncCharge(supabase: any, stripe: any, charge: any) {
   await supabase.from('stripe_charges').upsert({
     id: charge.id,
     payment_intent_id: charge.payment_intent,
+    customer_id: charge.customer,
     status: charge.status,
     amount: charge.amount,
     currency: charge.currency?.toUpperCase() || 'BRL',

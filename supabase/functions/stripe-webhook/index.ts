@@ -102,6 +102,16 @@ serve(async (req) => {
         case 'payout.created':
           await processPayout(supabaseClient, data);
           break;
+        
+        case 'customer.created':
+        case 'customer.updated':
+          await processCustomer(supabaseClient, data);
+          break;
+        
+        case 'customer.deleted':
+          console.log('🗑️ Customer deleted:', data.id);
+          // Manter histórico, não deletar
+          break;
       }
       
       // Atualizar evento como processado
@@ -232,6 +242,7 @@ async function processCharge(supabase: any, stripe: any, charge: any) {
   await supabase.from('stripe_charges').upsert({
     id: charge.id,
     payment_intent_id: charge.payment_intent,
+    customer_id: charge.customer,
     status: charge.status,
     amount: charge.amount,
     currency: charge.currency?.toUpperCase() || 'BRL',
@@ -352,5 +363,26 @@ async function processPayout(supabase: any, payout: any) {
     status: payout.status,
     balance_txn_id: payout.balance_transaction,
     created_utc: new Date(payout.created * 1000).toISOString()
+  }, { onConflict: 'id', ignoreDuplicates: false });
+}
+
+async function processCustomer(supabase: any, customer: any) {
+  console.log('👤 Processing customer:', customer.id);
+  
+  await supabase.from('stripe_customers').upsert({
+    id: customer.id,
+    email: customer.email,
+    name: customer.name,
+    phone: customer.phone,
+    description: customer.description,
+    metadata: customer.metadata || {},
+    default_source: customer.default_source,
+    invoice_prefix: customer.invoice_prefix,
+    balance: customer.balance || 0,
+    currency: customer.currency?.toUpperCase() || 'BRL',
+    delinquent: customer.delinquent || false,
+    discount: customer.discount,
+    created_utc: new Date(customer.created * 1000).toISOString(),
+    updated_utc: new Date().toISOString()
   }, { onConflict: 'id', ignoreDuplicates: false });
 }

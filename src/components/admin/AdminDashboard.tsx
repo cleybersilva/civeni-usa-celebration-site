@@ -29,7 +29,7 @@ const AdminDashboard = () => {
   });
   const [syncing, setSyncing] = useState(false);
 
-  const { summary, timeseries, byBrand, funnel, charges, loading, refresh } = useStripeDashboard(filters.range);
+  const { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh } = useStripeDashboard(filters.range);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -231,12 +231,85 @@ const AdminDashboard = () => {
       {/* Tabs */}
       <Tabs defaultValue="tabela">
         <TabsList>
-          <TabsTrigger value="tabela">Tabela Detalhada</TabsTrigger>
+          <TabsTrigger value="tabela">Transações Detalhadas</TabsTrigger>
+          <TabsTrigger value="customers">Clientes</TabsTrigger>
           <TabsTrigger value="analises">Análises</TabsTrigger>
         </TabsList>
 
         <TabsContent value="tabela">
           <ChargesTable data={charges} loading={loading} />
+        </TabsContent>
+
+        <TabsContent value="customers">
+          <Card>
+            <CardHeader>
+              <CardTitle>Clientes do Stripe</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                {loading ? (
+                  <div className="h-[400px] flex items-center justify-center">
+                    <p className="text-muted-foreground">Carregando clientes...</p>
+                  </div>
+                ) : customers.length === 0 ? (
+                  <div className="h-[400px] flex items-center justify-center">
+                    <p className="text-muted-foreground">Nenhum cliente encontrado</p>
+                  </div>
+                ) : (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">Nome</th>
+                        <th className="text-left p-2">Email</th>
+                        <th className="text-left p-2">Forma de Pagamento</th>
+                        <th className="text-left p-2">Criado</th>
+                        <th className="text-right p-2">Total Gasto</th>
+                        <th className="text-center p-2">Pagamentos</th>
+                        <th className="text-center p-2">Reembolsos</th>
+                        <th className="text-right p-2">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {customers.map((customer: any) => (
+                        <tr key={customer.id} className="border-b hover:bg-muted/50">
+                          <td className="p-2 font-medium">{customer.nome}</td>
+                          <td className="p-2 text-sm text-muted-foreground">{customer.email}</td>
+                          <td className="p-2 text-sm">{customer.forma_pagamento_padrao}</td>
+                          <td className="p-2 text-sm">{customer.criado}</td>
+                          <td className="p-2 text-right font-bold text-green-600">
+                            {formatCurrency(customer.total_gasto)}
+                          </td>
+                          <td className="p-2 text-center">
+                            <Badge variant="secondary">{customer.pagamentos}</Badge>
+                          </td>
+                          <td className="p-2 text-center">
+                            <Badge variant={customer.reembolsos > 0 ? "destructive" : "outline"}>
+                              {customer.reembolsos}
+                            </Badge>
+                          </td>
+                          <td className="p-2 text-right">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              asChild
+                            >
+                              <a 
+                                href={customer.stripe_link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                              >
+                                Ver no Stripe
+                              </a>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="analises">
