@@ -127,8 +127,13 @@ const AdminDashboard = () => {
               Bruto: {formatCurrency(summary?.bruto || 0)}
             </p>
             <p className="text-xs text-red-500">
-              Taxas: {formatCurrency(summary?.taxas || 0)}
+              Taxas: -{formatCurrency(summary?.taxas || 0)}
             </p>
+            {!summary && (
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                Aguardando dados do Stripe...
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -143,8 +148,13 @@ const AdminDashboard = () => {
               Não pagas: {summary?.naoPagos || 0}
             </p>
             <p className="text-xs text-green-600 font-medium">
-              Conversão: {summary?.taxaConversao || '0'}%
+              Conversão: {summary?.taxaConversao || '0.00'}%
             </p>
+            {summary && summary.pagos === 0 && (
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                Nenhum pagamento confirmado ainda
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -155,7 +165,14 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(summary?.ticketMedio || 0)}</div>
-            <p className="text-xs text-muted-foreground">Por transação confirmada</p>
+            <p className="text-xs text-muted-foreground">
+              Por transação confirmada
+            </p>
+            {summary && summary.pagos > 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Baseado em {summary.pagos} {summary.pagos === 1 ? 'transação' : 'transações'}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -172,6 +189,11 @@ const AdminDashboard = () => {
             <p className="text-xs text-red-500">
               Falhas: {summary?.falhas || 0}
             </p>
+            {summary && (summary.disputas > 0 || summary.falhas > 0) && (
+              <p className="text-xs text-orange-500 mt-1 font-medium">
+                ⚠️ Requer atenção
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

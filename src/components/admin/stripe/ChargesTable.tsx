@@ -82,93 +82,135 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data/Hora</TableHead>
+                <TableHead>Data/Hora (BRT)</TableHead>
                 <TableHead>Participante</TableHead>
+                <TableHead>ID Transação</TableHead>
                 <TableHead className="text-right">Valor Bruto</TableHead>
                 <TableHead className="text-right">Taxa</TableHead>
                 <TableHead className="text-right">Líquido</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Método</TableHead>
+                <TableHead>Método/Bandeira</TableHead>
+                <TableHead>Cartão</TableHead>
                 <TableHead>Lote/Cupom</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((charge) => (
-                <TableRow key={charge.id}>
-                  <TableCell className="text-xs whitespace-nowrap">
-                    {charge.data_hora_brt}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-sm">{charge.participante}</p>
-                      <p className="text-xs text-muted-foreground">{charge.email}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatCurrency(charge.valor_bruto)}
-                  </TableCell>
-                  <TableCell className="text-right text-xs text-muted-foreground">
-                    {formatCurrency(charge.taxa)}
-                  </TableCell>
-                  <TableCell className="text-right font-bold">
-                    {formatCurrency(charge.valor_liquido)}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(charge.status, charge.paid)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <Badge variant="outline" className="capitalize">
-                        {charge.bandeira}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {charge.last4}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-xs space-y-1">
-                      <p className="font-medium">{charge.lote}</p>
-                      {charge.cupom !== 'sem_cupom' && (
-                        <Badge variant="secondary" className="text-xs">
-                          {charge.cupom}
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8"
-                        onClick={() => copyToClipboard(charge.id, 'ID')}
-                      >
-                        {copiedId === charge.id ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8"
-                        asChild
-                      >
-                        <a 
-                          href={charge.stripe_link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    </div>
+              {data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
+                    Nenhuma transação encontrada no período selecionado
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                data.map((charge) => (
+                  <TableRow key={charge.id}>
+                    <TableCell className="text-xs whitespace-nowrap">
+                      {charge.data_hora_brt}
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium text-sm">{charge.participante}</p>
+                        <p className="text-xs text-muted-foreground">{charge.email}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                          {charge.id.substring(charge.id.length - 8)}
+                        </code>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => copyToClipboard(charge.id, 'ID da Transação')}
+                        >
+                          {copiedId === charge.id ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-500" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatCurrency(charge.valor_bruto)}
+                    </TableCell>
+                    <TableCell className="text-right text-xs text-red-500">
+                      -{formatCurrency(charge.taxa)}
+                    </TableCell>
+                    <TableCell className="text-right font-bold text-green-600">
+                      {formatCurrency(charge.valor_liquido)}
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(charge.status, charge.paid)}
+                      {charge.failure_code && (
+                        <p className="text-xs text-red-500 mt-1" title={charge.failure_message}>
+                          {charge.failure_code}
+                        </p>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="outline" className="capitalize w-fit">
+                          {charge.bandeira}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {charge.funding}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-xs space-y-1">
+                        <code className="bg-muted px-1 py-0.5 rounded">
+                          {charge.last4}
+                        </code>
+                        <p className="text-muted-foreground">{charge.exp}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-xs space-y-1">
+                        <p className="font-medium">{charge.lote}</p>
+                        {charge.cupom !== 'sem_cupom' && (
+                          <Badge variant="secondary" className="text-xs">
+                            {charge.cupom}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        {charge.payment_intent_id && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={() => copyToClipboard(charge.payment_intent_id, 'Payment Intent ID')}
+                            title="Copiar Payment Intent ID"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          asChild
+                          title="Abrir no Stripe Dashboard"
+                        >
+                          <a 
+                            href={charge.stripe_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
