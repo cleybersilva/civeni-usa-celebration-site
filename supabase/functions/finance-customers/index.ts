@@ -24,50 +24,118 @@ serve(async (req) => {
 
     console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Buscar da view v_fin_customers que já tem os cálculos
-    let query = supabaseClient
-      .from('v_fin_customers')
-      .select('*')
-      .order('total_gasto', { ascending: false })
-      .range(offset, offset + limit - 1);
+    // Buscar clientes dos payment intents (agrupados por email)
+    const { data: paymentIntents, error: piError } = await supabaseClient
+      .from('stripe_payment_intents')
+      .select('*');
+    
+    if (piError) throw piError;
 
-    // Filtro de busca por email ou nome
-    if (search) {
-      query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%`);
-    }
+    // Buscar charges para calcular valores
+    const { data: charges, error: chargesError } = await supabaseClient
+      .from('stripe_charges')
+      .select(`
+        *,
+        stripe_balance_transactions(fee, net)
+      `);
+    
+    if (chargesError) throw chargesError;
 
-    const { data: customers, error, count } = await query;
-
-    if (error) throw error;
-
-    // Formatar dados para BRT
-    const formatted = (customers || []).map(customer => {
-      const createdDate = new Date(customer.created_utc);
-      const brtDate = new Date(createdDate.getTime() - 3 * 60 * 60 * 1000);
+    // Agrupar por email dos metadados
+    const customersMap = new Map();
+    
+    paymentIntents?.forEach(pi => {
+      const email = pi.metadata?.email || pi.metadata?.customer_email || 'N/A';
+      const name = pi.metadata?.full_name || pi.metadata?.customer_name || 'N/A';
       
-      const lastPaymentDate = customer.ultimo_pagamento ? new Date(customer.ultimo_pagamento) : null;
-      const lastPaymentBRT = lastPaymentDate 
-        ? new Date(lastPaymentDate.getTime() - 3 * 60 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 19)
-        : null;
-
-      return {
-        id: customer.id,
-        nome: customer.name || 'N/A',
-        email: customer.email || 'N/A',
-        forma_pagamento_padrao: customer.forma_pagamento_padrao || 'Não definida',
-        criado: brtDate.toISOString().replace('T', ' ').substring(0, 19),
-        total_gasto: customer.total_gasto || 0,
-        pagamentos: customer.total_pagamentos || 0,
-        reembolsos: customer.total_reembolsos || 0,
-        ultimo_pagamento: lastPaymentBRT,
-        stripe_link: `https://dashboard.stripe.com/customers/${customer.id}`
-      };
+      if (!customersMap.has(email)) {
+        customersMap.set(email, {
+          email,
+          name,
+          total_gasto: 0,
+          pagamentos: 0,
+          reembolsos: 0,
+          primeiro_pagamento: pi.created_utc,
+          ultimo_pagamento: pi.created_utc,
+          payment_methods: new Set()
+        });
+      }
+      
+      const customer = customersMap.get(email);
+      
+      // Atualizar datas
+      if (new Date(pi.created_utc) < new Date(customer.primeiro_pagamento)) {
+        customer.primeiro_pagamento = pi.created_utc;
+      }
+      if (new Date(pi.created_utc) > new Date(customer.ultimo_pagamento)) {
+        customer.ultimo_pagamento = pi.created_utc;
+      }
     });
 
-    // Total count para paginação
-    const { count: totalCount } = await supabaseClient
-      .from('v_fin_customers')
-      .select('*', { count: 'exact', head: true });
+    // Calcular valores das charges
+    charges?.forEach(charge => {
+      const pi = paymentIntents?.find(p => p.id === charge.payment_intent_id);
+      if (!pi) return;
+      
+      const email = pi.metadata?.email || pi.metadata?.customer_email || 'N/A';
+      const customer = customersMap.get(email);
+      if (!customer) return;
+      
+      if (charge.status === 'succeeded' && charge.paid) {
+        customer.total_gasto += charge.amount / 100;
+        customer.pagamentos += 1;
+      }
+      
+      if (charge.refunded) {
+        customer.reembolsos += 1;
+      }
+      
+      if (charge.brand) {
+        customer.payment_methods.add(charge.brand);
+      }
+    });
+
+    // Converter para array e filtrar por search
+    let customers = Array.from(customersMap.values());
+    
+    if (search) {
+      const searchLower = search.toLowerCase();
+      customers = customers.filter(c => 
+        c.email.toLowerCase().includes(searchLower) || 
+        c.name.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Ordenar por total gasto
+    customers.sort((a, b) => b.total_gasto - a.total_gasto);
+    
+    const totalCount = customers.length;
+    
+    // Aplicar paginação
+    customers = customers.slice(offset, offset + limit);
+
+    // Formatar dados para BRT
+    const formatted = customers.map((customer, index) => {
+      const createdDate = new Date(customer.primeiro_pagamento);
+      const brtDate = new Date(createdDate.getTime() - 3 * 60 * 60 * 1000);
+      
+      const lastPaymentDate = new Date(customer.ultimo_pagamento);
+      const lastPaymentBRT = new Date(lastPaymentDate.getTime() - 3 * 60 * 60 * 1000)
+        .toISOString().replace('T', ' ').substring(0, 19);
+
+      return {
+        id: `virtual_${offset + index}`,
+        nome: customer.name,
+        email: customer.email,
+        forma_pagamento_padrao: Array.from(customer.payment_methods).join(', ') || 'Não definida',
+        criado: brtDate.toISOString().replace('T', ' ').substring(0, 19),
+        total_gasto: customer.total_gasto,
+        pagamentos: customer.pagamentos,
+        reembolsos: customer.reembolsos,
+        ultimo_pagamento: lastPaymentBRT,
+        stripe_link: `https://dashboard.stripe.com/payments?email=${encodeURIComponent(customer.email)}`
+      };
+    });
 
     return new Response(JSON.stringify({
       data: formatted,
