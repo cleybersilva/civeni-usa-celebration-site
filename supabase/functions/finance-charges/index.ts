@@ -27,14 +27,14 @@ serve(async (req) => {
 
     console.log(`💵 Finance charges requested: limit=${limit}, offset=${offset}`);
 
-    // Query com joins
+    // Query com joins especificando qual FK usar (LEFT JOIN para customer ser opcional)
     let query = supabaseClient
       .from('stripe_charges')
       .select(`
         *,
         stripe_balance_transactions(fee, net),
         stripe_payment_intents(metadata, customer_id),
-        stripe_customers(email, name)
+        stripe_customers!fk_stripe_charges_customer(email, name)
       `)
       .order('created_utc', { ascending: false })
       .range(offset, offset + limit - 1);

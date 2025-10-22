@@ -2969,20 +2969,6 @@ export type Database = {
             referencedRelation: "stripe_payment_intents"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "stripe_charges_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "stripe_customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "stripe_charges_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "v_fin_customers"
-            referencedColumns: ["id"]
-          },
         ]
       }
       stripe_checkout_sessions: {
