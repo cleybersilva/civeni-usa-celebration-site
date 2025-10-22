@@ -2949,6 +2949,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_stripe_charges_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "stripe_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_stripe_charges_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_fin_customers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_stripe_charges_payment_intent"
             columns: ["payment_intent_id"]
             isOneToOne: false
