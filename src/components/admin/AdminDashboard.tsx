@@ -90,24 +90,35 @@ const AdminDashboard = () => {
 
     setDeletingCustomer(email);
     try {
-      const { error } = await supabase
+      console.log('🗑️ Tentando excluir registros de:', email);
+      
+      const { data, error, count } = await supabase
         .from('event_registrations')
         .delete()
-        .eq('email', email);
+        .eq('email', email)
+        .select();
 
-      if (error) throw error;
+      console.log('🗑️ Resultado da exclusão:', { data, error, count });
+
+      if (error) {
+        console.error('❌ Erro na exclusão:', error);
+        throw error;
+      }
 
       toast({
         title: "Registros excluídos!",
-        description: `Todos os registros de ${email} foram removidos`,
+        description: `${data?.length || 0} registro(s) de ${email} foram removidos`,
       });
 
-      refresh();
-    } catch (error) {
+      // Aguardar um pouco antes de atualizar para garantir que o banco atualizou
+      setTimeout(() => {
+        refresh();
+      }, 500);
+    } catch (error: any) {
       console.error('Delete error:', error);
       toast({
         title: "Erro ao excluir",
-        description: "Não foi possível excluir os registros",
+        description: error.message || "Não foi possível excluir os registros",
         variant: "destructive"
       });
     } finally {
