@@ -65,10 +65,15 @@ const SubmissaoTrabalhos = () => {
 
     try {
       // Step 1: Upload file first
-      console.log('Uploading file:', file.name);
+      console.log('📤 Iniciando upload do arquivo:', file.name);
+      console.log('📊 Tamanho do arquivo:', (file.size / 1024 / 1024).toFixed(2), 'MB');
+      console.log('📝 Tipo do arquivo:', file.type);
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `submissions/${fileName}`;
+
+      console.log('📂 Caminho do arquivo no storage:', filePath);
 
       const { error: uploadError, data: uploadData } = await supabase.storage
         .from('work-submissions')
@@ -79,18 +84,37 @@ const SubmissaoTrabalhos = () => {
         });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
-        const errorMsg = uploadError.message || 'Erro ao fazer upload do arquivo';
-        toast.error(`Erro no upload: ${errorMsg}`);
-        throw new Error(`Erro ao fazer upload: ${errorMsg}`);
+        console.error('❌ Erro ao fazer upload:', uploadError);
+        console.error('Detalhes do erro:', {
+          message: uploadError.message,
+          name: uploadError.name
+        });
+        
+        let errorMsg = 'Erro ao fazer upload do arquivo';
+        
+        if (uploadError.message?.includes('authorization')) {
+          errorMsg = 'Erro de autorização no upload. Entre em contato com o suporte.';
+        } else if (uploadError.message?.includes('size')) {
+          errorMsg = 'Arquivo muito grande. Máximo permitido: 10MB';
+        } else if (uploadError.message?.includes('type')) {
+          errorMsg = 'Tipo de arquivo não permitido. Use PDF ou DOCX';
+        } else {
+          errorMsg = uploadError.message || errorMsg;
+        }
+        
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
       }
 
-      console.log('File uploaded successfully:', filePath);
+      console.log('✅ Upload concluído com sucesso!');
+      console.log('📄 Dados do upload:', uploadData);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('work-submissions')
         .getPublicUrl(filePath);
+
+      console.log('🔗 URL pública gerada:', publicUrl);
 
       // Step 2: Submit form data with file info
       const submissionData = {
@@ -107,28 +131,28 @@ const SubmissaoTrabalhos = () => {
         file_size: file.size
       };
 
-      console.log('Submitting to edge function:', submissionData);
+      console.log('📨 Enviando dados para edge function...');
 
       const { data, error } = await supabase.functions.invoke('submit-work', {
         body: submissionData
       });
 
-      console.log('Edge function response:', { data, error });
-
       if (error) {
+        console.error('❌ Erro na edge function:', error);
         throw new Error(error.message || 'Erro ao comunicar com o servidor');
       }
 
       if (!data?.success) {
+        console.error('❌ Edge function retornou erro:', data?.error);
         throw new Error(data?.error || 'Erro ao processar submissão');
       }
 
-      console.log('Submission completed successfully');
+      console.log('✅ Submissão processada com sucesso!');
       toast.success('Trabalho submetido com sucesso!');
       navigate('/work-submission/success');
 
     } catch (error: any) {
-      console.error('Error submitting work:', error);
+      console.error('❌ Erro geral na submissão:', error);
       toast.error(error.message || 'Erro ao submeter trabalho. Tente novamente.');
     } finally {
       setIsSubmitting(false);
