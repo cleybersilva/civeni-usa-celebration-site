@@ -2942,6 +2942,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_stripe_charges_balance_txn"
+            columns: ["balance_txn_id"]
+            isOneToOne: false
+            referencedRelation: "stripe_balance_transactions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "stripe_charges_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
