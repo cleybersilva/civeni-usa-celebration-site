@@ -24,34 +24,53 @@ serve(async (req) => {
 
     console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Buscar clientes dos payment intents (agrupados por email)
-    const { data: paymentIntents, error: piError } = await supabaseClient
-      .from('stripe_payment_intents')
-      .select('*');
-    
-    if (piError) throw piError;
-
-    // Buscar charges para calcular valores
+    // Buscar charges com payment intents para obter dados
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
       .select(`
         *,
-        stripe_balance_transactions(fee, net)
+        stripe_balance_transactions(fee, net),
+        stripe_payment_intents(metadata)
       `);
     
     if (chargesError) throw chargesError;
+
+    // Buscar checkout sessions
+    const { data: checkoutSessions } = await supabaseClient
+      .from('stripe_checkout_sessions')
+      .select('*');
 
     // Buscar reembolsos
     const { data: refunds } = await supabaseClient
       .from('stripe_refunds')
       .select('charge_id, amount');
 
-    // Agrupar por email dos metadados
+    // Criar map de checkout sessions por payment_intent_id
+    const sessionsMap = new Map();
+    checkoutSessions?.forEach(session => {
+      if (session.payment_intent_id) {
+        sessionsMap.set(session.payment_intent_id, session);
+      }
+    });
+
+    // Agrupar charges por combinação de email/nome ou criar cliente único por charge
     const customersMap = new Map();
     
-    paymentIntents?.forEach(pi => {
-      const email = pi.metadata?.email || pi.metadata?.customer_email || 'N/A';
-      const name = pi.metadata?.full_name || pi.metadata?.customer_name || 'N/A';
+    charges?.forEach(charge => {
+      const pi = charge.stripe_payment_intents;
+      const session = sessionsMap.get(charge.payment_intent_id);
+      
+      // Tentar obter email/nome de várias fontes
+      const email = pi?.metadata?.email || 
+                    session?.metadata?.email || 
+                    pi?.metadata?.customer_email ||
+                    `cliente_${charge.id.substring(0, 8)}@virtual.com`;
+      
+      const name = pi?.metadata?.full_name || 
+                   pi?.metadata?.name ||
+                   session?.metadata?.full_name ||
+                   session?.metadata?.name ||
+                   `Cliente ${charge.last4 || 'Anônimo'}`;
       
       if (!customersMap.has(email)) {
         customersMap.set(email, {
@@ -61,8 +80,8 @@ serve(async (req) => {
           pagamentos: 0,
           reembolsos: 0,
           reembolsos_valor: 0,
-          primeiro_pagamento: pi.created_utc,
-          ultimo_pagamento: pi.created_utc,
+          primeiro_pagamento: charge.created_utc,
+          ultimo_pagamento: charge.created_utc,
           payment_methods: new Set(),
           card_brand: null,
           last4: null
@@ -72,23 +91,14 @@ serve(async (req) => {
       const customer = customersMap.get(email);
       
       // Atualizar datas
-      if (new Date(pi.created_utc) < new Date(customer.primeiro_pagamento)) {
-        customer.primeiro_pagamento = pi.created_utc;
+      if (new Date(charge.created_utc) < new Date(customer.primeiro_pagamento)) {
+        customer.primeiro_pagamento = charge.created_utc;
       }
-      if (new Date(pi.created_utc) > new Date(customer.ultimo_pagamento)) {
-        customer.ultimo_pagamento = pi.created_utc;
+      if (new Date(charge.created_utc) > new Date(customer.ultimo_pagamento)) {
+        customer.ultimo_pagamento = charge.created_utc;
       }
-    });
-
-    // Calcular valores das charges
-    charges?.forEach(charge => {
-      const pi = paymentIntents?.find(p => p.id === charge.payment_intent_id);
-      if (!pi) return;
       
-      const email = pi.metadata?.email || pi.metadata?.customer_email || 'N/A';
-      const customer = customersMap.get(email);
-      if (!customer) return;
-      
+      // Calcular valores
       if (charge.status === 'succeeded' && charge.paid) {
         customer.total_gasto += charge.amount / 100;
         customer.pagamentos += 1;
@@ -110,10 +120,14 @@ serve(async (req) => {
       const charge = charges?.find(c => c.id === refund.charge_id);
       if (!charge) return;
       
-      const pi = paymentIntents?.find(p => p.id === charge.payment_intent_id);
-      if (!pi) return;
+      const pi = charge.stripe_payment_intents;
+      const session = sessionsMap.get(charge.payment_intent_id);
       
-      const email = pi.metadata?.email || pi.metadata?.customer_email || 'N/A';
+      const email = pi?.metadata?.email || 
+                    session?.metadata?.email || 
+                    pi?.metadata?.customer_email ||
+                    `cliente_${charge.id.substring(0, 8)}@virtual.com`;
+      
       const customer = customersMap.get(email);
       if (customer) {
         customer.reembolsos += 1;

@@ -276,14 +276,18 @@ const AdminDashboard = () => {
                             <div className="text-xs text-muted-foreground">Convidado</div>
                           </td>
                           <td className="p-3 text-muted-foreground">
-                            <a 
-                              href={customer.stripe_link} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="hover:text-primary hover:underline"
-                            >
-                              {customer.email}
-                            </a>
+                            {customer.email.includes('@virtual.com') ? (
+                              <span className="text-xs italic">Email não capturado</span>
+                            ) : (
+                              <a 
+                                href={customer.stripe_link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hover:text-primary hover:underline"
+                              >
+                                {customer.email}
+                              </a>
+                            )}
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
