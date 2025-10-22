@@ -66,26 +66,63 @@ const FinancialDashboard = () => {
     );
   }
 
+  // Helper function to group data by week
+  const groupByWeek = (series: typeof registrationSeries) => {
+    const weekMap = new Map<string, { value: number; startDate: string }>();
+    
+    series.forEach(d => {
+      const date = new Date(d.date);
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (weekMap.has(weekKey)) {
+        const existing = weekMap.get(weekKey)!;
+        weekMap.set(weekKey, { value: existing.value + d.value, startDate: weekKey });
+      } else {
+        weekMap.set(weekKey, { value: d.value, startDate: weekKey });
+      }
+    });
+    
+    return Array.from(weekMap.values()).map(w => ({
+      name: new Date(w.startDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+      value: w.value,
+      periodo: w.startDate
+    }));
+  };
+
   // Transformar dados do realtime para formato dos gráficos
-  const dailyRegistrations = registrationSeries.map((d, i) => ({
-    name: new Date(d.date).toLocaleDateString('pt-BR', { weekday: 'short' }),
+  const dailyRegistrations = registrationSeries.map((d) => ({
+    name: new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
     inscricoes: d.value,
     periodo: d.date
   }));
 
-  const dailyRevenue = revenueSeries.map((d, i) => ({
-    name: new Date(d.date).toLocaleDateString('pt-BR', { weekday: 'short' }),
+  const weeklyRegistrations = groupByWeek(registrationSeries).map(w => ({
+    name: w.name,
+    inscricoes: w.value,
+    periodo: w.periodo
+  }));
+
+  const dailyRevenue = revenueSeries.map((d) => ({
+    name: new Date(d.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
     faturamento: d.value,
     periodo: d.date
   }));
 
-  const batchRegistrations = lotBreakdown.slice(0, 5).map(b => ({
+  const weeklyRevenue = groupByWeek(revenueSeries).map(w => ({
+    name: w.name,
+    faturamento: w.value,
+    periodo: w.periodo
+  }));
+
+  const batchRegistrations = lotBreakdown.map(b => ({
     name: b.category,
     inscricoes: b.payments,
     periodo: b.category
   }));
 
-  const batchRevenue = lotBreakdown.slice(0, 5).map(b => ({
+  const batchRevenue = lotBreakdown.map(b => ({
     name: b.category,
     faturamento: b.net,
     periodo: b.category
@@ -146,7 +183,7 @@ const FinancialDashboard = () => {
                       <div className="w-full">
                         <RegistrationCharts
                           dailyData={dailyRegistrations}
-                          weeklyData={[]}
+                          weeklyData={weeklyRegistrations}
                           batchData={batchRegistrations}
                         />
                       </div>
@@ -161,7 +198,7 @@ const FinancialDashboard = () => {
                       <div className="w-full">
                         <RevenueCharts
                           dailyData={dailyRevenue}
-                          weeklyData={[]}
+                          weeklyData={weeklyRevenue}
                           batchData={batchRevenue}
                         />
                       </div>
