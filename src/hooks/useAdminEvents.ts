@@ -9,36 +9,94 @@ export const useAdminEvents = () => {
   const { toast } = useToast();
   const { user, sessionToken } = useAdminAuth();
 
+  console.log('=== useAdminEvents: Hook initialized ===');
+  console.log('User:', user?.email, 'Has session token:', !!sessionToken);
+
   const fetchEvents = async () => {
+    console.log('=== fetchEvents: Starting ===');
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
+      // Set admin context before querying
+      if (user && sessionToken) {
+        console.log('=== Setting admin context ===');
+        const { error: contextError } = await supabase.rpc('set_current_user_email_secure', {
+          user_email: user.email,
+          session_token: sessionToken
+        });
+        
+        if (contextError) {
+          console.error('Error setting admin context:', contextError);
+        } else {
+          console.log('=== Admin context set successfully ===');
+        }
+      }
+      
+      // First, fetch all events
+      console.log('=== Fetching events from database ===');
+      const { data: eventsData, error: eventsError } = await supabase
         .from('events')
-        .select(`
-          *,
-          event_translations(
-            titulo,
-            subtitulo,
-            descricao_richtext,
-            meta_title,
-            meta_description,
-            og_image,
-            idioma
-          ),
-          event_speakers(
-            ordem,
-            cms_speakers(
-              id,
-              name,
-              title,
-              institution
-            )
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (eventsError) {
+        console.error('=== Error fetching events ===', eventsError);
+        throw eventsError;
+      }
+
+      console.log('=== Events fetched successfully ===', eventsData?.length || 0, 'events');
+
+      if (!eventsData || eventsData.length === 0) {
+        console.log('No events found');
+        setEvents([]);
+        setLoading(false);
+        return;
+      }
+
+      // Then fetch translations for these events
+      const eventIds = eventsData.map(e => e.id);
+      console.log('=== Fetching translations for', eventIds.length, 'events ===');
+      
+      const { data: translationsData, error: translationsError } = await supabase
+        .from('event_translations')
+        .select('*')
+        .in('event_id', eventIds);
+
+      if (translationsError) {
+        console.error('Error fetching translations:', translationsError);
+      } else {
+        console.log('=== Translations fetched ===', translationsData?.length || 0, 'translations');
+      }
+
+      // Fetch speakers for these events
+      console.log('=== Fetching speakers ===');
+      const { data: speakersData, error: speakersError } = await supabase
+        .from('event_speakers')
+        .select(`
+          *,
+          cms_speakers(
+            id,
+            name,
+            title,
+            institution
+          )
+        `)
+        .in('event_id', eventIds)
+        .order('ordem', { ascending: true });
+
+      if (speakersError) {
+        console.error('Error fetching speakers:', speakersError);
+      } else {
+        console.log('=== Speakers fetched ===', speakersData?.length || 0, 'speaker relations');
+      }
+
+      // Combine the data
+      console.log('=== Combining data ===');
+      const data = eventsData.map(event => ({
+        ...event,
+        event_translations: translationsData?.filter(t => t.event_id === event.id) || [],
+        event_speakers: speakersData?.filter(s => s.event_id === event.id) || []
+      }));
 
       console.log('Admin events fetched:', data);
 
@@ -68,17 +126,7 @@ export const useAdminEvents = () => {
               console.error('Error creating translation:', translationError);
             } else {
               console.log(`Translation created for: ${defaultTitle}`);
-              // Add the created translation to the event data
-              if (!event.event_translations) event.event_translations = [];
-              event.event_translations.push({
-                idioma: 'pt-BR',
-                titulo: defaultTitle,
-                subtitulo: 'Evento do III CIVENI 2025',
-                descricao_richtext: `Participe do ${defaultTitle}, um evento importante do III CIVENI 2025.`,
-                meta_title: defaultTitle,
-                meta_description: `Participe do ${defaultTitle} - III CIVENI 2025`,
-                og_image: event.banner_url || ''
-              });
+              // Refetch to get the complete translation data
             }
           }
         }
@@ -103,10 +151,17 @@ export const useAdminEvents = () => {
       }) || [];
 
       console.log('Transformed admin events:', transformedEvents);
+      console.log('=== Setting events state with', transformedEvents.length, 'events ===');
 
       setEvents(transformedEvents);
     } catch (error: any) {
-      console.error('Error fetching events:', error);
+      console.error('=== ERRO AO CARREGAR EVENTOS ===', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       toast({
         title: 'Erro ao carregar eventos',
         description: error.message,
@@ -114,6 +169,7 @@ export const useAdminEvents = () => {
       });
     } finally {
       setLoading(false);
+      console.log('=== fetchEvents: Completed, loading set to false ===');
     }
   };
 

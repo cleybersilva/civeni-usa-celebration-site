@@ -25,12 +25,16 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventsManager = () => {
-  console.log('=== EventsManager: Component iniciando ===');
+  console.log('=== EventsManager: Component rendering ===');
   const { t } = useTranslation();
   
+  console.log('=== EventsManager: Calling useAdminEvents hook ===');
   const { events, loading, createEvent, updateEvent, deleteEvent } = useAdminEvents();
-  console.log('=== EventsManager: Hook useAdminEvents executado com sucesso ===');
-  console.log('Events:', events, 'Loading:', loading);
+  console.log('=== EventsManager: Hook returned ===', { 
+    eventsCount: events?.length || 0, 
+    loading,
+    eventsData: events 
+  });
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -38,7 +42,15 @@ const EventsManager = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
 
-  console.log('EventsManager rendered - events:', events, 'loading:', loading);
+  // Log whenever events or loading changes
+  React.useEffect(() => {
+    console.log('=== EventsManager: State changed ===', {
+      eventsCount: events?.length || 0,
+      loading,
+      hasEvents: !!events,
+      eventsIsArray: Array.isArray(events)
+    });
+  }, [events, loading]);
 
   const getEventStatus = (event: any) => {
     const now = new Date();
