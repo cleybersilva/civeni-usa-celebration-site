@@ -70,16 +70,18 @@ const SubmissaoTrabalhos = () => {
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `submissions/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('work-submissions')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          contentType: file.type
         });
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
         const errorMsg = uploadError.message || 'Erro ao fazer upload do arquivo';
+        toast.error(`Erro no upload: ${errorMsg}`);
         throw new Error(`Erro ao fazer upload: ${errorMsg}`);
       }
 
