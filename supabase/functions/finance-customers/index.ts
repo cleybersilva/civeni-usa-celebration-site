@@ -24,116 +24,108 @@ serve(async (req) => {
 
     console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Buscar charges com payment intents para obter dados
+    // Buscar registros completos (tem email e nome)
+    const { data: registrations, error: regError } = await supabaseClient
+      .from('event_registrations')
+      .select('*')
+      .eq('payment_status', 'completed');
+    
+    if (regError) throw regError;
+
+    console.log(`📝 Found ${registrations?.length || 0} completed registrations`);
+
+    // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
-      .select(`
-        *,
-        stripe_balance_transactions(fee, net),
-        stripe_payment_intents(metadata)
-      `);
+      .select('*');
     
     if (chargesError) throw chargesError;
-
-    // Buscar checkout sessions
-    const { data: checkoutSessions } = await supabaseClient
-      .from('stripe_checkout_sessions')
-      .select('*');
 
     // Buscar reembolsos
     const { data: refunds } = await supabaseClient
       .from('stripe_refunds')
       .select('charge_id, amount');
 
-    // Criar map de checkout sessions por payment_intent_id
-    const sessionsMap = new Map();
-    checkoutSessions?.forEach(session => {
-      if (session.payment_intent_id) {
-        sessionsMap.set(session.payment_intent_id, session);
+    // Criar map de charges por payment_intent_id
+    const chargesMap = new Map();
+    charges?.forEach(charge => {
+      if (charge.payment_intent_id) {
+        chargesMap.set(charge.payment_intent_id, charge);
       }
     });
 
-    // Agrupar charges por combinação de email/nome ou criar cliente único por charge
+    // Criar map de reembolsos por charge_id
+    const refundsMap = new Map();
+    refunds?.forEach(refund => {
+      if (!refundsMap.has(refund.charge_id)) {
+        refundsMap.set(refund.charge_id, []);
+      }
+      refundsMap.get(refund.charge_id).push(refund);
+    });
+
+    // Agrupar registros por email
     const customersMap = new Map();
     
-    charges?.forEach(charge => {
-      const pi = charge.stripe_payment_intents;
-      const session = sessionsMap.get(charge.payment_intent_id);
-      
-      // Tentar obter email/nome de várias fontes
-      const email = pi?.metadata?.email || 
-                    session?.metadata?.email || 
-                    pi?.metadata?.customer_email ||
-                    `cliente_${charge.id.substring(0, 8)}@virtual.com`;
-      
-      const name = pi?.metadata?.full_name || 
-                   pi?.metadata?.name ||
-                   session?.metadata?.full_name ||
-                   session?.metadata?.name ||
-                   `Cliente ${charge.last4 || 'Anônimo'}`;
+    registrations?.forEach(reg => {
+      const email = reg.email;
       
       if (!customersMap.has(email)) {
         customersMap.set(email, {
           email,
-          name,
+          name: reg.full_name,
           total_gasto: 0,
           pagamentos: 0,
           reembolsos: 0,
           reembolsos_valor: 0,
-          primeiro_pagamento: charge.created_utc,
-          ultimo_pagamento: charge.created_utc,
+          primeiro_pagamento: reg.created_at,
+          ultimo_pagamento: reg.created_at,
           payment_methods: new Set(),
           card_brand: null,
-          last4: null
+          last4: null,
+          registrations: []
         });
       }
       
       const customer = customersMap.get(email);
+      customer.registrations.push(reg);
       
       // Atualizar datas
-      if (new Date(charge.created_utc) < new Date(customer.primeiro_pagamento)) {
-        customer.primeiro_pagamento = charge.created_utc;
+      if (new Date(reg.created_at) < new Date(customer.primeiro_pagamento)) {
+        customer.primeiro_pagamento = reg.created_at;
       }
-      if (new Date(charge.created_utc) > new Date(customer.ultimo_pagamento)) {
-        customer.ultimo_pagamento = charge.created_utc;
+      if (new Date(reg.created_at) > new Date(customer.ultimo_pagamento)) {
+        customer.ultimo_pagamento = reg.created_at;
       }
       
-      // Calcular valores
-      if (charge.status === 'succeeded' && charge.paid) {
-        customer.total_gasto += charge.amount / 100;
-        customer.pagamentos += 1;
-        
-        // Pegar informações do cartão do primeiro pagamento bem-sucedido
-        if (!customer.card_brand && charge.brand) {
-          customer.card_brand = charge.brand;
-          customer.last4 = charge.last4;
+      // Adicionar ao total gasto
+      customer.total_gasto += parseFloat(reg.amount_paid || 0);
+      customer.pagamentos += 1;
+      
+      // Buscar informações do cartão no charge correspondente
+      if (reg.stripe_payment_intent_id) {
+        const charge = chargesMap.get(reg.stripe_payment_intent_id);
+        if (charge) {
+          if (!customer.card_brand && charge.brand) {
+            customer.card_brand = charge.brand;
+            customer.last4 = charge.last4;
+          }
+          if (charge.brand) {
+            customer.payment_methods.add(charge.brand);
+          }
+          
+          // Verificar se esse charge tem reembolsos
+          const chargeRefunds = refundsMap.get(charge.id);
+          if (chargeRefunds && chargeRefunds.length > 0) {
+            customer.reembolsos += chargeRefunds.length;
+            chargeRefunds.forEach(refund => {
+              customer.reembolsos_valor += refund.amount / 100;
+            });
+          }
         }
-      }
-      
-      if (charge.brand) {
-        customer.payment_methods.add(charge.brand);
       }
     });
 
-    // Calcular reembolsos
-    refunds?.forEach(refund => {
-      const charge = charges?.find(c => c.id === refund.charge_id);
-      if (!charge) return;
-      
-      const pi = charge.stripe_payment_intents;
-      const session = sessionsMap.get(charge.payment_intent_id);
-      
-      const email = pi?.metadata?.email || 
-                    session?.metadata?.email || 
-                    pi?.metadata?.customer_email ||
-                    `cliente_${charge.id.substring(0, 8)}@virtual.com`;
-      
-      const customer = customersMap.get(email);
-      if (customer) {
-        customer.reembolsos += 1;
-        customer.reembolsos_valor += refund.amount / 100;
-      }
-    });
+    console.log(`👥 Grouped into ${customersMap.size} unique customers`);
 
     // Converter para array e filtrar por search
     let customers = Array.from(customersMap.values());
@@ -168,7 +160,7 @@ serve(async (req) => {
       const formattedDate = `${day} de ${month}. ${hours}:${minutes}`;
 
       return {
-        id: `virtual_${offset + index}`,
+        id: `customer_${offset + index}`,
         nome: customer.name,
         email: customer.email,
         card_brand: customer.card_brand,
@@ -182,6 +174,8 @@ serve(async (req) => {
         stripe_link: `https://dashboard.stripe.com/payments?email=${encodeURIComponent(customer.email)}`
       };
     });
+
+    console.log(`✅ Returning ${formatted.length} customers (total: ${totalCount})`);
 
     return new Response(JSON.stringify({
       data: formatted,
