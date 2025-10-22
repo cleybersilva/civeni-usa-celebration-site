@@ -1,5 +1,8 @@
 project_id = "wdkeqxfglmritghmakma"
 
+[functions.upload-and-register]
+verify_jwt = false
+
 [functions.create-registration-payment]
 verify_jwt = false
 

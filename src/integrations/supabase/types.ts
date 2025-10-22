@@ -469,6 +469,60 @@ export type Database = {
         }
         Relationships: []
       }
+      civeni_submissoes: {
+        Row: {
+          area_tematica: string | null
+          autores: Json
+          created_at: string
+          created_by: string
+          file_path: string
+          file_sha256: string | null
+          file_size_bytes: number | null
+          id: string
+          mime_type: string | null
+          palavras_chave: string[] | null
+          resumo: string | null
+          status: Database["public"]["Enums"]["civeni_status_submissao"]
+          tipo: Database["public"]["Enums"]["civeni_tipo_submissao"]
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          area_tematica?: string | null
+          autores?: Json
+          created_at?: string
+          created_by: string
+          file_path: string
+          file_sha256?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          mime_type?: string | null
+          palavras_chave?: string[] | null
+          resumo?: string | null
+          status?: Database["public"]["Enums"]["civeni_status_submissao"]
+          tipo: Database["public"]["Enums"]["civeni_tipo_submissao"]
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          area_tematica?: string | null
+          autores?: Json
+          created_at?: string
+          created_by?: string
+          file_path?: string
+          file_sha256?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          mime_type?: string | null
+          palavras_chave?: string[] | null
+          resumo?: string | null
+          status?: Database["public"]["Enums"]["civeni_status_submissao"]
+          tipo?: Database["public"]["Enums"]["civeni_tipo_submissao"]
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cms_committee_members: {
         Row: {
           affiliation: string | null
@@ -3772,6 +3826,12 @@ export type Database = {
         | "encerramento"
         | "cerimonia"
         | "outro"
+      civeni_status_submissao:
+        | "enviado"
+        | "em_analise"
+        | "aprovado"
+        | "rejeitado"
+      civeni_tipo_submissao: "artigo" | "consorcio"
       submission_kind: "artigo" | "consorcio"
       transmission_status: "scheduled" | "live" | "ended"
     }
@@ -3918,6 +3978,13 @@ export const Constants = {
         "cerimonia",
         "outro",
       ],
+      civeni_status_submissao: [
+        "enviado",
+        "em_analise",
+        "aprovado",
+        "rejeitado",
+      ],
+      civeni_tipo_submissao: ["artigo", "consorcio"],
       submission_kind: ["artigo", "consorcio"],
       transmission_status: ["scheduled", "live", "ended"],
     },

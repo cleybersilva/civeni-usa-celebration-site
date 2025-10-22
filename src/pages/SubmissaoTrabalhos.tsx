@@ -44,8 +44,8 @@ const SubmissaoTrabalhos = () => {
         return;
       }
       
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        toast.error('O arquivo deve ter no máximo 10MB');
+      if (selectedFile.size > 15 * 1024 * 1024) {
+        toast.error('O arquivo deve ter no máximo 15MB');
         return;
       }
       
@@ -64,91 +64,54 @@ const SubmissaoTrabalhos = () => {
     setIsSubmitting(true);
 
     try {
-      // Step 1: Upload file first
-      console.log('📤 Iniciando upload do arquivo:', file.name);
+      // Verificar autenticação
+      const { data: { session }, error: authErr } = await supabase.auth.getSession();
+      if (authErr || !session) {
+        toast.error('Faça login antes de submeter o arquivo.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('📤 Iniciando submissão via Edge Function');
       console.log('📊 Tamanho do arquivo:', (file.size / 1024 / 1024).toFixed(2), 'MB');
       console.log('📝 Tipo do arquivo:', file.type);
-      
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `submissions/${fileName}`;
 
-      console.log('📂 Caminho do arquivo no storage:', filePath);
-      console.log('🔐 Tentando upload para bucket: work-submissions');
-
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('work-submissions')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
-        });
-
-      if (uploadError) {
-        console.error('❌ Erro ao fazer upload:', uploadError);
-        console.error('Detalhes do erro:', {
-          message: uploadError.message,
-          name: uploadError.name
-        });
-        
-        let errorMsg = 'Erro ao fazer upload do arquivo';
-        
-        if (uploadError.message?.includes('authorization')) {
-          errorMsg = 'Erro de autorização no upload. Entre em contato com o suporte.';
-        } else if (uploadError.message?.includes('size')) {
-          errorMsg = 'Arquivo muito grande. Máximo permitido: 10MB';
-        } else if (uploadError.message?.includes('type')) {
-          errorMsg = 'Tipo de arquivo não permitido. Use PDF ou DOCX';
-        } else {
-          errorMsg = uploadError.message || errorMsg;
-        }
-        
-        toast.error(errorMsg);
-        throw new Error(errorMsg);
-      }
-
-      console.log('✅ Upload concluído com sucesso!');
-      console.log('📄 Dados do upload:', uploadData);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('work-submissions')
-        .getPublicUrl(filePath);
-
-      console.log('🔗 URL pública gerada:', publicUrl);
-
-      // Step 2: Submit form data with file info
-      const submissionData = {
-        author_name: formData.author_name.trim(),
-        institution: formData.institution.trim(),
+      // Preparar dados do formulário
+      const fd = new FormData();
+      fd.append('tipo', activeTab);
+      fd.append('titulo', formData.work_title.trim());
+      fd.append('autores', JSON.stringify([{
+        nome: formData.author_name.trim(),
         email: formData.email.trim(),
-        work_title: formData.work_title.trim(),
-        abstract: formData.abstract.trim(),
-        keywords: formData.keywords.trim(),
-        thematic_area: formData.thematic_area.trim(),
-        submission_kind: activeTab,
-        file_url: publicUrl,
-        file_name: file.name,
-        file_size: file.size
-      };
+        instituicao: formData.institution.trim()
+      }]));
+      fd.append('resumo', formData.abstract.trim());
+      fd.append('area_tematica', formData.thematic_area.trim());
+      fd.append('palavras_chave', JSON.stringify(
+        formData.keywords.split(',').map(k => k.trim()).filter(Boolean)
+      ));
+      fd.append('file', file);
 
-      console.log('📨 Enviando dados para edge function...');
+      // Chamar Edge Function
+      const resp = await fetch(
+        `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/upload-and-register`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: fd
+        }
+      );
 
-      const { data, error } = await supabase.functions.invoke('submit-work', {
-        body: submissionData
-      });
+      const json = await resp.json();
 
-      if (error) {
-        console.error('❌ Erro na edge function:', error);
-        throw new Error(error.message || 'Erro ao comunicar com o servidor');
+      if (!resp.ok) {
+        const msg = json?.error || 'Falha ao submeter. Tente novamente.';
+        console.error('❌ Erro na submissão:', msg);
+        toast.error(msg);
+        throw new Error(msg);
       }
 
-      if (!data?.success) {
-        console.error('❌ Edge function retornou erro:', data?.error);
-        throw new Error(data?.error || 'Erro ao processar submissão');
-      }
-
-      console.log('✅ Submissão processada com sucesso!');
+      console.log('✅ Submissão processada com sucesso!', json.submissao);
       toast.success('Trabalho submetido com sucesso!');
       navigate('/work-submission/success');
 
@@ -347,7 +310,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Arquivo do Trabalho * (PDF ou DOCX, máximo 10MB)
+                        Arquivo do Trabalho * (PDF ou DOCX, máximo 15MB)
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
                         <input
@@ -367,7 +330,7 @@ const SubmissaoTrabalhos = () => {
                             <div>
                               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                               <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
-                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 10MB</p>
+                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 15MB</p>
                             </div>
                           )}
                         </label>
@@ -507,7 +470,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Proposta do Consórcio * (PDF ou DOCX, máximo 10MB)
+                        Proposta do Consórcio * (PDF ou DOCX, máximo 15MB)
                       </label>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
                         <input
@@ -527,7 +490,7 @@ const SubmissaoTrabalhos = () => {
                             <div>
                               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                               <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
-                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 10MB</p>
+                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 15MB</p>
                             </div>
                           )}
                         </label>
