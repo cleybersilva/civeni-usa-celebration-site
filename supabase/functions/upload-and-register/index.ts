@@ -36,13 +36,18 @@ serve(async (req) => {
   try {
     if (req.method !== "POST") return badRequest("Método não permitido", 405);
 
+    // Submissão anônima agora é permitida
+    let userId: string | null = null;
+    
     const jwt = req.headers.get("Authorization")?.replace("Bearer ", "");
-    if (!jwt) return badRequest("Não autenticado", 401);
-
-    // Verificar usuário autenticado
-    const sbUser = createClient(SUPABASE_URL, jwt);
-    const { data: userResp, error: userErr } = await sbUser.auth.getUser();
-    if (userErr || !userResp?.user) return badRequest("Token inválido", 401);
+    if (jwt) {
+      // Se houver token, tenta usar (para usuários autenticados)
+      const sbUser = createClient(SUPABASE_URL, jwt);
+      const { data: userResp } = await sbUser.auth.getUser();
+      if (userResp?.user) {
+        userId = userResp.user.id;
+      }
+    }
 
     const form = await req.formData();
     const file = form.get("file") as File | null;
@@ -65,9 +70,10 @@ serve(async (req) => {
     const buf = new Uint8Array(await file.arrayBuffer());
     const sha256 = await calculateSHA256(buf);
 
-    const uid = userResp.user.id;
     const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const path = `user/${uid}/${tipo}/${filename}`;
+    const path = userId 
+      ? `user/${userId}/${tipo}/${filename}` 
+      : `anonymous/${tipo}/${filename}`;
 
     console.log(`📤 Fazendo upload: ${path}`);
 
@@ -97,7 +103,7 @@ serve(async (req) => {
         file_sha256: sha256,
         mime_type: file.type,
         file_size_bytes: file.size,
-        created_by: uid,
+        created_by: userId, // Pode ser null para submissões anônimas
         status: "enviado"
       })
       .select()

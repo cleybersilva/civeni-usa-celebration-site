@@ -64,17 +64,12 @@ const SubmissaoTrabalhos = () => {
     setIsSubmitting(true);
 
     try {
-      // Verificar autenticação
-      const { data: { session }, error: authErr } = await supabase.auth.getSession();
-      if (authErr || !session) {
-        toast.error('Faça login antes de submeter o arquivo.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      console.log('📤 Iniciando submissão via Edge Function');
+      console.log('📤 Iniciando submissão via Edge Function (anônima)');
       console.log('📊 Tamanho do arquivo:', (file.size / 1024 / 1024).toFixed(2), 'MB');
       console.log('📝 Tipo do arquivo:', file.type);
+
+      // Obter sessão se existir (opcional para submissão anônima)
+      const { data: { session } } = await supabase.auth.getSession();
 
       // Preparar dados do formulário
       const fd = new FormData();
@@ -92,12 +87,17 @@ const SubmissaoTrabalhos = () => {
       ));
       fd.append('file', file);
 
-      // Chamar Edge Function
+      // Chamar Edge Function (com ou sem autenticação)
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers.Authorization = `Bearer ${session.access_token}`;
+      }
+
       const resp = await fetch(
         `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/upload-and-register`,
         {
           method: 'POST',
-          headers: { Authorization: `Bearer ${session.access_token}` },
+          headers,
           body: fd
         }
       );

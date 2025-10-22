@@ -474,7 +474,7 @@ export type Database = {
           area_tematica: string | null
           autores: Json
           created_at: string
-          created_by: string
+          created_by: string | null
           file_path: string
           file_sha256: string | null
           file_size_bytes: number | null
@@ -491,7 +491,7 @@ export type Database = {
           area_tematica?: string | null
           autores?: Json
           created_at?: string
-          created_by: string
+          created_by?: string | null
           file_path: string
           file_sha256?: string | null
           file_size_bytes?: number | null
@@ -508,7 +508,7 @@ export type Database = {
           area_tematica?: string | null
           autores?: Json
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           file_path?: string
           file_sha256?: string | null
           file_size_bytes?: number | null
