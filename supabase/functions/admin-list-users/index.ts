@@ -1,15 +1,14 @@
-import { serve } from "https://deno.land/std/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -20,10 +19,13 @@ serve(async (req) => {
     
     if (!authHeader) {
       console.error('❌ Missing Authorization header');
-      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { 
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ error: 'Missing Authorization header' }), 
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -43,28 +45,39 @@ serve(async (req) => {
       .gt('expires_at', new Date().toISOString())
       .maybeSingle();
     
-    console.log('📋 Session query result:', { session, error: sessionError });
+    console.log('📋 Session query result:', { 
+      hasSession: !!session, 
+      email: session?.email,
+      hasError: !!sessionError,
+      errorMessage: sessionError?.message 
+    });
     
     if (sessionError) {
       console.error('❌ Session query error:', sessionError);
-      return new Response(JSON.stringify({ 
-        error: 'Database error', 
-        details: sessionError.message 
-      }), { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database error', 
+          details: sessionError.message 
+        }), 
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
     
     if (!session) {
       console.error('❌ No valid session found for token');
-      return new Response(JSON.stringify({ 
-        error: 'Invalid or expired session',
-        hint: 'Please login again'
-      }), { 
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid or expired session',
+          hint: 'Please login again'
+        }), 
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     console.log('✅ Session validated for email:', session.email);
@@ -76,23 +89,36 @@ serve(async (req) => {
       .eq('email', session.email)
       .single();
 
+    console.log('👤 Admin user check:', {
+      found: !!adminUser,
+      userType: adminUser?.user_type,
+      isRoot: adminUser?.is_admin_root,
+      hasError: !!adminError
+    });
+
     if (adminError) {
       console.error('❌ Admin user query error:', adminError);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to verify admin privileges',
-        details: adminError.message 
-      }), { 
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to verify admin privileges',
+          details: adminError.message 
+        }), 
+        { 
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     if (!adminUser || !['admin', 'admin_root'].includes(adminUser.user_type)) {
       console.error('❌ Access denied - user type:', adminUser?.user_type);
-      return new Response(JSON.stringify({ error: 'Access denied: admin privileges required' }), { 
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ error: 'Access denied: admin privileges required' }), 
+        { 
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     console.log('✅ Admin access granted for:', session.email, 'type:', adminUser.user_type);
@@ -122,13 +148,16 @@ serve(async (req) => {
 
     if (usersError) {
       console.error('❌ Error fetching users:', usersError);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to fetch users',
-        details: usersError.message 
-      }), { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to fetch users',
+          details: usersError.message 
+        }), 
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     console.log('✅ Users fetched:', users?.length || 0, 'total:', count);
@@ -142,28 +171,34 @@ serve(async (req) => {
       created_at: user.created_at
     })) || [];
 
-    const response = { 
+    const responseData = { 
       data: transformedUsers,
       count: count || 0,
       page,
       pageSize
     };
 
-    console.log('📤 Sending response:', response);
+    console.log('📤 Sending successful response with', transformedUsers.length, 'users');
 
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify(responseData), 
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
 
   } catch (error) {
     console.error('💥 Function error:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : String(error)
-    }), { 
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : String(error)
+      }), 
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
