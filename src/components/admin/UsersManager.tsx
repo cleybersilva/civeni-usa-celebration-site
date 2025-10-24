@@ -68,41 +68,32 @@ const UsersManager = () => {
       
       console.log('Fetching users... User:', user?.email);
       
-      if (!user?.email) {
+      if (!user?.email || !sessionToken) {
         setError('Usuário não logado');
         return;
       }
 
-      // Admin check será feito na UI, não bloquear aqui
+      // Usar edge function que tem service role access
+      const { data, error } = await supabase.functions.invoke('admin-list-users', {
+        headers: {
+          Authorization: `Bearer ${sessionToken}`
+        }
+      });
 
-      // Buscar usuários diretamente do banco de dados
-      const { data, error } = await supabase
-        .from('admin_users')
-        .select('id, email, user_type, is_admin_root, created_at')
-        .order('created_at', { ascending: false });
-
-      console.log('Query result:', { data, error });
+      console.log('Edge function result:', { data, error });
 
       if (error) {
-        console.error('Database error:', error);
+        console.error('Edge function error:', error);
         setError('Erro ao carregar usuários: ' + error.message);
         return;
       }
 
-      console.log('Raw data from database:', data);
-
-      // Transformar os dados para o formato esperado
-      const transformedUsers = (data || []).map(user => ({
-        user_id: user.id,
-        email: user.email,
-        user_type: user.user_type,
-        is_admin_root: user.is_admin_root,
-        created_at: user.created_at
-      }));
-
-      console.log('Transformed users:', transformedUsers);
-      console.log('About to set users state with:', transformedUsers.length, 'users');
-      setUsers(transformedUsers);
+      if (data?.data) {
+        console.log('Users loaded:', data.data.length);
+        setUsers(data.data);
+      } else {
+        setUsers([]);
+      }
       
     } catch (error: any) {
       const errorMessage = error?.message || 'Erro ao carregar usuários';
