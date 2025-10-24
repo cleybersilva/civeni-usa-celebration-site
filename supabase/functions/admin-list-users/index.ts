@@ -27,12 +27,17 @@ serve(async (req) => {
     // Create Supabase client with service role key for admin operations
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Verify the requesting user is an admin by checking their JWT
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Verify the session token using admin_sessions table
+    const sessionToken = authHeader.replace('Bearer ', '');
+    const { data: session, error: sessionError } = await supabase
+      .from('admin_sessions')
+      .select('email')
+      .eq('token', sessionToken)
+      .gt('expires_at', new Date().toISOString())
+      .single();
     
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid authentication' }), { 
+    if (sessionError || !session) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired session' }), { 
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -42,7 +47,7 @@ serve(async (req) => {
     const { data: adminUser, error: adminError } = await supabase
       .from('admin_users')
       .select('user_type, is_admin_root')
-      .eq('email', user.email)
+      .eq('email', session.email)
       .single();
 
     if (adminError || !adminUser || !['admin', 'admin_root'].includes(adminUser.user_type)) {
