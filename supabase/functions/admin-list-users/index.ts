@@ -34,29 +34,34 @@ serve(async (req) => {
 
     // Verify the session token using admin_sessions table
     const sessionToken = authHeader.replace('Bearer ', '');
-    console.log('🔑 Validating session token:', sessionToken.substring(0, 10) + '...');
+    console.log('🔑 Session token received:', sessionToken.substring(0, 10) + '...');
     
     const { data: session, error: sessionError } = await supabase
       .from('admin_sessions')
       .select('email')
       .eq('token', sessionToken)
       .gt('expires_at', new Date().toISOString())
-      .single();
+      .maybeSingle();
+    
+    console.log('📋 Session query result:', { session, error: sessionError });
     
     if (sessionError) {
       console.error('❌ Session query error:', sessionError);
       return new Response(JSON.stringify({ 
-        error: 'Invalid or expired session', 
+        error: 'Database error', 
         details: sessionError.message 
       }), { 
-        status: 401,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
     
     if (!session) {
-      console.error('❌ No session found');
-      return new Response(JSON.stringify({ error: 'Invalid or expired session' }), { 
+      console.error('❌ No valid session found for token');
+      return new Response(JSON.stringify({ 
+        error: 'Invalid or expired session',
+        hint: 'Please login again'
+      }), { 
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
