@@ -73,24 +73,23 @@ const UsersManager = () => {
         return;
       }
 
-      // Usar edge function que tem service role access
-      const { data, error } = await supabase.functions.invoke('admin-list-users', {
-        headers: {
-          Authorization: `Bearer ${sessionToken}`
-        }
+      // Usar função RPC que já existe e funciona em produção
+      const { data, error } = await (supabase as any).rpc('list_admin_users_secure', {
+        user_email: user.email,
+        session_token: sessionToken
       });
 
-      console.log('Edge function result:', { data, error });
+      console.log('RPC result:', { data, error });
 
       if (error) {
-        console.error('Edge function error:', error);
+        console.error('RPC error:', error);
         setError('Erro ao carregar usuários: ' + error.message);
         return;
       }
 
-      if (data?.data) {
-        console.log('Users loaded:', data.data.length);
-        setUsers(data.data);
+      if (data) {
+        console.log('Users loaded:', data.length);
+        setUsers(data);
       } else {
         setUsers([]);
       }
