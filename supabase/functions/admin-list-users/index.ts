@@ -14,6 +14,8 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get('Authorization');
+    console.log('Authorization header present:', !!authHeader);
+    
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { 
         status: 401,
@@ -29,6 +31,8 @@ serve(async (req) => {
 
     // Verify the session token using admin_sessions table
     const sessionToken = authHeader.replace('Bearer ', '');
+    console.log('Session token:', sessionToken.substring(0, 10) + '...');
+    
     const { data: session, error: sessionError } = await supabase
       .from('admin_sessions')
       .select('email')
@@ -36,12 +40,17 @@ serve(async (req) => {
       .gt('expires_at', new Date().toISOString())
       .single();
     
+    console.log('Session query result:', { session, error: sessionError });
+    
     if (sessionError || !session) {
-      return new Response(JSON.stringify({ error: 'Invalid or expired session' }), { 
+      console.error('Session validation failed:', sessionError);
+      return new Response(JSON.stringify({ error: 'Invalid or expired session', details: sessionError?.message }), { 
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+
+    console.log('Session validated for email:', session.email);
 
     // Check if user is admin in admin_users table
     const { data: adminUser, error: adminError } = await supabase
@@ -50,12 +59,17 @@ serve(async (req) => {
       .eq('email', session.email)
       .single();
 
+    console.log('Admin user check:', { adminUser, error: adminError });
+
     if (adminError || !adminUser || !['admin', 'admin_root'].includes(adminUser.user_type)) {
+      console.error('Access denied:', { adminError, adminUser });
       return new Response(JSON.stringify({ error: 'Access denied: admin privileges required' }), { 
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+
+    console.log('Admin access granted for:', session.email);
 
     // Parse query parameters
     const url = new URL(req.url);
