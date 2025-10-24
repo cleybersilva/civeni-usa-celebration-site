@@ -456,7 +456,6 @@ const UsersManager = () => {
           {users.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               {t('admin.users.noUsersFound')}
-              <p className="text-sm mt-2">Debug: canManageUsers={canManageUsers.toString()}, userType={user?.user_type}, isAdminRoot={isAdminRoot().toString()}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
