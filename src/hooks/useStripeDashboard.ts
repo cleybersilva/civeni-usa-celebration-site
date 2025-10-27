@@ -44,21 +44,46 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       let to: string | undefined;
 
       if (filters.customFrom && filters.customTo) {
-        // Ajustar para início e fim do dia em BRT (UTC-3)
-        const fromDate = new Date(filters.customFrom);
+        // Criar cópias das datas para não modificar as originais
+        const fromDate = new Date(filters.customFrom.getTime());
+        const toDate = new Date(filters.customTo.getTime());
+        
+        // Ajustar para início do dia (00:00:00) no fuso local
         fromDate.setHours(0, 0, 0, 0);
         
-        const toDate = new Date(filters.customTo);
+        // Ajustar para fim do dia (23:59:59.999) no fuso local
         toDate.setHours(23, 59, 59, 999);
         
         from = fromDate.toISOString();
         to = toDate.toISOString();
+        
+        console.log('📅 Filtro personalizado:', {
+          fromLocal: fromDate.toLocaleString('pt-BR'),
+          toLocal: toDate.toLocaleString('pt-BR'),
+          fromISO: from,
+          toISO: to
+        });
       } else if (filters.range && filters.range !== 'custom') {
         const now = new Date();
-        const fromDate = new Date(now.getTime() - (parseInt(filters.range) || 30) * 24 * 60 * 60 * 1000);
+        const days = parseInt(filters.range) || 30;
+        const fromDate = new Date(now.getTime());
+        
+        // Retroceder N dias
+        fromDate.setDate(fromDate.getDate() - days);
+        
+        // Ajustar para início do dia
         fromDate.setHours(0, 0, 0, 0);
+        
         from = fromDate.toISOString();
         to = now.toISOString();
+        
+        console.log('📅 Filtro por período:', {
+          days,
+          fromLocal: fromDate.toLocaleString('pt-BR'),
+          toLocal: now.toLocaleString('pt-BR'),
+          fromISO: from,
+          toISO: to
+        });
       }
 
       console.log('🔄 Fetching Stripe dashboard data...', { from, to, filters });

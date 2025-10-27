@@ -8,13 +8,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2 } from 'lucide-react';
+import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StripeFilters } from './stripe/StripeFilters';
 import { RevenueChart } from './stripe/RevenueChart';
 import { BrandChart } from './stripe/BrandChart';
 import { FunnelChart } from './stripe/FunnelChart';
 import { ChargesTable } from './stripe/ChargesTable';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
@@ -140,6 +143,153 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    
+    // Título
+    doc.setFontSize(18);
+    doc.text('Relatório Financeiro - Civeni 2025', 14, 20);
+    
+    // Período
+    doc.setFontSize(11);
+    let periodo = '';
+    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+    } else {
+      const days = parseInt(filters.range) || 30;
+      periodo = `Últimos ${days} dias`;
+    }
+    doc.text(`Período: ${periodo}`, 14, 28);
+    
+    // KPIs
+    doc.setFontSize(14);
+    doc.text('Resumo Executivo', 14, 38);
+    
+    const kpisData = [
+      ['Métrica', 'Valor'],
+      ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
+      ['Taxas', formatCurrency(summary?.taxas || 0)],
+      ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
+      ['Inscrições Pagas', `${summary?.pagos || 0}`],
+      ['Inscrições Não Pagas', `${summary?.naoPagos || 0}`],
+      ['Taxa de Conversão', `${summary?.taxaConversao || '0.00'}%`],
+      ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)],
+      ['Reembolsos', `${summary?.reembolsos || 0}`],
+      ['Disputas', `${summary?.disputas || 0}`],
+      ['Falhas', `${summary?.falhas || 0}`],
+    ];
+    
+    autoTable(doc, {
+      startY: 42,
+      head: [kpisData[0]],
+      body: kpisData.slice(1),
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+    
+    // Tabela de Transações
+    const finalY = (doc as any).lastAutoTable.finalY || 42;
+    doc.setFontSize(14);
+    doc.text('Transações', 14, finalY + 10);
+    
+    const chargesData = charges.slice(0, 20).map((charge: any) => [
+      new Date(charge.created).toLocaleDateString('pt-BR'),
+      charge.customer_email || 'N/A',
+      formatCurrency(charge.amount / 100),
+      charge.status === 'succeeded' ? 'Confirmado' : charge.status === 'failed' ? 'Falhou' : 'Processando',
+      charge.payment_method_brand || 'N/A',
+    ]);
+    
+    autoTable(doc, {
+      startY: finalY + 14,
+      head: [['Data', 'Cliente', 'Valor', 'Status', 'Bandeira']],
+      body: chargesData,
+      theme: 'striped',
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+    
+    doc.save(`relatorio-financeiro-${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "PDF exportado!",
+      description: "O relatório foi baixado com sucesso",
+    });
+  };
+
+  const handleExportExcel = () => {
+    // Criar workbook
+    const wb = XLSX.utils.book_new();
+    
+    // Sheet 1: Resumo
+    const summaryData = [
+      ['Relatório Financeiro - Civeni 2025'],
+      [''],
+      ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
+        ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
+        : `Últimos ${parseInt(filters.range) || 30} dias`
+      ],
+      [''],
+      ['Métrica', 'Valor'],
+      ['Receita Bruta', summary?.bruto || 0],
+      ['Taxas', summary?.taxas || 0],
+      ['Receita Líquida', summary?.liquido || 0],
+      ['Inscrições Pagas', summary?.pagos || 0],
+      ['Inscrições Não Pagas', summary?.naoPagos || 0],
+      ['Taxa de Conversão', `${summary?.taxaConversao || '0.00'}%`],
+      ['Ticket Médio', summary?.ticketMedio || 0],
+      ['Reembolsos', summary?.reembolsos || 0],
+      ['Disputas', summary?.disputas || 0],
+      ['Falhas', summary?.falhas || 0],
+    ];
+    const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, ws1, 'Resumo');
+    
+    // Sheet 2: Transações
+    const chargesData = charges.map((charge: any) => ({
+      'Data': new Date(charge.created).toLocaleDateString('pt-BR'),
+      'ID': charge.id,
+      'Cliente': charge.customer_email || 'N/A',
+      'Valor (R$)': (charge.amount / 100).toFixed(2),
+      'Status': charge.status === 'succeeded' ? 'Confirmado' : charge.status === 'failed' ? 'Falhou' : 'Processando',
+      'Bandeira': charge.payment_method_brand || 'N/A',
+      'Últimos 4 dígitos': charge.payment_method_last4 || 'N/A',
+      'Descrição': charge.description || 'N/A',
+    }));
+    const ws2 = XLSX.utils.json_to_sheet(chargesData);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Transações');
+    
+    // Sheet 3: Clientes
+    const customersData = customers.map((customer: any) => ({
+      'Nome': customer.nome,
+      'E-mail': customer.email,
+      'Bandeira': customer.card_brand || 'N/A',
+      'Últimos 4 dígitos': customer.last4 || 'N/A',
+      'Data Criação': customer.criado,
+      'Total Gasto (R$)': (customer.total_gasto || 0).toFixed(2),
+      'Nº Pagamentos': customer.pagamentos,
+      'Reembolsos (R$)': (customer.reembolsos_valor || 0).toFixed(2),
+    }));
+    const ws3 = XLSX.utils.json_to_sheet(customersData);
+    XLSX.utils.book_append_sheet(wb, ws3, 'Clientes');
+    
+    // Sheet 4: Por Bandeira
+    const brandData = byBrand.map((brand: any) => ({
+      'Bandeira': brand.bandeira || 'Não informado',
+      'Transações': brand.transacoes,
+      'Valor Total (R$)': (brand.valor || 0).toFixed(2),
+    }));
+    const ws4 = XLSX.utils.json_to_sheet(brandData);
+    XLSX.utils.book_append_sheet(wb, ws4, 'Por Bandeira');
+    
+    // Salvar arquivo
+    XLSX.writeFile(wb, `relatorio-financeiro-${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Excel exportado!",
+      description: "O relatório foi baixado com sucesso",
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -151,7 +301,15 @@ const AdminDashboard = () => {
             Espelho em tempo real • Civeni 2025
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={handleExportPDF} disabled={loading} variant="outline">
+            <FileText className="h-4 w-4 mr-2" />
+            Exportar PDF
+          </Button>
+          <Button onClick={handleExportExcel} disabled={loading} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Exportar Excel
+          </Button>
           <Button onClick={handleSync} disabled={syncing} variant="outline">
             <Database className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
             Sincronizar
