@@ -144,14 +144,14 @@ const AdminDashboard = () => {
   };
 
   const handleExportPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('l', 'mm', 'a4'); // landscape para mais colunas
     
     // Título
     doc.setFontSize(18);
-    doc.text('Relatório Financeiro - Civeni 2025', 14, 20);
+    doc.text('Relatório Financeiro - Civeni 2025', 14, 15);
     
     // Período
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     let periodo = '';
     if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
       periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
@@ -159,69 +159,113 @@ const AdminDashboard = () => {
       const days = parseInt(filters.range) || 30;
       periodo = `Últimos ${days} dias`;
     }
-    doc.text(`Período: ${periodo}`, 14, 28);
+    doc.text(`Período: ${periodo}`, 14, 25);
     
-    // KPIs
-    doc.setFontSize(14);
-    doc.text('Resumo Executivo', 14, 38);
+    if (summary) {
+      doc.text(`Receita Bruta: ${formatCurrency(summary.bruto)} | Líquida: ${formatCurrency(summary.liquido)} | Transações: ${summary.pagos + summary.naoPagos}`, 14, 32);
+    }
     
-    const kpisData = [
-      ['Métrica', 'Valor'],
-      ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
-      ['Taxas', formatCurrency(summary?.taxas || 0)],
-      ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
-      ['Inscrições Pagas', `${summary?.pagos || 0}`],
-      ['Inscrições Não Pagas', `${summary?.naoPagos || 0}`],
-      ['Taxa de Conversão', `${summary?.taxaConversao || '0.00'}%`],
-      ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)],
-      ['Reembolsos', `${summary?.reembolsos || 0}`],
-      ['Disputas', `${summary?.disputas || 0}`],
-      ['Falhas', `${summary?.falhas || 0}`],
-    ];
-    
-    autoTable(doc, {
-      startY: 42,
-      head: [kpisData[0]],
-      body: kpisData.slice(1),
-      theme: 'grid',
-      headStyles: { fillColor: [59, 130, 246] },
+    // Tabela de Transações Detalhadas
+    const transacoesData = charges.map((charge: any) => {
+      const created = new Date(charge.created * 1000);
+      const dataBRT = created.toLocaleDateString('pt-BR');
+      const horaBRT = created.toLocaleTimeString('pt-BR');
+      const valorBruto = charge.amount / 100;
+      const taxa = charge.fee ? charge.fee / 100 : 0;
+      const liquido = charge.net ? charge.net / 100 : valorBruto - taxa;
+      
+      return [
+        `${dataBRT} ${horaBRT}`,
+        charge.customer_email || '-',
+        charge.metadata?.participant_name || '-',
+        charge.id?.substring(0, 12) || '-',
+        formatCurrency(valorBruto),
+        formatCurrency(taxa),
+        formatCurrency(liquido),
+        charge.status === 'succeeded' ? 'Pago' : charge.status === 'pending' ? 'Pendente' : 'Falhou',
+        charge.payment_method_details?.card?.brand?.toUpperCase() || charge.payment_method_details?.type || '-',
+        `*${charge.payment_method_details?.card?.last4 || '****'}`,
+        charge.metadata?.lote || charge.metadata?.cupom || '-'
+      ];
     });
     
-    // Tabela de Transações
-    const finalY = (doc as any).lastAutoTable.finalY || 42;
-    doc.setFontSize(14);
-    doc.text('Transações', 14, finalY + 10);
+    autoTable(doc, {
+      head: [['Data/Hora (BRT)', 'Cliente', 'Participante', 'ID Transação', 'Valor Bruto', 'Taxa', 'Líquido', 'Status', 'Método/Bandeira', 'Cartão', 'Lote/Cupom']],
+      body: transacoesData,
+      startY: 40,
+      styles: { fontSize: 7 },
+      headStyles: { fillColor: [59, 130, 246], fontSize: 7 },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 15 },
+        6: { cellWidth: 20 },
+        7: { cellWidth: 18 },
+        8: { cellWidth: 25 },
+        9: { cellWidth: 15 },
+        10: { cellWidth: 20 }
+      }
+    });
     
-    const chargesData = charges.slice(0, 20).map((charge: any) => [
-      new Date(charge.created).toLocaleDateString('pt-BR'),
-      charge.customer_email || 'N/A',
-      formatCurrency(charge.amount / 100),
-      charge.status === 'succeeded' ? 'Confirmado' : charge.status === 'failed' ? 'Falhou' : 'Processando',
-      charge.payment_method_brand || 'N/A',
+    // Nova página para Clientes
+    doc.addPage();
+    doc.setFontSize(16);
+    doc.text('Relatório de Clientes', 14, 15);
+    
+    const clientesData = customers.map((customer: any) => [
+      customer.email || '-',
+      customer.name || '-',
+      customer.total_payments || 0,
+      formatCurrency(customer.total_spent || 0),
+      formatCurrency(customer.total_refunded || 0),
+      customer.last_payment_date ? new Date(customer.last_payment_date).toLocaleDateString('pt-BR') : '-',
+      customer.payment_methods?.join(', ') || '-'
     ]);
     
     autoTable(doc, {
-      startY: finalY + 14,
-      head: [['Data', 'Cliente', 'Valor', 'Status', 'Bandeira']],
-      body: chargesData,
-      theme: 'striped',
-      headStyles: { fillColor: [59, 130, 246] },
+      head: [['Email', 'Nome', 'Pagamentos', 'Total Gasto', 'Reembolsos', 'Último Pagamento', 'Métodos']],
+      body: clientesData,
+      startY: 25,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [59, 130, 246] }
     });
     
-    doc.save(`relatorio-financeiro-${new Date().toISOString().split('T')[0]}.pdf`);
+    // Nova página para Análises por Bandeira
+    doc.addPage();
+    doc.setFontSize(16);
+    doc.text('Análise por Bandeira', 14, 15);
+    
+    const bandeirasData = byBrand.map((brand: any) => [
+      brand.brand || '-',
+      brand.count || 0,
+      formatCurrency((brand.amount || 0) / 100),
+      `${((brand.count / charges.length) * 100).toFixed(1)}%`
+    ]);
+    
+    autoTable(doc, {
+      head: [['Bandeira', 'Transações', 'Valor Total', 'Percentual']],
+      body: bandeirasData,
+      startY: 25,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [59, 130, 246] }
+    });
+    
+    doc.save(`relatorio-completo-stripe-${new Date().toISOString().split('T')[0]}.pdf`);
     
     toast({
       title: "PDF exportado!",
-      description: "O relatório foi baixado com sucesso",
+      description: "O relatório completo foi baixado com sucesso",
     });
   };
 
   const handleExportExcel = () => {
-    // Criar workbook
     const wb = XLSX.utils.book_new();
     
     // Sheet 1: Resumo
-    const summaryData = [
+    const resumoData = [
       ['Relatório Financeiro - Civeni 2025'],
       [''],
       ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
@@ -229,64 +273,72 @@ const AdminDashboard = () => {
         : `Últimos ${parseInt(filters.range) || 30} dias`
       ],
       [''],
-      ['Métrica', 'Valor'],
-      ['Receita Bruta', summary?.bruto || 0],
-      ['Taxas', summary?.taxas || 0],
-      ['Receita Líquida', summary?.liquido || 0],
-      ['Inscrições Pagas', summary?.pagos || 0],
-      ['Inscrições Não Pagas', summary?.naoPagos || 0],
-      ['Taxa de Conversão', `${summary?.taxaConversao || '0.00'}%`],
-      ['Ticket Médio', summary?.ticketMedio || 0],
-      ['Reembolsos', summary?.reembolsos || 0],
-      ['Disputas', summary?.disputas || 0],
+      ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
+      ['Taxas', formatCurrency(summary?.taxas || 0)],
+      ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
+      ['Pagamentos Confirmados', summary?.pagos || 0],
+      ['Pagamentos Pendentes', summary?.naoPagos || 0],
       ['Falhas', summary?.falhas || 0],
+      ['Reembolsos', summary?.reembolsos || 0],
+      ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)]
     ];
-    const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, ws1, 'Resumo');
+    const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
     
-    // Sheet 2: Transações
-    const chargesData = charges.map((charge: any) => ({
-      'Data': new Date(charge.created).toLocaleDateString('pt-BR'),
-      'ID': charge.id,
-      'Cliente': charge.customer_email || 'N/A',
-      'Valor (R$)': (charge.amount / 100).toFixed(2),
-      'Status': charge.status === 'succeeded' ? 'Confirmado' : charge.status === 'failed' ? 'Falhou' : 'Processando',
-      'Bandeira': charge.payment_method_brand || 'N/A',
-      'Últimos 4 dígitos': charge.payment_method_last4 || 'N/A',
-      'Descrição': charge.description || 'N/A',
-    }));
-    const ws2 = XLSX.utils.json_to_sheet(chargesData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Transações');
+    // Sheet 2: Transações Detalhadas
+    const transacoesData = charges.map((charge: any) => {
+      const created = new Date(charge.created * 1000);
+      const dataBRT = created.toLocaleDateString('pt-BR');
+      const horaBRT = created.toLocaleTimeString('pt-BR');
+      const valorBruto = charge.amount / 100;
+      const taxa = charge.fee ? charge.fee / 100 : 0;
+      const liquido = charge.net ? charge.net / 100 : valorBruto - taxa;
+      
+      return {
+        'Data/Hora (BRT)': `${dataBRT} ${horaBRT}`,
+        'Cliente': charge.customer_email || '-',
+        'Participante': charge.metadata?.participant_name || '-',
+        'ID Transação': charge.id || '-',
+        'Valor Bruto': `R$ ${valorBruto.toFixed(2)}`,
+        'Taxa': `R$ ${taxa.toFixed(2)}`,
+        'Líquido': `R$ ${liquido.toFixed(2)}`,
+        'Status': charge.status === 'succeeded' ? 'Pago' : charge.status === 'pending' ? 'Pendente' : 'Falhou',
+        'Método/Bandeira': charge.payment_method_details?.card?.brand?.toUpperCase() || charge.payment_method_details?.type || '-',
+        'Cartão': charge.payment_method_details?.card?.last4 ? `**** **** **** ${charge.payment_method_details.card.last4}` : '-',
+        'Lote/Cupom': charge.metadata?.lote || charge.metadata?.cupom || '-'
+      };
+    });
+    const wsTransacoes = XLSX.utils.json_to_sheet(transacoesData);
+    XLSX.utils.book_append_sheet(wb, wsTransacoes, 'Transações Detalhadas');
     
     // Sheet 3: Clientes
-    const customersData = customers.map((customer: any) => ({
-      'Nome': customer.nome,
-      'E-mail': customer.email,
-      'Bandeira': customer.card_brand || 'N/A',
-      'Últimos 4 dígitos': customer.last4 || 'N/A',
-      'Data Criação': customer.criado,
-      'Total Gasto (R$)': (customer.total_gasto || 0).toFixed(2),
-      'Nº Pagamentos': customer.pagamentos,
-      'Reembolsos (R$)': (customer.reembolsos_valor || 0).toFixed(2),
+    const clientesData = customers.map((customer: any) => ({
+      'Email': customer.email || '-',
+      'Nome': customer.name || '-',
+      'Total de Pagamentos': customer.total_payments || 0,
+      'Total Gasto': formatCurrency(customer.total_spent || 0),
+      'Total Reembolsado': formatCurrency(customer.total_refunded || 0),
+      'Último Pagamento': customer.last_payment_date ? new Date(customer.last_payment_date).toLocaleDateString('pt-BR') : '-',
+      'Métodos de Pagamento': customer.payment_methods?.join(', ') || '-'
     }));
-    const ws3 = XLSX.utils.json_to_sheet(customersData);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Clientes');
+    const wsClientes = XLSX.utils.json_to_sheet(clientesData);
+    XLSX.utils.book_append_sheet(wb, wsClientes, 'Clientes');
     
-    // Sheet 4: Por Bandeira
+    // Sheet 4: Análise por Bandeira
     const brandData = byBrand.map((brand: any) => ({
-      'Bandeira': brand.bandeira || 'Não informado',
-      'Transações': brand.transacoes,
-      'Valor Total (R$)': (brand.valor || 0).toFixed(2),
+      'Bandeira': brand.brand?.toUpperCase() || '-',
+      'Número de Transações': brand.count || 0,
+      'Valor Total': formatCurrency((brand.amount || 0) / 100),
+      'Percentual do Total': `${((brand.count / charges.length) * 100).toFixed(2)}%`
     }));
-    const ws4 = XLSX.utils.json_to_sheet(brandData);
-    XLSX.utils.book_append_sheet(wb, ws4, 'Por Bandeira');
+    const wsBrand = XLSX.utils.json_to_sheet(brandData);
+    XLSX.utils.book_append_sheet(wb, wsBrand, 'Análise por Bandeira');
     
-    // Salvar arquivo
-    XLSX.writeFile(wb, `relatorio-financeiro-${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(wb, `relatorio-completo-stripe-${new Date().toISOString().split('T')[0]}.xlsx`);
     
     toast({
       title: "Excel exportado!",
-      description: "O relatório foi baixado com sucesso",
+      description: "O relatório completo foi baixado com sucesso",
     });
   };
 
