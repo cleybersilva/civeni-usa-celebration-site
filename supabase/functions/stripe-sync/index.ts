@@ -34,7 +34,8 @@ serve(async (req) => {
     };
 
     const sinceTimestamp = since ? Math.floor(new Date(since).getTime() / 1000) : undefined;
-    const untilTimestamp = until ? Math.floor(new Date(until).getTime() / 1000) : undefined;
+    // Add 1 day to until to include the entire end date (until 23:59:59)
+    const untilTimestamp = until ? Math.floor((new Date(until).getTime() + 86400000) / 1000) : undefined;
 
     // Sync Payment Intents
     if (resources.includes('payment_intents')) {
