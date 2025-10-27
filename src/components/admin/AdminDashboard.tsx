@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   });
   const [syncing, setSyncing] = useState(false);
 
-  const { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh } = useStripeDashboard(filters.range);
+  const { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh } = useStripeDashboard(filters);
   const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
 
   const formatCurrency = (value: number) => {

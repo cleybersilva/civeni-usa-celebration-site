@@ -60,6 +60,7 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
                     mode="single"
                     selected={filters.customFrom}
                     onSelect={(date) => onFilterChange('customFrom', date)}
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -82,6 +83,7 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
                     mode="single"
                     selected={filters.customTo}
                     onSelect={(date) => onFilterChange('customTo', date)}
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>

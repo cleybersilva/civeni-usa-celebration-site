@@ -16,7 +16,17 @@ interface StripeSummary {
   proximoPayout: any;
 }
 
-export const useStripeDashboard = (range: string = '30d') => {
+interface StripeDashboardFilters {
+  range?: string;
+  customFrom?: Date;
+  customTo?: Date;
+  status?: string;
+  lote?: string;
+  cupom?: string;
+  brand?: string;
+}
+
+export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
   const [summary, setSummary] = useState<StripeSummary | null>(null);
   const [timeseries, setTimeseries] = useState<any[]>([]);
   const [byBrand, setByBrand] = useState<any[]>([]);
@@ -29,45 +39,69 @@ export const useStripeDashboard = (range: string = '30d') => {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const now = new Date();
-      const from = new Date(now.getTime() - (parseInt(range) || 30) * 24 * 60 * 60 * 1000).toISOString();
-      const to = now.toISOString();
+      // Use custom dates if provided, otherwise calculate from range
+      let from: string | undefined;
+      let to: string | undefined;
 
-      console.log('🔄 Fetching Stripe dashboard data...', { from, to, range });
+      if (filters.customFrom && filters.customTo) {
+        from = filters.customFrom.toISOString();
+        to = filters.customTo.toISOString();
+      } else if (filters.range && filters.range !== 'custom') {
+        const now = new Date();
+        from = new Date(now.getTime() - (parseInt(filters.range) || 30) * 24 * 60 * 60 * 1000).toISOString();
+        to = now.toISOString();
+      }
+
+      console.log('🔄 Fetching Stripe dashboard data...', { from, to, filters });
+
+      // Build query params for all requests
+      const buildParams = () => {
+        const params = new URLSearchParams();
+        if (from) params.append('from', from);
+        if (to) params.append('to', to);
+        if (filters.status && filters.status !== 'all') params.append('status', filters.status);
+        if (filters.lote) params.append('lote', filters.lote);
+        if (filters.cupom) params.append('cupom', filters.cupom);
+        if (filters.brand && filters.brand !== 'all') params.append('brand', filters.brand);
+        return params.toString();
+      };
+
+      const queryString = buildParams();
+      const requestUrl = queryString ? `?${queryString}` : '';
 
       const [summaryRes, timeseriesRes, brandRes, funnelRes, chargesRes, customersRes] = await Promise.all([
-        supabase.functions.invoke('finance-summary', { 
+        supabase.functions.invoke(`finance-summary${requestUrl}`, { 
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         }).then(res => {
           console.log('📊 Summary response:', res);
           return res;
         }),
-        supabase.functions.invoke('finance-timeseries', { 
+        supabase.functions.invoke(`finance-timeseries${requestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('📈 Timeseries response:', res);
           return res;
         }),
-        supabase.functions.invoke('finance-by-brand', { 
+        supabase.functions.invoke(`finance-by-brand${requestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('💳 By-brand response:', res);
           return res;
         }),
-        supabase.functions.invoke('finance-funnel', { 
+        supabase.functions.invoke(`finance-funnel${requestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('🔽 Funnel response:', res);
           return res;
         }),
-        supabase.functions.invoke('finance-charges', { 
+        supabase.functions.invoke(`finance-charges${requestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('💰 Charges response:', res);
           return res;
         }),
-        supabase.functions.invoke('finance-customers', {
+        supabase.functions.invoke(`finance-customers${requestUrl}`, {
           method: 'GET'
         }).then(res => {
           console.log('👥 Customers response:', res);
@@ -98,7 +132,7 @@ export const useStripeDashboard = (range: string = '30d') => {
     } finally {
       setLoading(false);
     }
-  }, [range, toast]);
+  }, [filters, toast]);
 
   useEffect(() => {
     fetchAll();
