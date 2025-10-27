@@ -143,14 +143,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleExportPDF = () => {
-    const doc = new jsPDF('l', 'mm', 'a4'); // landscape para mais colunas
+  // Relatório de Transações
+  const handleExportTransacoesPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a4');
     
-    // Título
     doc.setFontSize(18);
-    doc.text('Relatório Financeiro - Civeni 2025', 14, 15);
+    doc.text('Relatório de Transações - Civeni 2025', 14, 15);
     
-    // Período
     doc.setFontSize(10);
     let periodo = '';
     if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
@@ -162,10 +161,9 @@ const AdminDashboard = () => {
     doc.text(`Período: ${periodo}`, 14, 25);
     
     if (summary) {
-      doc.text(`Receita Bruta: ${formatCurrency(summary.bruto)} | Líquida: ${formatCurrency(summary.liquido)} | Transações: ${summary.pagos + summary.naoPagos}`, 14, 32);
+      doc.text(`Total de Transações: ${charges.length} | Valor Total: ${formatCurrency(summary.bruto)}`, 14, 32);
     }
     
-    // Tabela de Transações Detalhadas
     const transacoesData = charges.map((charge: any) => {
       const created = new Date(charge.created * 1000);
       const dataBRT = created.toLocaleDateString('pt-BR');
@@ -210,82 +208,17 @@ const AdminDashboard = () => {
       }
     });
     
-    // Nova página para Clientes
-    doc.addPage();
-    doc.setFontSize(16);
-    doc.text('Relatório de Clientes', 14, 15);
-    
-    const clientesData = customers.map((customer: any) => [
-      customer.email || '-',
-      customer.name || '-',
-      customer.total_payments || 0,
-      formatCurrency(customer.total_spent || 0),
-      formatCurrency(customer.total_refunded || 0),
-      customer.last_payment_date ? new Date(customer.last_payment_date).toLocaleDateString('pt-BR') : '-',
-      customer.payment_methods?.join(', ') || '-'
-    ]);
-    
-    autoTable(doc, {
-      head: [['Email', 'Nome', 'Pagamentos', 'Total Gasto', 'Reembolsos', 'Último Pagamento', 'Métodos']],
-      body: clientesData,
-      startY: 25,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [59, 130, 246] }
-    });
-    
-    // Nova página para Análises por Bandeira
-    doc.addPage();
-    doc.setFontSize(16);
-    doc.text('Análise por Bandeira', 14, 15);
-    
-    const bandeirasData = byBrand.map((brand: any) => [
-      brand.brand || '-',
-      brand.count || 0,
-      formatCurrency((brand.amount || 0) / 100),
-      `${((brand.count / charges.length) * 100).toFixed(1)}%`
-    ]);
-    
-    autoTable(doc, {
-      head: [['Bandeira', 'Transações', 'Valor Total', 'Percentual']],
-      body: bandeirasData,
-      startY: 25,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [59, 130, 246] }
-    });
-    
-    doc.save(`relatorio-completo-stripe-${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`relatorio-transacoes-${new Date().toISOString().split('T')[0]}.pdf`);
     
     toast({
       title: "PDF exportado!",
-      description: "O relatório completo foi baixado com sucesso",
+      description: "Relatório de transações baixado com sucesso",
     });
   };
 
-  const handleExportExcel = () => {
+  const handleExportTransacoesExcel = () => {
     const wb = XLSX.utils.book_new();
     
-    // Sheet 1: Resumo
-    const resumoData = [
-      ['Relatório Financeiro - Civeni 2025'],
-      [''],
-      ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
-        ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
-        : `Últimos ${parseInt(filters.range) || 30} dias`
-      ],
-      [''],
-      ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
-      ['Taxas', formatCurrency(summary?.taxas || 0)],
-      ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
-      ['Pagamentos Confirmados', summary?.pagos || 0],
-      ['Pagamentos Pendentes', summary?.naoPagos || 0],
-      ['Falhas', summary?.falhas || 0],
-      ['Reembolsos', summary?.reembolsos || 0],
-      ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)]
-    ];
-    const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
-    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
-    
-    // Sheet 2: Transações Detalhadas
     const transacoesData = charges.map((charge: any) => {
       const created = new Date(charge.created * 1000);
       const dataBRT = created.toLocaleDateString('pt-BR');
@@ -308,37 +241,265 @@ const AdminDashboard = () => {
         'Lote/Cupom': charge.metadata?.lote || charge.metadata?.cupom || '-'
       };
     });
-    const wsTransacoes = XLSX.utils.json_to_sheet(transacoesData);
-    XLSX.utils.book_append_sheet(wb, wsTransacoes, 'Transações Detalhadas');
     
-    // Sheet 3: Clientes
+    const ws = XLSX.utils.json_to_sheet(transacoesData);
+    XLSX.utils.book_append_sheet(wb, ws, 'Transações');
+    
+    XLSX.writeFile(wb, `relatorio-transacoes-${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Excel exportado!",
+      description: "Relatório de transações baixado com sucesso",
+    });
+  };
+
+  // Relatório de Clientes
+  const handleExportClientesPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a4');
+    
+    doc.setFontSize(18);
+    doc.text('Relatório de Clientes - Civeni 2025', 14, 15);
+    
+    doc.setFontSize(10);
+    let periodo = '';
+    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+    } else {
+      const days = parseInt(filters.range) || 30;
+      periodo = `Últimos ${days} dias`;
+    }
+    doc.text(`Período: ${periodo}`, 14, 25);
+    doc.text(`Total de Clientes: ${customers.length}`, 14, 32);
+    
+    const clientesData = customers.map((customer: any) => [
+      customer.email || '-',
+      customer.nome || '-',
+      customer.pagamentos || 0,
+      formatCurrency(customer.total_gasto || 0),
+      formatCurrency(customer.reembolsos_valor || 0),
+      customer.criado || '-',
+      `${customer.card_brand || '-'} ${customer.last4 ? '****' + customer.last4 : ''}`
+    ]);
+    
+    autoTable(doc, {
+      head: [['Email', 'Nome', 'Pagamentos', 'Total Gasto', 'Reembolsos', 'Criado', 'Método Padrão']],
+      body: clientesData,
+      startY: 40,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [59, 130, 246] },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 30 },
+        6: { cellWidth: 40 }
+      }
+    });
+    
+    doc.save(`relatorio-clientes-${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "PDF exportado!",
+      description: "Relatório de clientes baixado com sucesso",
+    });
+  };
+
+  const handleExportClientesExcel = () => {
+    const wb = XLSX.utils.book_new();
+    
     const clientesData = customers.map((customer: any) => ({
       'Email': customer.email || '-',
-      'Nome': customer.name || '-',
-      'Total de Pagamentos': customer.total_payments || 0,
-      'Total Gasto': formatCurrency(customer.total_spent || 0),
-      'Total Reembolsado': formatCurrency(customer.total_refunded || 0),
-      'Último Pagamento': customer.last_payment_date ? new Date(customer.last_payment_date).toLocaleDateString('pt-BR') : '-',
-      'Métodos de Pagamento': customer.payment_methods?.join(', ') || '-'
+      'Nome': customer.nome || '-',
+      'Total de Pagamentos': customer.pagamentos || 0,
+      'Total Gasto': formatCurrency(customer.total_gasto || 0),
+      'Total Reembolsado': formatCurrency(customer.reembolsos_valor || 0),
+      'Data de Criação': customer.criado || '-',
+      'Método Padrão': customer.card_brand || '-',
+      'Últimos 4 Dígitos': customer.last4 || '-',
+      'Link Stripe': customer.stripe_link || '-'
     }));
-    const wsClientes = XLSX.utils.json_to_sheet(clientesData);
-    XLSX.utils.book_append_sheet(wb, wsClientes, 'Clientes');
     
-    // Sheet 4: Análise por Bandeira
+    const ws = XLSX.utils.json_to_sheet(clientesData);
+    XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+    
+    XLSX.writeFile(wb, `relatorio-clientes-${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Excel exportado!",
+      description: "Relatório de clientes baixado com sucesso",
+    });
+  };
+
+  // Relatório de Análises
+  const handleExportAnalisesPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a4');
+    
+    doc.setFontSize(18);
+    doc.text('Relatório de Análises Avançadas - Civeni 2025', 14, 15);
+    
+    doc.setFontSize(10);
+    let periodo = '';
+    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+    } else {
+      const days = parseInt(filters.range) || 30;
+      periodo = `Últimos ${days} dias`;
+    }
+    doc.text(`Período: ${periodo}`, 14, 25);
+    
+    // Resumo KPIs
+    if (summary) {
+      doc.setFontSize(12);
+      doc.text('Resumo Financeiro', 14, 38);
+      doc.setFontSize(9);
+      doc.text(`Receita Bruta: ${formatCurrency(summary.bruto)}`, 14, 45);
+      doc.text(`Taxas: ${formatCurrency(summary.taxas)}`, 14, 52);
+      doc.text(`Receita Líquida: ${formatCurrency(summary.liquido)}`, 14, 59);
+      doc.text(`Pagamentos Confirmados: ${summary.pagos}`, 100, 45);
+      doc.text(`Pagamentos Pendentes: ${summary.naoPagos}`, 100, 52);
+      doc.text(`Ticket Médio: ${formatCurrency(summary.ticketMedio)}`, 100, 59);
+    }
+    
+    // Análise por Bandeira
+    doc.setFontSize(12);
+    doc.text('Análise por Bandeira de Cartão', 14, 75);
+    
+    const bandeirasData = byBrand.map((brand: any) => [
+      brand.brand?.toUpperCase() || '-',
+      brand.count || 0,
+      formatCurrency((brand.amount || 0) / 100),
+      `${charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(1) : 0}%`
+    ]);
+    
+    autoTable(doc, {
+      head: [['Bandeira', 'Transações', 'Valor Total', 'Percentual']],
+      body: bandeirasData,
+      startY: 82,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [59, 130, 246] }
+    });
+    
+    // Série Temporal (últimos registros)
+    if (timeseries && timeseries.length > 0) {
+      doc.addPage();
+      doc.setFontSize(12);
+      doc.text('Série Temporal de Receita', 14, 15);
+      
+      const serieData = timeseries.slice(-30).map((item: any) => [
+        item.date || '-',
+        formatCurrency((item.gross_revenue || 0) / 100),
+        formatCurrency((item.net_revenue || 0) / 100),
+        item.transaction_count || 0
+      ]);
+      
+      autoTable(doc, {
+        head: [['Data', 'Receita Bruta', 'Receita Líquida', 'Transações']],
+        body: serieData,
+        startY: 25,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [59, 130, 246] }
+      });
+    }
+    
+    // Funil de Conversão
+    if (funnel && funnel.steps) {
+      doc.addPage();
+      doc.setFontSize(12);
+      doc.text('Funil de Conversão', 14, 15);
+      
+      const funnelData = funnel.steps.map((step: any) => [
+        step.name || '-',
+        step.count || 0,
+        `${step.percentage?.toFixed(1) || 0}%`
+      ]);
+      
+      autoTable(doc, {
+        head: [['Etapa', 'Quantidade', 'Percentual']],
+        body: funnelData,
+        startY: 25,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [59, 130, 246] }
+      });
+      
+      const finalY = 25 + (funnelData.length * 10) + 20;
+      doc.setFontSize(10);
+      doc.text(`Taxa de Conversão Total: ${funnel.conversionRate?.toFixed(2) || 0}%`, 14, finalY);
+    }
+    
+    doc.save(`relatorio-analises-${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "PDF exportado!",
+      description: "Relatório de análises baixado com sucesso",
+    });
+  };
+
+  const handleExportAnalisesExcel = () => {
+    const wb = XLSX.utils.book_new();
+    
+    // Sheet 1: Resumo
+    const resumoData = [
+      ['Relatório de Análises Avançadas - Civeni 2025'],
+      [''],
+      ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
+        ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
+        : `Últimos ${parseInt(filters.range) || 30} dias`
+      ],
+      [''],
+      ['KPI', 'Valor'],
+      ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
+      ['Taxas', formatCurrency(summary?.taxas || 0)],
+      ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
+      ['Pagamentos Confirmados', summary?.pagos || 0],
+      ['Pagamentos Pendentes', summary?.naoPagos || 0],
+      ['Falhas', summary?.falhas || 0],
+      ['Reembolsos', summary?.reembolsos || 0],
+      ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)],
+      ['Taxa de Conversão', `${summary?.taxaConversao || 0}%`]
+    ];
+    const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+    
+    // Sheet 2: Análise por Bandeira
     const brandData = byBrand.map((brand: any) => ({
       'Bandeira': brand.brand?.toUpperCase() || '-',
       'Número de Transações': brand.count || 0,
       'Valor Total': formatCurrency((brand.amount || 0) / 100),
-      'Percentual do Total': `${((brand.count / charges.length) * 100).toFixed(2)}%`
+      'Percentual do Total': `${charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(2) : 0}%`
     }));
     const wsBrand = XLSX.utils.json_to_sheet(brandData);
-    XLSX.utils.book_append_sheet(wb, wsBrand, 'Análise por Bandeira');
+    XLSX.utils.book_append_sheet(wb, wsBrand, 'Por Bandeira');
     
-    XLSX.writeFile(wb, `relatorio-completo-stripe-${new Date().toISOString().split('T')[0]}.xlsx`);
+    // Sheet 3: Série Temporal
+    if (timeseries && timeseries.length > 0) {
+      const serieData = timeseries.map((item: any) => ({
+        'Data': item.date || '-',
+        'Receita Bruta': formatCurrency((item.gross_revenue || 0) / 100),
+        'Receita Líquida': formatCurrency((item.net_revenue || 0) / 100),
+        'Número de Transações': item.transaction_count || 0
+      }));
+      const wsSerie = XLSX.utils.json_to_sheet(serieData);
+      XLSX.utils.book_append_sheet(wb, wsSerie, 'Série Temporal');
+    }
+    
+    // Sheet 4: Funil de Conversão
+    if (funnel && funnel.steps) {
+      const funnelData = funnel.steps.map((step: any) => ({
+        'Etapa': step.name || '-',
+        'Quantidade': step.count || 0,
+        'Percentual': `${step.percentage?.toFixed(2) || 0}%`
+      }));
+      const wsFunnel = XLSX.utils.json_to_sheet(funnelData);
+      XLSX.utils.book_append_sheet(wb, wsFunnel, 'Funil de Conversão');
+    }
+    
+    XLSX.writeFile(wb, `relatorio-analises-${new Date().toISOString().split('T')[0]}.xlsx`);
     
     toast({
       title: "Excel exportado!",
-      description: "O relatório completo foi baixado com sucesso",
+      description: "Relatório de análises baixado com sucesso",
     });
   };
 
@@ -354,14 +515,6 @@ const AdminDashboard = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleExportPDF} disabled={loading} variant="outline">
-            <FileText className="h-4 w-4 mr-2" />
-            Exportar PDF
-          </Button>
-          <Button onClick={handleExportExcel} disabled={loading} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Exportar Excel
-          </Button>
           <Button onClick={handleSync} disabled={syncing} variant="outline">
             <Database className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
             Sincronizar
@@ -505,13 +658,40 @@ const AdminDashboard = () => {
         </TabsList>
 
         <TabsContent value="tabela">
-          <ChargesTable data={charges} loading={loading} />
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Transações Detalhadas</CardTitle>
+              <div className="flex gap-2">
+                <Button onClick={handleExportTransacoesPDF} disabled={loading} size="sm" variant="outline">
+                  <FileText className="h-4 w-4 mr-2" />
+                  PDF
+                </Button>
+                <Button onClick={handleExportTransacoesExcel} disabled={loading} size="sm" variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Excel
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ChargesTable data={charges} loading={loading} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="customers">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Clientes</CardTitle>
+              <div className="flex gap-2">
+                <Button onClick={handleExportClientesPDF} disabled={loading} size="sm" variant="outline">
+                  <FileText className="h-4 w-4 mr-2" />
+                  PDF
+                </Button>
+                <Button onClick={handleExportClientesExcel} disabled={loading} size="sm" variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Excel
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -605,17 +785,96 @@ const AdminDashboard = () => {
 
         <TabsContent value="analises">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Análises Avançadas</CardTitle>
+              <div className="flex gap-2">
+                <Button onClick={handleExportAnalisesPDF} disabled={loading} size="sm" variant="outline">
+                  <FileText className="h-4 w-4 mr-2" />
+                  PDF
+                </Button>
+                <Button onClick={handleExportAnalisesExcel} disabled={loading} size="sm" variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Excel
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Visualize tendências, padrões e insights detalhados das transações.
-              </p>
-              <Button variant="outline" className="w-full">
-                <Download className="h-4 w-4 mr-2" />
-                Exportar Relatório (CSV)
-              </Button>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Resumo Financeiro</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Receita Bruta</p>
+                      <p className="text-xl font-bold">{formatCurrency(summary?.bruto || 0)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Taxas</p>
+                      <p className="text-xl font-bold text-red-500">-{formatCurrency(summary?.taxas || 0)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Receita Líquida</p>
+                      <p className="text-xl font-bold text-green-600">{formatCurrency(summary?.liquido || 0)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground">Ticket Médio</p>
+                      <p className="text-xl font-bold">{formatCurrency(summary?.ticketMedio || 0)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Análise por Bandeira</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Bandeira</th>
+                          <th className="text-right p-2">Transações</th>
+                          <th className="text-right p-2">Valor Total</th>
+                          <th className="text-right p-2">Percentual</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {byBrand.map((brand: any, index: number) => (
+                          <tr key={index} className="border-b">
+                            <td className="p-2 font-medium">{brand.brand?.toUpperCase() || '-'}</td>
+                            <td className="p-2 text-right">{brand.count || 0}</td>
+                            <td className="p-2 text-right">{formatCurrency((brand.amount || 0) / 100)}</td>
+                            <td className="p-2 text-right">{charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(1) : 0}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {funnel && funnel.steps && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Funil de Conversão</h3>
+                    <div className="space-y-2">
+                      {funnel.steps.map((step: any, index: number) => (
+                        <div key={index} className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm font-medium">{step.name}</span>
+                              <span className="text-sm text-muted-foreground">{step.count} ({step.percentage?.toFixed(1)}%)</span>
+                            </div>
+                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary transition-all" 
+                                style={{ width: `${step.percentage || 0}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="mt-4 p-3 bg-muted rounded-lg">
+                        <p className="text-sm font-medium">Taxa de Conversão Total: {funnel.conversionRate?.toFixed(2)}%</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
