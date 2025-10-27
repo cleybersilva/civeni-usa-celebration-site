@@ -44,11 +44,20 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       let to: string | undefined;
 
       if (filters.customFrom && filters.customTo) {
-        from = filters.customFrom.toISOString();
-        to = filters.customTo.toISOString();
+        // Ajustar para início e fim do dia em BRT (UTC-3)
+        const fromDate = new Date(filters.customFrom);
+        fromDate.setHours(0, 0, 0, 0);
+        
+        const toDate = new Date(filters.customTo);
+        toDate.setHours(23, 59, 59, 999);
+        
+        from = fromDate.toISOString();
+        to = toDate.toISOString();
       } else if (filters.range && filters.range !== 'custom') {
         const now = new Date();
-        from = new Date(now.getTime() - (parseInt(filters.range) || 30) * 24 * 60 * 60 * 1000).toISOString();
+        const fromDate = new Date(now.getTime() - (parseInt(filters.range) || 30) * 24 * 60 * 60 * 1000);
+        fromDate.setHours(0, 0, 0, 0);
+        from = fromDate.toISOString();
         to = now.toISOString();
       }
 
