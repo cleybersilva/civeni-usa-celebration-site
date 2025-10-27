@@ -265,6 +265,82 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleExportParticipantesPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a4');
+    
+    doc.setFontSize(18);
+    doc.text('Relatório de Participantes - Civeni 2025', 14, 15);
+    
+    doc.setFontSize(10);
+    let periodo = '';
+    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+    } else {
+      const days = parseInt(filters.range) || 30;
+      periodo = `Últimos ${days} dias`;
+    }
+    doc.text(`Período: ${periodo}`, 14, 25);
+    doc.text(`Total de Participantes: ${customers.length}`, 14, 32);
+    
+    const participantesData = customers.map((customer: any) => [
+      customer.nome || '-',
+      customer.email || '-',
+      customer.card_brand ? `${customer.card_brand} •••• ${customer.last4 || '****'}` : 'Não definida',
+      customer.criado || '-',
+      formatCurrency(customer.total_gasto || 0),
+      customer.pagamentos || 0,
+      formatCurrency(customer.reembolsos_valor || 0)
+    ]);
+    
+    autoTable(doc, {
+      head: [['Nome', 'E-mail', 'Forma de Pagamento', 'Data de Criação', 'Total Gasto', 'Pagamentos', 'Reembolsos']],
+      body: participantesData,
+      startY: 40,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [59, 130, 246] },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 },
+        5: { cellWidth: 20 },
+        6: { cellWidth: 25 }
+      }
+    });
+    
+    doc.save(`participantes-civeni-${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "PDF exportado!",
+      description: "Relatório de participantes baixado com sucesso",
+    });
+  };
+
+  const handleExportParticipantesExcel = () => {
+    const wb = XLSX.utils.book_new();
+    
+    const participantesData = customers.map((customer: any) => ({
+      'Nome': customer.nome || '-',
+      'E-mail': customer.email || '-',
+      'Forma de Pagamento': customer.card_brand ? `${customer.card_brand} •••• ${customer.last4 || '****'}` : 'Não definida',
+      'Data de Criação': customer.criado || '-',
+      'Total Gasto': formatCurrency(customer.total_gasto || 0),
+      'Número de Pagamentos': customer.pagamentos || 0,
+      'Total Reembolsado': formatCurrency(customer.reembolsos_valor || 0)
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(participantesData);
+    XLSX.utils.book_append_sheet(wb, ws, 'Participantes');
+    
+    XLSX.writeFile(wb, `participantes-civeni-${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Excel exportado!",
+      description: "Relatório de participantes baixado com sucesso",
+    });
+  };
+
   const handleExportExcel = () => {
     const wb = XLSX.utils.book_new();
     
@@ -504,7 +580,7 @@ const AdminDashboard = () => {
       <Tabs defaultValue="tabela">
         <TabsList>
           <TabsTrigger value="tabela">Transações Detalhadas</TabsTrigger>
-          <TabsTrigger value="customers">Clientes</TabsTrigger>
+          <TabsTrigger value="customers">Participantes</TabsTrigger>
           <TabsTrigger value="analises">Análises</TabsTrigger>
         </TabsList>
 
@@ -516,7 +592,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <div className="space-y-2">
-                <CardTitle>Clientes</CardTitle>
+                <CardTitle>Participantes</CardTitle>
                 <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
                   <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
                   <div className="flex-1 text-sm">
@@ -533,11 +609,11 @@ const AdminDashboard = () => {
               <div className="overflow-x-auto">
                 {loading ? (
                   <div className="h-[400px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Carregando clientes...</p>
+                    <p className="text-muted-foreground">Carregando participantes...</p>
                   </div>
                 ) : customers.length === 0 ? (
                   <div className="h-[400px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Nenhum cliente encontrado</p>
+                    <p className="text-muted-foreground">Nenhum participante encontrado</p>
                   </div>
                 ) : (
                   <table className="w-full text-sm">
@@ -622,6 +698,28 @@ const AdminDashboard = () => {
                   </table>
                 )}
               </div>
+              
+              {/* Botões de Exportação */}
+              {customers.length > 0 && (
+                <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+                  <Button 
+                    onClick={handleExportParticipantesPDF} 
+                    variant="outline"
+                    disabled={loading}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Exportar PDF
+                  </Button>
+                  <Button 
+                    onClick={handleExportParticipantesExcel} 
+                    variant="outline"
+                    disabled={loading}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Exportar Excel
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
