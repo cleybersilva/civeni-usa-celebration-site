@@ -145,362 +145,416 @@ const AdminDashboard = () => {
 
   // Relatório de Transações
   const handleExportTransacoesPDF = () => {
-    const doc = new jsPDF('l', 'mm', 'a4');
-    
-    doc.setFontSize(18);
-    doc.text('Relatório de Transações - Civeni 2025', 14, 15);
-    
-    doc.setFontSize(10);
-    let periodo = '';
-    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
-      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
-    } else {
-      const days = parseInt(filters.range) || 30;
-      periodo = `Últimos ${days} dias`;
-    }
-    doc.text(`Período: ${periodo}`, 14, 25);
-    
-    if (summary) {
-      doc.text(`Total de Transações: ${charges.length} | Valor Total: ${formatCurrency(summary.bruto)}`, 14, 32);
-    }
-    
-    const transacoesData = charges.map((charge: any) => {
-      const created = new Date(charge.created * 1000);
-      const dataBRT = created.toLocaleDateString('pt-BR');
-      const horaBRT = created.toLocaleTimeString('pt-BR');
-      const valorBruto = charge.amount / 100;
-      const taxa = charge.fee ? charge.fee / 100 : 0;
-      const liquido = charge.net ? charge.net / 100 : valorBruto - taxa;
+    try {
+      const doc = new jsPDF('l', 'mm', 'a4');
       
-      return [
-        `${dataBRT} ${horaBRT}`,
-        charge.customer_email || '-',
-        charge.metadata?.participant_name || '-',
-        charge.id?.substring(0, 12) || '-',
-        formatCurrency(valorBruto),
-        formatCurrency(taxa),
-        formatCurrency(liquido),
-        charge.status === 'succeeded' ? 'Pago' : charge.status === 'pending' ? 'Pendente' : 'Falhou',
-        charge.payment_method_details?.card?.brand?.toUpperCase() || charge.payment_method_details?.type || '-',
-        `*${charge.payment_method_details?.card?.last4 || '****'}`,
-        charge.metadata?.lote || charge.metadata?.cupom || '-'
-      ];
-    });
-    
-    autoTable(doc, {
-      head: [['Data/Hora (BRT)', 'Cliente', 'Participante', 'ID Transação', 'Valor Bruto', 'Taxa', 'Líquido', 'Status', 'Método/Bandeira', 'Cartão', 'Lote/Cupom']],
-      body: transacoesData,
-      startY: 40,
-      styles: { fontSize: 7 },
-      headStyles: { fillColor: [59, 130, 246], fontSize: 7 },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 35 },
-        2: { cellWidth: 30 },
-        3: { cellWidth: 20 },
-        4: { cellWidth: 20 },
-        5: { cellWidth: 15 },
-        6: { cellWidth: 20 },
-        7: { cellWidth: 18 },
-        8: { cellWidth: 25 },
-        9: { cellWidth: 15 },
-        10: { cellWidth: 20 }
+      doc.setFontSize(18);
+      doc.text('Relatório de Transações - Civeni 2025', 14, 15);
+      
+      doc.setFontSize(10);
+      let periodo = '';
+      if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+        periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+      } else {
+        const days = parseInt(filters.range) || 30;
+        periodo = `Últimos ${days} dias`;
       }
-    });
-    
-    doc.save(`relatorio-transacoes-${new Date().toISOString().split('T')[0]}.pdf`);
-    
-    toast({
-      title: "PDF exportado!",
-      description: "Relatório de transações baixado com sucesso",
-    });
+      doc.text(`Período: ${periodo}`, 14, 25);
+      
+      if (summary) {
+        doc.text(`Total de Transações: ${charges.length} | Valor Total: ${formatCurrency(summary.bruto)}`, 14, 32);
+      }
+      
+      const transacoesData = charges.map((charge: any) => {
+        const created = new Date(charge.created * 1000);
+        const dataBRT = created.toLocaleDateString('pt-BR');
+        const horaBRT = created.toLocaleTimeString('pt-BR');
+        const valorBruto = charge.amount / 100;
+        const taxa = charge.fee ? charge.fee / 100 : 0;
+        const liquido = charge.net ? charge.net / 100 : valorBruto - taxa;
+        
+        return [
+          `${dataBRT} ${horaBRT}`,
+          charge.customer_email || '-',
+          charge.metadata?.participant_name || '-',
+          charge.id?.substring(0, 12) || '-',
+          formatCurrency(valorBruto),
+          formatCurrency(taxa),
+          formatCurrency(liquido),
+          charge.status === 'succeeded' ? 'Pago' : charge.status === 'pending' ? 'Pendente' : 'Falhou',
+          charge.payment_method_details?.card?.brand?.toUpperCase() || charge.payment_method_details?.type || '-',
+          `*${charge.payment_method_details?.card?.last4 || '****'}`,
+          charge.metadata?.lote || charge.metadata?.cupom || '-'
+        ];
+      });
+      
+      autoTable(doc, {
+        head: [['Data/Hora (BRT)', 'Cliente', 'Participante', 'ID Transação', 'Valor Bruto', 'Taxa', 'Líquido', 'Status', 'Método/Bandeira', 'Cartão', 'Lote/Cupom']],
+        body: transacoesData,
+        startY: 40,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [59, 130, 246], fontSize: 7 },
+        columnStyles: {
+          0: { cellWidth: 30 },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 15 },
+          6: { cellWidth: 20 },
+          7: { cellWidth: 18 },
+          8: { cellWidth: 25 },
+          9: { cellWidth: 15 },
+          10: { cellWidth: 20 }
+        }
+      });
+      
+      doc.save(`relatorio-transacoes-${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast({
+        title: "PDF exportado!",
+        description: "Relatório de transações baixado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar PDF de transações:', error);
+      toast({
+        title: "Erro ao exportar PDF",
+        description: "Não foi possível gerar o relatório",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleExportTransacoesExcel = () => {
-    const wb = XLSX.utils.book_new();
-    
-    const transacoesData = charges.map((charge: any) => {
-      const created = new Date(charge.created * 1000);
-      const dataBRT = created.toLocaleDateString('pt-BR');
-      const horaBRT = created.toLocaleTimeString('pt-BR');
-      const valorBruto = charge.amount / 100;
-      const taxa = charge.fee ? charge.fee / 100 : 0;
-      const liquido = charge.net ? charge.net / 100 : valorBruto - taxa;
+    try {
+      const wb = XLSX.utils.book_new();
       
-      return {
-        'Data/Hora (BRT)': `${dataBRT} ${horaBRT}`,
-        'Cliente': charge.customer_email || '-',
-        'Participante': charge.metadata?.participant_name || '-',
-        'ID Transação': charge.id || '-',
-        'Valor Bruto': `R$ ${valorBruto.toFixed(2)}`,
-        'Taxa': `R$ ${taxa.toFixed(2)}`,
-        'Líquido': `R$ ${liquido.toFixed(2)}`,
-        'Status': charge.status === 'succeeded' ? 'Pago' : charge.status === 'pending' ? 'Pendente' : 'Falhou',
-        'Método/Bandeira': charge.payment_method_details?.card?.brand?.toUpperCase() || charge.payment_method_details?.type || '-',
-        'Cartão': charge.payment_method_details?.card?.last4 ? `**** **** **** ${charge.payment_method_details.card.last4}` : '-',
-        'Lote/Cupom': charge.metadata?.lote || charge.metadata?.cupom || '-'
-      };
-    });
-    
-    const ws = XLSX.utils.json_to_sheet(transacoesData);
-    XLSX.utils.book_append_sheet(wb, ws, 'Transações');
-    
-    XLSX.writeFile(wb, `relatorio-transacoes-${new Date().toISOString().split('T')[0]}.xlsx`);
-    
-    toast({
-      title: "Excel exportado!",
-      description: "Relatório de transações baixado com sucesso",
-    });
+      const transacoesData = charges.map((charge: any) => {
+        const created = new Date(charge.created * 1000);
+        const dataBRT = created.toLocaleDateString('pt-BR');
+        const horaBRT = created.toLocaleTimeString('pt-BR');
+        const valorBruto = charge.amount / 100;
+        const taxa = charge.fee ? charge.fee / 100 : 0;
+        const liquido = charge.net ? charge.net / 100 : valorBruto - taxa;
+        
+        return {
+          'Data/Hora (BRT)': `${dataBRT} ${horaBRT}`,
+          'Cliente': charge.customer_email || '-',
+          'Participante': charge.metadata?.participant_name || '-',
+          'ID Transação': charge.id || '-',
+          'Valor Bruto': `R$ ${valorBruto.toFixed(2)}`,
+          'Taxa': `R$ ${taxa.toFixed(2)}`,
+          'Líquido': `R$ ${liquido.toFixed(2)}`,
+          'Status': charge.status === 'succeeded' ? 'Pago' : charge.status === 'pending' ? 'Pendente' : 'Falhou',
+          'Método/Bandeira': charge.payment_method_details?.card?.brand?.toUpperCase() || charge.payment_method_details?.type || '-',
+          'Cartão': charge.payment_method_details?.card?.last4 ? `**** **** **** ${charge.payment_method_details.card.last4}` : '-',
+          'Lote/Cupom': charge.metadata?.lote || charge.metadata?.cupom || '-'
+        };
+      });
+      
+      const ws = XLSX.utils.json_to_sheet(transacoesData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Transações');
+      
+      XLSX.writeFile(wb, `relatorio-transacoes-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      toast({
+        title: "Excel exportado!",
+        description: "Relatório de transações baixado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar Excel de transações:', error);
+      toast({
+        title: "Erro ao exportar Excel",
+        description: "Não foi possível gerar o relatório",
+        variant: "destructive"
+      });
+    }
   };
 
   // Relatório de Clientes
   const handleExportClientesPDF = () => {
-    const doc = new jsPDF('l', 'mm', 'a4');
-    
-    doc.setFontSize(18);
-    doc.text('Relatório de Clientes - Civeni 2025', 14, 15);
-    
-    doc.setFontSize(10);
-    let periodo = '';
-    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
-      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
-    } else {
-      const days = parseInt(filters.range) || 30;
-      periodo = `Últimos ${days} dias`;
-    }
-    doc.text(`Período: ${periodo}`, 14, 25);
-    doc.text(`Total de Clientes: ${customers.length}`, 14, 32);
-    
-    const clientesData = customers.map((customer: any) => [
-      customer.email || '-',
-      customer.nome || '-',
-      customer.pagamentos || 0,
-      formatCurrency(customer.total_gasto || 0),
-      formatCurrency(customer.reembolsos_valor || 0),
-      customer.criado || '-',
-      `${customer.card_brand || '-'} ${customer.last4 ? '****' + customer.last4 : ''}`
-    ]);
-    
-    autoTable(doc, {
-      head: [['Email', 'Nome', 'Pagamentos', 'Total Gasto', 'Reembolsos', 'Criado', 'Método Padrão']],
-      body: clientesData,
-      startY: 40,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [59, 130, 246] },
-      columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 25 },
-        3: { cellWidth: 30 },
-        4: { cellWidth: 30 },
-        5: { cellWidth: 30 },
-        6: { cellWidth: 40 }
+    try {
+      const doc = new jsPDF('l', 'mm', 'a4');
+      
+      doc.setFontSize(18);
+      doc.text('Relatório de Clientes - Civeni 2025', 14, 15);
+      
+      doc.setFontSize(10);
+      let periodo = '';
+      if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+        periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+      } else {
+        const days = parseInt(filters.range) || 30;
+        periodo = `Últimos ${days} dias`;
       }
-    });
-    
-    doc.save(`relatorio-clientes-${new Date().toISOString().split('T')[0]}.pdf`);
-    
-    toast({
-      title: "PDF exportado!",
-      description: "Relatório de clientes baixado com sucesso",
-    });
+      doc.text(`Período: ${periodo}`, 14, 25);
+      doc.text(`Total de Clientes: ${customers.length}`, 14, 32);
+      
+      const clientesData = customers.map((customer: any) => [
+        customer.email || '-',
+        customer.nome || '-',
+        customer.pagamentos || 0,
+        formatCurrency(customer.total_gasto || 0),
+        formatCurrency(customer.reembolsos_valor || 0),
+        customer.criado || '-',
+        `${customer.card_brand || '-'} ${customer.last4 ? '****' + customer.last4 : ''}`
+      ]);
+      
+      autoTable(doc, {
+        head: [['Email', 'Nome', 'Pagamentos', 'Total Gasto', 'Reembolsos', 'Criado', 'Método Padrão']],
+        body: clientesData,
+        startY: 40,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [59, 130, 246] },
+        columnStyles: {
+          0: { cellWidth: 50 },
+          1: { cellWidth: 40 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 30 },
+          5: { cellWidth: 30 },
+          6: { cellWidth: 40 }
+        }
+      });
+      
+      doc.save(`relatorio-clientes-${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast({
+        title: "PDF exportado!",
+        description: "Relatório de clientes baixado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar PDF de clientes:', error);
+      toast({
+        title: "Erro ao exportar PDF",
+        description: "Não foi possível gerar o relatório",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleExportClientesExcel = () => {
-    const wb = XLSX.utils.book_new();
-    
-    const clientesData = customers.map((customer: any) => ({
-      'Email': customer.email || '-',
-      'Nome': customer.nome || '-',
-      'Total de Pagamentos': customer.pagamentos || 0,
-      'Total Gasto': formatCurrency(customer.total_gasto || 0),
-      'Total Reembolsado': formatCurrency(customer.reembolsos_valor || 0),
-      'Data de Criação': customer.criado || '-',
-      'Método Padrão': customer.card_brand || '-',
-      'Últimos 4 Dígitos': customer.last4 || '-',
-      'Link Stripe': customer.stripe_link || '-'
-    }));
-    
-    const ws = XLSX.utils.json_to_sheet(clientesData);
-    XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
-    
-    XLSX.writeFile(wb, `relatorio-clientes-${new Date().toISOString().split('T')[0]}.xlsx`);
-    
-    toast({
-      title: "Excel exportado!",
-      description: "Relatório de clientes baixado com sucesso",
-    });
+    try {
+      const wb = XLSX.utils.book_new();
+      
+      const clientesData = customers.map((customer: any) => ({
+        'Email': customer.email || '-',
+        'Nome': customer.nome || '-',
+        'Total de Pagamentos': customer.pagamentos || 0,
+        'Total Gasto': formatCurrency(customer.total_gasto || 0),
+        'Total Reembolsado': formatCurrency(customer.reembolsos_valor || 0),
+        'Data de Criação': customer.criado || '-',
+        'Método Padrão': customer.card_brand || '-',
+        'Últimos 4 Dígitos': customer.last4 || '-',
+        'Link Stripe': customer.stripe_link || '-'
+      }));
+      
+      const ws = XLSX.utils.json_to_sheet(clientesData);
+      XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+      
+      XLSX.writeFile(wb, `relatorio-clientes-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      toast({
+        title: "Excel exportado!",
+        description: "Relatório de clientes baixado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar Excel de clientes:', error);
+      toast({
+        title: "Erro ao exportar Excel",
+        description: "Não foi possível gerar o relatório",
+        variant: "destructive"
+      });
+    }
   };
 
   // Relatório de Análises
   const handleExportAnalisesPDF = () => {
-    const doc = new jsPDF('l', 'mm', 'a4');
-    
-    doc.setFontSize(18);
-    doc.text('Relatório de Análises Avançadas - Civeni 2025', 14, 15);
-    
-    doc.setFontSize(10);
-    let periodo = '';
-    if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
-      periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
-    } else {
-      const days = parseInt(filters.range) || 30;
-      periodo = `Últimos ${days} dias`;
-    }
-    doc.text(`Período: ${periodo}`, 14, 25);
-    
-    // Resumo KPIs
-    if (summary) {
-      doc.setFontSize(12);
-      doc.text('Resumo Financeiro', 14, 38);
-      doc.setFontSize(9);
-      doc.text(`Receita Bruta: ${formatCurrency(summary.bruto)}`, 14, 45);
-      doc.text(`Taxas: ${formatCurrency(summary.taxas)}`, 14, 52);
-      doc.text(`Receita Líquida: ${formatCurrency(summary.liquido)}`, 14, 59);
-      doc.text(`Pagamentos Confirmados: ${summary.pagos}`, 100, 45);
-      doc.text(`Pagamentos Pendentes: ${summary.naoPagos}`, 100, 52);
-      doc.text(`Ticket Médio: ${formatCurrency(summary.ticketMedio)}`, 100, 59);
-    }
-    
-    // Análise por Bandeira
-    doc.setFontSize(12);
-    doc.text('Análise por Bandeira de Cartão', 14, 75);
-    
-    const bandeirasData = byBrand.map((brand: any) => [
-      brand.brand?.toUpperCase() || '-',
-      brand.count || 0,
-      formatCurrency((brand.amount || 0) / 100),
-      `${charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(1) : 0}%`
-    ]);
-    
-    autoTable(doc, {
-      head: [['Bandeira', 'Transações', 'Valor Total', 'Percentual']],
-      body: bandeirasData,
-      startY: 82,
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [59, 130, 246] }
-    });
-    
-    // Série Temporal (últimos registros)
-    if (timeseries && timeseries.length > 0) {
-      doc.addPage();
-      doc.setFontSize(12);
-      doc.text('Série Temporal de Receita', 14, 15);
+    try {
+      const doc = new jsPDF('l', 'mm', 'a4');
       
-      const serieData = timeseries.slice(-30).map((item: any) => [
-        item.date || '-',
-        formatCurrency((item.gross_revenue || 0) / 100),
-        formatCurrency((item.net_revenue || 0) / 100),
-        item.transaction_count || 0
-      ]);
+      doc.setFontSize(18);
+      doc.text('Relatório de Análises Avançadas - Civeni 2025', 14, 15);
       
-      autoTable(doc, {
-        head: [['Data', 'Receita Bruta', 'Receita Líquida', 'Transações']],
-        body: serieData,
-        startY: 25,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [59, 130, 246] }
-      });
-    }
-    
-    // Funil de Conversão
-    if (funnel && funnel.steps) {
-      doc.addPage();
-      doc.setFontSize(12);
-      doc.text('Funil de Conversão', 14, 15);
-      
-      const funnelData = funnel.steps.map((step: any) => [
-        step.name || '-',
-        step.count || 0,
-        `${step.percentage?.toFixed(1) || 0}%`
-      ]);
-      
-      autoTable(doc, {
-        head: [['Etapa', 'Quantidade', 'Percentual']],
-        body: funnelData,
-        startY: 25,
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [59, 130, 246] }
-      });
-      
-      const finalY = 25 + (funnelData.length * 10) + 20;
       doc.setFontSize(10);
-      doc.text(`Taxa de Conversão Total: ${funnel.conversionRate?.toFixed(2) || 0}%`, 14, finalY);
+      let periodo = '';
+      if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+        periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+      } else {
+        const days = parseInt(filters.range) || 30;
+        periodo = `Últimos ${days} dias`;
+      }
+      doc.text(`Período: ${periodo}`, 14, 25);
+      
+      // Resumo KPIs
+      if (summary) {
+        doc.setFontSize(12);
+        doc.text('Resumo Financeiro', 14, 38);
+        doc.setFontSize(9);
+        doc.text(`Receita Bruta: ${formatCurrency(summary.bruto)}`, 14, 45);
+        doc.text(`Taxas: ${formatCurrency(summary.taxas)}`, 14, 52);
+        doc.text(`Receita Líquida: ${formatCurrency(summary.liquido)}`, 14, 59);
+        doc.text(`Pagamentos Confirmados: ${summary.pagos}`, 100, 45);
+        doc.text(`Pagamentos Pendentes: ${summary.naoPagos}`, 100, 52);
+        doc.text(`Ticket Médio: ${formatCurrency(summary.ticketMedio)}`, 100, 59);
+      }
+      
+      // Análise por Bandeira
+      doc.setFontSize(12);
+      doc.text('Análise por Bandeira de Cartão', 14, 75);
+      
+      const bandeirasData = byBrand.map((brand: any) => [
+        brand.brand?.toUpperCase() || '-',
+        brand.count || 0,
+        formatCurrency((brand.amount || 0) / 100),
+        `${charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(1) : 0}%`
+      ]);
+      
+      autoTable(doc, {
+        head: [['Bandeira', 'Transações', 'Valor Total', 'Percentual']],
+        body: bandeirasData,
+        startY: 82,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [59, 130, 246] }
+      });
+      
+      // Série Temporal (últimos registros)
+      if (timeseries && timeseries.length > 0) {
+        doc.addPage();
+        doc.setFontSize(12);
+        doc.text('Série Temporal de Receita', 14, 15);
+        
+        const serieData = timeseries.slice(-30).map((item: any) => [
+          item.date || '-',
+          formatCurrency((item.gross_revenue || 0) / 100),
+          formatCurrency((item.net_revenue || 0) / 100),
+          item.transaction_count || 0
+        ]);
+        
+        autoTable(doc, {
+          head: [['Data', 'Receita Bruta', 'Receita Líquida', 'Transações']],
+          body: serieData,
+          startY: 25,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [59, 130, 246] }
+        });
+      }
+      
+      // Funil de Conversão
+      if (funnel && funnel.steps) {
+        doc.addPage();
+        doc.setFontSize(12);
+        doc.text('Funil de Conversão', 14, 15);
+        
+        const funnelData = funnel.steps.map((step: any) => [
+          step.name || '-',
+          step.count || 0,
+          `${step.percentage?.toFixed(1) || 0}%`
+        ]);
+        
+        autoTable(doc, {
+          head: [['Etapa', 'Quantidade', 'Percentual']],
+          body: funnelData,
+          startY: 25,
+          styles: { fontSize: 10 },
+          headStyles: { fillColor: [59, 130, 246] }
+        });
+        
+        const finalY = 25 + (funnelData.length * 10) + 20;
+        doc.setFontSize(10);
+        doc.text(`Taxa de Conversão Total: ${funnel.conversionRate?.toFixed(2) || 0}%`, 14, finalY);
+      }
+      
+      doc.save(`relatorio-analises-${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast({
+        title: "PDF exportado!",
+        description: "Relatório de análises baixado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar PDF de análises:', error);
+      toast({
+        title: "Erro ao exportar PDF",
+        description: "Não foi possível gerar o relatório",
+        variant: "destructive"
+      });
     }
-    
-    doc.save(`relatorio-analises-${new Date().toISOString().split('T')[0]}.pdf`);
-    
-    toast({
-      title: "PDF exportado!",
-      description: "Relatório de análises baixado com sucesso",
-    });
   };
 
   const handleExportAnalisesExcel = () => {
-    const wb = XLSX.utils.book_new();
-    
-    // Sheet 1: Resumo
-    const resumoData = [
-      ['Relatório de Análises Avançadas - Civeni 2025'],
-      [''],
-      ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
-        ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
-        : `Últimos ${parseInt(filters.range) || 30} dias`
-      ],
-      [''],
-      ['KPI', 'Valor'],
-      ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
-      ['Taxas', formatCurrency(summary?.taxas || 0)],
-      ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
-      ['Pagamentos Confirmados', summary?.pagos || 0],
-      ['Pagamentos Pendentes', summary?.naoPagos || 0],
-      ['Falhas', summary?.falhas || 0],
-      ['Reembolsos', summary?.reembolsos || 0],
-      ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)],
-      ['Taxa de Conversão', `${summary?.taxaConversao || 0}%`]
-    ];
-    const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
-    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
-    
-    // Sheet 2: Análise por Bandeira
-    const brandData = byBrand.map((brand: any) => ({
-      'Bandeira': brand.brand?.toUpperCase() || '-',
-      'Número de Transações': brand.count || 0,
-      'Valor Total': formatCurrency((brand.amount || 0) / 100),
-      'Percentual do Total': `${charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(2) : 0}%`
-    }));
-    const wsBrand = XLSX.utils.json_to_sheet(brandData);
-    XLSX.utils.book_append_sheet(wb, wsBrand, 'Por Bandeira');
-    
-    // Sheet 3: Série Temporal
-    if (timeseries && timeseries.length > 0) {
-      const serieData = timeseries.map((item: any) => ({
-        'Data': item.date || '-',
-        'Receita Bruta': formatCurrency((item.gross_revenue || 0) / 100),
-        'Receita Líquida': formatCurrency((item.net_revenue || 0) / 100),
-        'Número de Transações': item.transaction_count || 0
+    try {
+      const wb = XLSX.utils.book_new();
+      
+      // Sheet 1: Resumo
+      const resumoData = [
+        ['Relatório de Análises Avançadas - Civeni 2025'],
+        [''],
+        ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
+          ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
+          : `Últimos ${parseInt(filters.range) || 30} dias`
+        ],
+        [''],
+        ['KPI', 'Valor'],
+        ['Receita Bruta', formatCurrency(summary?.bruto || 0)],
+        ['Taxas', formatCurrency(summary?.taxas || 0)],
+        ['Receita Líquida', formatCurrency(summary?.liquido || 0)],
+        ['Pagamentos Confirmados', summary?.pagos || 0],
+        ['Pagamentos Pendentes', summary?.naoPagos || 0],
+        ['Falhas', summary?.falhas || 0],
+        ['Reembolsos', summary?.reembolsos || 0],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0)],
+        ['Taxa de Conversão', `${summary?.taxaConversao || 0}%`]
+      ];
+      const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+      XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+      
+      // Sheet 2: Análise por Bandeira
+      const brandData = byBrand.map((brand: any) => ({
+        'Bandeira': brand.brand?.toUpperCase() || '-',
+        'Número de Transações': brand.count || 0,
+        'Valor Total': formatCurrency((brand.amount || 0) / 100),
+        'Percentual do Total': `${charges.length > 0 ? ((brand.count / charges.length) * 100).toFixed(2) : 0}%`
       }));
-      const wsSerie = XLSX.utils.json_to_sheet(serieData);
-      XLSX.utils.book_append_sheet(wb, wsSerie, 'Série Temporal');
+      const wsBrand = XLSX.utils.json_to_sheet(brandData);
+      XLSX.utils.book_append_sheet(wb, wsBrand, 'Por Bandeira');
+      
+      // Sheet 3: Série Temporal
+      if (timeseries && timeseries.length > 0) {
+        const serieData = timeseries.map((item: any) => ({
+          'Data': item.date || '-',
+          'Receita Bruta': formatCurrency((item.gross_revenue || 0) / 100),
+          'Receita Líquida': formatCurrency((item.net_revenue || 0) / 100),
+          'Número de Transações': item.transaction_count || 0
+        }));
+        const wsSerie = XLSX.utils.json_to_sheet(serieData);
+        XLSX.utils.book_append_sheet(wb, wsSerie, 'Série Temporal');
+      }
+      
+      // Sheet 4: Funil de Conversão
+      if (funnel && funnel.steps) {
+        const funnelData = funnel.steps.map((step: any) => ({
+          'Etapa': step.name || '-',
+          'Quantidade': step.count || 0,
+          'Percentual': `${step.percentage?.toFixed(2) || 0}%`
+        }));
+        const wsFunnel = XLSX.utils.json_to_sheet(funnelData);
+        XLSX.utils.book_append_sheet(wb, wsFunnel, 'Funil de Conversão');
+      }
+      
+      XLSX.writeFile(wb, `relatorio-analises-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      toast({
+        title: "Excel exportado!",
+        description: "Relatório de análises baixado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar Excel de análises:', error);
+      toast({
+        title: "Erro ao exportar Excel",
+        description: "Não foi possível gerar o relatório",
+        variant: "destructive"
+      });
     }
-    
-    // Sheet 4: Funil de Conversão
-    if (funnel && funnel.steps) {
-      const funnelData = funnel.steps.map((step: any) => ({
-        'Etapa': step.name || '-',
-        'Quantidade': step.count || 0,
-        'Percentual': `${step.percentage?.toFixed(2) || 0}%`
-      }));
-      const wsFunnel = XLSX.utils.json_to_sheet(funnelData);
-      XLSX.utils.book_append_sheet(wb, wsFunnel, 'Funil de Conversão');
-    }
-    
-    XLSX.writeFile(wb, `relatorio-analises-${new Date().toISOString().split('T')[0]}.xlsx`);
-    
-    toast({
-      title: "Excel exportado!",
-      description: "Relatório de análises baixado com sucesso",
-    });
   };
 
   return (
