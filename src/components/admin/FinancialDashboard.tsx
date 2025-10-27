@@ -886,6 +886,43 @@ const FinancialDashboard = () => {
             <TabsContent value="relatorios" className="h-full m-0">
               <ScrollArea className="h-full">
                 <div className="p-6">
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-semibold">Relatórios de Inscrições</h3>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => {
+                            const reports = document.querySelector('[data-registration-reports]');
+                            if (reports) {
+                              // Trigger CSV export from RegistrationReports
+                              const csvBtn = reports.querySelector('[data-export-csv]') as HTMLButtonElement;
+                              csvBtn?.click();
+                            }
+                          }} 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <FileSpreadsheet className="w-4 h-4 mr-2" />
+                          Exportar CSV
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            const reports = document.querySelector('[data-registration-reports]');
+                            if (reports) {
+                              // Trigger PDF export from RegistrationReports
+                              const pdfBtn = reports.querySelector('[data-export-pdf]') as HTMLButtonElement;
+                              pdfBtn?.click();
+                            }
+                          }}
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          Exportar PDF
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                   <RegistrationReports />
                 </div>
               </ScrollArea>

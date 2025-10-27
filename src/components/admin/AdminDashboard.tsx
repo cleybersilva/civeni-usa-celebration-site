@@ -89,14 +89,14 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteCustomer = async (email: string) => {
-    if (!confirm(`Tem certeza que deseja excluir todos os registros de ${email}?`)) {
+    if (!confirm(`Tem certeza que deseja excluir TODOS os registros duplicados de ${email}?\n\nEsta ação é irreversível!`)) {
       return;
     }
 
-    if (!user) {
+    if (!user || !sessionToken) {
       toast({
         title: "Erro de autenticação",
-        description: "Você precisa estar autenticado",
+        description: "Você precisa estar autenticado para realizar esta ação",
         variant: "destructive"
       });
       return;
@@ -104,38 +104,42 @@ const AdminDashboard = () => {
 
     setDeletingCustomer(email);
     try {
-      console.log('🗑️ Tentando excluir registros de:', email);
+      console.log('🗑️ Tentando excluir registros duplicados de:', email);
+      console.log('🔑 Token disponível:', sessionToken ? 'Sim' : 'Não');
       
       // Chamar a Edge Function para fazer a exclusão com service role
       const { data, error } = await supabase.functions.invoke('delete-customer-registrations', {
-        body: { email }
+        body: { email },
+        headers: {
+          Authorization: `Bearer ${sessionToken}`
+        }
       });
 
       console.log('🗑️ Resultado da exclusão:', { data, error });
 
       if (error) {
         console.error('❌ Erro na exclusão:', error);
-        throw error;
+        throw new Error(error.message || 'Erro ao chamar função de exclusão');
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Erro ao excluir registros');
+      if (!data || !data.success) {
+        throw new Error(data?.error || 'Erro ao excluir registros - resposta inválida');
       }
 
       toast({
-        title: "Registros excluídos!",
-        description: `${data.deleted_count} registro(s) de ${email} foram removidos`,
+        title: "✅ Registros Excluídos!",
+        description: `${data.deleted_count} registro(s) duplicado(s) de ${email} foram removidos com sucesso`,
       });
 
-      // Aguardar um pouco antes de atualizar
+      // Aguardar um pouco antes de atualizar para dar tempo do Supabase processar
       setTimeout(() => {
         refresh();
-      }, 500);
+      }, 1000);
     } catch (error: any) {
-      console.error('Delete error:', error);
+      console.error('❌ Delete error completo:', error);
       toast({
-        title: "Erro ao excluir",
-        description: error.message || "Não foi possível excluir os registros",
+        title: "Erro ao excluir registros",
+        description: error.message || "Não foi possível excluir os registros. Verifique suas permissões.",
         variant: "destructive"
       });
     } finally {
@@ -511,7 +515,19 @@ const AdminDashboard = () => {
         <TabsContent value="customers">
           <Card>
             <CardHeader>
-              <CardTitle>Clientes</CardTitle>
+              <div className="space-y-2">
+                <CardTitle>Clientes</CardTitle>
+                <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                  <div className="flex-1 text-sm">
+                    <p className="font-medium text-yellow-800 dark:text-yellow-200">Exclusão de Registros Duplicados</p>
+                    <p className="text-yellow-700 dark:text-yellow-300 mt-1">
+                      Use o botão "Excluir" para remover TODOS os registros duplicados de um cliente específico. 
+                      Esta ação é irreversível e requer confirmação.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -585,11 +601,18 @@ const AdminDashboard = () => {
                               onClick={() => handleDeleteCustomer(customer.email)}
                               disabled={deletingCustomer === customer.email}
                               className="hover:bg-destructive/10 hover:text-destructive"
+                              title={`Excluir todos os registros duplicados de ${customer.email}`}
                             >
                               {deletingCustomer === customer.email ? (
-                                <RefreshCw className="h-4 w-4 animate-spin" />
+                                <div className="flex items-center gap-2">
+                                  <RefreshCw className="h-4 w-4 animate-spin" />
+                                  <span className="text-xs">Excluindo...</span>
+                                </div>
                               ) : (
-                                <Trash2 className="h-4 w-4" />
+                                <div className="flex items-center gap-2">
+                                  <Trash2 className="h-4 w-4" />
+                                  <span className="text-xs">Excluir</span>
+                                </div>
                               )}
                             </Button>
                           </td>

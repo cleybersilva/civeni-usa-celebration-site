@@ -289,7 +289,7 @@ const RegistrationReports = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-registration-reports>
       {/* Summary Cards */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -376,13 +376,13 @@ const RegistrationReports = () => {
               <option value="month">Este mês</option>
             </select>
             
-            <Button onClick={exportToCSV} variant="outline" size="sm">
+            <Button onClick={exportToCSV} variant="outline" size="sm" data-export-csv>
               <FileSpreadsheet className="w-4 h-4 mr-2" />
-              CSV
+              Exportar CSV
             </Button>
-            <Button onClick={exportToPDF} variant="outline" size="sm">
+            <Button onClick={exportToPDF} variant="outline" size="sm" data-export-pdf>
               <FileText className="w-4 h-4 mr-2" />
-              PDF
+              Exportar PDF
             </Button>
           </div>
         </div>
