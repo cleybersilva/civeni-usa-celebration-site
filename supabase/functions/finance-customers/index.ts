@@ -37,9 +37,11 @@ serve(async (req) => {
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
-      .select('*');
+      .select('id, payment_intent_id, brand, last4, customer_email, billing_details');
     
     if (chargesError) throw chargesError;
+
+    console.log(`💳 Found ${charges?.length || 0} charges with card info`);
 
     // Buscar reembolsos
     const { data: refunds } = await supabaseClient
@@ -172,12 +174,22 @@ serve(async (req) => {
       const minutes = String(brtDate.getMinutes()).padStart(2, '0');
       const formattedDate = `${day} de ${month}. ${hours}:${minutes}`;
 
+      // Log para debug
+      if (index === 0) {
+        console.log('📊 Exemplo de customer:', {
+          email: customer.email,
+          card_brand: customer.card_brand,
+          last4: customer.last4,
+          payment_methods: Array.from(customer.payment_methods)
+        });
+      }
+
       return {
         id: `customer_${offset + index}`,
         nome: customer.name,
         email: customer.email,
-        card_brand: customer.card_brand,
-        last4: customer.last4,
+        card_brand: customer.card_brand || null,
+        last4: customer.last4 || null,
         forma_pagamento_padrao: Array.from(customer.payment_methods).join(', ') || 'Não definida',
         criado: formattedDate,
         total_gasto: customer.total_gasto,
