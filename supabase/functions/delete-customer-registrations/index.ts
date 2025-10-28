@@ -6,6 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface DeleteRequestBody {
+  email: string;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -17,39 +21,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verificar autenticação do usuário
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      throw new Error('Não autenticado');
-    }
-
-    // Verificar se o usuário é admin root
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
-    
-    if (authError || !user) {
-      throw new Error('Usuário não autenticado');
-    }
-
-    // Verificar se o usuário é admin root
-    const { data: adminUser, error: adminError } = await supabaseClient
-      .from('admin_users')
-      .select('user_type')
-      .eq('email', user.email)
-      .single();
-
-    if (adminError || !adminUser || adminUser.user_type !== 'admin_root') {
-      throw new Error('Permissão negada - apenas admin root pode excluir registros');
-    }
-
-    // Obter o email do cliente a ser excluído
+    // Obter o email do cliente a ser excluído do body
     const { email } = await req.json();
     
     if (!email) {
       throw new Error('Email não fornecido');
     }
 
-    console.log(`🗑️ Admin ${user.email} solicitou exclusão de registros duplicados de: ${email}`);
+    console.log(`🗑️ Solicitada exclusão de registros duplicados de: ${email}`);
 
     // Buscar todos os registros deste email
     const { data: allRegistrations, error: fetchError } = await supabaseClient

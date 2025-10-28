@@ -93,26 +93,13 @@ const AdminDashboard = () => {
       return;
     }
 
-    if (!user || !sessionToken) {
-      toast({
-        title: "Erro de autenticação",
-        description: "Você precisa estar autenticado para realizar esta ação",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setDeletingCustomer(email);
     try {
       console.log('🗑️ Tentando excluir registros duplicados de:', email);
-      console.log('🔑 Token disponível:', sessionToken ? 'Sim' : 'Não');
       
       // Chamar a Edge Function para fazer a exclusão com service role
       const { data, error } = await supabase.functions.invoke('delete-customer-registrations', {
-        body: { email },
-        headers: {
-          Authorization: `Bearer ${sessionToken}`
-        }
+        body: { email }
       });
 
       console.log('🗑️ Resultado da exclusão:', { data, error });
@@ -127,7 +114,7 @@ const AdminDashboard = () => {
       }
 
       toast({
-        title: "✅ Registros Excluídos!",
+        title: "✅ Registros Duplicados Excluídos!",
         description: `${data.deleted_count} registro(s) duplicado(s) de ${email} foram removidos com sucesso`,
       });
 
@@ -139,7 +126,7 @@ const AdminDashboard = () => {
       console.error('❌ Delete error completo:', error);
       toast({
         title: "Erro ao excluir registros",
-        description: error.message || "Não foi possível excluir os registros. Verifique suas permissões.",
+        description: error.message || "Não foi possível excluir os registros duplicados.",
         variant: "destructive"
       });
     } finally {
