@@ -138,8 +138,8 @@ serve(async (req) => {
       );
     }
     
-    // Ordenar por total gasto
-    customers.sort((a, b) => b.total_gasto - a.total_gasto);
+    // Ordenar por data mais recente (último pagamento)
+    customers.sort((a, b) => new Date(b.ultimo_pagamento).getTime() - new Date(a.ultimo_pagamento).getTime());
     
     const totalCount = customers.length;
     
