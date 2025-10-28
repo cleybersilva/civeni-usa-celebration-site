@@ -123,6 +123,19 @@ serve(async (req) => {
           }
         }
       }
+      
+      // Se ainda não temos forma de pagamento, buscar por email nos charges
+      if (!customer.card_brand && charges) {
+        const chargeByEmail = charges.find((c: any) => 
+          c.customer_email === email || 
+          c.billing_details?.email === email
+        );
+        if (chargeByEmail && chargeByEmail.brand) {
+          customer.card_brand = chargeByEmail.brand;
+          customer.last4 = chargeByEmail.last4;
+          customer.payment_methods.add(chargeByEmail.brand);
+        }
+      }
     });
 
     console.log(`👥 Grouped into ${customersMap.size} unique customers`);
