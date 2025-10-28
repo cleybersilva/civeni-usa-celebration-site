@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, ChevronLeft, ChevronRight, Copy, CheckCircle2 } from 'lucide-react';
+import { ExternalLink, ChevronLeft, ChevronRight, Copy, CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ChargesTableProps {
@@ -26,6 +26,46 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
 }) => {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<'data' | 'participante'>('data');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  const sortedData = useMemo(() => {
+    if (!data) return [];
+    
+    const sorted = [...data].sort((a, b) => {
+      if (sortField === 'data') {
+        const dateA = new Date(a.data_hora_brt).getTime();
+        const dateB = new Date(b.data_hora_brt).getTime();
+        return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+      } else {
+        const nameA = a.participante.toLowerCase();
+        const nameB = b.participante.toLowerCase();
+        if (sortDirection === 'desc') {
+          return nameB.localeCompare(nameA);
+        } else {
+          return nameA.localeCompare(nameB);
+        }
+      }
+    });
+    
+    return sorted;
+  }, [data, sortField, sortDirection]);
+
+  const toggleSort = (field: 'data' | 'participante') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortField(field);
+      setSortDirection(field === 'data' ? 'desc' : 'asc');
+    }
+  };
+
+  const getSortIcon = (field: 'data' | 'participante') => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />;
+    return sortDirection === 'desc' ? 
+      <ArrowDown className="h-4 w-4 ml-1" /> : 
+      <ArrowUp className="h-4 w-4 ml-1" />;
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { 
@@ -82,8 +122,28 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data/Hora (BRT)</TableHead>
-                <TableHead>Participante</TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => toggleSort('data')}
+                    className="flex items-center hover:bg-transparent p-0 h-auto font-medium"
+                  >
+                    Data/Hora (BRT)
+                    {getSortIcon('data')}
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => toggleSort('participante')}
+                    className="flex items-center hover:bg-transparent p-0 h-auto font-medium"
+                  >
+                    Participante
+                    {getSortIcon('participante')}
+                  </Button>
+                </TableHead>
                 <TableHead>ID Transação</TableHead>
                 <TableHead className="text-right">Valor Bruto</TableHead>
                 <TableHead className="text-right">Taxa</TableHead>
@@ -96,14 +156,14 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.length === 0 ? (
+              {sortedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
                     Nenhuma transação encontrada no período selecionado
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((charge) => (
+                sortedData.map((charge) => (
                   <TableRow key={charge.id}>
                     <TableCell className="text-xs whitespace-nowrap">
                       {charge.data_hora_brt}
