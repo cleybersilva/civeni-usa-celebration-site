@@ -11,6 +11,9 @@ interface DeleteRequestBody {
 }
 
 serve(async (req) => {
+  console.log('🚀 delete-customer-registrations iniciada');
+  console.log('📝 Método:', req.method);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,9 +25,13 @@ serve(async (req) => {
     );
 
     // Obter o email do cliente a ser excluído do body
-    const { email } = await req.json();
+    const body = await req.json();
+    console.log('📦 Body recebido:', body);
+    
+    const { email } = body;
     
     if (!email) {
+      console.error('❌ Email não fornecido no body');
       throw new Error('Email não fornecido');
     }
 
