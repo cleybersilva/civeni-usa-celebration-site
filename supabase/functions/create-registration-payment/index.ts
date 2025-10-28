@@ -82,6 +82,31 @@ serve(async (req) => {
 
     logStep("Batch found", { loteName: lote.nome, priceCents: lote.price_cents });
 
+    // Check for duplicate registration
+    const { data: existingRegistration, error: duplicateCheckError } = await supabase
+      .from('event_registrations')
+      .select('id, email, full_name, payment_status')
+      .eq('email', email.toLowerCase())
+      .eq('payment_status', 'completed')
+      .maybeSingle();
+
+    if (duplicateCheckError) {
+      logStep("Error checking duplicates", { duplicateCheckError });
+    }
+
+    if (existingRegistration) {
+      logStep("Duplicate registration found", { existingEmail: existingRegistration.email });
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Este e-mail já possui uma inscrição confirmada. Use um e-mail diferente ou entre em contato com o suporte." 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    logStep("No duplicate registration found");
+
     // Validate coupon if provided using robust RPC
     let finalPrice = category.is_free ? 0 : (category.price_cents || lote.price_cents);
     let validCoupon = null;

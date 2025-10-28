@@ -23,6 +23,8 @@ const RegistrationSuccess = () => {
     
     try {
       setLoading(true);
+      console.log('Verifying payment for session:', sessionId);
+      
       const { data, error } = await supabase.functions.invoke('verify-payment', {
         body: { session_id: sessionId }
       });

@@ -90,6 +90,22 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     setError('');
     
     try {
+      // Check for duplicate registration by email
+      const { data: existingRegistration, error: duplicateError } = await supabase
+        .from('event_registrations')
+        .select('id, email, full_name, payment_status')
+        .eq('email', formData.email.toLowerCase())
+        .eq('payment_status', 'completed')
+        .maybeSingle();
+
+      if (duplicateError) {
+        console.error('Error checking for duplicates:', duplicateError);
+      }
+
+      if (existingRegistration) {
+        throw new Error('Este e-mail já possui uma inscrição confirmada. Use um e-mail diferente ou entre em contato com o suporte.');
+      }
+
       let validCoupon = null;
       if (formData.couponCode) {
         validCoupon = await validateCoupon(
