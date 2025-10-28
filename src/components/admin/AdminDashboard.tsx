@@ -91,7 +91,7 @@ const AdminDashboard = () => {
   const handleDeleteCustomer = async (email: string) => {
     console.log('🗑️ Função handleDeleteCustomer chamada para:', email);
     
-    if (!confirm(`Tem certeza que deseja excluir TODOS os registros duplicados de ${email}?\n\nEsta ação é irreversível!`)) {
+    if (!confirm(`Tem certeza que deseja excluir TODOS os registros de ${email}?\n\nEsta ação é irreversível!`)) {
       console.log('🚫 Exclusão cancelada pelo usuário');
       return;
     }
@@ -136,8 +136,8 @@ const AdminDashboard = () => {
       console.log(`✅ Sucesso! ${data.deleted_count} registros excluídos`);
 
       toast({
-        title: "✅ Registros Duplicados Excluídos!",
-        description: `${data.deleted_count} registro(s) duplicado(s) de ${email} foram removidos com sucesso`,
+        title: "✅ Registros Excluídos!",
+        description: `${data.deleted_count} registro(s) de ${email} foram removidos com sucesso`,
       });
 
       // Aguardar um pouco antes de atualizar
@@ -605,16 +605,16 @@ const AdminDashboard = () => {
             <CardHeader>
               <div className="space-y-2">
                 <CardTitle>Participantes</CardTitle>
-                <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
-                  <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
-                  <div className="flex-1 text-sm">
-                    <p className="font-medium text-yellow-800 dark:text-yellow-200">Exclusão de Registros Duplicados</p>
-                    <p className="text-yellow-700 dark:text-yellow-300 mt-1">
-                      Use o botão "Excluir" para remover TODOS os registros duplicados de um cliente específico. 
-                      Esta ação é irreversível e requer confirmação.
-                    </p>
+                  <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
+                    <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                    <div className="flex-1 text-sm">
+                      <p className="font-medium text-yellow-800 dark:text-yellow-200">Exclusão de Registros</p>
+                      <p className="text-yellow-700 dark:text-yellow-300 mt-1">
+                        Use o botão "Excluir" para remover TODOS os registros de um participante específico. 
+                        Esta ação é irreversível e requer confirmação.
+                      </p>
+                    </div>
                   </div>
-                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -689,7 +689,7 @@ const AdminDashboard = () => {
                               onClick={() => handleDeleteCustomer(customer.email)}
                               disabled={deletingCustomer === customer.email}
                               className="hover:bg-destructive/10 hover:text-destructive"
-                              title={`Excluir todos os registros duplicados de ${customer.email}`}
+                              title={`Excluir todos os registros de ${customer.email}`}
                             >
                               {deletingCustomer === customer.email ? (
                                 <div className="flex items-center gap-2">

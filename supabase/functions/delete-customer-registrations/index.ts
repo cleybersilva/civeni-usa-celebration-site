@@ -18,38 +18,37 @@ serve(async (req) => {
       throw new Error('Email não fornecido');
     }
 
-    console.log(`🗑️ Excluindo duplicados de: ${email}`);
+    console.log(`🗑️ Excluindo todos os registros de: ${email}`);
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Buscar todos os registros
+    // Buscar quantos registros existem
     const { data: registros, error: erroSelect } = await supabase
       .from('event_registrations')
       .select('id, created_at')
-      .eq('email', email)
-      .order('created_at', { ascending: false });
+      .eq('email', email);
 
     if (erroSelect) throw erroSelect;
 
     console.log(`📊 Encontrados ${registros?.length || 0} registros`);
 
-    if (!registros || registros.length <= 1) {
+    if (!registros || registros.length === 0) {
       return new Response(JSON.stringify({
         success: true,
         deleted_count: 0,
-        message: 'Nenhum duplicado encontrado'
+        message: 'Nenhum registro encontrado'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Manter o primeiro (mais recente) e deletar o resto
-    const idsParaDeletar = registros.slice(1).map(r => r.id);
+    // Deletar TODOS os registros
+    const idsParaDeletar = registros.map(r => r.id);
     
-    console.log(`🗑️ Deletando ${idsParaDeletar.length} registros`);
+    console.log(`🗑️ Deletando todos os ${idsParaDeletar.length} registros`);
 
     const { error: erroDelete } = await supabase
       .from('event_registrations')
@@ -58,12 +57,12 @@ serve(async (req) => {
 
     if (erroDelete) throw erroDelete;
 
-    console.log(`✅ Sucesso! Deletados ${idsParaDeletar.length} registros`);
+    console.log(`✅ Sucesso! Deletados todos os ${idsParaDeletar.length} registros`);
 
     return new Response(JSON.stringify({
       success: true,
       deleted_count: idsParaDeletar.length,
-      message: `${idsParaDeletar.length} duplicados removidos`
+      message: `${idsParaDeletar.length} registro(s) removido(s)`
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
