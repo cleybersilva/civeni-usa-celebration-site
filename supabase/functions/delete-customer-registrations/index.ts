@@ -49,13 +49,46 @@ serve(async (req) => {
       throw new Error('Email não fornecido');
     }
 
-    console.log(`🗑️ Admin ${user.email} solicitou exclusão de registros de: ${email}`);
+    console.log(`🗑️ Admin ${user.email} solicitou exclusão de registros duplicados de: ${email}`);
 
-    // Excluir os registros
-    const { data, error, count } = await supabaseClient
+    // Buscar todos os registros deste email
+    const { data: allRegistrations, error: fetchError } = await supabaseClient
+      .from('event_registrations')
+      .select('*')
+      .eq('email', email)
+      .order('created_at', { ascending: false });
+
+    if (fetchError) {
+      console.error('❌ Erro ao buscar registros:', fetchError);
+      throw fetchError;
+    }
+
+    if (!allRegistrations || allRegistrations.length <= 1) {
+      return new Response(JSON.stringify({
+        success: true,
+        deleted_count: 0,
+        message: 'Nenhum registro duplicado encontrado para excluir'
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Manter apenas o registro mais recente (primeiro da lista) e excluir os demais
+    const registrationToKeep = allRegistrations[0];
+    const registrationsToDelete = allRegistrations.slice(1);
+
+    console.log(`📊 Total de registros: ${allRegistrations.length}`);
+    console.log(`✅ Mantendo registro mais recente: ${registrationToKeep.id}`);
+    console.log(`🗑️ Excluindo ${registrationsToDelete.length} registro(s) duplicado(s)`);
+
+    // Excluir os registros duplicados
+    const idsToDelete = registrationsToDelete.map(r => r.id);
+    
+    const { data, error } = await supabaseClient
       .from('event_registrations')
       .delete()
-      .eq('email', email)
+      .in('id', idsToDelete)
       .select();
 
     if (error) {
@@ -63,7 +96,7 @@ serve(async (req) => {
       throw error;
     }
 
-    console.log(`✅ ${data?.length || 0} registro(s) excluídos com sucesso`);
+    console.log(`✅ ${data?.length || 0} registro(s) duplicado(s) excluídos com sucesso`);
 
     return new Response(JSON.stringify({
       success: true,
