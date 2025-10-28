@@ -89,41 +89,66 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteCustomer = async (email: string) => {
+    console.log('🗑️ Função handleDeleteCustomer chamada para:', email);
+    
     if (!confirm(`Tem certeza que deseja excluir TODOS os registros duplicados de ${email}?\n\nEsta ação é irreversível!`)) {
+      console.log('🚫 Exclusão cancelada pelo usuário');
       return;
     }
 
     setDeletingCustomer(email);
+    
     try {
       console.log('🗑️ Tentando excluir registros duplicados de:', email);
+      console.log('📞 Chamando edge function delete-customer-registrations...');
       
       // Chamar a Edge Function para fazer a exclusão com service role
       const { data, error } = await supabase.functions.invoke('delete-customer-registrations', {
         body: { email }
       });
 
-      console.log('🗑️ Resultado da exclusão:', { data, error });
+      console.log('📥 Resposta recebida:', { 
+        data, 
+        error,
+        hasData: !!data,
+        hasError: !!error,
+        dataType: typeof data,
+        errorType: typeof error
+      });
 
       if (error) {
-        console.error('❌ Erro na exclusão:', error);
+        console.error('❌ Erro retornado pela função:', error);
         throw new Error(error.message || 'Erro ao chamar função de exclusão');
       }
 
-      if (!data || !data.success) {
-        throw new Error(data?.error || 'Erro ao excluir registros - resposta inválida');
+      if (!data) {
+        console.error('❌ Nenhum dado retornado pela função');
+        throw new Error('Função não retornou dados');
       }
+
+      console.log('✅ Dados retornados:', data);
+
+      if (!data.success) {
+        console.error('❌ Função retornou success=false:', data.error);
+        throw new Error(data.error || 'Erro ao excluir registros');
+      }
+
+      console.log(`✅ Sucesso! ${data.deleted_count} registros excluídos`);
 
       toast({
         title: "✅ Registros Duplicados Excluídos!",
         description: `${data.deleted_count} registro(s) duplicado(s) de ${email} foram removidos com sucesso`,
       });
 
-      // Aguardar um pouco antes de atualizar para dar tempo do Supabase processar
+      // Aguardar um pouco antes de atualizar
+      console.log('🔄 Aguardando 1s antes de atualizar lista...');
       setTimeout(() => {
+        console.log('🔄 Atualizando lista de participantes...');
         refresh();
       }, 1000);
     } catch (error: any) {
       console.error('❌ Delete error completo:', error);
+      console.error('❌ Stack trace:', error.stack);
       toast({
         title: "Erro ao excluir registros",
         description: error.message || "Não foi possível excluir os registros duplicados.",
