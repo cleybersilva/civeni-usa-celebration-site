@@ -37,7 +37,7 @@ serve(async (req) => {
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
-      .select('id, payment_intent_id, brand, last4, customer_email, billing_details');
+      .select('id, payment_intent_id, brand, last4, customer_id');
     
     if (chargesError) throw chargesError;
 
@@ -126,18 +126,8 @@ serve(async (req) => {
         }
       }
       
-      // Se ainda não temos forma de pagamento, buscar por email nos charges
-      if (!customer.card_brand && charges) {
-        const chargeByEmail = charges.find((c: any) => 
-          c.customer_email === email || 
-          c.billing_details?.email === email
-        );
-        if (chargeByEmail && chargeByEmail.brand) {
-          customer.card_brand = chargeByEmail.brand;
-          customer.last4 = chargeByEmail.last4;
-          customer.payment_methods.add(chargeByEmail.brand);
-        }
-      }
+      // Comentado: busca por email foi removida pois a coluna não existe
+      // A informação do cartão já foi obtida via payment_intent_id acima
     });
 
     console.log(`👥 Grouped into ${customersMap.size} unique customers`);
