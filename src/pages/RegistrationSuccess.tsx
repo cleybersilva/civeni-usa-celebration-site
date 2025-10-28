@@ -81,7 +81,7 @@ const RegistrationSuccess = () => {
                   <Mail className="w-6 h-6 text-green-600" />
                 </div>
                 <p className="text-center text-green-700 font-medium">
-                  Você receberá confirmação por e-mail, WhatsApp e SMS em breve.
+                  Prepare-se para vivenciar momentos incríveis de aprendizagem no Civeni 2025 - Celebration/Florida-EUA.
                 </p>
               </div>
 
