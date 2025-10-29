@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
 import { CreditCard } from 'lucide-react';
 
 interface BrandChartProps {
@@ -94,7 +94,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
               name="Receita Líquida"
             >
               {data.map((entry, index) => (
-                <rect key={`cell-${index}`} fill={getBrandColor(entry.bandeira)} />
+                <Cell key={`cell-${index}`} fill={getBrandColor(entry.bandeira)} />
               ))}
             </Bar>
           </BarChart>
