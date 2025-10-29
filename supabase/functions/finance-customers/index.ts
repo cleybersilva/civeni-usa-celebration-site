@@ -43,6 +43,17 @@ serve(async (req) => {
     if (regError) throw regError;
 
     console.log(`📝 Found ${registrations?.length || 0} paid/free registrations (excluding pending)`);
+    
+    // Log de debug para ver estrutura dos dados
+    if (registrations && registrations.length > 0) {
+      console.log('🔍 Exemplo de registro:', JSON.stringify({
+        email: registrations[0].email,
+        curso_id: registrations[0].curso_id,
+        turma_id: registrations[0].turma_id,
+        cursos: registrations[0].cursos,
+        turmas: registrations[0].turmas
+      }));
+    }
 
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
@@ -82,11 +93,16 @@ serve(async (req) => {
       const email = reg.email;
       
       if (!customersMap.has(email)) {
+        const cursoNome = reg.cursos?.nome_curso || 'Não especificado';
+        const turmaNome = reg.turmas?.nome_turma || 'Não especificado';
+        
+        console.log(`👤 Criando customer ${email}: curso="${cursoNome}", turma="${turmaNome}"`);
+        
         customersMap.set(email, {
           email,
           name: reg.full_name,
-          curso: reg.cursos?.nome_curso || 'Não especificado',
-          turma: reg.turmas?.nome_turma || 'Não especificado',
+          curso: cursoNome,
+          turma: turmaNome,
           total_gasto: 0,
           pagamentos: 0,
           reembolsos: 0,
