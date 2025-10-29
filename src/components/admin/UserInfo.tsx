@@ -72,16 +72,16 @@ const UserInfo: React.FC = () => {
       <CardContent className="pt-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium">{user.email}</p>
-            <p className="text-sm text-muted-foreground">{userTypeInfo.description}</p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{user.email}</p>
+            <p className="text-base text-gray-600 dark:text-gray-300 font-medium mt-1">{userTypeInfo.description}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={userTypeInfo.variant} className="flex items-center gap-1">
+            <Badge variant={userTypeInfo.variant} className="flex items-center gap-1 px-3 py-1.5 text-sm">
               {userTypeInfo.icon}
               {userTypeInfo.label}
             </Badge>
             {isAdminRoot() && (
-              <Badge variant="destructive" className="flex items-center gap-1">
+              <Badge variant="destructive" className="flex items-center gap-1 px-3 py-1.5 text-sm">
                 <Crown className="h-3 w-3" />
                 Root
               </Badge>
