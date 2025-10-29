@@ -260,15 +260,20 @@ serve(async (req) => {
       const paymentStatus = customer.registrations[0]?.payment_status || 'unknown';
       
       // Determinar forma de pagamento:
-      // - Se curso = "Não especificado" → Voucher/Gratuito
-      // - Se tem card_brand do Stripe → mostrar a bandeira
-      // - Caso contrário → Voucher/Gratuito
+      // 1. Se tem payment_intent e card_brand do Stripe → mostrar bandeira
+      // 2. Se tem amount_paid > 0 mas sem payment_intent → Pagamento Manual
+      // 3. Se curso = "Não especificado" ou amount_paid = 0 → Voucher/Gratuito
       let formaPagamento = 'Voucher/Gratuito';
-      if (customer.curso !== 'Não especificado' && customer.card_brand) {
+      
+      if (customer.card_brand && customer.registrations[0]?.stripe_payment_intent_id) {
+        // Tem pagamento via Stripe com cartão
         formaPagamento = customer.card_brand.charAt(0).toUpperCase() + customer.card_brand.slice(1);
         if (customer.last4) {
           formaPagamento += ` ****${customer.last4}`;
         }
+      } else if (customer.total_gasto > 0 && customer.curso !== 'Não especificado') {
+        // Tem valor pago mas sem Stripe = pagamento manual/externo
+        formaPagamento = 'Pagamento Manual';
       }
       
       return {
