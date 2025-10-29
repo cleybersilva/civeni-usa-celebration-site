@@ -45,12 +45,12 @@ serve(async (req) => {
         )
       `);
     
-    // Aplicar filtros - excluir pendentes, mostrar pagos e gratuitos
+    // Aplicar filtros
     if (statusFilter) {
       query = query.eq('payment_status', statusFilter);
     } else {
-      // Por padrão, excluir apenas pendentes (mostrar completed e free/gratuitos)
-      query = query.neq('payment_status', 'pending');
+      // Por padrão, mostrar apenas completed
+      query = query.eq('payment_status', 'completed');
     }
     
     if (cursoFilter) {
