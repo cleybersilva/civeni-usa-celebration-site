@@ -447,19 +447,35 @@ const AdminDashboard = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={handleExportPDF} disabled={loading} variant="outline">
+          <Button 
+            onClick={handleExportPDF} 
+            disabled={loading} 
+            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0"
+          >
             <FileText className="h-4 w-4 mr-2" />
             Exportar PDF
           </Button>
-          <Button onClick={handleExportExcel} disabled={loading} variant="outline">
+          <Button 
+            onClick={handleExportExcel} 
+            disabled={loading} 
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0"
+          >
             <Download className="h-4 w-4 mr-2" />
             Exportar Excel
           </Button>
-          <Button onClick={handleSync} disabled={syncing} variant="outline">
+          <Button 
+            onClick={handleSync} 
+            disabled={syncing} 
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0"
+          >
             <Database className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
             Sincronizar
           </Button>
-          <Button onClick={refresh} disabled={loading} variant="outline">
+          <Button 
+            onClick={refresh} 
+            disabled={loading} 
+            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0"
+          >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Atualizar
           </Button>
@@ -722,19 +738,19 @@ const AdminDashboard = () => {
               
               {/* Botões de Exportação */}
               {customers.length > 0 && (
-                <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+                <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-purple-200 dark:border-purple-800">
                   <Button 
                     onClick={handleExportParticipantesPDF} 
-                    variant="outline"
                     disabled={loading}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Exportar PDF
                   </Button>
                   <Button 
                     onClick={handleExportParticipantesExcel} 
-                    variant="outline"
                     disabled={loading}
+                    className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Exportar Excel
