@@ -29,7 +29,7 @@ const AdminHeader = () => {
   };
 
   return (
-    <header className="bg-gradient-to-br from-admin-from via-admin-via to-admin-to border-b h-16">
+    <header className="bg-gradient-to-br from-admin-gradient-from via-admin-gradient-via to-admin-gradient-to border-b h-16">
       <div className="flex justify-between items-center px-6 py-3 h-full">
         <div className="flex items-center space-x-4">
           <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80" />

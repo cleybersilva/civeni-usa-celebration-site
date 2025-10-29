@@ -63,7 +63,7 @@ const UserInfo: React.FC = () => {
 
   return (
     <Card className="mb-6 overflow-hidden border-none shadow-lg">
-      <CardHeader className="pb-3 bg-gradient-to-br from-admin-from via-admin-via to-admin-to">
+      <CardHeader className="pb-3 bg-gradient-to-br from-admin-gradient-from via-admin-gradient-via to-admin-gradient-to">
         <CardTitle className="text-lg flex items-center gap-2 text-white drop-shadow-md">
           {userTypeInfo.icon}
           {t('admin.userInfo', 'Informações do Usuário')}

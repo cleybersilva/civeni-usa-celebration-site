@@ -70,9 +70,11 @@ export default {
 					green: 'hsl(var(--civeni-green))'
 				},
 				// Admin dashboard gradient colors
-				'admin-from': 'hsl(var(--admin-gradient-from))',
-				'admin-via': 'hsl(var(--admin-gradient-via))',
-				'admin-to': 'hsl(var(--admin-gradient-to))'
+				'admin-gradient': {
+					'from': 'hsl(200 48% 21%)',
+					'via': 'hsl(200 35% 27%)',
+					'to': 'hsl(300 35% 28%)'
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
