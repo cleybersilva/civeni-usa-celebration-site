@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 
+// Stripe Filters Component - v2.0
 interface StripeFiltersProps {
   filters: {
     range: string;

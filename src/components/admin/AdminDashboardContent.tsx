@@ -1,4 +1,4 @@
-
+// Admin Dashboard Content - v2.0 - Garantindo renderização de filtros e exportação
 import React, { useState, useEffect } from 'react';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';

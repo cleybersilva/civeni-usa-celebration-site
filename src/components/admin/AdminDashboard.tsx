@@ -19,6 +19,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
+// Dashboard Stripe - v2.0 - Filtros e Exportação Corrigidos
 const AdminDashboard = () => {
   const { t } = useTranslation();
   const { toast } = useToast();

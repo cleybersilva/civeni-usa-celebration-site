@@ -22,6 +22,7 @@ import { useFinancialData } from './dashboard/hooks/useFinancialData';
 import { useFinanceRealtime } from '@/hooks/useFinanceRealtime';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
+// Dashboard Financeiro - v2.0 - Filtros e Exportação Garantidos
 const FinancialDashboard = () => {
   const { t } = useTranslation();
   const { user } = useAdminAuth();
