@@ -475,19 +475,21 @@ const AdminDashboard = () => {
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="border-l-4 border-l-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Receita Líquida</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {formatCurrency(summary?.liquido || 0)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Bruto: {formatCurrency(summary?.bruto || 0)}
             </p>
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-red-500 dark:text-red-400">
               Taxas: -{formatCurrency(summary?.taxas || 0)}
             </p>
             {!summary && (
@@ -498,17 +500,19 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Inscrições Pagas</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summary?.pagos || 0}</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summary?.pagos || 0}</div>
             <p className="text-xs text-muted-foreground">
               Não pagas: {summary?.naoPagos || 0}
             </p>
-            <p className="text-xs text-green-600 font-medium">
+            <p className="text-xs text-green-600 dark:text-green-400 font-medium">
               Conversão: {summary?.taxaConversao || '0.00'}%
             </p>
             {summary && summary.pagos === 0 && (
@@ -519,13 +523,15 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Ticket Médio</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary?.ticketMedio || 0)}</div>
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary?.ticketMedio || 0)}</div>
             <p className="text-xs text-muted-foreground">
               Por transação confirmada
             </p>
@@ -537,21 +543,23 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Alertas & Disputas</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{summary?.disputas || 0}</div>
+            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{summary?.disputas || 0}</div>
             <p className="text-xs text-muted-foreground">
               Reembolsos: {summary?.reembolsos || 0}
             </p>
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-red-500 dark:text-red-400">
               Falhas: {summary?.falhas || 0}
             </p>
             {summary && (summary.disputas > 0 || summary.falhas > 0) && (
-              <p className="text-xs text-orange-500 mt-1 font-medium">
+              <p className="text-xs text-orange-500 dark:text-orange-400 mt-1 font-medium">
                 ⚠️ Requer atenção
               </p>
             )}
@@ -561,18 +569,18 @@ const AdminDashboard = () => {
 
       {/* Próximo Payout */}
       {summary?.proximoPayout && (
-        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
+        <Card className="border-l-4 border-l-emerald-500 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 dark:from-green-950/30 dark:via-emerald-950/30 dark:to-teal-950/30 shadow-lg">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Próximo Payout</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm text-emerald-700 dark:text-emerald-300 font-medium">Próximo Payout</p>
+                <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-1">
                   {formatCurrency(summary.proximoPayout.valor)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Data prevista</p>
-                <p className="text-lg font-medium">
+                <p className="text-sm text-emerald-700 dark:text-emerald-300 font-medium">Data prevista</p>
+                <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                   {new Date(summary.proximoPayout.data).toLocaleDateString('pt-BR')}
                 </p>
               </div>
@@ -591,10 +599,10 @@ const AdminDashboard = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="tabela">
-        <TabsList>
-          <TabsTrigger value="tabela">Transações Detalhadas</TabsTrigger>
-          <TabsTrigger value="customers">Participantes</TabsTrigger>
-          <TabsTrigger value="analises">Análises</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20">
+          <TabsTrigger value="tabela" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">Transações Detalhadas</TabsTrigger>
+          <TabsTrigger value="customers" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white">Participantes</TabsTrigger>
+          <TabsTrigger value="analises" className="data-[state=active]:bg-pink-500 data-[state=active]:text-white">Análises</TabsTrigger>
         </TabsList>
 
         <TabsContent value="tabela">
@@ -602,12 +610,12 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="customers">
-          <Card>
-            <CardHeader>
+          <Card className="border-t-4 border-t-purple-500">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
               <div className="space-y-2">
-                <CardTitle>Participantes</CardTitle>
+                <CardTitle className="text-purple-700 dark:text-purple-300">Participantes</CardTitle>
                   <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
+                    <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
                     <div className="flex-1 text-sm">
                       <p className="font-medium text-yellow-800 dark:text-yellow-200">Exclusão de Registros</p>
                       <p className="text-yellow-700 dark:text-yellow-300 mt-1">
@@ -738,15 +746,15 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="analises">
-          <Card>
-            <CardHeader>
-              <CardTitle>Análises Avançadas</CardTitle>
+          <Card className="border-t-4 border-t-pink-500">
+            <CardHeader className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
+              <CardTitle className="text-pink-700 dark:text-pink-300">Análises Avançadas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
                 Visualize tendências, padrões e insights detalhados das transações.
               </p>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-pink-300 hover:bg-pink-50 dark:border-pink-700 dark:hover:bg-pink-950/30">
                 <Download className="h-4 w-4 mr-2" />
                 Exportar Relatório (CSV)
               </Button>
