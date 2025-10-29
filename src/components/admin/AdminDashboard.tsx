@@ -43,9 +43,7 @@ const AdminDashboard = () => {
     customersCurso: '',
     customersTurma: '',
     customersStatus: '',
-    customersPaymentMethod: '',
-    customersStartDate: '',
-    customersEndDate: ''
+    customersPaymentMethod: ''
   });
 
   const { 
@@ -85,9 +83,7 @@ const AdminDashboard = () => {
       customersCurso: '',
       customersTurma: '',
       customersStatus: '',
-      customersPaymentMethod: '',
-      customersStartDate: '',
-      customersEndDate: ''
+      customersPaymentMethod: ''
     });
   };
 
@@ -698,14 +694,6 @@ const AdminDashboard = () => {
             paymentMethodFilter={filters.customersPaymentMethod}
             onPaymentMethodFilterChange={(method) => {
               setFilters(prev => ({ ...prev, customersPaymentMethod: method, customersOffset: 0 }));
-            }}
-            startDate={filters.customersStartDate}
-            endDate={filters.customersEndDate}
-            onStartDateChange={(date) => {
-              setFilters(prev => ({ ...prev, customersStartDate: date, customersOffset: 0 }));
-            }}
-            onEndDateChange={(date) => {
-              setFilters(prev => ({ ...prev, customersEndDate: date, customersOffset: 0 }));
             }}
           />
         </TabsContent>

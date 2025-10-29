@@ -25,10 +25,8 @@ serve(async (req) => {
     const turmaFilter = url.searchParams.get('turma') || '';
     const statusFilter = url.searchParams.get('status') || '';
     const paymentMethodFilter = url.searchParams.get('payment_method') || '';
-    const startDate = url.searchParams.get('start_date') || '';
-    const endDate = url.searchParams.get('end_date') || '';
 
-    console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}, filters={curso:${cursoFilter}, turma:${turmaFilter}, status:${statusFilter}, payment_method:${paymentMethodFilter}, dates:${startDate}-${endDate}}`);
+    console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}, filters={curso:${cursoFilter}, turma:${turmaFilter}, status:${statusFilter}, payment_method:${paymentMethodFilter}}`);
 
     // Buscar registros com base nos filtros
     let query = supabaseClient
@@ -45,13 +43,10 @@ serve(async (req) => {
         )
       `);
     
-    // Aplicar filtros
-    if (statusFilter) {
-      query = query.eq('payment_status', statusFilter);
-    } else {
-      // Por padrão, mostrar apenas completed
-      query = query.eq('payment_status', 'completed');
-    }
+    // Aplicar filtros apenas se fornecidos
+    // Se nenhum filtro de status for fornecido, mostrar apenas completed por padrão
+    const effectiveStatusFilter = statusFilter || 'completed';
+    query = query.eq('payment_status', effectiveStatusFilter);
     
     if (cursoFilter) {
       query = query.eq('curso_id', cursoFilter);
@@ -59,14 +54,6 @@ serve(async (req) => {
     
     if (turmaFilter) {
       query = query.eq('turma_id', turmaFilter);
-    }
-    
-    if (startDate) {
-      query = query.gte('created_at', startDate);
-    }
-    
-    if (endDate) {
-      query = query.lte('created_at', endDate);
     }
     
     const { data: registrations, error: regError } = await query;

@@ -29,10 +29,6 @@ interface ParticipantsTableProps {
   onStatusFilterChange?: (status: string) => void;
   paymentMethodFilter?: string;
   onPaymentMethodFilterChange?: (method: string) => void;
-  startDate?: string;
-  endDate?: string;
-  onStartDateChange?: (date: string) => void;
-  onEndDateChange?: (date: string) => void;
 }
 
 export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({ 
@@ -51,11 +47,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
   statusFilter = '',
   onStatusFilterChange,
   paymentMethodFilter = '',
-  onPaymentMethodFilterChange,
-  startDate = '',
-  endDate = '',
-  onStartDateChange,
-  onEndDateChange
+  onPaymentMethodFilterChange
 }) => {
   const { toast } = useToast();
   const [sortField, setSortField] = useState<'data' | 'nome'>('data');
@@ -253,26 +245,6 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
               <option value="elo">Elo</option>
               <option value="amex">Amex</option>
             </select>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                onStartDateChange?.(e.target.value);
-                onPageChange?.(0);
-              }}
-              placeholder="Data Inicial"
-              className="min-w-[150px]"
-            />
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => {
-                onEndDateChange?.(e.target.value);
-                onPageChange?.(0);
-              }}
-              placeholder="Data Final"
-              className="min-w-[150px]"
-            />
           </div>
         </div>
 
