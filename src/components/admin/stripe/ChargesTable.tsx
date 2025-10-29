@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { ExternalLink, ChevronLeft, ChevronRight, Copy, CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
+import { ExternalLink, ChevronLeft, ChevronRight, Copy, CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ChargesTableProps {
@@ -17,17 +16,13 @@ interface ChargesTableProps {
     hasMore: boolean;
   };
   onPageChange?: (offset: number) => void;
-  searchValue?: string;
-  onSearchChange?: (search: string) => void;
 }
 
 export const ChargesTable: React.FC<ChargesTableProps> = ({ 
   data, 
   loading, 
   pagination,
-  onPageChange,
-  searchValue = '',
-  onSearchChange
+  onPageChange 
 }) => {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -123,19 +118,6 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
         <CardTitle>Transações Detalhadas</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Campo de Busca */}
-        <div className="mb-4 flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por participante, email ou ID da transação..."
-              value={searchValue}
-              onChange={(e) => onSearchChange?.(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </div>
-        
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>

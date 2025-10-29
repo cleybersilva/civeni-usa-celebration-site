@@ -35,11 +35,6 @@ const AdminDashboard = () => {
     customTo: undefined
   });
   const [syncing, setSyncing] = useState(false);
-  const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
-  const [chargesOffset, setChargesOffset] = useState(0);
-  const [customersOffset, setCustomersOffset] = useState(0);
-  const [chargesSearch, setChargesSearch] = useState('');
-  const [customersSearch, setCustomersSearch] = useState('');
 
   const { 
     summary, 
@@ -52,13 +47,10 @@ const AdminDashboard = () => {
     customersPagination,
     loading, 
     refresh 
-  } = useStripeDashboard({
-    ...filters,
-    chargesOffset,
-    customersOffset,
-    chargesSearch,
-    customersSearch
-  });
+  } = useStripeDashboard(filters);
+  const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
+  const [chargesOffset, setChargesOffset] = useState(0);
+  const [customersOffset, setCustomersOffset] = useState(0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -650,11 +642,9 @@ const AdminDashboard = () => {
             pagination={chargesPagination}
             onPageChange={(offset) => {
               setChargesOffset(offset);
-            }}
-            searchValue={chargesSearch}
-            onSearchChange={(search) => {
-              setChargesSearch(search);
-              setChargesOffset(0);
+              // Atualizar filtros com novo offset não vai funcionar bem
+              // Melhor seria modificar o hook para aceitar offset separado
+              refresh();
             }}
           />
         </TabsContent>
@@ -666,14 +656,10 @@ const AdminDashboard = () => {
             pagination={customersPagination}
             onPageChange={(offset) => {
               setCustomersOffset(offset);
+              refresh();
             }}
             onDelete={handleDeleteCustomer}
             deletingCustomer={deletingCustomer}
-            searchValue={customersSearch}
-            onSearchChange={(search) => {
-              setCustomersSearch(search);
-              setCustomersOffset(0);
-            }}
           />
         </TabsContent>
 

@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { ChevronLeft, ChevronRight, CreditCard, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Trash2, RefreshCw, AlertTriangle, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CreditCard, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Trash2, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ParticipantsTableProps {
@@ -19,8 +18,6 @@ interface ParticipantsTableProps {
   onPageChange?: (offset: number) => void;
   onDelete?: (email: string) => void;
   deletingCustomer?: string | null;
-  searchValue?: string;
-  onSearchChange?: (search: string) => void;
 }
 
 export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({ 
@@ -29,9 +26,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
   pagination,
   onPageChange,
   onDelete,
-  deletingCustomer,
-  searchValue = '',
-  onSearchChange
+  deletingCustomer
 }) => {
   const { toast } = useToast();
   const [sortField, setSortField] = useState<'data' | 'nome'>('data');
@@ -130,19 +125,6 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        {/* Campo de Busca */}
-        <div className="mb-4 flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nome ou email..."
-              value={searchValue}
-              onChange={(e) => onSearchChange?.(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </div>
-        
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
