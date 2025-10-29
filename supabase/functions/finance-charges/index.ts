@@ -28,7 +28,7 @@ serve(async (req) => {
 
     console.log(`💵 Finance charges requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Query com joins especificando qual FK usar (LEFT JOIN para customer ser opcional)
+    // Se há busca, precisamos buscar TODOS os registros para filtrar
     let query = supabaseClient
       .from('stripe_charges')
       .select(`
@@ -37,8 +37,12 @@ serve(async (req) => {
         stripe_payment_intents(metadata, customer_id),
         stripe_customers!fk_stripe_charges_customer(email, name)
       `)
-      .order('created_utc', { ascending: false })
-      .range(offset, offset + limit - 1);
+      .order('created_utc', { ascending: false });
+
+    // Se NÃO há busca, podemos paginar diretamente no banco
+    if (!search) {
+      query = query.range(offset, offset + limit - 1);
+    }
 
     if (from) query = query.gte('created_utc', from);
     if (to) query = query.lte('created_utc', to);
@@ -49,8 +53,10 @@ serve(async (req) => {
 
     if (error) throw error;
 
-    // Filtrar por search se fornecido
     let charges = allCharges || [];
+    let totalCount = charges.length;
+
+    // Filtrar por search se fornecido
     if (search) {
       const searchLower = search.toLowerCase();
       charges = charges.filter(charge => {
@@ -64,12 +70,13 @@ serve(async (req) => {
                customerEmail.toLowerCase().includes(searchLower) ||
                chargeId.toLowerCase().includes(searchLower);
       });
+      
+      // Atualizar total após filtro
+      totalCount = charges.length;
+      
+      // Aplicar paginação na memória após filtro
+      charges = charges.slice(offset, offset + limit);
     }
-
-    const totalCount = charges.length;
-    
-    // Aplicar paginação
-    charges = charges.slice(offset, offset + limit);
 
     // Formatar dados
     const formatted = charges.map(charge => {
