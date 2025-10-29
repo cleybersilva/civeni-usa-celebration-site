@@ -74,79 +74,13 @@ serve(async (req) => {
     if (regError) throw regError;
 
     console.log(`📝 Found ${registrations?.length || 0} paid/free registrations (excluding pending)${cursoFilter ? ` for curso ${cursoFilter}` : ''}`);
-    
-    // Log de debug para ver estrutura dos dados
-    if (registrations && registrations.length > 0) {
-      console.log('🔍 Exemplo de registro:', JSON.stringify({
-        email: registrations[0].email,
-        curso_id: registrations[0].curso_id,
-        turma_id: registrations[0].turma_id,
-        cursos: registrations[0].cursos,
-        turmas: registrations[0].turmas
-      }));
-    }
-
-    // Buscar pagamentos do Stripe com email e informações do cartão
-    const { data: stripePayments, error: paymentsError } = await supabaseClient
-      .from('stripe_payments')
-      .select('email, customer_id, metadata');
-    
-    if (paymentsError) throw paymentsError;
-
-    console.log(`💳 Found ${stripePayments?.length || 0} stripe payments`);
-
-    // Buscar todos os charges para pegar informações de cartão
-    const { data: charges, error: chargesError } = await supabaseClient
-      .from('stripe_charges')
-      .select('id, payment_intent_id, brand, last4, customer_id');
-    
-    if (chargesError) throw chargesError;
-
-    console.log(`💳 Found ${charges?.length || 0} charges with card info`);
-    
-    // Log sample charge for debugging
-    if (charges && charges.length > 0) {
-      console.log('💳 Sample charge:', JSON.stringify({
-        payment_intent_id: charges[0].payment_intent_id,
-        brand: charges[0].brand,
-        last4: charges[0].last4,
-        customer_id: charges[0].customer_id
-      }));
-    }
-
-    // Criar map de charges por customer_id
-    const chargesByCustomer = new Map();
-    charges?.forEach(charge => {
-      if (charge.customer_id) {
-        if (!chargesByCustomer.has(charge.customer_id)) {
-          chargesByCustomer.set(charge.customer_id, []);
-        }
-        chargesByCustomer.get(charge.customer_id).push(charge);
-      }
-    });
-
-    // Criar map de payment data por email
-    const paymentsByEmail = new Map();
-    stripePayments?.forEach(payment => {
-      if (payment.email) {
-        paymentsByEmail.set(payment.email.toLowerCase(), payment);
-      }
-    });
 
     // Buscar reembolsos
     const { data: refunds } = await supabaseClient
       .from('stripe_refunds')
       .select('charge_id, amount');
 
-    // Criar map de charges por payment_intent_id
-    const chargesMap = new Map();
-    charges?.forEach(charge => {
-      if (charge.payment_intent_id) {
-        chargesMap.set(charge.payment_intent_id, charge);
-      }
-    });
-
-    // Criar map de reembolsos por charge_id
+    // Criar map de reembolsos por charge_id (para uso futuro quando houver dados vinculados)
     const refundsMap = new Map();
     refunds?.forEach(refund => {
       if (!refundsMap.has(refund.charge_id)) {
@@ -200,40 +134,9 @@ serve(async (req) => {
       customer.total_gasto += parseFloat(reg.amount_paid || 0);
       customer.pagamentos += 1;
       
-      // Buscar informações do cartão através do email no stripe_payments
-      const emailLower = email.toLowerCase();
-      const paymentInfo = paymentsByEmail.get(emailLower);
-      
-      if (paymentInfo && paymentInfo.customer_id) {
-        const customerCharges = chargesByCustomer.get(paymentInfo.customer_id);
-        if (customerCharges && customerCharges.length > 0) {
-          const latestCharge = customerCharges[customerCharges.length - 1];
-          console.log(`💳 Encontrado charge para ${email}: brand=${latestCharge.brand}, last4=${latestCharge.last4}`);
-          
-          if (!customer.card_brand && latestCharge.brand) {
-            customer.card_brand = latestCharge.brand;
-            customer.last4 = latestCharge.last4;
-          }
-          if (latestCharge.brand) {
-            customer.payment_methods.add(latestCharge.brand);
-          }
-          
-          // Verificar se esse charge tem reembolsos
-          const chargeRefunds = refundsMap.get(latestCharge.id);
-          if (chargeRefunds && chargeRefunds.length > 0) {
-            customer.reembolsos += chargeRefunds.length;
-            chargeRefunds.forEach(refund => {
-              customer.reembolsos_valor += refund.amount / 100;
-            });
-          }
-        } else {
-          console.log(`⚠️ Customer ${email} tem payment mas sem charges`);
-        }
-      } else {
-        if (parseFloat(reg.amount_paid || 0) > 0) {
-          console.log(`⚠️ Registro ${email} com valor R$ ${reg.amount_paid} mas sem stripe_payments`);
-        }
-      }
+      // NOTA: Dados do Stripe não estão vinculados aos registros
+      // Todos os pagamentos com valor > 0 serão tratados como "Pagamento Manual"
+      // até que a sincronização do Stripe seja corrigida
     });
 
     console.log(`👥 Grouped into ${customersMap.size} unique customers`);
@@ -294,19 +197,12 @@ serve(async (req) => {
       const paymentStatus = customer.registrations[0]?.payment_status || 'unknown';
       
       // Determinar forma de pagamento:
-      // 1. Se tem payment_intent e card_brand do Stripe → mostrar bandeira
-      // 2. Se tem amount_paid > 0 mas sem payment_intent → Pagamento Manual
-      // 3. Se curso = "Não especificado" ou amount_paid = 0 → Voucher/Gratuito
+      // NOTA: Dados do Stripe não estão sincronizados/vinculados aos registros
+      // 1. Se curso = "Não especificado" ou amount_paid = 0 → Voucher/Gratuito
+      // 2. Se tem amount_paid > 0 → Pagamento Manual (até sincronização do Stripe ser corrigida)
       let formaPagamento = 'Voucher/Gratuito';
       
-      if (customer.card_brand && customer.registrations[0]?.stripe_payment_intent_id) {
-        // Tem pagamento via Stripe com cartão
-        formaPagamento = customer.card_brand.charAt(0).toUpperCase() + customer.card_brand.slice(1);
-        if (customer.last4) {
-          formaPagamento += ` ****${customer.last4}`;
-        }
-      } else if (customer.total_gasto > 0 && customer.curso !== 'Não especificado') {
-        // Tem valor pago mas sem Stripe = pagamento manual/externo
+      if (customer.total_gasto > 0 && customer.curso !== 'Não especificado') {
         formaPagamento = 'Pagamento Manual';
       }
       
