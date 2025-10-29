@@ -43,24 +43,34 @@ serve(async (req) => {
         )
       `);
     
+    console.log('🔍 Aplicando filtros...');
+    
     // Aplicar filtros apenas se fornecidos
     if (statusFilter) {
+      console.log(`   ✓ Filtro de status: ${statusFilter}`);
       query = query.eq('payment_status', statusFilter);
+    } else {
+      console.log('   ⊘ Sem filtro de status - buscando todos os registros');
     }
     
     if (cursoFilter) {
+      console.log(`   ✓ Filtro de curso: ${cursoFilter}`);
       query = query.eq('curso_id', cursoFilter);
     }
     
     if (turmaFilter) {
+      console.log(`   ✓ Filtro de turma: ${turmaFilter}`);
       query = query.eq('turma_id', turmaFilter);
     }
     
     const { data: registrations, error: regError } = await query;
     
-    if (regError) throw regError;
+    if (regError) {
+      console.error('❌ Erro ao buscar registrations:', regError);
+      throw regError;
+    }
 
-    console.log(`📝 Found ${registrations?.length || 0} registrations${cursoFilter ? ` for curso ${cursoFilter}` : ''}${turmaFilter ? ` for turma ${turmaFilter}` : ''}${statusFilter ? ` with status ${statusFilter}` : ''}`);
+    console.log(`📝 Found ${registrations?.length || 0} registrations`);
     
     // Log de debug para ver estrutura dos dados
     if (registrations && registrations.length > 0) {
@@ -76,9 +86,12 @@ serve(async (req) => {
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
-      .select('id, payment_intent_id, brand, last4, customer_id, customer_email');
+      .select('id, payment_intent_id, brand, last4, customer_id');
     
-    if (chargesError) throw chargesError;
+    if (chargesError) {
+      console.error('❌ Erro ao buscar charges:', chargesError);
+      throw chargesError;
+    }
 
     console.log(`💳 Found ${charges?.length || 0} charges with card info`);
     
@@ -87,8 +100,7 @@ serve(async (req) => {
       console.log('💳 Sample charge:', JSON.stringify({
         payment_intent_id: charges[0].payment_intent_id,
         brand: charges[0].brand,
-        last4: charges[0].last4,
-        customer_email: charges[0].customer_email
+        last4: charges[0].last4
       }));
     }
 
@@ -97,18 +109,11 @@ serve(async (req) => {
       .from('stripe_refunds')
       .select('charge_id, amount');
 
-    // Criar map de charges por payment_intent_id e por email
+    // Criar map de charges por payment_intent_id
     const chargesMap = new Map();
-    const chargesByEmail = new Map();
     charges?.forEach(charge => {
       if (charge.payment_intent_id) {
         chargesMap.set(charge.payment_intent_id, charge);
-      }
-      if (charge.customer_email) {
-        if (!chargesByEmail.has(charge.customer_email)) {
-          chargesByEmail.set(charge.customer_email, []);
-        }
-        chargesByEmail.get(charge.customer_email).push(charge);
       }
     });
 
@@ -185,19 +190,6 @@ serve(async (req) => {
             chargeRefunds.forEach(refund => {
               customer.reembolsos_valor += refund.amount / 100;
             });
-          }
-        }
-      }
-      
-      // Buscar por email se não encontrou pelo payment_intent_id
-      if (!customer.card_brand && chargesByEmail.has(email)) {
-        const emailCharges = chargesByEmail.get(email);
-        if (emailCharges && emailCharges.length > 0) {
-          const latestCharge = emailCharges[emailCharges.length - 1];
-          if (latestCharge.brand) {
-            customer.card_brand = latestCharge.brand;
-            customer.last4 = latestCharge.last4;
-            customer.payment_methods.add(latestCharge.brand);
           }
         }
       }
