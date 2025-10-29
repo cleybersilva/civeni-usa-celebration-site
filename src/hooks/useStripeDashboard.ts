@@ -24,6 +24,10 @@ interface StripeDashboardFilters {
   lote?: string;
   cupom?: string;
   brand?: string;
+  chargesOffset?: number;
+  customersOffset?: number;
+  chargesSearch?: string;
+  customersSearch?: string;
 }
 
 export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
@@ -91,7 +95,7 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       console.log('🔄 Fetching Stripe dashboard data...', { from, to, filters });
 
       // Build query params for all requests
-      const buildParams = () => {
+      const buildParams = (includeChargesParams = false, includeCustomersParams = false) => {
         const params = new URLSearchParams();
         if (from) params.append('from', from);
         if (to) params.append('to', to);
@@ -99,11 +103,28 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
         if (filters.lote) params.append('lote', filters.lote);
         if (filters.cupom) params.append('cupom', filters.cupom);
         if (filters.brand && filters.brand !== 'all') params.append('brand', filters.brand);
+        
+        if (includeChargesParams) {
+          if (filters.chargesOffset) params.append('offset', filters.chargesOffset.toString());
+          if (filters.chargesSearch) params.append('search', filters.chargesSearch);
+        }
+        
+        if (includeCustomersParams) {
+          if (filters.customersOffset) params.append('offset', filters.customersOffset.toString());
+          if (filters.customersSearch) params.append('search', filters.customersSearch);
+        }
+        
         return params.toString();
       };
 
       const queryString = buildParams();
       const requestUrl = queryString ? `?${queryString}` : '';
+      
+      const chargesQueryString = buildParams(true, false);
+      const chargesRequestUrl = chargesQueryString ? `?${chargesQueryString}` : '';
+      
+      const customersQueryString = buildParams(false, true);
+      const customersRequestUrl = customersQueryString ? `?${customersQueryString}` : '';
 
       const [summaryRes, timeseriesRes, brandRes, funnelRes, chargesRes, customersRes] = await Promise.all([
         supabase.functions.invoke(`finance-summary${requestUrl}`, { 
@@ -131,13 +152,13 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
           console.log('🔽 Funnel response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-charges${requestUrl}`, { 
+        supabase.functions.invoke(`finance-charges${chargesRequestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('💰 Charges response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-customers${requestUrl}`, {
+        supabase.functions.invoke(`finance-customers${customersRequestUrl}`, {
           method: 'GET'
         }).then(res => {
           console.log('👥 Customers response:', res);
