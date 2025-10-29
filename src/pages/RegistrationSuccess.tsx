@@ -73,6 +73,9 @@ const RegistrationSuccess = () => {
                 <p className="text-lg text-muted-foreground">
                   Parabéns! Sua inscrição no Civeni 2025 foi confirmada.
                 </p>
+                <p className="text-base text-muted-foreground">
+                  Fique ligado(a)! Até 10/12/2025, você receberá no e-mail ou WhatsApp o link para acessar a programação do III CIVENI 2025.
+                </p>
               </div>
               
               {/* Info Box */}
