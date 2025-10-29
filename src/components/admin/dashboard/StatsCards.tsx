@@ -46,7 +46,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="border-blue-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(214 100% 97%), hsl(214 100% 92%))' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-blue-800">{t('admin.dashboard.totalRegistrations', 'Total de Inscrições')}</CardTitle>
           <Users className="h-4 w-4 text-blue-600" />
@@ -59,7 +59,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="border-green-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(138 76% 97%), hsl(142 76% 91%))' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-green-800">{t('admin.dashboard.confirmedPayments', 'Pagamentos Confirmados')}</CardTitle>
           <DollarSign className="h-4 w-4 text-green-600" />
@@ -72,7 +72,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(270 100% 98%), hsl(270 100% 95%))' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-purple-800">{t('admin.dashboard.totalRevenue', 'Receita Total')}</CardTitle>
           <TrendingUp className="h-4 w-4 text-purple-600" />
@@ -85,7 +85,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="border-amber-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(48 100% 96%), hsl(48 96% 89%))' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-amber-800">{t('admin.dashboard.conversionRate', 'Taxa de Conversão')}</CardTitle>
           <AlertTriangle className="h-4 w-4 text-amber-600" />

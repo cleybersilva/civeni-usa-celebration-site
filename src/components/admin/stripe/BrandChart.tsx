@@ -63,7 +63,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
 
   return (
     <Card className="border-l-4 border-l-orange-500 shadow-md">
-      <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
+      <CardHeader style={{ background: 'linear-gradient(to right, hsl(33 100% 96%), hsl(48 100% 96%))' }}>
         <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
           <CreditCard className="h-5 w-5" />
           Receita por Bandeira

@@ -37,7 +37,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({ data, loading }) => {
 
   return (
     <Card className="border-l-4 border-l-purple-500 shadow-md">
-      <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+      <CardHeader style={{ background: 'linear-gradient(to right, hsl(270 100% 98%), hsl(330 100% 98%))' }}>
         <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
           <TrendingDown className="h-5 w-5" />
           Funil de Conversão
@@ -81,7 +81,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({ data, loading }) => {
         })}
         
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg">
+          <div className="text-center p-4 rounded-lg" style={{ background: 'linear-gradient(to right, hsl(138 76% 97%), hsl(160 84% 96%))' }}>
             <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Taxa de Conversão Total</p>
             <p className="text-4xl font-bold text-green-600 dark:text-green-400 mt-1">{data.taxa_conversao?.toFixed(2)}%</p>
           </div>
