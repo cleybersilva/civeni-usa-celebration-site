@@ -80,11 +80,11 @@ serve(async (req) => {
       const fee = bt?.fee || charge.fee_amount || 0;
       const net = bt?.net || charge.net_amount || (amount - fee);
 
-      bruto += amount;
-      taxas += fee;
-      liquido += net;
-
+      // Apenas somar valores para pagamentos confirmados e pagos
       if (charge.status === 'succeeded' && charge.paid) {
+        bruto += amount;
+        taxas += fee;
+        liquido += net;
         pagos++;
       } else {
         naoPagos++;
