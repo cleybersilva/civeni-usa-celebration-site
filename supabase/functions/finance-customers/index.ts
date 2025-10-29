@@ -175,7 +175,9 @@ serve(async (req) => {
       // Buscar informações do cartão no charge correspondente
       if (reg.stripe_payment_intent_id) {
         const charge = chargesMap.get(reg.stripe_payment_intent_id);
+        console.log(`🔍 Buscando charge para ${email}, payment_intent: ${reg.stripe_payment_intent_id}, encontrado: ${!!charge}`);
         if (charge) {
+          console.log(`💳 Charge encontrado - brand: ${charge.brand}, last4: ${charge.last4}`);
           if (!customer.card_brand && charge.brand) {
             customer.card_brand = charge.brand;
             customer.last4 = charge.last4;
@@ -192,7 +194,11 @@ serve(async (req) => {
               customer.reembolsos_valor += refund.amount / 100;
             });
           }
+        } else {
+          console.log(`⚠️ Charge NÃO encontrado para payment_intent: ${reg.stripe_payment_intent_id}`);
         }
+      } else {
+        console.log(`⚠️ Registro ${email} sem stripe_payment_intent_id, amount_paid: ${reg.amount_paid}`);
       }
     });
 
