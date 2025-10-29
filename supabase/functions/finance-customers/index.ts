@@ -259,6 +259,18 @@ serve(async (req) => {
       const participantType = customer.registrations[0]?.participant_type || 'Não especificado';
       const paymentStatus = customer.registrations[0]?.payment_status || 'unknown';
       
+      // Determinar forma de pagamento:
+      // - Se curso = "Não especificado" → Voucher/Gratuito
+      // - Se tem card_brand do Stripe → mostrar a bandeira
+      // - Caso contrário → Voucher/Gratuito
+      let formaPagamento = 'Voucher/Gratuito';
+      if (customer.curso !== 'Não especificado' && customer.card_brand) {
+        formaPagamento = customer.card_brand.charAt(0).toUpperCase() + customer.card_brand.slice(1);
+        if (customer.last4) {
+          formaPagamento += ` ****${customer.last4}`;
+        }
+      }
+      
       return {
         id: `customer_${offset + index}`,
         nome: customer.name,
@@ -269,7 +281,7 @@ serve(async (req) => {
         payment_status: paymentStatus,
         card_brand: customer.card_brand || null,
         last4: customer.last4 || null,
-        forma_pagamento_padrao: Array.from(customer.payment_methods).join(', ') || 'Não definida',
+        forma_pagamento_padrao: formaPagamento,
         criado: formattedDate,
         total_gasto: customer.total_gasto,
         pagamentos: customer.pagamentos,
