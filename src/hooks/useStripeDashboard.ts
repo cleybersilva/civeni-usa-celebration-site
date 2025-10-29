@@ -28,6 +28,7 @@ interface StripeDashboardFilters {
   customersOffset?: number;
   chargesSearch?: string;
   customersSearch?: string;
+  customersCurso?: string;
 }
 
 export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
@@ -54,7 +55,8 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
     filters.chargesOffset,
     filters.customersOffset,
     filters.chargesSearch,
-    filters.customersSearch
+    filters.customersSearch,
+    filters.customersCurso
   ]);
 
   const fetchAll = useCallback(async () => {
@@ -125,6 +127,10 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
         }
         if (includeOffset === 'customers') {
           params.append('offset', String(stableFilters.customersOffset || 0));
+          // Add curso filter for customers
+          if (stableFilters.customersCurso) {
+            params.append('curso', stableFilters.customersCurso);
+          }
         }
         if (includeSearch === 'charges' && stableFilters.chargesSearch) {
           params.append('search', stableFilters.chargesSearch);

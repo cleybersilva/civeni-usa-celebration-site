@@ -21,11 +21,12 @@ serve(async (req) => {
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
     const search = url.searchParams.get('search') || '';
+    const cursoFilter = url.searchParams.get('curso') || '';
 
-    console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}`);
+    console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}, curso=${cursoFilter}`);
 
     // Buscar apenas registros com pagamento confirmado (pagos e gratuitos/vouchers)
-    const { data: registrations, error: regError } = await supabaseClient
+    let query = supabaseClient
       .from('event_registrations')
       .select(`
         *,
@@ -40,9 +41,16 @@ serve(async (req) => {
       `)
       .eq('payment_status', 'completed');
     
+    // Aplicar filtro de curso se fornecido
+    if (cursoFilter) {
+      query = query.eq('curso_id', cursoFilter);
+    }
+    
+    const { data: registrations, error: regError } = await query;
+    
     if (regError) throw regError;
 
-    console.log(`📝 Found ${registrations?.length || 0} paid/free registrations (excluding pending)`);
+    console.log(`📝 Found ${registrations?.length || 0} paid/free registrations (excluding pending)${cursoFilter ? ` for curso ${cursoFilter}` : ''}`);
     
     // Log de debug para ver estrutura dos dados
     if (registrations && registrations.length > 0) {

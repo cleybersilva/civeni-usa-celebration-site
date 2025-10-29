@@ -39,7 +39,8 @@ const AdminDashboard = () => {
     chargesOffset: 0,
     customersOffset: 0,
     chargesSearch: '',
-    customersSearch: ''
+    customersSearch: '',
+    customersCurso: ''
   });
 
   const { 
@@ -75,7 +76,8 @@ const AdminDashboard = () => {
       chargesOffset: 0,
       customersOffset: 0,
       chargesSearch: '',
-      customersSearch: ''
+      customersSearch: '',
+      customersCurso: ''
     });
   };
 
@@ -670,6 +672,10 @@ const AdminDashboard = () => {
             searchValue={filters.customersSearch}
             onSearchChange={(search) => {
               setFilters(prev => ({ ...prev, customersSearch: search, customersOffset: 0 }));
+            }}
+            cursoFilter={filters.customersCurso}
+            onCursoFilterChange={(cursoId) => {
+              setFilters(prev => ({ ...prev, customersCurso: cursoId, customersOffset: 0 }));
             }}
           />
         </TabsContent>

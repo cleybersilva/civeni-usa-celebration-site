@@ -21,6 +21,8 @@ interface ParticipantsTableProps {
   deletingCustomer?: string | null;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
+  cursoFilter?: string;
+  onCursoFilterChange?: (cursoId: string) => void;
 }
 
 export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({ 
@@ -31,11 +33,27 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
   onDelete,
   deletingCustomer,
   searchValue = '',
-  onSearchChange
+  onSearchChange,
+  cursoFilter = '',
+  onCursoFilterChange
 }) => {
   const { toast } = useToast();
   const [sortField, setSortField] = useState<'data' | 'nome'>('data');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [cursos, setCursos] = useState<Array<{id: string, nome_curso: string}>>([]);
+
+  // Buscar lista de cursos
+  React.useEffect(() => {
+    const fetchCursos = async () => {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data } = await supabase
+        .from('cursos')
+        .select('id, nome_curso')
+        .order('nome_curso');
+      if (data) setCursos(data);
+    };
+    fetchCursos();
+  }, []);
 
   const sortedData = useMemo(() => {
     if (!data) return [];
@@ -130,9 +148,9 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        {/* Campo de busca */}
-        <div className="mb-4">
-          <div className="relative">
+        {/* Filtros */}
+        <div className="mb-4 flex gap-3">
+          <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por nome ou email..."
@@ -144,6 +162,21 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
               className="pl-10"
             />
           </div>
+          <select
+            value={cursoFilter}
+            onChange={(e) => {
+              onCursoFilterChange?.(e.target.value);
+              onPageChange?.(0); // Reset to first page on filter
+            }}
+            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[250px]"
+          >
+            <option value="">Todos os Cursos ({pagination?.total || 0})</option>
+            {cursos.map((curso) => (
+              <option key={curso.id} value={curso.id}>
+                {curso.nome_curso}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="overflow-x-auto">
