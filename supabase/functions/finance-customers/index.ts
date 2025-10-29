@@ -49,8 +49,8 @@ serve(async (req) => {
     if (statusFilter) {
       query = query.eq('payment_status', statusFilter);
     } else {
-      // Por padrão, mostrar apenas completed
-      query = query.eq('payment_status', 'completed');
+      // Por padrão, excluir apenas pending (mostra completed e free/voucher)
+      query = query.neq('payment_status', 'pending');
     }
     
     if (cursoFilter) {
