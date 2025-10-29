@@ -27,10 +27,6 @@ const AdminDashboard = () => {
   const { user, sessionToken } = useAdminAuth();
   const [syncing, setSyncing] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
-  const [chargesOffset, setChargesOffset] = useState(0);
-  const [customersOffset, setCustomersOffset] = useState(0);
-  const [chargesSearch, setChargesSearch] = useState('');
-  const [customersSearch, setCustomersSearch] = useState('');
 
   const [filters, setFilters] = useState({
     range: '30d',
@@ -57,13 +53,7 @@ const AdminDashboard = () => {
     customersPagination,
     loading, 
     refresh 
-  } = useStripeDashboard({
-    ...filters,
-    chargesOffset,
-    customersOffset,
-    chargesSearch,
-    customersSearch
-  });
+  } = useStripeDashboard(filters);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -87,10 +77,6 @@ const AdminDashboard = () => {
       chargesSearch: '',
       customersSearch: ''
     });
-    setChargesOffset(0);
-    setCustomersOffset(0);
-    setChargesSearch('');
-    setCustomersSearch('');
   };
 
   const handleSync = async () => {
@@ -661,9 +647,13 @@ const AdminDashboard = () => {
             data={charges} 
             loading={loading} 
             pagination={chargesPagination}
-            onPageChange={(offset) => setChargesOffset(offset)}
-            searchValue={chargesSearch}
-            onSearchChange={setChargesSearch}
+            onPageChange={(offset) => {
+              setFilters(prev => ({ ...prev, chargesOffset: offset }));
+            }}
+            searchValue={filters.chargesSearch}
+            onSearchChange={(search) => {
+              setFilters(prev => ({ ...prev, chargesSearch: search, chargesOffset: 0 }));
+            }}
           />
         </TabsContent>
 
@@ -672,11 +662,15 @@ const AdminDashboard = () => {
             data={customers}
             loading={loading}
             pagination={customersPagination}
-            onPageChange={(offset) => setCustomersOffset(offset)}
+            onPageChange={(offset) => {
+              setFilters(prev => ({ ...prev, customersOffset: offset }));
+            }}
             onDelete={handleDeleteCustomer}
             deletingCustomer={deletingCustomer}
-            searchValue={customersSearch}
-            onSearchChange={setCustomersSearch}
+            searchValue={filters.customersSearch}
+            onSearchChange={(search) => {
+              setFilters(prev => ({ ...prev, customersSearch: search, customersOffset: 0 }));
+            }}
           />
         </TabsContent>
 

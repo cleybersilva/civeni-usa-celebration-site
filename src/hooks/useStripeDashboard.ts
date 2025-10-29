@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -42,6 +42,21 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Criar uma versão estável de filters usando useMemo
+  const stableFilters = useMemo(() => filters, [
+    filters.range,
+    filters.customFrom,
+    filters.customTo,
+    filters.status,
+    filters.lote,
+    filters.cupom,
+    filters.brand,
+    filters.chargesOffset,
+    filters.customersOffset,
+    filters.chargesSearch,
+    filters.customersSearch
+  ]);
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
@@ -49,10 +64,10 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       let from: string | undefined;
       let to: string | undefined;
 
-      if (filters.customFrom && filters.customTo) {
+      if (stableFilters.customFrom && stableFilters.customTo) {
         // Criar cópias das datas para não modificar as originais
-        const fromDate = new Date(filters.customFrom.getTime());
-        const toDate = new Date(filters.customTo.getTime());
+        const fromDate = new Date(stableFilters.customFrom.getTime());
+        const toDate = new Date(stableFilters.customTo.getTime());
         
         // Ajustar para início do dia (00:00:00) no fuso local
         fromDate.setHours(0, 0, 0, 0);
@@ -69,9 +84,9 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
           fromISO: from,
           toISO: to
         });
-      } else if (filters.range && filters.range !== 'custom') {
+      } else if (stableFilters.range && stableFilters.range !== 'custom') {
         const now = new Date();
-        const days = parseInt(filters.range) || 30;
+        const days = parseInt(stableFilters.range) || 30;
         const fromDate = new Date(now.getTime());
         
         // Retroceder N dias
@@ -92,30 +107,30 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
         });
       }
 
-      console.log('🔄 Fetching Stripe dashboard data...', { from, to, filters });
+      console.log('🔄 Fetching Stripe dashboard data...', { from, to, stableFilters });
 
       // Build query params for all requests
       const buildParams = (includeOffset?: 'charges' | 'customers', includeSearch?: 'charges' | 'customers') => {
         const params = new URLSearchParams();
         if (from) params.append('from', from);
         if (to) params.append('to', to);
-        if (filters.status && filters.status !== 'all') params.append('status', filters.status);
-        if (filters.lote) params.append('lote', filters.lote);
-        if (filters.cupom) params.append('cupom', filters.cupom);
-        if (filters.brand && filters.brand !== 'all') params.append('brand', filters.brand);
+        if (stableFilters.status && stableFilters.status !== 'all') params.append('status', stableFilters.status);
+        if (stableFilters.lote) params.append('lote', stableFilters.lote);
+        if (stableFilters.cupom) params.append('cupom', stableFilters.cupom);
+        if (stableFilters.brand && stableFilters.brand !== 'all') params.append('brand', stableFilters.brand);
         
         // Add offset and search based on context
         if (includeOffset === 'charges') {
-          params.append('offset', String(filters.chargesOffset || 0));
+          params.append('offset', String(stableFilters.chargesOffset || 0));
         }
         if (includeOffset === 'customers') {
-          params.append('offset', String(filters.customersOffset || 0));
+          params.append('offset', String(stableFilters.customersOffset || 0));
         }
-        if (includeSearch === 'charges' && filters.chargesSearch) {
-          params.append('search', filters.chargesSearch);
+        if (includeSearch === 'charges' && stableFilters.chargesSearch) {
+          params.append('search', stableFilters.chargesSearch);
         }
-        if (includeSearch === 'customers' && filters.customersSearch) {
-          params.append('search', filters.customersSearch);
+        if (includeSearch === 'customers' && stableFilters.customersSearch) {
+          params.append('search', stableFilters.customersSearch);
         }
         
         return params.toString();
@@ -203,7 +218,7 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [filters, toast]);
+  }, [stableFilters, toast]);
 
   useEffect(() => {
     fetchAll();
