@@ -89,7 +89,7 @@ serve(async (req) => {
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
-      .select('id, payment_intent_id, brand, last4, customer_id, customer_email');
+      .select('id, payment_intent_id, brand, last4, customer_id');
     
     if (chargesError) throw chargesError;
 
@@ -101,7 +101,7 @@ serve(async (req) => {
         payment_intent_id: charges[0].payment_intent_id,
         brand: charges[0].brand,
         last4: charges[0].last4,
-        customer_email: charges[0].customer_email
+        customer_id: charges[0].customer_id
       }));
     }
 
@@ -110,18 +110,11 @@ serve(async (req) => {
       .from('stripe_refunds')
       .select('charge_id, amount');
 
-    // Criar map de charges por payment_intent_id e por email
+    // Criar map de charges por payment_intent_id
     const chargesMap = new Map();
-    const chargesByEmail = new Map();
     charges?.forEach(charge => {
       if (charge.payment_intent_id) {
         chargesMap.set(charge.payment_intent_id, charge);
-      }
-      if (charge.customer_email) {
-        if (!chargesByEmail.has(charge.customer_email)) {
-          chargesByEmail.set(charge.customer_email, []);
-        }
-        chargesByEmail.get(charge.customer_email).push(charge);
       }
     });
 
@@ -198,19 +191,6 @@ serve(async (req) => {
             chargeRefunds.forEach(refund => {
               customer.reembolsos_valor += refund.amount / 100;
             });
-          }
-        }
-      }
-      
-      // Buscar por email se não encontrou pelo payment_intent_id
-      if (!customer.card_brand && chargesByEmail.has(email)) {
-        const emailCharges = chargesByEmail.get(email);
-        if (emailCharges && emailCharges.length > 0) {
-          const latestCharge = emailCharges[emailCharges.length - 1];
-          if (latestCharge.brand) {
-            customer.card_brand = latestCharge.brand;
-            customer.last4 = latestCharge.last4;
-            customer.payment_methods.add(latestCharge.brand);
           }
         }
       }
