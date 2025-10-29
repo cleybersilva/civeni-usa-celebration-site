@@ -82,19 +82,11 @@ serve(async (req) => {
       const email = reg.email;
       
       if (!customersMap.has(email)) {
-        // Montar string de curso e turma
-        let cursoInfo = 'Não especificado';
-        if (reg.cursos?.nome_curso) {
-          cursoInfo = reg.cursos.nome_curso;
-          if (reg.turmas?.nome_turma) {
-            cursoInfo += ` - ${reg.turmas.nome_turma}`;
-          }
-        }
-        
         customersMap.set(email, {
           email,
           name: reg.full_name,
-          curso: cursoInfo,
+          curso: reg.cursos?.nome_curso || 'Não especificado',
+          turma: reg.turmas?.nome_turma || 'Não especificado',
           total_gasto: 0,
           pagamentos: 0,
           reembolsos: 0,
@@ -204,6 +196,7 @@ serve(async (req) => {
         email: customer.email,
         participant_type: participantType,
         curso: customer.curso,
+        turma: customer.turma,
         payment_status: paymentStatus,
         card_brand: customer.card_brand || null,
         last4: customer.last4 || null,
