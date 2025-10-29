@@ -40,7 +40,12 @@ const AdminDashboard = () => {
     customersOffset: 0,
     chargesSearch: '',
     customersSearch: '',
-    customersCurso: ''
+    customersCurso: '',
+    customersTurma: '',
+    customersStatus: '',
+    customersPaymentMethod: '',
+    customersStartDate: '',
+    customersEndDate: ''
   });
 
   const { 
@@ -77,7 +82,12 @@ const AdminDashboard = () => {
       customersOffset: 0,
       chargesSearch: '',
       customersSearch: '',
-      customersCurso: ''
+      customersCurso: '',
+      customersTurma: '',
+      customersStatus: '',
+      customersPaymentMethod: '',
+      customersStartDate: '',
+      customersEndDate: ''
     });
   };
 
@@ -675,7 +685,27 @@ const AdminDashboard = () => {
             }}
             cursoFilter={filters.customersCurso}
             onCursoFilterChange={(cursoId) => {
-              setFilters(prev => ({ ...prev, customersCurso: cursoId, customersOffset: 0 }));
+              setFilters(prev => ({ ...prev, customersCurso: cursoId, customersTurma: '', customersOffset: 0 }));
+            }}
+            turmaFilter={filters.customersTurma}
+            onTurmaFilterChange={(turmaId) => {
+              setFilters(prev => ({ ...prev, customersTurma: turmaId, customersOffset: 0 }));
+            }}
+            statusFilter={filters.customersStatus}
+            onStatusFilterChange={(status) => {
+              setFilters(prev => ({ ...prev, customersStatus: status, customersOffset: 0 }));
+            }}
+            paymentMethodFilter={filters.customersPaymentMethod}
+            onPaymentMethodFilterChange={(method) => {
+              setFilters(prev => ({ ...prev, customersPaymentMethod: method, customersOffset: 0 }));
+            }}
+            startDate={filters.customersStartDate}
+            endDate={filters.customersEndDate}
+            onStartDateChange={(date) => {
+              setFilters(prev => ({ ...prev, customersStartDate: date, customersOffset: 0 }));
+            }}
+            onEndDateChange={(date) => {
+              setFilters(prev => ({ ...prev, customersEndDate: date, customersOffset: 0 }));
             }}
           />
         </TabsContent>

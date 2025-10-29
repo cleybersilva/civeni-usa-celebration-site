@@ -23,6 +23,16 @@ interface ParticipantsTableProps {
   onSearchChange?: (value: string) => void;
   cursoFilter?: string;
   onCursoFilterChange?: (cursoId: string) => void;
+  turmaFilter?: string;
+  onTurmaFilterChange?: (turmaId: string) => void;
+  statusFilter?: string;
+  onStatusFilterChange?: (status: string) => void;
+  paymentMethodFilter?: string;
+  onPaymentMethodFilterChange?: (method: string) => void;
+  startDate?: string;
+  endDate?: string;
+  onStartDateChange?: (date: string) => void;
+  onEndDateChange?: (date: string) => void;
 }
 
 export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({ 
@@ -35,24 +45,42 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
   searchValue = '',
   onSearchChange,
   cursoFilter = '',
-  onCursoFilterChange
+  onCursoFilterChange,
+  turmaFilter = '',
+  onTurmaFilterChange,
+  statusFilter = '',
+  onStatusFilterChange,
+  paymentMethodFilter = '',
+  onPaymentMethodFilterChange,
+  startDate = '',
+  endDate = '',
+  onStartDateChange,
+  onEndDateChange
 }) => {
   const { toast } = useToast();
   const [sortField, setSortField] = useState<'data' | 'nome'>('data');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [cursos, setCursos] = useState<Array<{id: string, nome_curso: string}>>([]);
+  const [turmas, setTurmas] = useState<Array<{id: string, nome_turma: string}>>([]);
 
-  // Buscar lista de cursos
+  // Buscar lista de cursos e turmas
   React.useEffect(() => {
-    const fetchCursos = async () => {
+    const fetchData = async () => {
       const { supabase } = await import('@/integrations/supabase/client');
-      const { data } = await supabase
+      
+      const { data: cursosData } = await supabase
         .from('cursos')
         .select('id, nome_curso')
         .order('nome_curso');
-      if (data) setCursos(data);
+      if (cursosData) setCursos(cursosData);
+      
+      const { data: turmasData } = await supabase
+        .from('turmas')
+        .select('id, nome_turma')
+        .order('nome_turma');
+      if (turmasData) setTurmas(turmasData);
     };
-    fetchCursos();
+    fetchData();
   }, []);
 
   const sortedData = useMemo(() => {
@@ -149,34 +177,103 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
       </CardHeader>
       <CardContent>
         {/* Filtros */}
-        <div className="mb-4 flex gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nome ou email..."
-              value={searchValue}
+        <div className="mb-4 space-y-3">
+          <div className="flex gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome ou email..."
+                value={searchValue}
+                onChange={(e) => {
+                  onSearchChange?.(e.target.value);
+                  onPageChange?.(0);
+                }}
+                className="pl-10"
+              />
+            </div>
+            <select
+              value={cursoFilter}
               onChange={(e) => {
-                onSearchChange?.(e.target.value);
-                onPageChange?.(0); // Reset to first page on search
+                onCursoFilterChange?.(e.target.value);
+                onTurmaFilterChange?.(''); // Reset turma when curso changes
+                onPageChange?.(0);
               }}
-              className="pl-10"
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[200px]"
+            >
+              <option value="">Todos os Cursos</option>
+              {cursos.map((curso) => (
+                <option key={curso.id} value={curso.id}>
+                  {curso.nome_curso}
+                </option>
+              ))}
+            </select>
+            <select
+              value={turmaFilter}
+              onChange={(e) => {
+                onTurmaFilterChange?.(e.target.value);
+                onPageChange?.(0);
+              }}
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[150px]"
+            >
+              <option value="">Todas as Turmas</option>
+              {turmas.map((turma) => (
+                <option key={turma.id} value={turma.id}>
+                  {turma.nome_turma}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                onStatusFilterChange?.(e.target.value);
+                onPageChange?.(0);
+              }}
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[150px]"
+            >
+              <option value="">Todos os Status</option>
+              <option value="completed">Pago</option>
+              <option value="pending">Pendente</option>
+              <option value="processing">Processando</option>
+              <option value="failed">Falhou</option>
+            </select>
+            <select
+              value={paymentMethodFilter}
+              onChange={(e) => {
+                onPaymentMethodFilterChange?.(e.target.value);
+                onPageChange?.(0);
+              }}
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[180px]"
+            >
+              <option value="">Todas as Formas</option>
+              <option value="voucher">Voucher/Gratuito</option>
+              <option value="visa">Visa</option>
+              <option value="mastercard">Mastercard</option>
+              <option value="elo">Elo</option>
+              <option value="amex">Amex</option>
+            </select>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                onStartDateChange?.(e.target.value);
+                onPageChange?.(0);
+              }}
+              placeholder="Data Inicial"
+              className="min-w-[150px]"
+            />
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                onEndDateChange?.(e.target.value);
+                onPageChange?.(0);
+              }}
+              placeholder="Data Final"
+              className="min-w-[150px]"
             />
           </div>
-          <select
-            value={cursoFilter}
-            onChange={(e) => {
-              onCursoFilterChange?.(e.target.value);
-              onPageChange?.(0); // Reset to first page on filter
-            }}
-            className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[250px]"
-          >
-            <option value="">Todos os Cursos ({pagination?.total || 0})</option>
-            {cursos.map((curso) => (
-              <option key={curso.id} value={curso.id}>
-                {curso.nome_curso}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="overflow-x-auto">

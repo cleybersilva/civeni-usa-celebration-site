@@ -29,6 +29,11 @@ interface StripeDashboardFilters {
   chargesSearch?: string;
   customersSearch?: string;
   customersCurso?: string;
+  customersTurma?: string;
+  customersStatus?: string;
+  customersPaymentMethod?: string;
+  customersStartDate?: string;
+  customersEndDate?: string;
 }
 
 export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
@@ -56,7 +61,12 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
     filters.customersOffset,
     filters.chargesSearch,
     filters.customersSearch,
-    filters.customersCurso
+    filters.customersCurso,
+    filters.customersTurma,
+    filters.customersStatus,
+    filters.customersPaymentMethod,
+    filters.customersStartDate,
+    filters.customersEndDate
   ]);
 
   const fetchAll = useCallback(async () => {
@@ -130,6 +140,21 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
           // Add curso filter for customers
           if (stableFilters.customersCurso) {
             params.append('curso', stableFilters.customersCurso);
+          }
+          if (stableFilters.customersTurma) {
+            params.append('turma', stableFilters.customersTurma);
+          }
+          if (stableFilters.customersStatus) {
+            params.append('status', stableFilters.customersStatus);
+          }
+          if (stableFilters.customersPaymentMethod) {
+            params.append('payment_method', stableFilters.customersPaymentMethod);
+          }
+          if (stableFilters.customersStartDate) {
+            params.append('start_date', stableFilters.customersStartDate);
+          }
+          if (stableFilters.customersEndDate) {
+            params.append('end_date', stableFilters.customersEndDate);
           }
         }
         if (includeSearch === 'charges' && stableFilters.chargesSearch) {

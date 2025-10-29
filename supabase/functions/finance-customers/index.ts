@@ -22,10 +22,15 @@ serve(async (req) => {
     const offset = parseInt(url.searchParams.get('offset') || '0');
     const search = url.searchParams.get('search') || '';
     const cursoFilter = url.searchParams.get('curso') || '';
+    const turmaFilter = url.searchParams.get('turma') || '';
+    const statusFilter = url.searchParams.get('status') || '';
+    const paymentMethodFilter = url.searchParams.get('payment_method') || '';
+    const startDate = url.searchParams.get('start_date') || '';
+    const endDate = url.searchParams.get('end_date') || '';
 
-    console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}, curso=${cursoFilter}`);
+    console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}, filters={curso:${cursoFilter}, turma:${turmaFilter}, status:${statusFilter}, payment_method:${paymentMethodFilter}, dates:${startDate}-${endDate}}`);
 
-    // Buscar apenas registros com pagamento confirmado (pagos e gratuitos/vouchers)
+    // Buscar registros com base nos filtros
     let query = supabaseClient
       .from('event_registrations')
       .select(`
@@ -38,12 +43,30 @@ serve(async (req) => {
           id,
           nome_turma
         )
-      `)
-      .eq('payment_status', 'completed');
+      `);
     
-    // Aplicar filtro de curso se fornecido
+    // Aplicar filtros
+    if (statusFilter) {
+      query = query.eq('payment_status', statusFilter);
+    } else {
+      // Por padrão, mostrar apenas completed
+      query = query.eq('payment_status', 'completed');
+    }
+    
     if (cursoFilter) {
       query = query.eq('curso_id', cursoFilter);
+    }
+    
+    if (turmaFilter) {
+      query = query.eq('turma_id', turmaFilter);
+    }
+    
+    if (startDate) {
+      query = query.gte('created_at', startDate);
+    }
+    
+    if (endDate) {
+      query = query.lte('created_at', endDate);
     }
     
     const { data: registrations, error: regError } = await query;
@@ -66,22 +89,39 @@ serve(async (req) => {
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
-      .select('id, payment_intent_id, brand, last4, customer_id');
+      .select('id, payment_intent_id, brand, last4, customer_id, customer_email');
     
     if (chargesError) throw chargesError;
 
     console.log(`💳 Found ${charges?.length || 0} charges with card info`);
+    
+    // Log sample charge for debugging
+    if (charges && charges.length > 0) {
+      console.log('💳 Sample charge:', JSON.stringify({
+        payment_intent_id: charges[0].payment_intent_id,
+        brand: charges[0].brand,
+        last4: charges[0].last4,
+        customer_email: charges[0].customer_email
+      }));
+    }
 
     // Buscar reembolsos
     const { data: refunds } = await supabaseClient
       .from('stripe_refunds')
       .select('charge_id, amount');
 
-    // Criar map de charges por payment_intent_id
+    // Criar map de charges por payment_intent_id e por email
     const chargesMap = new Map();
+    const chargesByEmail = new Map();
     charges?.forEach(charge => {
       if (charge.payment_intent_id) {
         chargesMap.set(charge.payment_intent_id, charge);
+      }
+      if (charge.customer_email) {
+        if (!chargesByEmail.has(charge.customer_email)) {
+          chargesByEmail.set(charge.customer_email, []);
+        }
+        chargesByEmail.get(charge.customer_email).push(charge);
       }
     });
 
@@ -162,13 +202,23 @@ serve(async (req) => {
         }
       }
       
-      // Comentado: busca por email foi removida pois a coluna não existe
-      // A informação do cartão já foi obtida via payment_intent_id acima
+      // Buscar por email se não encontrou pelo payment_intent_id
+      if (!customer.card_brand && chargesByEmail.has(email)) {
+        const emailCharges = chargesByEmail.get(email);
+        if (emailCharges && emailCharges.length > 0) {
+          const latestCharge = emailCharges[emailCharges.length - 1];
+          if (latestCharge.brand) {
+            customer.card_brand = latestCharge.brand;
+            customer.last4 = latestCharge.last4;
+            customer.payment_methods.add(latestCharge.brand);
+          }
+        }
+      }
     });
 
     console.log(`👥 Grouped into ${customersMap.size} unique customers`);
 
-    // Converter para array e filtrar por search
+    // Converter para array e filtrar por search e payment method
     let customers = Array.from(customersMap.values());
     
     if (search) {
@@ -177,6 +227,15 @@ serve(async (req) => {
         c.email.toLowerCase().includes(searchLower) || 
         c.name.toLowerCase().includes(searchLower)
       );
+    }
+    
+    // Filtrar por forma de pagamento
+    if (paymentMethodFilter) {
+      if (paymentMethodFilter === 'voucher') {
+        customers = customers.filter(c => !c.card_brand);
+      } else {
+        customers = customers.filter(c => c.card_brand && c.card_brand.toLowerCase() === paymentMethodFilter.toLowerCase());
+      }
     }
     
     // Ordenar por data mais recente (último pagamento)
