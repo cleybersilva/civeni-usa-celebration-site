@@ -36,27 +36,40 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
   };
 
   const brandColors: Record<string, string> = {
-    visa: 'hsl(var(--chart-1))',
-    mastercard: 'hsl(var(--chart-2))',
-    amex: 'hsl(var(--chart-3))',
-    elo: 'hsl(var(--chart-4))',
-    hipercard: 'hsl(var(--chart-5))',
-    unknown: 'hsl(var(--muted-foreground))'
+    visa: '#1434CB',
+    mastercard: '#EB001B',
+    amex: '#006FCF',
+    elo: '#FFCB05',
+    hipercard: '#E31E24',
+    unknown: '#64748b'
+  };
+
+  const brandBgColors: Record<string, string> = {
+    visa: 'bg-blue-600',
+    mastercard: 'bg-red-600',
+    amex: 'bg-blue-700',
+    elo: 'bg-yellow-500',
+    hipercard: 'bg-red-600',
+    unknown: 'bg-gray-500'
   };
 
   const getBrandColor = (brand: string) => {
     return brandColors[brand.toLowerCase()] || brandColors.unknown;
   };
 
+  const getBrandBgColor = (brand: string) => {
+    return brandBgColors[brand.toLowerCase()] || brandBgColors.unknown;
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="border-l-4 border-l-orange-500 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
+        <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
           <CreditCard className="h-5 w-5" />
           Receita por Bandeira
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -65,7 +78,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
               type="category" 
               dataKey="bandeira" 
               width={100}
-              className="text-xs"
+              className="text-xs font-medium"
             />
             <Tooltip 
               formatter={(value: any) => formatCurrency(value)}
@@ -77,27 +90,31 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
             />
             <Bar 
               dataKey="receita_liquida" 
-              fill="hsl(var(--primary))"
-              radius={[0, 4, 4, 0]}
+              radius={[0, 8, 8, 0]}
               name="Receita Líquida"
-            />
+            >
+              {data.map((entry, index) => (
+                <rect key={`cell-${index}`} fill={getBrandColor(entry.bandeira)} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
         
-        {/* Legend com badges */}
+        {/* Legend com badges coloridos */}
         <div className="flex flex-wrap gap-2 mt-4">
           {data.map((item) => (
             <div 
               key={`${item.bandeira}-${item.funding}`}
-              className="flex items-center gap-2 text-xs px-2 py-1 rounded-md border"
+              className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border-2 shadow-sm hover:shadow-md transition-shadow"
+              style={{ borderColor: getBrandColor(item.bandeira) }}
             >
               <div 
-                className="w-3 h-3 rounded-full" 
+                className="w-4 h-4 rounded-full shadow-sm" 
                 style={{ backgroundColor: getBrandColor(item.bandeira) }}
               />
-              <span className="font-medium capitalize">{item.bandeira}</span>
-              <span className="text-muted-foreground">({item.funding})</span>
-              <span className="font-bold">{item.qtd}</span>
+              <span className="font-semibold capitalize">{item.bandeira}</span>
+              <span className="text-muted-foreground font-medium">({item.funding})</span>
+              <span className="font-bold text-gray-900 dark:text-gray-100">{item.qtd}</span>
             </div>
           ))}
         </div>

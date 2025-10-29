@@ -38,21 +38,21 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data, loading }) => 
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Receita ao longo do tempo</CardTitle>
+    <Card className="border-l-4 border-l-blue-500 shadow-md">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+        <CardTitle className="text-blue-700 dark:text-blue-300">Receita ao longo do tempo</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorBruta" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.05} />
               </linearGradient>
               <linearGradient id="colorLiquida" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -77,14 +77,16 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data, loading }) => 
             <Area 
               type="monotone" 
               dataKey="receita_bruta" 
-              stroke="hsl(var(--primary))" 
+              stroke="#3b82f6" 
+              strokeWidth={2}
               fill="url(#colorBruta)"
               name="Receita Bruta"
             />
             <Area 
               type="monotone" 
               dataKey="receita_liquida" 
-              stroke="hsl(var(--chart-2))" 
+              stroke="#10b981" 
+              strokeWidth={2}
               fill="url(#colorLiquida)"
               name="Receita Líquida"
             />
