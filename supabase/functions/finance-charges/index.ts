@@ -24,8 +24,9 @@ serve(async (req) => {
     const brand = url.searchParams.get('brand');
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
+    const search = url.searchParams.get('search') || '';
 
-    console.log(`💵 Finance charges requested: limit=${limit}, offset=${offset}`);
+    console.log(`💵 Finance charges requested: limit=${limit}, offset=${offset}, search=${search}`);
 
     // Query com joins especificando qual FK usar (LEFT JOIN para customer ser opcional)
     let query = supabaseClient
@@ -44,12 +45,34 @@ serve(async (req) => {
     if (status) query = query.eq('status', status);
     if (brand) query = query.eq('brand', brand);
 
-    const { data: charges, error, count } = await query;
+    const { data: allCharges, error } = await query;
 
     if (error) throw error;
 
+    // Filtrar por search se fornecido
+    let charges = allCharges || [];
+    if (search) {
+      const searchLower = search.toLowerCase();
+      charges = charges.filter(charge => {
+        const customer = charge.stripe_customers;
+        const pi = charge.stripe_payment_intents;
+        const customerName = customer?.name || pi?.metadata?.full_name || '';
+        const customerEmail = customer?.email || pi?.metadata?.email || '';
+        const chargeId = charge.id || '';
+        
+        return customerName.toLowerCase().includes(searchLower) ||
+               customerEmail.toLowerCase().includes(searchLower) ||
+               chargeId.toLowerCase().includes(searchLower);
+      });
+    }
+
+    const totalCount = charges.length;
+    
+    // Aplicar paginação
+    charges = charges.slice(offset, offset + limit);
+
     // Formatar dados
-    const formatted = (charges || []).map(charge => {
+    const formatted = charges.map(charge => {
       const bt = charge.stripe_balance_transactions;
       const pi = charge.stripe_payment_intents;
       const customer = charge.stripe_customers;
@@ -82,11 +105,6 @@ serve(async (req) => {
         stripe_link: `https://dashboard.stripe.com/payments/${charge.id}`
       };
     });
-
-    // Total count para paginação
-    const { count: totalCount } = await supabaseClient
-      .from('stripe_charges')
-      .select('*', { count: 'exact', head: true });
 
     return new Response(JSON.stringify({
       data: formatted,

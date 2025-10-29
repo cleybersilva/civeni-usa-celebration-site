@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, ChevronLeft, ChevronRight, Copy, CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ExternalLink, ChevronLeft, ChevronRight, Copy, CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ChargesTableProps {
@@ -16,13 +17,17 @@ interface ChargesTableProps {
     hasMore: boolean;
   };
   onPageChange?: (offset: number) => void;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export const ChargesTable: React.FC<ChargesTableProps> = ({ 
   data, 
   loading, 
   pagination,
-  onPageChange 
+  onPageChange,
+  searchValue = '',
+  onSearchChange
 }) => {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -118,6 +123,22 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
         <CardTitle>Transações Detalhadas</CardTitle>
       </CardHeader>
       <CardContent>
+        {/* Campo de busca */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome, email ou ID da transação..."
+              value={searchValue}
+              onChange={(e) => {
+                onSearchChange?.(e.target.value);
+                onPageChange?.(0); // Reset to first page on search
+              }}
+              className="pl-10"
+            />
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>

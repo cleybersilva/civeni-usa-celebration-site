@@ -24,6 +24,10 @@ interface StripeDashboardFilters {
   lote?: string;
   cupom?: string;
   brand?: string;
+  chargesOffset?: number;
+  customersOffset?: number;
+  chargesSearch?: string;
+  customersSearch?: string;
 }
 
 export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
@@ -91,7 +95,7 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       console.log('🔄 Fetching Stripe dashboard data...', { from, to, filters });
 
       // Build query params for all requests
-      const buildParams = () => {
+      const buildParams = (includeOffset?: 'charges' | 'customers', includeSearch?: 'charges' | 'customers') => {
         const params = new URLSearchParams();
         if (from) params.append('from', from);
         if (to) params.append('to', to);
@@ -99,45 +103,66 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
         if (filters.lote) params.append('lote', filters.lote);
         if (filters.cupom) params.append('cupom', filters.cupom);
         if (filters.brand && filters.brand !== 'all') params.append('brand', filters.brand);
+        
+        // Add offset and search based on context
+        if (includeOffset === 'charges') {
+          params.append('offset', String(filters.chargesOffset || 0));
+        }
+        if (includeOffset === 'customers') {
+          params.append('offset', String(filters.customersOffset || 0));
+        }
+        if (includeSearch === 'charges' && filters.chargesSearch) {
+          params.append('search', filters.chargesSearch);
+        }
+        if (includeSearch === 'customers' && filters.customersSearch) {
+          params.append('search', filters.customersSearch);
+        }
+        
         return params.toString();
       };
 
-      const queryString = buildParams();
-      const requestUrl = queryString ? `?${queryString}` : '';
+      const baseQueryString = buildParams();
+      const baseRequestUrl = baseQueryString ? `?${baseQueryString}` : '';
+      
+      const chargesQueryString = buildParams('charges', 'charges');
+      const chargesRequestUrl = chargesQueryString ? `?${chargesQueryString}` : '';
+      
+      const customersQueryString = buildParams('customers', 'customers');
+      const customersRequestUrl = customersQueryString ? `?${customersQueryString}` : '';
 
       const [summaryRes, timeseriesRes, brandRes, funnelRes, chargesRes, customersRes] = await Promise.all([
-        supabase.functions.invoke(`finance-summary${requestUrl}`, { 
+        supabase.functions.invoke(`finance-summary${baseRequestUrl}`, { 
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         }).then(res => {
           console.log('📊 Summary response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-timeseries${requestUrl}`, { 
+        supabase.functions.invoke(`finance-timeseries${baseRequestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('📈 Timeseries response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-by-brand${requestUrl}`, { 
+        supabase.functions.invoke(`finance-by-brand${baseRequestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('💳 By-brand response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-funnel${requestUrl}`, { 
+        supabase.functions.invoke(`finance-funnel${baseRequestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('🔽 Funnel response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-charges${requestUrl}`, { 
+        supabase.functions.invoke(`finance-charges${chargesRequestUrl}`, { 
           method: 'GET'
         }).then(res => {
           console.log('💰 Charges response:', res);
           return res;
         }),
-        supabase.functions.invoke(`finance-customers${requestUrl}`, {
+        supabase.functions.invoke(`finance-customers${customersRequestUrl}`, {
           method: 'GET'
         }).then(res => {
           console.log('👥 Customers response:', res);

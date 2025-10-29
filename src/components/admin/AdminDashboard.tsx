@@ -25,6 +25,13 @@ const AdminDashboard = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { user, sessionToken } = useAdminAuth();
+  const [syncing, setSyncing] = useState(false);
+  const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
+  const [chargesOffset, setChargesOffset] = useState(0);
+  const [customersOffset, setCustomersOffset] = useState(0);
+  const [chargesSearch, setChargesSearch] = useState('');
+  const [customersSearch, setCustomersSearch] = useState('');
+
   const [filters, setFilters] = useState({
     range: '30d',
     status: 'all',
@@ -32,9 +39,12 @@ const AdminDashboard = () => {
     cupom: '',
     brand: 'all',
     customFrom: undefined,
-    customTo: undefined
+    customTo: undefined,
+    chargesOffset: 0,
+    customersOffset: 0,
+    chargesSearch: '',
+    customersSearch: ''
   });
-  const [syncing, setSyncing] = useState(false);
 
   const { 
     summary, 
@@ -47,10 +57,13 @@ const AdminDashboard = () => {
     customersPagination,
     loading, 
     refresh 
-  } = useStripeDashboard(filters);
-  const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
-  const [chargesOffset, setChargesOffset] = useState(0);
-  const [customersOffset, setCustomersOffset] = useState(0);
+  } = useStripeDashboard({
+    ...filters,
+    chargesOffset,
+    customersOffset,
+    chargesSearch,
+    customersSearch
+  });
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -68,8 +81,16 @@ const AdminDashboard = () => {
       cupom: '',
       brand: 'all',
       customFrom: undefined,
-      customTo: undefined
+      customTo: undefined,
+      chargesOffset: 0,
+      customersOffset: 0,
+      chargesSearch: '',
+      customersSearch: ''
     });
+    setChargesOffset(0);
+    setCustomersOffset(0);
+    setChargesSearch('');
+    setCustomersSearch('');
   };
 
   const handleSync = async () => {
@@ -640,12 +661,9 @@ const AdminDashboard = () => {
             data={charges} 
             loading={loading} 
             pagination={chargesPagination}
-            onPageChange={(offset) => {
-              setChargesOffset(offset);
-              // Atualizar filtros com novo offset não vai funcionar bem
-              // Melhor seria modificar o hook para aceitar offset separado
-              refresh();
-            }}
+            onPageChange={(offset) => setChargesOffset(offset)}
+            searchValue={chargesSearch}
+            onSearchChange={setChargesSearch}
           />
         </TabsContent>
 
@@ -654,12 +672,11 @@ const AdminDashboard = () => {
             data={customers}
             loading={loading}
             pagination={customersPagination}
-            onPageChange={(offset) => {
-              setCustomersOffset(offset);
-              refresh();
-            }}
+            onPageChange={(offset) => setCustomersOffset(offset)}
             onDelete={handleDeleteCustomer}
             deletingCustomer={deletingCustomer}
+            searchValue={customersSearch}
+            onSearchChange={setCustomersSearch}
           />
         </TabsContent>
 
