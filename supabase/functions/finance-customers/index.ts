@@ -44,9 +44,9 @@ serve(async (req) => {
       `);
     
     // Aplicar filtros apenas se fornecidos
-    // Se nenhum filtro de status for fornecido, mostrar apenas completed por padrão
-    const effectiveStatusFilter = statusFilter || 'completed';
-    query = query.eq('payment_status', effectiveStatusFilter);
+    if (statusFilter) {
+      query = query.eq('payment_status', statusFilter);
+    }
     
     if (cursoFilter) {
       query = query.eq('curso_id', cursoFilter);
@@ -60,7 +60,7 @@ serve(async (req) => {
     
     if (regError) throw regError;
 
-    console.log(`📝 Found ${registrations?.length || 0} paid/free registrations (excluding pending)${cursoFilter ? ` for curso ${cursoFilter}` : ''}`);
+    console.log(`📝 Found ${registrations?.length || 0} registrations${cursoFilter ? ` for curso ${cursoFilter}` : ''}${turmaFilter ? ` for turma ${turmaFilter}` : ''}${statusFilter ? ` with status ${statusFilter}` : ''}`);
     
     // Log de debug para ver estrutura dos dados
     if (registrations && registrations.length > 0) {
