@@ -27,7 +27,13 @@ serve(async (req) => {
     // Buscar apenas registros com pagamento confirmado (pagos e gratuitos/vouchers)
     const { data: registrations, error: regError } = await supabaseClient
       .from('event_registrations')
-      .select('*')
+      .select(`
+        *,
+        cursos:curso_id (
+          id,
+          nome_curso
+        )
+      `)
       .eq('payment_status', 'completed');
     
     if (regError) throw regError;
@@ -75,6 +81,7 @@ serve(async (req) => {
         customersMap.set(email, {
           email,
           name: reg.full_name,
+          curso: reg.cursos?.nome_curso || 'Não especificado',
           total_gasto: 0,
           pagamentos: 0,
           reembolsos: 0,
@@ -183,6 +190,7 @@ serve(async (req) => {
         nome: customer.name,
         email: customer.email,
         participant_type: participantType,
+        curso: customer.curso,
         payment_status: paymentStatus,
         card_brand: customer.card_brand || null,
         last4: customer.last4 || null,

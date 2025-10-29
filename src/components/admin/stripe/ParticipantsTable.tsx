@@ -162,6 +162,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                   </Button>
                 </TableHead>
                 <TableHead>E-mail</TableHead>
+                <TableHead>Curso</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Forma de Pagamento</TableHead>
                 <TableHead>
@@ -184,7 +185,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
             <TableBody>
               {sortedData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     Nenhum participante encontrado
                   </TableCell>
                 </TableRow>
@@ -207,6 +208,9 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                         {participant.email}
                         <ExternalLink className="h-3 w-3" />
                       </a>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{participant.curso || 'Não especificado'}</span>
                     </TableCell>
                     <TableCell>
                       {getPaymentStatusBadge(participant.payment_status)}
