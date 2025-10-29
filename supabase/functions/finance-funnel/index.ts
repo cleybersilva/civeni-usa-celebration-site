@@ -23,45 +23,63 @@ serve(async (req) => {
 
     console.log(`🔀 Finance funnel requested: from=${from}, to=${to}`);
 
-    // Query registrations for accurate funnel
-    let registrationsQuery = supabaseClient
+    // Query all registrations without date filter for accurate counts
+    const { data: allRegistrations, error: regError } = await supabaseClient
       .from('event_registrations')
-      .select('payment_status', { count: 'exact' });
+      .select('payment_status, created_at');
 
-    if (from) {
-      registrationsQuery = registrationsQuery.gte('created_at', from);
-    }
-    if (to) {
-      registrationsQuery = registrationsQuery.lte('created_at', to);
+    if (regError) {
+      console.error('❌ Error fetching registrations:', regError);
+      throw regError;
     }
 
-    const { data: registrations, count: totalRegistrations } = await registrationsQuery;
+    // Filter by date in JavaScript if needed
+    let filteredRegistrations = allRegistrations || [];
+    
+    if (from || to) {
+      filteredRegistrations = filteredRegistrations.filter(r => {
+        const createdAt = new Date(r.created_at);
+        if (from && createdAt < new Date(from)) return false;
+        if (to && createdAt > new Date(to)) return false;
+        return true;
+      });
+    }
+
+    console.log(`📊 Total registrations found: ${filteredRegistrations.length}`);
 
     // Count by status
-    const initiated = registrations?.filter(r => 
-      ['pending', 'started', 'processing'].includes(r.payment_status)
-    ).length || 0;
+    const pending = filteredRegistrations.filter(r => 
+      ['pending', 'started'].includes(r.payment_status)
+    ).length;
     
-    const completed = registrations?.filter(r => 
+    const processing = filteredRegistrations.filter(r => 
+      r.payment_status === 'processing'
+    ).length;
+    
+    const completed = filteredRegistrations.filter(r => 
       r.payment_status === 'completed'
-    ).length || 0;
+    ).length;
 
-    const total = totalRegistrations || 0;
+    const total = filteredRegistrations.length;
+    const paymentCreated = pending + processing + completed;
+    
+    console.log(`📈 Funnel: Total=${total}, Created=${paymentCreated}, Completed=${completed}`);
+
     const taxaConversao = total > 0 
       ? ((completed / total) * 100).toFixed(2) 
       : '0.00';
 
     const funnel = {
       total_sessions: total,
-      total_intents: initiated + completed,
+      total_intents: paymentCreated,
       charges_succeeded: completed,
       taxa_conversao: parseFloat(taxaConversao),
       steps: [
         { step: 'Checkout Iniciado', count: total, percentage: 100 },
         { 
           step: 'Pagamento Criado', 
-          count: initiated + completed, 
-          percentage: total > 0 ? (((initiated + completed) / total) * 100).toFixed(1) : '0' 
+          count: paymentCreated, 
+          percentage: total > 0 ? ((paymentCreated / total) * 100).toFixed(1) : '0' 
         },
         { 
           step: 'Pagamento Confirmado', 
