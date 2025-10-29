@@ -28,7 +28,26 @@ serve(async (req) => {
 
     console.log(`💵 Finance charges requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Se há busca, precisamos buscar TODOS os registros para filtrar
+    // Build count query first to get total
+    let countQuery = supabaseClient
+      .from('stripe_charges')
+      .select('id', { count: 'exact', head: true });
+    
+    if (from) countQuery = countQuery.gte('created_utc', from);
+    if (to) countQuery = countQuery.lte('created_utc', to);
+    if (status) countQuery = countQuery.eq('status', status);
+    if (brand) countQuery = countQuery.eq('brand', brand);
+
+    const { count: totalCount, error: countError } = await countQuery;
+    
+    if (countError) {
+      console.error('Error counting charges:', countError);
+      throw countError;
+    }
+
+    console.log(`📊 Total charges in filter: ${totalCount}`);
+
+    // Query para buscar os dados com joins
     let query = supabaseClient
       .from('stripe_charges')
       .select(`
@@ -39,22 +58,23 @@ serve(async (req) => {
       `)
       .order('created_utc', { ascending: false });
 
-    // Se NÃO há busca, podemos paginar diretamente no banco
-    if (!search) {
-      query = query.range(offset, offset + limit - 1);
-    }
-
     if (from) query = query.gte('created_utc', from);
     if (to) query = query.lte('created_utc', to);
     if (status) query = query.eq('status', status);
     if (brand) query = query.eq('brand', brand);
+
+    // Se há busca, buscar TODOS para filtrar na memória
+    // Se NÃO há busca, paginar no banco
+    if (!search) {
+      query = query.range(offset, offset + limit - 1);
+    }
 
     const { data: allCharges, error } = await query;
 
     if (error) throw error;
 
     let charges = allCharges || [];
-    let totalCount = charges.length;
+    let finalTotal = totalCount || 0;
 
     // Filtrar por search se fornecido
     if (search) {
@@ -71,11 +91,13 @@ serve(async (req) => {
                chargeId.toLowerCase().includes(searchLower);
       });
       
-      // Atualizar total após filtro
-      totalCount = charges.length;
+      // Atualizar total após filtro de busca
+      finalTotal = charges.length;
       
       // Aplicar paginação na memória após filtro
       charges = charges.slice(offset, offset + limit);
+      
+      console.log(`🔍 Search filtered: ${finalTotal} matches, showing ${charges.length}`);
     }
 
     // Formatar dados
@@ -118,8 +140,8 @@ serve(async (req) => {
       pagination: {
         limit,
         offset,
-        total: totalCount || 0,
-        hasMore: (offset + limit) < (totalCount || 0)
+        total: finalTotal || 0,
+        hasMore: (offset + limit) < (finalTotal || 0)
       }
     }), {
       status: 200,
