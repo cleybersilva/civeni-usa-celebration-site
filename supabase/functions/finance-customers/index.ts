@@ -32,6 +32,10 @@ serve(async (req) => {
         cursos:curso_id (
           id,
           nome_curso
+        ),
+        turmas:turma_id (
+          id,
+          nome_turma
         )
       `)
       .eq('payment_status', 'completed');
@@ -78,10 +82,19 @@ serve(async (req) => {
       const email = reg.email;
       
       if (!customersMap.has(email)) {
+        // Montar string de curso e turma
+        let cursoInfo = 'Não especificado';
+        if (reg.cursos?.nome_curso) {
+          cursoInfo = reg.cursos.nome_curso;
+          if (reg.turmas?.nome_turma) {
+            cursoInfo += ` - ${reg.turmas.nome_turma}`;
+          }
+        }
+        
         customersMap.set(email, {
           email,
           name: reg.full_name,
-          curso: reg.cursos?.nome_curso || 'Não especificado',
+          curso: cursoInfo,
           total_gasto: 0,
           pagamentos: 0,
           reembolsos: 0,
