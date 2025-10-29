@@ -33,6 +33,8 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
   const [funnel, setFunnel] = useState<any>(null);
   const [charges, setCharges] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [chargesPagination, setChargesPagination] = useState({ total: 0, limit: 50, offset: 0, hasMore: false });
+  const [customersPagination, setCustomersPagination] = useState({ total: 0, limit: 50, offset: 0, hasMore: false });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -153,8 +155,18 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       if (timeseriesRes.data) setTimeseries(timeseriesRes.data.data || timeseriesRes.data || []);
       if (brandRes.data) setByBrand(brandRes.data.data || brandRes.data || []);
       if (funnelRes.data) setFunnel(funnelRes.data);
-      if (chargesRes.data) setCharges(chargesRes.data.data || chargesRes.data || []);
-      if (customersRes.data) setCustomers(customersRes.data.data || customersRes.data || []);
+      if (chargesRes.data) {
+        setCharges(chargesRes.data.data || chargesRes.data || []);
+        if (chargesRes.data.pagination) {
+          setChargesPagination(chargesRes.data.pagination);
+        }
+      }
+      if (customersRes.data) {
+        setCustomers(customersRes.data.data || customersRes.data || []);
+        if (customersRes.data.pagination) {
+          setCustomersPagination(customersRes.data.pagination);
+        }
+      }
 
     } catch (error) {
       console.error('❌ Error fetching dashboard:', error);
@@ -187,5 +199,16 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
     };
   }, [fetchAll]);
 
-  return { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh: fetchAll };
+  return { 
+    summary, 
+    timeseries, 
+    byBrand, 
+    funnel, 
+    charges, 
+    customers, 
+    chargesPagination,
+    customersPagination,
+    loading, 
+    refresh: fetchAll 
+  };
 };

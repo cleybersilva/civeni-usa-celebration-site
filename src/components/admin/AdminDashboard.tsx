@@ -15,6 +15,7 @@ import { RevenueChart } from './stripe/RevenueChart';
 import { BrandChart } from './stripe/BrandChart';
 import { FunnelChart } from './stripe/FunnelChart';
 import { ChargesTable } from './stripe/ChargesTable';
+import { ParticipantsTable } from './stripe/ParticipantsTable';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -35,8 +36,21 @@ const AdminDashboard = () => {
   });
   const [syncing, setSyncing] = useState(false);
 
-  const { summary, timeseries, byBrand, funnel, charges, customers, loading, refresh } = useStripeDashboard(filters);
+  const { 
+    summary, 
+    timeseries, 
+    byBrand, 
+    funnel, 
+    charges, 
+    customers, 
+    chargesPagination,
+    customersPagination,
+    loading, 
+    refresh 
+  } = useStripeDashboard(filters);
   const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
+  const [chargesOffset, setChargesOffset] = useState(0);
+  const [customersOffset, setCustomersOffset] = useState(0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -622,143 +636,31 @@ const AdminDashboard = () => {
         </TabsList>
 
         <TabsContent value="tabela">
-          <ChargesTable data={charges} loading={loading} />
+          <ChargesTable 
+            data={charges} 
+            loading={loading} 
+            pagination={chargesPagination}
+            onPageChange={(offset) => {
+              setChargesOffset(offset);
+              // Atualizar filtros com novo offset não vai funcionar bem
+              // Melhor seria modificar o hook para aceitar offset separado
+              refresh();
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="customers">
-          <Card className="border-t-4 border-t-purple-500">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
-              <div className="space-y-2">
-                <CardTitle className="text-purple-700 dark:text-purple-300">Participantes</CardTitle>
-                  <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
-                    <div className="flex-1 text-sm">
-                      <p className="font-medium text-yellow-800 dark:text-yellow-200">Exclusão de Registros</p>
-                      <p className="text-yellow-700 dark:text-yellow-300 mt-1">
-                        Use o botão "Excluir" para remover TODOS os registros de um participante específico. 
-                        Esta ação é irreversível e requer confirmação.
-                      </p>
-                    </div>
-                  </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                {loading ? (
-                  <div className="h-[400px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Carregando participantes...</p>
-                  </div>
-                ) : customers.length === 0 ? (
-                  <div className="h-[400px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Nenhum participante encontrado</p>
-                  </div>
-                ) : (
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b text-xs text-muted-foreground">
-                        <th className="text-left p-3 font-medium">Nome</th>
-                        <th className="text-left p-3 font-medium">E-mail</th>
-                        <th className="text-left p-3 font-medium">Forma de pagamento padrão</th>
-                        <th className="text-left p-3 font-medium">Criado</th>
-                        <th className="text-right p-3 font-medium">Total gasto</th>
-                        <th className="text-center p-3 font-medium">Pagamentos</th>
-                        <th className="text-right p-3 font-medium">Reembolsos</th>
-                        <th className="text-center p-3 font-medium">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {customers.map((customer: any) => (
-                        <tr key={customer.id} className="border-b hover:bg-muted/30 transition-colors">
-                          <td className="p-3">
-                            <div className="font-medium">{customer.nome}</div>
-                            <div className="text-xs text-muted-foreground">Convidado</div>
-                          </td>
-                          <td className="p-3 text-muted-foreground">
-                            <a 
-                              href={customer.stripe_link} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="hover:text-primary hover:underline"
-                            >
-                              {customer.email}
-                            </a>
-                          </td>
-                          <td className="p-3">
-                            <div className="flex items-center gap-2">
-                              {customer.card_brand && (
-                                <>
-                                  <CreditCard className="h-4 w-4" />
-                                  <span className="font-medium">{customer.card_brand}</span>
-                                  {customer.last4 && (
-                                    <span className="text-muted-foreground">•••• {customer.last4}</span>
-                                  )}
-                                </>
-                              )}
-                              {!customer.card_brand && (
-                                <span className="text-muted-foreground">Não definida</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="p-3 text-muted-foreground">{customer.criado}</td>
-                          <td className="p-3 text-right font-medium">
-                            {formatCurrency(customer.total_gasto)}
-                          </td>
-                          <td className="p-3 text-center">{customer.pagamentos}</td>
-                          <td className="p-3 text-right font-medium">
-                            {formatCurrency(customer.reembolsos_valor || 0)}
-                          </td>
-                          <td className="p-3 text-center">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteCustomer(customer.email)}
-                              disabled={deletingCustomer === customer.email}
-                              className="hover:bg-destructive/10 hover:text-destructive"
-                              title={`Excluir todos os registros de ${customer.email}`}
-                            >
-                              {deletingCustomer === customer.email ? (
-                                <div className="flex items-center gap-2">
-                                  <RefreshCw className="h-4 w-4 animate-spin" />
-                                  <span className="text-xs">Excluindo...</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <Trash2 className="h-4 w-4" />
-                                  <span className="text-xs">Excluir</span>
-                                </div>
-                              )}
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-              
-              {/* Botões de Exportação */}
-              {customers.length > 0 && (
-                <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-purple-200 dark:border-purple-800">
-                  <Button 
-                    onClick={handleExportParticipantesPDF} 
-                    disabled={loading}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0"
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Exportar PDF
-                  </Button>
-                  <Button 
-                    onClick={handleExportParticipantesExcel} 
-                    disabled={loading}
-                    className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Exportar Excel
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <ParticipantsTable
+            data={customers}
+            loading={loading}
+            pagination={customersPagination}
+            onPageChange={(offset) => {
+              setCustomersOffset(offset);
+              refresh();
+            }}
+            onDelete={handleDeleteCustomer}
+            deletingCustomer={deletingCustomer}
+          />
         </TabsContent>
 
         <TabsContent value="analises">

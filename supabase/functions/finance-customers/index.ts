@@ -24,11 +24,10 @@ serve(async (req) => {
 
     console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Buscar registros completos (tem email e nome)
+    // Buscar TODOS os registros (incluindo pendentes, vouchers, etc)
     const { data: registrations, error: regError } = await supabaseClient
       .from('event_registrations')
-      .select('*')
-      .eq('payment_status', 'completed');
+      .select('*');
     
     if (regError) throw regError;
 
@@ -174,10 +173,16 @@ serve(async (req) => {
         });
       }
 
+      // Obter tipo de participante da primeira inscrição
+      const participantType = customer.registrations[0]?.participant_type || 'Não especificado';
+      const paymentStatus = customer.registrations[0]?.payment_status || 'unknown';
+      
       return {
         id: `customer_${offset + index}`,
         nome: customer.name,
         email: customer.email,
+        participant_type: participantType,
+        payment_status: paymentStatus,
         card_brand: customer.card_brand || null,
         last4: customer.last4 || null,
         forma_pagamento_padrao: Array.from(customer.payment_methods).join(', ') || 'Não definida',
