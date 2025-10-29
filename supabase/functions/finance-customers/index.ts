@@ -86,6 +86,15 @@ serve(async (req) => {
       }));
     }
 
+    // Buscar pagamentos do Stripe com email e informações do cartão
+    const { data: stripePayments, error: paymentsError } = await supabaseClient
+      .from('stripe_payments')
+      .select('email, customer_id, metadata');
+    
+    if (paymentsError) throw paymentsError;
+
+    console.log(`💳 Found ${stripePayments?.length || 0} stripe payments`);
+
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
       .from('stripe_charges')
@@ -104,6 +113,25 @@ serve(async (req) => {
         customer_id: charges[0].customer_id
       }));
     }
+
+    // Criar map de charges por customer_id
+    const chargesByCustomer = new Map();
+    charges?.forEach(charge => {
+      if (charge.customer_id) {
+        if (!chargesByCustomer.has(charge.customer_id)) {
+          chargesByCustomer.set(charge.customer_id, []);
+        }
+        chargesByCustomer.get(charge.customer_id).push(charge);
+      }
+    });
+
+    // Criar map de payment data por email
+    const paymentsByEmail = new Map();
+    stripePayments?.forEach(payment => {
+      if (payment.email) {
+        paymentsByEmail.set(payment.email.toLowerCase(), payment);
+      }
+    });
 
     // Buscar reembolsos
     const { data: refunds } = await supabaseClient
@@ -172,22 +200,26 @@ serve(async (req) => {
       customer.total_gasto += parseFloat(reg.amount_paid || 0);
       customer.pagamentos += 1;
       
-      // Buscar informações do cartão no charge correspondente
-      if (reg.stripe_payment_intent_id) {
-        const charge = chargesMap.get(reg.stripe_payment_intent_id);
-        console.log(`🔍 Buscando charge para ${email}, payment_intent: ${reg.stripe_payment_intent_id}, encontrado: ${!!charge}`);
-        if (charge) {
-          console.log(`💳 Charge encontrado - brand: ${charge.brand}, last4: ${charge.last4}`);
-          if (!customer.card_brand && charge.brand) {
-            customer.card_brand = charge.brand;
-            customer.last4 = charge.last4;
+      // Buscar informações do cartão através do email no stripe_payments
+      const emailLower = email.toLowerCase();
+      const paymentInfo = paymentsByEmail.get(emailLower);
+      
+      if (paymentInfo && paymentInfo.customer_id) {
+        const customerCharges = chargesByCustomer.get(paymentInfo.customer_id);
+        if (customerCharges && customerCharges.length > 0) {
+          const latestCharge = customerCharges[customerCharges.length - 1];
+          console.log(`💳 Encontrado charge para ${email}: brand=${latestCharge.brand}, last4=${latestCharge.last4}`);
+          
+          if (!customer.card_brand && latestCharge.brand) {
+            customer.card_brand = latestCharge.brand;
+            customer.last4 = latestCharge.last4;
           }
-          if (charge.brand) {
-            customer.payment_methods.add(charge.brand);
+          if (latestCharge.brand) {
+            customer.payment_methods.add(latestCharge.brand);
           }
           
           // Verificar se esse charge tem reembolsos
-          const chargeRefunds = refundsMap.get(charge.id);
+          const chargeRefunds = refundsMap.get(latestCharge.id);
           if (chargeRefunds && chargeRefunds.length > 0) {
             customer.reembolsos += chargeRefunds.length;
             chargeRefunds.forEach(refund => {
@@ -195,10 +227,12 @@ serve(async (req) => {
             });
           }
         } else {
-          console.log(`⚠️ Charge NÃO encontrado para payment_intent: ${reg.stripe_payment_intent_id}`);
+          console.log(`⚠️ Customer ${email} tem payment mas sem charges`);
         }
       } else {
-        console.log(`⚠️ Registro ${email} sem stripe_payment_intent_id, amount_paid: ${reg.amount_paid}`);
+        if (parseFloat(reg.amount_paid || 0) > 0) {
+          console.log(`⚠️ Registro ${email} com valor R$ ${reg.amount_paid} mas sem stripe_payments`);
+        }
       }
     });
 
