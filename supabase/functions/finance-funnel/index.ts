@@ -23,56 +23,50 @@ serve(async (req) => {
 
     console.log(`🔀 Finance funnel requested: from=${from}, to=${to}`);
 
-    // Query funnel
-    let sessionQuery = supabaseClient.from('stripe_checkout_sessions').select('id', { count: 'exact', head: true });
-    let intentQuery = supabaseClient.from('stripe_payment_intents').select('id', { count: 'exact', head: true });
-    let chargeQuery = supabaseClient
-      .from('stripe_charges')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'succeeded')
-      .eq('paid', true);
+    // Query registrations for accurate funnel
+    let registrationsQuery = supabaseClient
+      .from('event_registrations')
+      .select('payment_status', { count: 'exact' });
 
     if (from) {
-      sessionQuery = sessionQuery.gte('created_utc', from);
-      intentQuery = intentQuery.gte('created_utc', from);
-      chargeQuery = chargeQuery.gte('created_utc', from);
+      registrationsQuery = registrationsQuery.gte('created_at', from);
     }
     if (to) {
-      sessionQuery = sessionQuery.lte('created_utc', to);
-      intentQuery = intentQuery.lte('created_utc', to);
-      chargeQuery = chargeQuery.lte('created_utc', to);
+      registrationsQuery = registrationsQuery.lte('created_at', to);
     }
 
-    const [sessionsResult, intentsResult, chargesResult] = await Promise.all([
-      sessionQuery,
-      intentQuery,
-      chargeQuery
-    ]);
+    const { data: registrations, count: totalRegistrations } = await registrationsQuery;
 
-    const totalSessions = sessionsResult.count || 0;
-    const totalIntents = intentsResult.count || 0;
-    const chargesSucceeded = chargesResult.count || 0;
+    // Count by status
+    const initiated = registrations?.filter(r => 
+      ['pending', 'started', 'processing'].includes(r.payment_status)
+    ).length || 0;
+    
+    const completed = registrations?.filter(r => 
+      r.payment_status === 'completed'
+    ).length || 0;
 
-    const taxaConversao = totalSessions > 0 
-      ? ((chargesSucceeded / totalSessions) * 100).toFixed(2) 
+    const total = totalRegistrations || 0;
+    const taxaConversao = total > 0 
+      ? ((completed / total) * 100).toFixed(2) 
       : '0.00';
 
     const funnel = {
-      total_sessions: totalSessions,
-      total_intents: totalIntents,
-      charges_succeeded: chargesSucceeded,
+      total_sessions: total,
+      total_intents: initiated + completed,
+      charges_succeeded: completed,
       taxa_conversao: parseFloat(taxaConversao),
       steps: [
-        { step: 'Checkout Iniciado', count: totalSessions, percentage: 100 },
+        { step: 'Checkout Iniciado', count: total, percentage: 100 },
         { 
           step: 'Pagamento Criado', 
-          count: totalIntents, 
-          percentage: totalSessions > 0 ? ((totalIntents / totalSessions) * 100).toFixed(1) : '0' 
+          count: initiated + completed, 
+          percentage: total > 0 ? (((initiated + completed) / total) * 100).toFixed(1) : '0' 
         },
         { 
           step: 'Pagamento Confirmado', 
-          count: chargesSucceeded, 
-          percentage: totalSessions > 0 ? ((chargesSucceeded / totalSessions) * 100).toFixed(1) : '0' 
+          count: completed, 
+          percentage: total > 0 ? ((completed / total) * 100).toFixed(1) : '0' 
         }
       ]
     };
