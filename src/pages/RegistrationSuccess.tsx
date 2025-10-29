@@ -81,7 +81,7 @@ const RegistrationSuccess = () => {
                   <Mail className="w-6 h-6 text-green-600" />
                 </div>
                 <p className="text-center text-green-700 font-medium">
-                  Prepare-se para vivenciar momentos incríveis de aprendizagem no Civeni 2025 - Celebration/Florida-EUA.
+                  Para submeter o artigo acesse o menu Trabalho e clique em Submissão Artigos/Consórcio ou clique no link: <a href="https://civeni.com/submissao-trabalhos" className="underline hover:text-green-800" target="_blank" rel="noopener noreferrer">https://civeni.com/submissao-trabalhos</a>. Você vai encontrar o template do Artigo/Consórcio e do slide de apresentação. A submissão deve ser feita até o dia 30.11.2025.
                 </p>
               </div>
 
