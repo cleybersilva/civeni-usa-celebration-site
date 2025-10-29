@@ -22,6 +22,10 @@
     --civeni-blue: 200 100% 15%;
     --civeni-green: 135 60% 42%;
 
+    --admin-gradient-from: 200 48% 21%;  /* #1a3a52 */
+    --admin-gradient-via: 200 35% 27%;   /* #2d4a5e */
+    --admin-gradient-to: 300 35% 28%;    /* #6b2d5c */
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 

@@ -7,7 +7,7 @@ const AdminSidebarHeader = () => {
   const { t } = useTranslation();
 
   return (
-    <SidebarHeader className="border-b px-6 py-3 h-16 bg-gradient-to-br from-[#1a3a52] via-[#2d4a5e] to-[#6b2d5c]">
+    <SidebarHeader className="border-b px-6 py-3 h-16 bg-gradient-to-br from-admin-gradient-from via-admin-gradient-via to-admin-gradient-to">
       <div className="flex items-center justify-center h-full">
         <div>
           <h2 className="text-xl font-bold text-white drop-shadow-md">
