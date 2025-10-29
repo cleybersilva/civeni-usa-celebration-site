@@ -650,11 +650,13 @@ const AdminDashboard = () => {
             pagination={chargesPagination}
             onPageChange={(offset) => {
               setChargesOffset(offset);
+              setTimeout(() => refresh(), 0);
             }}
             searchValue={chargesSearch}
             onSearchChange={(search) => {
               setChargesSearch(search);
-              setChargesOffset(0); // Reset para primeira página ao buscar
+              setChargesOffset(0);
+              setTimeout(() => refresh(), 0);
             }}
           />
         </TabsContent>
@@ -666,13 +668,15 @@ const AdminDashboard = () => {
             pagination={customersPagination}
             onPageChange={(offset) => {
               setCustomersOffset(offset);
+              setTimeout(() => refresh(), 0);
             }}
             onDelete={handleDeleteCustomer}
             deletingCustomer={deletingCustomer}
             searchValue={customersSearch}
             onSearchChange={(search) => {
               setCustomersSearch(search);
-              setCustomersOffset(0); // Reset para primeira página ao buscar
+              setCustomersOffset(0);
+              setTimeout(() => refresh(), 0);
             }}
           />
         </TabsContent>
