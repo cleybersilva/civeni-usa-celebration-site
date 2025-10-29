@@ -24,14 +24,15 @@ serve(async (req) => {
 
     console.log(`👥 Finance customers requested: limit=${limit}, offset=${offset}, search=${search}`);
 
-    // Buscar TODOS os registros (incluindo pendentes, vouchers, etc)
+    // Buscar apenas registros com pagamento confirmado (pagos e gratuitos/vouchers)
     const { data: registrations, error: regError } = await supabaseClient
       .from('event_registrations')
-      .select('*');
+      .select('*')
+      .eq('payment_status', 'completed');
     
     if (regError) throw regError;
 
-    console.log(`📝 Found ${registrations?.length || 0} completed registrations`);
+    console.log(`📝 Found ${registrations?.length || 0} paid/free registrations (excluding pending)`);
 
     // Buscar todos os charges para pegar informações de cartão
     const { data: charges, error: chargesError } = await supabaseClient
