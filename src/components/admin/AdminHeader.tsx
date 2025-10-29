@@ -29,15 +29,15 @@ const AdminHeader = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-civeni-blue to-civeni-blue/90 border-b h-16">
+    <header className="bg-gradient-to-br from-[#1a3a52] via-[#2d4a5e] to-[#6b2d5c] border-b h-16">
       <div className="flex justify-between items-center px-6 py-3 h-full">
         <div className="flex items-center space-x-4">
           <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80" />
           <div>
-            <h1 className="text-xl font-bold text-white">
+            <h1 className="text-xl font-bold text-white drop-shadow-md">
               Dashboard
             </h1>
-            <p className="text-xs text-white/80">
+            <p className="text-xs text-white/90 drop-shadow-sm">
               {user?.email} ({getUserTypeLabel(user?.user_type || '')})
               {isAdminRoot() && <span className="ml-2 text-red-300 font-bold">[ROOT]</span>}
             </p>

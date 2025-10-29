@@ -62,14 +62,14 @@ const UserInfo: React.FC = () => {
   const userTypeInfo = getUserTypeInfo(user.user_type);
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
+    <Card className="mb-6 overflow-hidden border-none shadow-lg">
+      <CardHeader className="pb-3 bg-gradient-to-br from-[#1a3a52] via-[#2d4a5e] to-[#6b2d5c]">
+        <CardTitle className="text-lg flex items-center gap-2 text-white drop-shadow-md">
           {userTypeInfo.icon}
           {t('admin.userInfo', 'Informações do Usuário')}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="font-medium">{user.email}</p>
