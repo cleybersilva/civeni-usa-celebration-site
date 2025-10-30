@@ -89,22 +89,26 @@ serve(async (req) => {
 
     console.log("✅ Upload concluído");
 
-    // Registrar submissão
+    // Registrar submissão na tabela "submissions"
+    const autorPrincipal = autores[0]?.nome || "Sem nome";
+    const emailPrincipal = autores[0]?.email || "";
+    
     const { data: ins, error: insErr } = await supabaseAdmin
-      .from("civeni_submissoes")
+      .from("submissions")
       .insert({
         tipo,
         titulo: titulo.trim(),
-        autores,
         resumo: resumo.trim() || null,
         area_tematica: area_tematica.trim() || null,
         palavras_chave,
-        file_path: path,
-        file_sha256: sha256,
-        mime_type: file.type,
-        file_size_bytes: file.size,
-        created_by: userId, // Pode ser null para submissões anônimas
-        status: "enviado"
+        autor_principal: autorPrincipal,
+        autores,
+        email: emailPrincipal,
+        instituicao: autores[0]?.instituicao || null,
+        arquivo_path: path,
+        arquivo_mime: file.type,
+        arquivo_size: file.size,
+        status: "recebido"
       })
       .select()
       .single();
