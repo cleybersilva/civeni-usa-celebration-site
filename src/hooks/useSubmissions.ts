@@ -103,6 +103,9 @@ export const useSubmissions = () => {
 
   const getSignedUrl = async (path: string): Promise<string | null> => {
     try {
+      // Configurar sessão admin antes de acessar storage
+      await setupAdminSession();
+      
       const { data, error } = await supabase.storage
         .from('civeni-submissoes')
         .createSignedUrl(path, 900); // 15 minutos
