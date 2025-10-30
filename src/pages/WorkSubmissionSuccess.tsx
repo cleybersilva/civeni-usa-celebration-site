@@ -58,7 +58,7 @@ const WorkSubmissionSuccess = () => {
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Seu trabalho está sendo analisado pela nossa equipe de avaliadores. 
-                      Você receberá atualizações sobre o status da avaliação por e-mail.
+                      Você receberá atualizações sobre o status da avaliação por e-mail e ou WhatsApp realizado na inscrição do Civeni 2025.
                     </p>
                   </div>
                 </div>
