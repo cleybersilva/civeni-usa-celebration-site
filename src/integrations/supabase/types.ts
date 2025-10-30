@@ -101,6 +101,36 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor: string | null
+          created_at: string
+          diff: Json | null
+          id: number
+          row_id: string
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          created_at?: string
+          diff?: Json | null
+          id?: number
+          row_id: string
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          created_at?: string
+          diff?: Json | null
+          id?: number
+          row_id?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       banner_slides: {
         Row: {
           bg_image: string
@@ -3301,6 +3331,81 @@ export type Database = {
           reason?: string | null
           status?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      submissions: {
+        Row: {
+          area_tematica: string | null
+          arquivo_mime: string
+          arquivo_path: string
+          arquivo_size: number
+          autor_principal: string
+          autores: Json | null
+          created_at: string
+          deleted_at: string | null
+          email: string
+          id: string
+          instituicao: string | null
+          palavras_chave: string[] | null
+          resumo: string | null
+          status: string
+          status_motivo: string | null
+          telefone: string | null
+          tipo: string
+          titulo: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          area_tematica?: string | null
+          arquivo_mime: string
+          arquivo_path: string
+          arquivo_size: number
+          autor_principal: string
+          autores?: Json | null
+          created_at?: string
+          deleted_at?: string | null
+          email: string
+          id?: string
+          instituicao?: string | null
+          palavras_chave?: string[] | null
+          resumo?: string | null
+          status?: string
+          status_motivo?: string | null
+          telefone?: string | null
+          tipo: string
+          titulo: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          area_tematica?: string | null
+          arquivo_mime?: string
+          arquivo_path?: string
+          arquivo_size?: number
+          autor_principal?: string
+          autores?: Json | null
+          created_at?: string
+          deleted_at?: string | null
+          email?: string
+          id?: string
+          instituicao?: string | null
+          palavras_chave?: string[] | null
+          resumo?: string | null
+          status?: string
+          status_motivo?: string | null
+          telefone?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
