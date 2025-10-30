@@ -48,7 +48,7 @@ const WorkSubmissionSuccess = () => {
                 </p>
 
                 <p className="text-base text-foreground font-semibold">
-                  Fique ligado(a)! Não será permitido reenvio de Artigo/Consórcio, envio único por usuário.
+                  Fique ligado(a)! Não será permitido reenvio de Artigo/Consórcio, envio único por usuário para o III Civeni 2025 - Celebration/Florida-EUA.
                 </p>
               </div>
               
