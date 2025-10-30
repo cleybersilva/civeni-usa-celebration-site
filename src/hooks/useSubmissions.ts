@@ -59,8 +59,35 @@ export const useSubmissions = () => {
     try {
       setLoading(true);
 
+      // Configurar sessão admin e verificar se foi bem-sucedida
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        console.error('Sessão admin não encontrada');
+        toast.error('Sessão expirada. Faça login novamente.');
+        setLoading(false);
+        return;
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token) {
+        console.error('Token de sessão inválido');
+        toast.error('Sessão inválida. Faça login novamente.');
+        setLoading(false);
+        return;
+      }
+
       // Configurar sessão admin
-      await setupAdminSession();
+      const { data: sessionCheck, error: sessionError } = await supabase.rpc('set_current_user_email_secure', {
+        user_email: sessionData.user.email,
+        session_token: sessionData.session_token
+      });
+
+      if (sessionError || !sessionCheck) {
+        console.error('Erro ao configurar sessão:', sessionError);
+        toast.error('Erro de autenticação. Faça login novamente.');
+        setLoading(false);
+        return;
+      }
 
       let query = supabase
         .from('submissions')
