@@ -58,7 +58,7 @@ serve(async (req) => {
       logStep("Category not found", { categoryError });
       return new Response(
         JSON.stringify({ success: false, error: "Categoria não encontrada" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -76,7 +76,7 @@ serve(async (req) => {
       logStep("Batch not found", { loteError });
       return new Response(
         JSON.stringify({ success: false, error: "Lote não encontrado" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -101,7 +101,7 @@ serve(async (req) => {
           success: false, 
           error: "Este e-mail já possui uma inscrição confirmada. Use um e-mail diferente ou entre em contato com o suporte." 
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -127,7 +127,7 @@ serve(async (req) => {
         logStep("Coupon RPC error", { couponError });
         return new Response(
           JSON.stringify({ success: false, error: "Erro ao validar cupom" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
         );
       }
 
@@ -138,7 +138,7 @@ serve(async (req) => {
             success: false, 
             error: couponResult?.message || "Código de cupom inválido" 
           }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
         );
       }
 
@@ -190,7 +190,7 @@ serve(async (req) => {
       logStep("Registration creation failed", { registrationError });
       return new Response(
         JSON.stringify({ success: false, error: "Erro ao criar inscrição" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 

@@ -149,7 +149,11 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
 
         if (error) {
           console.error("Edge function error:", error);
-          throw new Error(`Erro na função: ${error.message || JSON.stringify(error)}`);
+          // Check if there's a specific error message in the response
+          if (error.message) {
+            throw new Error(error.message);
+          }
+          throw new Error('Erro ao processar inscrição. Tente novamente.');
         }
 
         if (!data) {
