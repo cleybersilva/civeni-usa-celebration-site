@@ -17,7 +17,10 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({
 }) => {
   const { hasPermission, user } = useAdminAuth();
 
+  console.log('[PermissionGuard] Checking resource:', resource, 'User:', user);
+
   if (!user) {
+    console.log('[PermissionGuard] No user logged in');
     return (
       <Alert>
         <Lock className="h-4 w-4" />
@@ -28,7 +31,10 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({
     );
   }
 
-  if (!hasPermission(resource)) {
+  const hasAccess = hasPermission(resource);
+  console.log('[PermissionGuard] hasPermission result:', hasAccess);
+
+  if (!hasAccess) {
     if (fallback) {
       return <>{fallback}</>;
     }

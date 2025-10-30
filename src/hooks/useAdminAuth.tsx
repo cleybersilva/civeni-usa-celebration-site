@@ -201,14 +201,12 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const hasPermission = (resource: string): boolean => {
     if (!user) return false;
     
+    console.log('[hasPermission] Checking:', { resource, user_type: user.user_type, roles: user.roles, is_admin_root: user.is_admin_root });
+    
     // Admin Root has access to everything (use server-validated roles)
     if (user.is_admin_root || user.roles?.includes('admin_root')) {
+      console.log('[hasPermission] Admin root access granted');
       return true;
-    }
-    
-    // If no roles loaded yet, deny access (they'll load on next render)
-    if (!user.roles || user.roles.length === 0) {
-      return false;
     }
     
     // Define permissions per role (UI-level only, RLS still enforces server-side)
@@ -219,10 +217,25 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
       viewer: ['read']
     };
 
+    // FALLBACK: Check user_type directly if roles not loaded yet
+    if (user.user_type && permissions[user.user_type]?.includes(resource)) {
+      console.log('[hasPermission] Access granted via user_type:', user.user_type);
+      return true;
+    }
+
+    // If no roles loaded yet and no user_type match, deny access
+    if (!user.roles || user.roles.length === 0) {
+      console.log('[hasPermission] No roles loaded, access denied');
+      return false;
+    }
+    
     // Check if any of the user's server-validated roles grant access
-    return user.roles?.some(role => 
+    const hasAccess = user.roles?.some(role => 
       permissions[role as keyof typeof permissions]?.includes(resource)
     ) || false;
+    
+    console.log('[hasPermission] Final decision:', hasAccess);
+    return hasAccess;
   };
 
   const isAdminRoot = () => {
