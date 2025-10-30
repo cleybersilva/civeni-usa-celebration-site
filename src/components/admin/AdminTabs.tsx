@@ -43,7 +43,7 @@ const AdminTabs = () => {
 
   return (
     <Tabs defaultValue="eventos" className="w-full">
-      <TabsList className="grid w-full grid-cols-6 lg:grid-cols-14">
+      <TabsList className="flex flex-wrap w-full gap-1 h-auto p-2">
         {canViewFinanceiro && (
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
         )}
