@@ -35,16 +35,7 @@ serve(async (req) => {
       currency = 'BRL'
     } = body;
 
-    logStep("Request body received", { email, fullName, categoryId, batchId, participantType, cursoId, turmaId });
-
-    // Validate required fields
-    if (!email || !fullName) {
-      logStep("Missing required fields", { email: !!email, fullName: !!fullName });
-      return new Response(
-        JSON.stringify({ success: false, error: "Email e nome completo são obrigatórios" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-      );
-    }
+    logStep("Request body received", { email, categoryId, batchId, participantType });
 
     // Initialize Supabase with service role for database operations
     const supabase = createClient(
