@@ -130,19 +130,32 @@ export const useSubmissions = () => {
 
   const getSignedUrl = async (path: string): Promise<string | null> => {
     try {
+      console.log('Iniciando getSignedUrl para:', path);
       await setupAdminSession();
       
-      // Tentar URL pública primeiro
+      // Tentar URL pública primeiro (bucket é público)
       const { data: publicData } = supabase.storage
         .from('civeni-submissoes')
         .getPublicUrl(path);
 
       if (publicData?.publicUrl) {
-        console.log('URL pública gerada:', publicData.publicUrl);
-        return publicData.publicUrl;
+        console.log('URL pública gerada com sucesso:', publicData.publicUrl);
+        
+        // Testar se a URL é acessível
+        try {
+          const testResponse = await fetch(publicData.publicUrl, { method: 'HEAD' });
+          console.log('Teste de URL pública - Status:', testResponse.status);
+          
+          if (testResponse.ok) {
+            return publicData.publicUrl;
+          }
+        } catch (testError) {
+          console.warn('URL pública não acessível, tentando URL assinada:', testError);
+        }
       }
 
-      // Fallback para URL assinada
+      // Fallback para URL assinada se a pública falhar
+      console.log('Tentando gerar URL assinada...');
       const { data: signedData, error } = await supabase.storage
         .from('civeni-submissoes')
         .createSignedUrl(path, 3600);
@@ -152,11 +165,11 @@ export const useSubmissions = () => {
         throw error;
       }
 
-      console.log('URL assinada gerada:', signedData.signedUrl);
+      console.log('URL assinada gerada com sucesso:', signedData.signedUrl);
       return signedData.signedUrl;
     } catch (error: any) {
-      console.error('Erro ao gerar link de download:', error);
-      toast.error('Erro ao gerar link de download: ' + error.message);
+      console.error('Erro completo em getSignedUrl:', error);
+      toast.error('Erro ao gerar link: ' + (error.message || 'Erro desconhecido'));
       return null;
     }
   };
