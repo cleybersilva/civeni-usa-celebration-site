@@ -103,15 +103,33 @@ export const useSubmissions = () => {
 
   const getSignedUrl = async (path: string): Promise<string | null> => {
     try {
-      // Como o bucket é público, usar URL pública direta
-      const { data } = supabase.storage
+      await setupAdminSession();
+      
+      // Tentar URL pública primeiro
+      const { data: publicData } = supabase.storage
         .from('civeni-submissoes')
         .getPublicUrl(path);
 
-      return data.publicUrl;
+      if (publicData?.publicUrl) {
+        console.log('URL pública gerada:', publicData.publicUrl);
+        return publicData.publicUrl;
+      }
+
+      // Fallback para URL assinada
+      const { data: signedData, error } = await supabase.storage
+        .from('civeni-submissoes')
+        .createSignedUrl(path, 3600);
+
+      if (error) {
+        console.error('Erro ao gerar URL assinada:', error);
+        throw error;
+      }
+
+      console.log('URL assinada gerada:', signedData.signedUrl);
+      return signedData.signedUrl;
     } catch (error: any) {
-      console.error('Erro ao gerar URL pública:', error);
-      toast.error('Erro ao gerar link de download');
+      console.error('Erro ao gerar link de download:', error);
+      toast.error('Erro ao gerar link de download: ' + error.message);
       return null;
     }
   };
