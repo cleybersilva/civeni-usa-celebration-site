@@ -70,6 +70,7 @@ const AdminDashboardContent = () => {
   // Verificar permissões
   const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
   const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
+  const isAdmin = isAdminRoot() || user?.user_type === 'admin';
 
   const renderTabContent = () => {
     console.log('Rendering tab content for:', activeTab);
@@ -105,7 +106,7 @@ const AdminDashboardContent = () => {
         ) : null;
       
       case 'contador':
-        return (hasPermission('contador') || isAdminRoot()) ? (
+        return (hasPermission('contador') || isAdmin) ? (
           <PermissionGuard resource="contador">
             <EventConfigManager />
           </PermissionGuard>
@@ -169,7 +170,7 @@ const AdminDashboardContent = () => {
         ) : null;
       
       case 'palestrantes':
-        return (hasPermission('palestrantes') || isAdminRoot()) ? (
+        return (hasPermission('palestrantes') || isAdmin) ? (
           <PermissionGuard resource="palestrantes">
             <SpeakersManager />
           </PermissionGuard>
@@ -224,7 +225,7 @@ const AdminDashboardContent = () => {
         ) : null;
       
       case 'submissoes':
-        return (hasPermission('submissoes') || isAdminRoot()) ? (
+        return (hasPermission('submissoes') || isAdmin) ? (
           <PermissionGuard resource="submissoes">
             <SubmissionsManager />
           </PermissionGuard>
