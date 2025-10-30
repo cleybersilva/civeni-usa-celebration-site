@@ -215,21 +215,17 @@ export const SubmissionsManager = () => {
                     </TableCell>
                     <TableCell>{getStatusBadge(submission.status)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground truncate max-w-[150px]" title={submission.arquivo_path.split('/').pop()}>
-                          {submission.arquivo_path.split('/').pop()}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            const filename = submission.arquivo_path.split('/').pop();
-                            handleDownload(submission.arquivo_path, filename || 'arquivo');
-                          }}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const filename = submission.arquivo_path.split('/').pop();
+                          handleDownload(submission.arquivo_path, filename || 'arquivo');
+                        }}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Baixar
+                      </Button>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
