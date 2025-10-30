@@ -33,6 +33,7 @@ import CiveniOnlineProgramManager from '@/components/admin/CiveniOnlineProgramMa
 import TransmissionStreamsManager from '@/components/admin/TransmissionStreamsManager';
 import TransmissionScheduleManager from '@/components/admin/TransmissionScheduleManager';
 import TransmissionFAQManager from '@/components/admin/TransmissionFAQManager';
+import { SubmissionsManager } from '@/components/admin/SubmissionsManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -220,6 +221,13 @@ const AdminDashboardContent = () => {
       case 'sincronizacao':
         return (hasPermission('admin') || isAdminRoot()) ? (
           <SyncManager />
+        ) : null;
+      
+      case 'submissoes':
+        return (hasPermission('submissoes') || isAdminRoot()) ? (
+          <PermissionGuard resource="submissoes">
+            <SubmissionsManager />
+          </PermissionGuard>
         ) : null;
       
       default:

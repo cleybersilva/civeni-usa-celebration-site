@@ -14,6 +14,7 @@ import {
   Settings,
   FileText,
   CalendarDays,
+  Inbox,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -123,6 +124,13 @@ export const createMenuItems = (
       label: t('admin.menu.sync', 'Sincronização'),
       icon: Settings,
       show: hasPermission('admin') || isAdminRoot(),
+      isPriority: false
+    },
+    {
+      id: 'submissoes',
+      label: t('admin.menu.submissions', 'Submissões'),
+      icon: Inbox,
+      show: hasPermission('submissoes') || isAdminRoot(),
       isPriority: false
     },
     {
