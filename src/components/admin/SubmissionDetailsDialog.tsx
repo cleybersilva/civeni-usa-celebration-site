@@ -32,7 +32,7 @@ interface SubmissionDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   onValidate: (id: string) => Promise<boolean>;
   onInvalidate: (id: string, motivo: string) => Promise<boolean>;
-  onDownload: (path: string, filename: string) => void;
+  onDownload: (id: string, filename: string) => void;
 }
 
 export const SubmissionDetailsDialog = ({
@@ -229,7 +229,7 @@ export const SubmissionDetailsDialog = ({
               </div>
               <Button
                 variant="outline"
-                onClick={() => onDownload(submission.arquivo_path, filename)}
+                onClick={() => onDownload(submission.id, filename)}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Baixar

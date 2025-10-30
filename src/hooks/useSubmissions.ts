@@ -128,47 +128,28 @@ export const useSubmissions = () => {
     }
   };
 
-  const getSignedUrl = async (path: string): Promise<string | null> => {
+  const getSignedUrl = async (submissionId: string): Promise<string | null> => {
     try {
-      console.log('Iniciando getSignedUrl para:', path);
-      await setupAdminSession();
+      console.log('Chamando Edge Function para gerar URL - Submission ID:', submissionId);
       
-      // Tentar URL pública primeiro (bucket é público)
-      const { data: publicData } = supabase.storage
-        .from('civeni-submissoes')
-        .getPublicUrl(path);
-
-      if (publicData?.publicUrl) {
-        console.log('URL pública gerada com sucesso:', publicData.publicUrl);
-        
-        // Testar se a URL é acessível
-        try {
-          const testResponse = await fetch(publicData.publicUrl, { method: 'HEAD' });
-          console.log('Teste de URL pública - Status:', testResponse.status);
-          
-          if (testResponse.ok) {
-            return publicData.publicUrl;
-          }
-        } catch (testError) {
-          console.warn('URL pública não acessível, tentando URL assinada:', testError);
-        }
-      }
-
-      // Fallback para URL assinada se a pública falhar
-      console.log('Tentando gerar URL assinada...');
-      const { data: signedData, error } = await supabase.storage
-        .from('civeni-submissoes')
-        .createSignedUrl(path, 3600);
+      const { data, error } = await supabase.functions.invoke('download-submissao', {
+        body: { submissionId }
+      });
 
       if (error) {
-        console.error('Erro ao gerar URL assinada:', error);
+        console.error('Erro na Edge Function:', error);
         throw error;
       }
 
-      console.log('URL assinada gerada com sucesso:', signedData.signedUrl);
-      return signedData.signedUrl;
+      if (!data?.url) {
+        console.error('Edge Function não retornou URL');
+        throw new Error('URL não gerada');
+      }
+
+      console.log('URL gerada com sucesso:', data.url);
+      return data.url;
     } catch (error: any) {
-      console.error('Erro completo em getSignedUrl:', error);
+      console.error('Erro ao gerar link de download:', error);
       toast.error('Erro ao gerar link: ' + (error.message || 'Erro desconhecido'));
       return null;
     }

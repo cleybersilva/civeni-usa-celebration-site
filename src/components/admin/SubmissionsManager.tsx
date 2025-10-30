@@ -58,37 +58,22 @@ export const SubmissionsManager = () => {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
-  const handleDownload = async (path: string, filename: string) => {
-    console.log('handleDownload chamado - Path:', path, 'Filename:', filename);
+  const handleDownload = async (submissionId: string, filename: string) => {
+    console.log('handleDownload - Submission ID:', submissionId, 'Filename:', filename);
     try {
-      const url = await getSignedUrl(path);
-      console.log('URL obtida:', url);
+      const url = await getSignedUrl(submissionId);
       
       if (url) {
-        console.log('Abrindo URL em nova aba:', url);
-        const newWindow = window.open(url, '_blank');
-        
-        if (!newWindow) {
-          console.error('Popup bloqueado - tentando download direto');
-          // Se popup foi bloqueado, tenta download direto
-          const a = document.createElement('a');
-          a.href = url;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } else {
-          console.log('Arquivo aberto com sucesso');
-          toast.success('Arquivo aberto em nova aba');
-        }
+        console.log('Iniciando download com URL:', url);
+        // Usar window.location.href para evitar popup blockers
+        window.location.href = url;
+        toast.success('Download iniciado');
       } else {
-        console.error('URL é null');
         toast.error('Não foi possível gerar o link do arquivo');
       }
     } catch (error: any) {
       console.error('Erro em handleDownload:', error);
-      toast.error('Erro ao abrir arquivo: ' + error.message);
+      toast.error('Erro ao baixar arquivo: ' + error.message);
     }
   };
 
@@ -243,7 +228,7 @@ export const SubmissionsManager = () => {
                         size="sm"
                         onClick={() => {
                           const filename = submission.arquivo_path.split('/').pop();
-                          handleDownload(submission.arquivo_path, filename || 'arquivo');
+                          handleDownload(submission.id, filename || 'arquivo');
                         }}
                       >
                         <Download className="h-4 w-4 mr-2" />
