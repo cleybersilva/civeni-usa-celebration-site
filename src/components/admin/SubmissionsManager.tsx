@@ -60,12 +60,8 @@ export const SubmissionsManager = () => {
   const handleDownload = async (path: string, filename: string) => {
     const url = await getSignedUrl(path);
     if (url) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      // Forçar download abrindo em nova aba
+      window.open(url, '_blank');
     }
   };
 
