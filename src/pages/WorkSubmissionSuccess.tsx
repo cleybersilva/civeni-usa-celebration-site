@@ -46,6 +46,10 @@ const WorkSubmissionSuccess = () => {
                 <p className="text-lg text-muted-foreground">
                   Obrigado por submeter seu trabalho ao III CIVENI 2025
                 </p>
+
+                <p className="text-base text-foreground font-semibold">
+                  Fique ligado(a)! Não será permitido reenvio de Artigo/Consórcio, envio único por usuário.
+                </p>
               </div>
               
               {/* Next Steps Info Box */}
