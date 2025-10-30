@@ -109,6 +109,19 @@ export const SubmissionsManager = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Gerenciamento de Submissão Artigos/Consórcio</h1>
+          <p className="text-muted-foreground mt-2">
+            Gerencie as submissões de artigos e trabalhos de consórcio recebidos
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <FileText className="h-4 w-4" />
+          <span>{submissions.length} submissões</span>
+        </div>
+      </div>
+
       <Card className="p-6">
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">

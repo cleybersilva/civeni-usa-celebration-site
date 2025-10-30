@@ -41,9 +41,26 @@ export const useSubmissions = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SubmissionFilters>({});
 
+  // Helper para configurar sessão admin
+  const setupAdminSession = async () => {
+    const savedSession = localStorage.getItem('adminSession');
+    if (savedSession) {
+      const sessionData = JSON.parse(savedSession);
+      if (sessionData.session_token) {
+        await supabase.rpc('set_current_user_email_secure', {
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token
+        });
+      }
+    }
+  };
+
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
+
+      // Configurar sessão admin
+      await setupAdminSession();
 
       let query = supabase
         .from('submissions')
@@ -101,6 +118,8 @@ export const useSubmissions = () => {
 
   const updateSubmission = async (id: string, updates: Partial<Submission>) => {
     try {
+      await setupAdminSession();
+      
       const { error } = await supabase
         .from('submissions')
         .update(updates)
@@ -120,6 +139,8 @@ export const useSubmissions = () => {
 
   const validateSubmission = async (id: string) => {
     try {
+      await setupAdminSession();
+      
       const { error } = await supabase
         .from('submissions')
         .update({
@@ -153,6 +174,8 @@ export const useSubmissions = () => {
 
   const invalidateSubmission = async (id: string, motivo: string) => {
     try {
+      await setupAdminSession();
+      
       const { error } = await supabase
         .from('submissions')
         .update({
@@ -175,6 +198,8 @@ export const useSubmissions = () => {
 
   const archiveSubmission = async (id: string) => {
     try {
+      await setupAdminSession();
+      
       const { error } = await supabase
         .from('submissions')
         .update({ status: 'arquivado' })
@@ -194,6 +219,8 @@ export const useSubmissions = () => {
 
   const restoreSubmission = async (id: string) => {
     try {
+      await setupAdminSession();
+      
       const { error } = await supabase
         .from('submissions')
         .update({ status: 'em_analise' })
