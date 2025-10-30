@@ -22,8 +22,9 @@ const AdminSidebar = () => {
   // Verificar permissões
   const canViewFinanceiro = isAdminRoot() || user?.user_type === 'admin';
   const canViewUsuarios = isAdminRoot() || user?.user_type === 'admin';
+  const isAdmin = isAdminRoot() || user?.user_type === 'admin';
 
-  const menuItems = createMenuItems(hasPermission, isAdminRoot, canViewFinanceiro, canViewUsuarios, t);
+  const menuItems = createMenuItems(hasPermission, isAdminRoot, canViewFinanceiro, canViewUsuarios, isAdmin, t);
 
   const visibleItems = menuItems.filter(item => item.show);
 

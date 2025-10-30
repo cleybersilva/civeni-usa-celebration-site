@@ -23,6 +23,7 @@ export const createMenuItems = (
   isAdminRoot: () => boolean,
   canViewFinanceiro: boolean,
   canViewUsuarios: boolean,
+  isAdmin: boolean,
   t: (key: string, fallback: string) => string
 ): MenuItem[] => {
   const items = [
@@ -46,7 +47,7 @@ export const createMenuItems = (
       id: 'contador',
       label: t('admin.menu.counter', 'Contador'),
       icon: Timer,
-      show: hasPermission('contador') || isAdminRoot(),
+      show: hasPermission('contador') || isAdmin,
       isPriority: false
     },
     {
@@ -109,7 +110,7 @@ export const createMenuItems = (
       id: 'palestrantes',
       label: t('admin.menu.speakers', 'Palestrantes'),
       icon: Users,
-      show: hasPermission('palestrantes') || isAdminRoot(),
+      show: hasPermission('palestrantes') || isAdmin,
       isPriority: false
     },
     {
@@ -130,7 +131,7 @@ export const createMenuItems = (
       id: 'submissoes',
       label: t('admin.menu.submissions', 'Submissões'),
       icon: Inbox,
-      show: hasPermission('submissoes') || isAdminRoot(),
+      show: hasPermission('submissoes') || isAdmin,
       isPriority: false
     },
     {
