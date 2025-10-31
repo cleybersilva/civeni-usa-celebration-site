@@ -4335,6 +4335,14 @@ export type Database = {
         Args: { session_token: string; user_email: string; video_data: Json }
         Returns: Json
       }
+      can_submit_trabalho: {
+        Args: { p_email: string; p_nome: string; p_tipo: string }
+        Returns: {
+          allowed: boolean
+          reason: string
+          remaining: number
+        }[]
+      }
       check_partner_application_rate_limit: {
         Args: { user_email: string; user_ip: unknown }
         Returns: boolean
