@@ -368,7 +368,7 @@ const SubmissaoTrabalhos = () => {
                             </Link>
                           </div>
                         )}
-                        {validationStatus.checked && validationStatus.hasSubmitted && (
+                        {validationStatus.checked && validationStatus.isRegistered && validationStatus.hasSubmitted && (
                           <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
                             ⚠️ Você já enviou uma submissão de {activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}. 
                             Cada aluno pode enviar apenas uma submissão por tipo.
@@ -555,7 +555,7 @@ const SubmissaoTrabalhos = () => {
                             </Link>
                           </div>
                         )}
-                        {validationStatus.checked && validationStatus.hasSubmitted && (
+                        {validationStatus.checked && validationStatus.isRegistered && validationStatus.hasSubmitted && (
                           <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
                             ⚠️ Você já enviou uma submissão de {activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}. 
                             Cada aluno pode enviar apenas uma submissão por tipo.
