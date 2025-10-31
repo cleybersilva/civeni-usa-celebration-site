@@ -387,6 +387,216 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleExportAnalysisPDF = () => {
+    try {
+      const doc = new jsPDF();
+      let yPos = 20;
+      
+      // Header
+      doc.setFontSize(18);
+      doc.setTextColor(219, 39, 119); // pink-600
+      doc.text('Relatório de Análises Avançadas - CIVENI 2025', 105, yPos, { align: 'center' });
+      yPos += 10;
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Data de Geração: ${new Date().toLocaleString('pt-BR')}`, 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Resumo Executivo - Cards
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Resumo Executivo', 14, yPos);
+      yPos += 8;
+      
+      const resumoData = [
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
+      ];
+      
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Métrica', 'Valor', 'Descrição']],
+        body: resumoData,
+        theme: 'grid',
+        headStyles: { fillColor: [219, 39, 119] },
+      });
+      
+      yPos = (doc as any).lastAutoTable.finalY + 10;
+      
+      // Análise por Bandeira
+      doc.setFontSize(14);
+      doc.text('Análise por Bandeira de Cartão', 14, yPos);
+      yPos += 8;
+      
+      const bandeiraData = byBrand && byBrand.length > 0 
+        ? byBrand.map(brand => {
+            const percentage = summary?.bruto && summary.bruto > 0 
+              ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
+              : '0';
+            return [
+              `${brand.bandeira || 'Não especificado'} ${brand.funding ? `(${brand.funding})` : ''}`,
+              `${brand.qtd || 0}`,
+              formatCurrency(brand.receita_liquida || 0),
+              formatCurrency(brand.receita_bruta || 0),
+              `${percentage}%`
+            ];
+          })
+        : [['Nenhum dado disponível', '', '', '', '']];
+      
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Bandeira', 'Qtd', 'Receita Líquida', 'Receita Bruta', '% do Total']],
+        body: bandeiraData,
+        theme: 'striped',
+        headStyles: { fillColor: [99, 102, 241] }, // indigo
+      });
+      
+      yPos = (doc as any).lastAutoTable.finalY + 10;
+      
+      // Tendências Temporais
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.text('Tendências Temporais', 14, yPos);
+      yPos += 8;
+      
+      const tendenciasData = timeseries && timeseries.length > 0
+        ? timeseries.slice(-10).map(item => {
+            const dateValue = item.dia || item.timestamp;
+            const receita = item.receita_liquida || 0;
+            const transacoes = item.transacoes || 0;
+            const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+            return [
+              dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
+              formatCurrency(receita),
+              `${transacoes}`,
+              formatCurrency(ticketMedio)
+            ];
+          })
+        : [['Nenhum dado disponível', '', '', '']];
+      
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Data', 'Receita', 'Transações', 'Ticket Médio']],
+        body: tendenciasData,
+        theme: 'striped',
+        headStyles: { fillColor: [16, 185, 129] }, // emerald
+      });
+      
+      // Save PDF
+      doc.save(`analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast({
+        title: "PDF exportado!",
+        description: "O relatório de análises foi gerado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
+      toast({
+        title: "Erro ao exportar",
+        description: "Não foi possível gerar o relatório PDF.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportAnalysisXLSX = () => {
+    try {
+      const wb = XLSX.utils.book_new();
+      
+      // Sheet 1: Resumo Executivo
+      const resumoData = [
+        ['Relatório de Análises Avançadas - CIVENI 2025'],
+        [''],
+        [`Data de Geração: ${new Date().toLocaleString('pt-BR')}`],
+        [''],
+        ['=== RESUMO EXECUTIVO ==='],
+        [''],
+        ['Métrica', 'Valor', 'Descrição'],
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
+      ];
+      const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+      XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo Executivo');
+      
+      // Sheet 2: Análise por Bandeira
+      const bandeiraData = [
+        ['Análise por Bandeira de Cartão'],
+        [''],
+        ['Bandeira', 'Funding', 'Quantidade', 'Receita Líquida', 'Receita Bruta', '% do Total']
+      ];
+      
+      if (byBrand && byBrand.length > 0) {
+        byBrand.forEach(brand => {
+          const percentage = summary?.bruto && summary.bruto > 0 
+            ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
+            : '0';
+          bandeiraData.push([
+            brand.bandeira || 'Não especificado',
+            brand.funding || '-',
+            brand.qtd || 0,
+            formatCurrency(brand.receita_liquida || 0),
+            formatCurrency(brand.receita_bruta || 0),
+            `${percentage}%`
+          ]);
+        });
+      } else {
+        bandeiraData.push(['Nenhum dado disponível', '', '', '', '', '']);
+      }
+      
+      const wsBandeira = XLSX.utils.aoa_to_sheet(bandeiraData);
+      XLSX.utils.book_append_sheet(wb, wsBandeira, 'Análise por Bandeira');
+      
+      // Sheet 3: Tendências Temporais
+      const tendenciasData = [
+        ['Tendências Temporais'],
+        [''],
+        ['Data', 'Receita', 'Transações', 'Ticket Médio']
+      ];
+      
+      if (timeseries && timeseries.length > 0) {
+        timeseries.forEach(item => {
+          const dateValue = item.dia || item.timestamp;
+          const receita = item.receita_liquida || 0;
+          const transacoes = item.transacoes || 0;
+          const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+          tendenciasData.push([
+            dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
+            formatCurrency(receita),
+            transacoes,
+            formatCurrency(ticketMedio)
+          ]);
+        });
+      } else {
+        tendenciasData.push(['Nenhum dado disponível', '', '', '']);
+      }
+      
+      const wsTendencias = XLSX.utils.aoa_to_sheet(tendenciasData);
+      XLSX.utils.book_append_sheet(wb, wsTendencias, 'Tendências Temporais');
+      
+      // Save XLSX
+      XLSX.writeFile(wb, `analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      toast({
+        title: "Excel exportado!",
+        description: "O relatório de análises foi gerado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar XLSX:', error);
+      toast({
+        title: "Erro ao exportar",
+        description: "Não foi possível gerar o relatório Excel.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleExportAnalysisCSV = () => {
     try {
       const csvRows: string[] = [];
@@ -1000,16 +1210,34 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  Exporte um relatório CSV completo com todas as análises, tendências e insights detalhados das transações.
+                  Exporte um relatório completo com todas as análises, tendências e insights detalhados das transações.
                 </p>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-pink-300 hover:bg-pink-50 dark:border-pink-700 dark:hover:bg-pink-950/30"
-                  onClick={handleExportAnalysisCSV}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exportar Relatório Completo (CSV)
-                </Button>
+                <div className="grid gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-red-300 hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-950/30"
+                    onClick={handleExportAnalysisPDF}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Exportar Relatório (PDF)
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-green-300 hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-950/30"
+                    onClick={handleExportAnalysisXLSX}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Exportar Relatório (XLSX)
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-pink-300 hover:bg-pink-50 dark:border-pink-700 dark:hover:bg-pink-950/30"
+                    onClick={handleExportAnalysisCSV}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Exportar Relatório (CSV)
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
