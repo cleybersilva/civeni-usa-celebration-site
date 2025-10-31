@@ -37,6 +37,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
 import { useSubmissions } from '@/hooks/useSubmissions';
 import { SubmissionDetailsDialog } from './SubmissionDetailsDialog';
 import { format } from 'date-fns';
@@ -57,6 +66,20 @@ export const SubmissionsManager = () => {
 
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Calcular paginação
+  const totalPages = Math.ceil(submissions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedSubmissions = submissions.slice(startIndex, endIndex);
+
+  // Resetar para primeira página quando filtros mudarem
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
 
   const handleDownload = async (submissionId: string, filename: string) => {
     console.log('handleDownload - Submission ID:', submissionId, 'Filename:', filename);
@@ -139,7 +162,7 @@ export const SubmissionsManager = () => {
                 <Input
                   placeholder="Buscar por título, autor ou email..."
                   value={filters.q || ''}
-                  onChange={(e) => setFilters({ ...filters, q: e.target.value })}
+                  onChange={(e) => handleFiltersChange({ ...filters, q: e.target.value })}
                   className="pl-10"
                 />
               </div>
@@ -148,7 +171,7 @@ export const SubmissionsManager = () => {
             <Select
               value={filters.tipo || 'all'}
               onValueChange={(value) => 
-                setFilters({ ...filters, tipo: value === 'all' ? undefined : value })
+                handleFiltersChange({ ...filters, tipo: value === 'all' ? undefined : value })
               }
             >
               <SelectTrigger className="w-full md:w-[180px]">
@@ -164,7 +187,7 @@ export const SubmissionsManager = () => {
             <Select
               value={filters.status || 'all'}
               onValueChange={(value) =>
-                setFilters({ ...filters, status: value === 'all' ? undefined : value })
+                handleFiltersChange({ ...filters, status: value === 'all' ? undefined : value })
               }
             >
               <SelectTrigger className="w-full md:w-[180px]">
@@ -200,14 +223,14 @@ export const SubmissionsManager = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {submissions.length === 0 ? (
+              {paginatedSubmissions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                     Nenhuma submissão encontrada
                   </TableCell>
                 </TableRow>
               ) : (
-                submissions.map((submission) => (
+                paginatedSubmissions.map((submission) => (
                   <TableRow key={submission.id}>
                     <TableCell className="whitespace-nowrap">
                       {format(new Date(submission.created_at), 'dd/MM/yyyy HH:mm')}
@@ -290,6 +313,62 @@ export const SubmissionsManager = () => {
             </TableBody>
           </Table>
         </div>
+
+        {submissions.length > 0 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Mostrando {startIndex + 1} a {Math.min(endIndex, submissions.length)} de {submissions.length} submissões
+            </div>
+            
+            {totalPages > 1 && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Mostrar primeira página, última página, página atual e páginas adjacentes
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => setCurrentPage(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    } else if (page === currentPage - 2 || page === currentPage + 2) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
+        )}
       </Card>
 
       {selectedSubmission && (
