@@ -413,23 +413,26 @@ const AdminDashboard = () => {
       
       // Análise por Bandeira
       csvRows.push('=== ANÁLISE POR BANDEIRA DE CARTÃO ===');
-      csvRows.push('Bandeira,Quantidade,Receita,% do Total');
+      csvRows.push('Bandeira,Funding,Quantidade,Receita Líquida,Receita Bruta,% do Total');
       if (byBrand && byBrand.length > 0) {
         const totalReceita = summary?.bruto || 1;
         byBrand.forEach(brand => {
-          const percentage = ((brand.receita / totalReceita) * 100).toFixed(2);
-          csvRows.push(`${brand.bandeira || 'Não especificado'},${brand.quantidade},${formatCurrency(brand.receita)},${percentage}%`);
+          const percentage = (((brand.receita_bruta || 0) / totalReceita) * 100).toFixed(2);
+          csvRows.push(`${brand.bandeira || 'Não especificado'},${brand.funding || '-'},${brand.qtd || 0},${formatCurrency(brand.receita_liquida || 0)},${formatCurrency(brand.receita_bruta || 0)},${percentage}%`);
         });
       }
       csvRows.push('');
       
       // Análise Temporal
       csvRows.push('=== ANÁLISE DE TENDÊNCIAS TEMPORAIS ===');
-      csvRows.push('Data,Receita,Quantidade de Transações,Ticket Médio');
+      csvRows.push('Data,Receita Líquida,Quantidade de Transações,Ticket Médio');
       if (timeseries && timeseries.length > 0) {
         timeseries.forEach(item => {
-          const ticketMedio = item.quantidade > 0 ? item.receita / item.quantidade : 0;
-          csvRows.push(`${new Date(item.data).toLocaleDateString('pt-BR')},${formatCurrency(item.receita)},${item.quantidade},${formatCurrency(ticketMedio)}`);
+          const dateValue = item.dia || item.timestamp;
+          const receita = item.receita_liquida || 0;
+          const transacoes = item.transacoes || 0;
+          const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+          csvRows.push(`${dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'},${formatCurrency(receita)},${transacoes},${formatCurrency(ticketMedio)}`);
         });
       }
       csvRows.push('');
@@ -505,7 +508,7 @@ const AdminDashboard = () => {
       
       if (byBrand && byBrand.length > 0) {
         const topBrand = byBrand[0];
-        csvRows.push(`💳 Bandeira principal: ${topBrand.bandeira} (${((topBrand.receita / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
+        csvRows.push(`💳 Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
       }
       
       if (summary && summary.ticketMedio) {
@@ -921,21 +924,24 @@ const AdminDashboard = () => {
               <CardContent className="pt-6">
                 <div className="space-y-3">
                   {byBrand && byBrand.length > 0 ? (
-                    byBrand.map((brand) => (
-                      <div key={brand.bandeira} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    byBrand.map((brand, idx) => (
+                      <div key={`${brand.bandeira}-${brand.funding}-${idx}`} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-xs font-bold text-primary">{brand.bandeira.substring(0, 2).toUpperCase()}</span>
+                            <span className="text-xs font-bold text-primary">{(brand.bandeira || 'NN').substring(0, 2).toUpperCase()}</span>
                           </div>
                           <div>
-                            <p className="font-medium">{brand.bandeira || 'Não especificado'}</p>
-                            <p className="text-xs text-muted-foreground">{brand.quantidade} transações</p>
+                            <p className="font-medium capitalize">{brand.bandeira || 'Não especificado'} {brand.funding ? `(${brand.funding})` : ''}</p>
+                            <p className="text-xs text-muted-foreground">{brand.qtd || 0} transações</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-green-600 dark:text-green-400">{formatCurrency(brand.receita)}</p>
+                          <p className="font-bold text-green-600 dark:text-green-400">{formatCurrency(brand.receita_liquida || 0)}</p>
                           <p className="text-xs text-muted-foreground">
-                            {((brand.receita / (summary?.bruto || 1)) * 100).toFixed(1)}% do total
+                            {summary?.bruto && summary.bruto > 0 
+                              ? `${(((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)}% do total`
+                              : '0% do total'
+                            }
                           </p>
                         </div>
                       </div>
@@ -961,16 +967,25 @@ const AdminDashboard = () => {
                       <div className="text-right">Transações</div>
                       <div className="text-right">Ticket Médio</div>
                     </div>
-                    {timeseries.slice(-10).map((item, idx) => (
-                      <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
-                        <div>{new Date(item.data).toLocaleDateString('pt-BR')}</div>
-                        <div className="text-right font-medium">{formatCurrency(item.receita)}</div>
-                        <div className="text-right">{item.quantidade}</div>
-                        <div className="text-right text-muted-foreground">
-                          {formatCurrency(item.quantidade > 0 ? item.receita / item.quantidade : 0)}
+                    {timeseries.slice(-10).map((item, idx) => {
+                      const dateValue = item.dia || item.timestamp;
+                      const receita = item.receita_liquida || 0;
+                      const transacoes = item.transacoes || 0;
+                      const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+                      
+                      return (
+                        <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
+                          <div>
+                            {dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'}
+                          </div>
+                          <div className="text-right font-medium">{formatCurrency(receita)}</div>
+                          <div className="text-right">{transacoes}</div>
+                          <div className="text-right text-muted-foreground">
+                            {formatCurrency(ticketMedio)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-center text-muted-foreground py-8">Nenhum dado temporal disponível</p>
