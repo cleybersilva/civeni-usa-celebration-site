@@ -76,22 +76,29 @@ const SubmissaoTrabalhos = () => {
 
     setIsValidating(true);
     try {
-      // Verificar se o aluno está inscrito no Civeni 2025
-      const { data: registration, error: regError } = await supabase
+      console.log('🔍 Validando inscrição...', { 
+        email: formData.email.toLowerCase().trim(),
+        nome: formData.author_name.trim()
+      });
+
+      // Verificar se o aluno está inscrito no Civeni 2025 pelo email
+      const { data: registrations, error: regError } = await supabase
         .from('event_registrations')
         .select('id, email, full_name, payment_status')
         .eq('email', formData.email.toLowerCase().trim())
-        .eq('payment_status', 'completed')
-        .maybeSingle();
+        .eq('payment_status', 'completed');
 
       if (regError) {
-        console.error('Erro ao verificar inscrição:', regError);
+        console.error('❌ Erro ao verificar inscrição:', regError);
         toast.error('Erro ao validar inscrição. Tente novamente.');
         setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: true });
         return;
       }
 
-      if (!registration) {
+      console.log('📋 Registros encontrados:', registrations);
+
+      if (!registrations || registrations.length === 0) {
+        console.log('⚠️ Nenhum registro encontrado com este email e status completed');
         setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: true });
         toast.error(
           'Você precisa estar inscrito no CIVENI 2025 para submeter trabalhos.',
@@ -105,6 +112,32 @@ const SubmissaoTrabalhos = () => {
         );
         return;
       }
+
+      // Verificar se o nome corresponde (normalizado)
+      const normalizeString = (str: string) => 
+        str.toLowerCase().trim().replace(/\s+/g, ' ');
+      
+      const authorNameNormalized = normalizeString(formData.author_name);
+      const matchingRegistration = registrations.find(reg => 
+        normalizeString(reg.full_name) === authorNameNormalized
+      );
+
+      if (!matchingRegistration) {
+        console.log('⚠️ Email encontrado mas nome não corresponde', {
+          nomeFormulario: authorNameNormalized,
+          nomesEncontrados: registrations.map(r => normalizeString(r.full_name))
+        });
+        setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: true });
+        toast.error(
+          'Nome não corresponde à inscrição encontrada.',
+          {
+            description: 'Verifique se o nome está exatamente como foi cadastrado na inscrição.'
+          }
+        );
+        return;
+      }
+
+      console.log('✅ Inscrição validada:', matchingRegistration);
 
       // Verificar se já existe submissão deste tipo para este email
       const { data: existingSubmission, error: subError } = await supabase
