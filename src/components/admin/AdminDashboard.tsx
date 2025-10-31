@@ -387,6 +387,162 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleExportAnalysisCSV = () => {
+    try {
+      const csvRows: string[] = [];
+      
+      // Header
+      csvRows.push('=== RELATÓRIO DE ANÁLISES AVANÇADAS - CIVENI 2025 ===');
+      csvRows.push(`Data de Geração: ${new Date().toLocaleString('pt-BR')}`);
+      csvRows.push('');
+      
+      // Resumo Executivo
+      csvRows.push('=== RESUMO EXECUTIVO ===');
+      csvRows.push('Métrica,Valor');
+      csvRows.push(`Receita Bruta,${formatCurrency(summary?.bruto || 0)}`);
+      csvRows.push(`Taxas Stripe,${formatCurrency(summary?.taxas || 0)}`);
+      csvRows.push(`Receita Líquida,${formatCurrency(summary?.liquido || 0)}`);
+      csvRows.push(`Pagamentos Concluídos,${summary?.pagos || 0}`);
+      csvRows.push(`Pagamentos Pendentes,${summary?.naoPagos || 0}`);
+      csvRows.push(`Falhas de Pagamento,${summary?.falhas || 0}`);
+      csvRows.push(`Reembolsos,${summary?.reembolsos || 0}`);
+      csvRows.push(`Disputas,${summary?.disputas || 0}`);
+      csvRows.push(`Ticket Médio,${formatCurrency(summary?.ticketMedio || 0)}`);
+      csvRows.push(`Taxa de Conversão,${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(2) : 0}%`);
+      csvRows.push('');
+      
+      // Análise por Bandeira
+      csvRows.push('=== ANÁLISE POR BANDEIRA DE CARTÃO ===');
+      csvRows.push('Bandeira,Quantidade,Receita,% do Total');
+      if (byBrand && byBrand.length > 0) {
+        const totalReceita = summary?.bruto || 1;
+        byBrand.forEach(brand => {
+          const percentage = ((brand.receita / totalReceita) * 100).toFixed(2);
+          csvRows.push(`${brand.bandeira || 'Não especificado'},${brand.quantidade},${formatCurrency(brand.receita)},${percentage}%`);
+        });
+      }
+      csvRows.push('');
+      
+      // Análise Temporal
+      csvRows.push('=== ANÁLISE DE TENDÊNCIAS TEMPORAIS ===');
+      csvRows.push('Data,Receita,Quantidade de Transações,Ticket Médio');
+      if (timeseries && timeseries.length > 0) {
+        timeseries.forEach(item => {
+          const ticketMedio = item.quantidade > 0 ? item.receita / item.quantidade : 0;
+          csvRows.push(`${new Date(item.data).toLocaleDateString('pt-BR')},${formatCurrency(item.receita)},${item.quantidade},${formatCurrency(ticketMedio)}`);
+        });
+      }
+      csvRows.push('');
+      
+      // Análise de Funil
+      csvRows.push('=== ANÁLISE DE FUNIL DE CONVERSÃO ===');
+      csvRows.push('Estágio,Quantidade,Valor Total');
+      if (funnel && funnel.length > 0) {
+        funnel.forEach(stage => {
+          csvRows.push(`${stage.estagio},${stage.quantidade},${formatCurrency(stage.valor)}`);
+        });
+      }
+      csvRows.push('');
+      
+      // Transações Detalhadas
+      csvRows.push('=== TRANSAÇÕES DETALHADAS ===');
+      csvRows.push('ID,Data,Cliente,Email,Valor,Status,Método,Bandeira,Descrição');
+      if (charges && charges.length > 0) {
+        charges.forEach(charge => {
+          const row = [
+            charge.id || '',
+            new Date(charge.created * 1000).toLocaleString('pt-BR'),
+            charge.customer?.nome || 'N/A',
+            charge.customer?.email || 'N/A',
+            formatCurrency(charge.amount / 100),
+            charge.status || 'N/A',
+            charge.payment_method_type || 'N/A',
+            charge.brand || 'N/A',
+            (charge.description || '').replace(/,/g, ';')
+          ].join(',');
+          csvRows.push(row);
+        });
+      }
+      csvRows.push('');
+      
+      // Participantes
+      csvRows.push('=== ANÁLISE DE PARTICIPANTES ===');
+      csvRows.push('Nome,Email,Curso,Turma,Valor Pago,Status,Método de Pagamento,Data de Registro');
+      if (customers && customers.length > 0) {
+        customers.forEach(customer => {
+          const row = [
+            (customer.nome || 'N/A').replace(/,/g, ';'),
+            customer.email || 'N/A',
+            (customer.curso || 'N/A').replace(/,/g, ';'),
+            customer.turma || 'N/A',
+            formatCurrency(customer.valor_pago || 0),
+            customer.status || 'N/A',
+            customer.metodo_pagamento || 'N/A',
+            customer.data_registro ? new Date(customer.data_registro).toLocaleDateString('pt-BR') : 'N/A'
+          ].join(',');
+          csvRows.push(row);
+        });
+      }
+      csvRows.push('');
+      
+      // Insights e Recomendações
+      csvRows.push('=== INSIGHTS E RECOMENDAÇÕES ===');
+      
+      // Calcular insights
+      const taxaFalha = summary && summary.pagos > 0 
+        ? ((summary.falhas / (summary.pagos + summary.falhas)) * 100).toFixed(2)
+        : '0';
+      
+      csvRows.push(`Taxa de Falha: ${taxaFalha}%`);
+      
+      if (parseFloat(taxaFalha) > 10) {
+        csvRows.push('⚠️ ATENÇÃO: Taxa de falha acima de 10% - Investigar possíveis problemas de checkout');
+      }
+      
+      if (summary && summary.disputas > 0) {
+        csvRows.push(`⚠️ ATENÇÃO: ${summary.disputas} disputas abertas - Requer ação imediata`);
+      }
+      
+      if (byBrand && byBrand.length > 0) {
+        const topBrand = byBrand[0];
+        csvRows.push(`💳 Bandeira principal: ${topBrand.bandeira} (${((topBrand.receita / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
+      }
+      
+      if (summary && summary.ticketMedio) {
+        csvRows.push(`💰 Ticket médio: ${formatCurrency(summary.ticketMedio)}`);
+      }
+      
+      csvRows.push('');
+      csvRows.push('=== FIM DO RELATÓRIO ===');
+      
+      // Criar e baixar CSV
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Relatório exportado!",
+        description: "O relatório de análises foi gerado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar análises:', error);
+      toast({
+        title: "Erro ao exportar",
+        description: "Não foi possível gerar o relatório de análises.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleExportExcel = () => {
     const wb = XLSX.utils.book_new();
     
@@ -711,20 +867,137 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="analises">
-          <Card className="border-t-4 border-t-pink-500">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
-              <CardTitle className="text-pink-700 dark:text-pink-300">Análises Avançadas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Visualize tendências, padrões e insights detalhados das transações.
-              </p>
-              <Button variant="outline" className="w-full border-pink-300 hover:bg-pink-50 dark:border-pink-700 dark:hover:bg-pink-950/30">
-                <Download className="h-4 w-4 mr-2" />
-                Exportar Relatório (CSV)
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            {/* Insights Cards */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="border-l-4 border-l-pink-500">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Taxa de Conversão</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">
+                    {summary?.taxaConversao ? `${Number(summary.taxaConversao).toFixed(1)}%` : '0%'}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {summary?.pagos || 0} pagos de {(summary?.pagos || 0) + (summary?.naoPagos || 0)} total
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-l-4 border-l-purple-500">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Ticket Médio</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {formatCurrency(summary?.ticketMedio || 0)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Por transação paga
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Receita Total</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {formatCurrency(summary?.liquido || 0)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Líquido após taxas
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Análise por Bandeira */}
+            <Card className="border-t-4 border-t-indigo-500">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20">
+                <CardTitle className="text-indigo-700 dark:text-indigo-300">Análise por Bandeira de Cartão</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-3">
+                  {byBrand && byBrand.length > 0 ? (
+                    byBrand.map((brand) => (
+                      <div key={brand.bandeira} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-xs font-bold text-primary">{brand.bandeira.substring(0, 2).toUpperCase()}</span>
+                          </div>
+                          <div>
+                            <p className="font-medium">{brand.bandeira || 'Não especificado'}</p>
+                            <p className="text-xs text-muted-foreground">{brand.quantidade} transações</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600 dark:text-green-400">{formatCurrency(brand.receita)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {((brand.receita / (summary?.bruto || 1)) * 100).toFixed(1)}% do total
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">Nenhum dado disponível</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Análise de Tendências */}
+            <Card className="border-t-4 border-t-emerald-500">
+              <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/20 dark:to-green-950/20">
+                <CardTitle className="text-emerald-700 dark:text-emerald-300">Tendências Temporais</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {timeseries && timeseries.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-muted-foreground pb-2 border-b">
+                      <div>Data</div>
+                      <div className="text-right">Receita</div>
+                      <div className="text-right">Transações</div>
+                      <div className="text-right">Ticket Médio</div>
+                    </div>
+                    {timeseries.slice(-10).map((item, idx) => (
+                      <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
+                        <div>{new Date(item.data).toLocaleDateString('pt-BR')}</div>
+                        <div className="text-right font-medium">{formatCurrency(item.receita)}</div>
+                        <div className="text-right">{item.quantidade}</div>
+                        <div className="text-right text-muted-foreground">
+                          {formatCurrency(item.quantidade > 0 ? item.receita / item.quantidade : 0)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">Nenhum dado temporal disponível</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Exportação */}
+            <Card className="border-t-4 border-t-pink-500">
+              <CardHeader className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
+                <CardTitle className="text-pink-700 dark:text-pink-300">Exportar Análises</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  Exporte um relatório CSV completo com todas as análises, tendências e insights detalhados das transações.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-pink-300 hover:bg-pink-50 dark:border-pink-700 dark:hover:bg-pink-950/30"
+                  onClick={handleExportAnalysisCSV}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar Relatório Completo (CSV)
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
