@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -14,6 +14,7 @@ const SubmissaoTrabalhos = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('artigo');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
   const { thematicAreas, isLoading: isLoadingAreas, getLocalizedContent } = useThematicAreas();
   const [formData, setFormData] = useState({
     author_name: '',
@@ -25,6 +26,16 @@ const SubmissaoTrabalhos = () => {
     thematic_area: ''
   });
   const [file, setFile] = useState<File | null>(null);
+  const [validationStatus, setValidationStatus] = useState<{
+    isRegistered: boolean;
+    hasSubmitted: boolean;
+    checked: boolean;
+  }>({ isRegistered: false, hasSubmitted: false, checked: false });
+
+  // Reset validation when changing tabs
+  useEffect(() => {
+    setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: false });
+  }, [activeTab]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -32,6 +43,11 @@ const SubmissaoTrabalhos = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Reset validation when email or author name changes
+    if (name === 'email' || name === 'author_name') {
+      setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: false });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,8 +69,112 @@ const SubmissaoTrabalhos = () => {
     }
   };
 
+  const validateRegistrationAndSubmission = async () => {
+    if (!formData.email || !formData.author_name) {
+      return;
+    }
+
+    setIsValidating(true);
+    try {
+      // Verificar se o aluno está inscrito no Civeni 2025
+      const { data: registration, error: regError } = await supabase
+        .from('event_registrations')
+        .select('id, email, full_name, payment_status')
+        .eq('email', formData.email.toLowerCase().trim())
+        .eq('payment_status', 'completed')
+        .maybeSingle();
+
+      if (regError) {
+        console.error('Erro ao verificar inscrição:', regError);
+        toast.error('Erro ao validar inscrição. Tente novamente.');
+        setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: true });
+        return;
+      }
+
+      if (!registration) {
+        setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: true });
+        toast.error(
+          'Você precisa estar inscrito no CIVENI 2025 para submeter trabalhos.',
+          {
+            description: 'Faça sua inscrição antes de enviar artigos ou consórcios.',
+            action: {
+              label: 'Ir para Inscrições',
+              onClick: () => navigate('/inscricoes')
+            }
+          }
+        );
+        return;
+      }
+
+      // Verificar se já existe submissão deste tipo para este email
+      const { data: existingSubmission, error: subError } = await supabase
+        .from('submissions')
+        .select('id, tipo, created_at')
+        .eq('email', formData.email.toLowerCase().trim())
+        .eq('tipo', activeTab)
+        .not('status', 'eq', 'arquivado')
+        .maybeSingle();
+
+      if (subError) {
+        console.error('Erro ao verificar submissões:', subError);
+        toast.error('Erro ao validar submissões. Tente novamente.');
+        setValidationStatus({ isRegistered: true, hasSubmitted: false, checked: true });
+        return;
+      }
+
+      if (existingSubmission) {
+        setValidationStatus({ isRegistered: true, hasSubmitted: true, checked: true });
+        toast.error(
+          `Você já enviou uma submissão de ${activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}.`,
+          {
+            description: 'Cada aluno pode enviar apenas uma submissão por tipo.'
+          }
+        );
+        return;
+      }
+
+      setValidationStatus({ isRegistered: true, hasSubmitted: false, checked: true });
+      toast.success('Inscrição validada! Você pode prosseguir com o envio.');
+    } catch (error) {
+      console.error('Erro na validação:', error);
+      toast.error('Erro ao validar dados. Tente novamente.');
+      setValidationStatus({ isRegistered: false, hasSubmitted: false, checked: true });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar inscrição e submissão antes de prosseguir
+    if (!validationStatus.checked) {
+      toast.error('Por favor, valide sua inscrição antes de enviar.');
+      return;
+    }
+
+    if (!validationStatus.isRegistered) {
+      toast.error(
+        'Você precisa estar inscrito no CIVENI 2025 para submeter trabalhos.',
+        {
+          action: {
+            label: 'Ir para Inscrições',
+            onClick: () => navigate('/inscricoes')
+          }
+        }
+      );
+      return;
+    }
+
+    if (validationStatus.hasSubmitted) {
+      toast.error(
+        `Você já enviou uma submissão de ${activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}.`,
+        {
+          description: 'Cada aluno pode enviar apenas uma submissão por tipo.'
+        }
+      );
+      return;
+    }
     
     if (!file) {
       toast.error('Por favor, anexe um arquivo');
@@ -225,14 +345,41 @@ const SubmissaoTrabalhos = () => {
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         E-mail *
                       </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                      />
+                      <div className="space-y-2">
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          onBlur={validateRegistrationAndSubmission}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        />
+                        {isValidating && (
+                          <p className="text-sm text-gray-500 flex items-center gap-2">
+                            <span className="animate-spin">⏳</span> Validando inscrição...
+                          </p>
+                        )}
+                        {validationStatus.checked && !validationStatus.isRegistered && (
+                          <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                            ⚠️ Você precisa estar inscrito no CIVENI 2025. 
+                            <Link to="/inscricoes" className="font-semibold underline ml-1">
+                              Clique aqui para se inscrever
+                            </Link>
+                          </div>
+                        )}
+                        {validationStatus.checked && validationStatus.hasSubmitted && (
+                          <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                            ⚠️ Você já enviou uma submissão de {activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}. 
+                            Cada aluno pode enviar apenas uma submissão por tipo.
+                          </div>
+                        )}
+                        {validationStatus.checked && validationStatus.isRegistered && !validationStatus.hasSubmitted && (
+                          <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                            ✅ Inscrição validada! Você pode prosseguir com o envio.
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div>
@@ -340,7 +487,7 @@ const SubmissaoTrabalhos = () => {
                     <div className="pt-6">
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !validationStatus.checked || !validationStatus.isRegistered || validationStatus.hasSubmitted}
                         className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isSubmitting ? 'Enviando...' : 'Submeter Artigo'}
@@ -385,14 +532,41 @@ const SubmissaoTrabalhos = () => {
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         E-mail *
                       </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
-                      />
+                      <div className="space-y-2">
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          onBlur={validateRegistrationAndSubmission}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
+                        />
+                        {isValidating && (
+                          <p className="text-sm text-gray-500 flex items-center gap-2">
+                            <span className="animate-spin">⏳</span> Validando inscrição...
+                          </p>
+                        )}
+                        {validationStatus.checked && !validationStatus.isRegistered && (
+                          <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                            ⚠️ Você precisa estar inscrito no CIVENI 2025. 
+                            <Link to="/inscricoes" className="font-semibold underline ml-1">
+                              Clique aqui para se inscrever
+                            </Link>
+                          </div>
+                        )}
+                        {validationStatus.checked && validationStatus.hasSubmitted && (
+                          <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                            ⚠️ Você já enviou uma submissão de {activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}. 
+                            Cada aluno pode enviar apenas uma submissão por tipo.
+                          </div>
+                        )}
+                        {validationStatus.checked && validationStatus.isRegistered && !validationStatus.hasSubmitted && (
+                          <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                            ✅ Inscrição validada! Você pode prosseguir com o envio.
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div>
@@ -500,7 +674,7 @@ const SubmissaoTrabalhos = () => {
                     <div className="pt-6">
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !validationStatus.checked || !validationStatus.isRegistered || validationStatus.hasSubmitted}
                         className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isSubmitting ? 'Enviando...' : 'Submeter Consórcio'}
