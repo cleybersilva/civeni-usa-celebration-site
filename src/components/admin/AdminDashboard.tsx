@@ -69,9 +69,10 @@ const AdminDashboard = () => {
   // Buscar TODOS os dados históricos de receitas para a seção Tendências Temporais
   useEffect(() => {
     const fetchAllTimeseries = async () => {
-      console.log('🔄 Iniciando busca de tendências temporais históricas...');
+      console.log('🔄 INÍCIO: Buscando tendências temporais...');
       setLoadingAllTimeseries(true);
       try {
+        console.log('📡 Fazendo query ao Supabase...');
         // Buscar diretamente da tabela stripe_charges para ter dados atualizados
         const { data, error } = await supabase
           .from('stripe_charges')
@@ -81,64 +82,90 @@ const AdminDashboard = () => {
           .eq('paid', true)
           .order('created_utc', { ascending: false });
 
+        console.log('📡 Resposta do Supabase:', { data: data?.length, error });
+
         if (error) {
-          console.error('❌ Erro ao buscar tendências temporais:', error);
+          console.error('❌ ERRO Supabase:', error);
           toast({
             title: "Erro ao carregar tendências",
             description: error.message,
             variant: "destructive"
           });
+          setAllTimeseriesData([]);
+        } else if (!data || data.length === 0) {
+          console.warn('⚠️ Nenhum dado retornado do Supabase');
+          setAllTimeseriesData([]);
         } else {
-          console.log('✅ Dados brutos carregados:', data?.length, 'charges');
+          console.log('✅ Dados carregados:', data.length, 'charges');
+          console.log('📊 Amostra:', data.slice(0, 2));
           
           // Agrupar por dia (timezone local Brasil)
           const groupedByDay = new Map();
           
-          data?.forEach(charge => {
-            // Converter UTC para timezone do Brasil (UTC-3)
-            const utcDate = new Date(charge.created_utc);
-            // Ajustar para horário do Brasil (UTC-3)
-            const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-            const year = brasilDate.getUTCFullYear();
-            const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(brasilDate.getUTCDate()).padStart(2, '0');
-            const dayKey = `${year}-${month}-${day}`;
-            
-            if (!groupedByDay.has(dayKey)) {
-              groupedByDay.set(dayKey, {
-                dia: dayKey,
-                receita_bruta: 0,
-                receita_liquida: 0,
-                taxas: 0,
-                transacoes: 0
-              });
+          data.forEach((charge, index) => {
+            try {
+              // Converter UTC para timezone do Brasil (UTC-3)
+              const utcDate = new Date(charge.created_utc);
+              // Ajustar para horário do Brasil (UTC-3)
+              const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
+              const year = brasilDate.getUTCFullYear();
+              const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
+              const day = String(brasilDate.getUTCDate()).padStart(2, '0');
+              const dayKey = `${year}-${month}-${day}`;
+              
+              if (index === 0) {
+                console.log('📅 Primeira conversão de data:', {
+                  utc: charge.created_utc,
+                  brasil: brasilDate.toISOString(),
+                  dayKey
+                });
+              }
+              
+              if (!groupedByDay.has(dayKey)) {
+                groupedByDay.set(dayKey, {
+                  dia: dayKey,
+                  receita_bruta: 0,
+                  receita_liquida: 0,
+                  taxas: 0,
+                  transacoes: 0
+                });
+              }
+              
+              const bucket = groupedByDay.get(dayKey);
+              const amount = charge.amount / 100;
+              const fee = (charge.fee_amount || 0) / 100;
+              const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
+              
+              bucket.receita_bruta += amount;
+              bucket.taxas += fee;
+              bucket.receita_liquida += net;
+              bucket.transacoes += 1;
+            } catch (dateError) {
+              console.error('❌ Erro ao processar charge:', charge, dateError);
             }
-            
-            const bucket = groupedByDay.get(dayKey);
-            const amount = charge.amount / 100;
-            const fee = (charge.fee_amount || 0) / 100;
-            const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
-            
-            bucket.receita_bruta += amount;
-            bucket.taxas += fee;
-            bucket.receita_liquida += net;
-            bucket.transacoes += 1;
           });
           
           const timeseriesData = Array.from(groupedByDay.values())
             .sort((a, b) => b.dia.localeCompare(a.dia));
           
-          console.log('📊 Dados agrupados por dia:', timeseriesData.length, 'dias');
-          console.log('📊 Primeiros 3 dias:', timeseriesData.slice(0, 3));
+          console.log('📊 RESULTADO FINAL:', {
+            totalDias: timeseriesData.length,
+            primeiros3: timeseriesData.slice(0, 3)
+          });
+          
           setAllTimeseriesData(timeseriesData);
+          console.log('✅ Estado atualizado com', timeseriesData.length, 'dias');
         }
       } catch (err) {
-        console.error('❌ Erro ao carregar tendências temporais:', err);
+        console.error('❌ EXCEÇÃO ao carregar tendências:', err);
+        setAllTimeseriesData([]);
       } finally {
         setLoadingAllTimeseries(false);
+        console.log('🏁 FIM: Busca de tendências concluída');
       }
     };
 
+    console.log('🎬 useEffect executado - iniciando fetch');
     fetchAllTimeseries();
   }, [toast]);
 
