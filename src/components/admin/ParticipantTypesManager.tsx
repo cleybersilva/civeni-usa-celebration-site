@@ -46,8 +46,22 @@ const ParticipantTypesManager = () => {
   const handleSetupSorteados = async () => {
     setSetupLoading(true);
     try {
-      // Chamar a função RPC segura do banco de dados
-      const { data, error } = await supabase.rpc('setup_sorteados_type');
+      // Obter credenciais do admin do localStorage
+      const adminData = localStorage.getItem('adminUser');
+      if (!adminData) {
+        throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
+      }
+
+      const { email, sessionToken } = JSON.parse(adminData);
+      if (!email || !sessionToken) {
+        throw new Error('Sessão inválida. Por favor, faça login novamente.');
+      }
+
+      // Chamar a função RPC segura do banco de dados com autenticação
+      const { data, error } = await supabase.rpc('setup_sorteados_type', {
+        user_email: email,
+        session_token: sessionToken
+      });
 
       if (error) {
         console.error('Erro RPC:', error);
