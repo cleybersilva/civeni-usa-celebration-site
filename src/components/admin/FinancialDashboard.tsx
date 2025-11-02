@@ -181,16 +181,17 @@ const FinancialDashboard = () => {
       }
       params.append('to', now.toISOString());
       
-      const { data: timeseriesData } = await supabase.functions.invoke(`finance-timeseries?${params.toString()}`, { 
+      const { data: timeseriesData, error: timeseriesError } = await supabase.functions.invoke(`finance-timeseries?${params.toString()}`, { 
         method: 'GET'
       });
       
-      const { data: breakdownData } = await supabase.functions.invoke(`finance-breakdown?${params.toString()}`, { 
-        method: 'GET'
-      });
+      console.log('🔍 PDF Export - Timeseries response:', { timeseriesData, timeseriesError, params: params.toString() });
       
       // Processar dados de timeseries atualizados
-      const timeseriesArray = timeseriesData?.data || [];
+      const timeseriesArray = (timeseriesData?.data || timeseriesData || []) as any[];
+      console.log('🔍 PDF Export - Timeseries array length:', timeseriesArray.length);
+      console.log('🔍 PDF Export - First item:', timeseriesArray[0]);
+      
       const exportDailyRegistrations = timeseriesArray.map((d: any) => ({
         name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
         inscricoes: d.transacoes || 0,
@@ -202,6 +203,9 @@ const FinancialDashboard = () => {
         faturamento: d.receita_liquida || 0,
         periodo: d.dia
       }));
+      
+      console.log('🔍 PDF Export - Daily registrations:', exportDailyRegistrations.slice(0, 3));
+      console.log('🔍 PDF Export - Daily revenue:', exportDailyRevenue.slice(0, 3));
       
       // Agrupar dados semanais para inscrições
       const weekMapInsc = new Map<string, { value: number; startDate: string }>();
@@ -612,12 +616,14 @@ const FinancialDashboard = () => {
     }
     params.append('to', now.toISOString());
     
-    const { data: timeseriesData } = await supabase.functions.invoke(`finance-timeseries?${params.toString()}`, { 
+    const { data: timeseriesData, error: timeseriesError } = await supabase.functions.invoke(`finance-timeseries?${params.toString()}`, { 
       method: 'GET'
     });
     
+    console.log('🔍 Excel Export - Timeseries response:', { timeseriesData, timeseriesError, params: params.toString() });
+    
     // Processar dados de timeseries atualizados
-    const timeseriesArray = timeseriesData?.data || [];
+    const timeseriesArray = (timeseriesData?.data || timeseriesData || []) as any[];
     const exportExcelDailyRegistrations = timeseriesArray.map((d: any) => ({
       name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
       inscricoes: d.transacoes || 0,
