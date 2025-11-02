@@ -218,12 +218,12 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                                     ? 'R$ 200,00'
                                     : category.slug === 'convidado'
                                       ? 'R$ 100,00'
-                                      : 'R$ 200,00'
+                                      : `R$ ${(loteVigente?.price_cents / 100).toFixed(2)}`
                                 }
                               </span>
                               {loteVigente && !category.is_free && category.slug !== 'participante-externo' && category.slug !== 'convidado' && (
                                 <span className="text-xs text-green-600 font-medium">
-                                  Lote ATUAL
+                                  {loteVigente.nome}
                                 </span>
                               )}
                               {category.slug === 'participante-externo' && (
@@ -275,7 +275,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                           ? 20000 
                           : selectedCategory.slug === 'convidado'
                             ? 10000
-                            : 20000
+                            : loteVigente?.price_cents ?? 0
                     }
                     participantType={formData.participantType}
                   />
