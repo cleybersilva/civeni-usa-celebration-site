@@ -7,9 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Wand2 } from 'lucide-react';
 import { useParticipantTypes } from '@/hooks/useParticipantTypes';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ParticipantType {
   id: string;
@@ -22,16 +23,72 @@ interface ParticipantType {
 }
 
 const ParticipantTypesManager = () => {
-  const { participantTypes, loading, createParticipantType, updateParticipantType, deleteParticipantType } = useParticipantTypes();
+  const { participantTypes, loading, createParticipantType, updateParticipantType, deleteParticipantType, refreshParticipantTypes } = useParticipantTypes();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingType, setEditingType] = useState<ParticipantType | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [setupLoading, setSetupLoading] = useState(false);
   const [formData, setFormData] = useState({
     type_name: '',
     description: '',
     requires_course_selection: false,
     is_active: true,
   });
+
+  const handleSetupSorteados = async () => {
+    setSetupLoading(true);
+    try {
+      // Verificar se "Sorteados" já existe
+      const { data: existingType } = await supabase
+        .from('participant_types')
+        .select('*')
+        .eq('type_name', 'Sorteados')
+        .single();
+
+      let sorteadosCreated = false;
+
+      if (!existingType) {
+        // Criar o tipo "Sorteados"
+        const { error: typeError } = await supabase
+          .from('participant_types')
+          .insert({
+            type_name: 'Sorteados',
+            description: 'Participantes sorteados com 100% de desconto',
+            requires_course_selection: false,
+            is_active: true
+          });
+
+        if (typeError) throw typeError;
+        sorteadosCreated = true;
+      }
+
+      // Atualizar o cupom CIVENI2025FREE
+      const { error: couponError } = await supabase
+        .from('coupon_codes')
+        .update({
+          participant_type: 'Professor(a),Palestrantes,Sorteados',
+          description: 'Cupom de 100% de desconto para Professor(a), Palestrantes e Sorteados',
+          updated_at: new Date().toISOString()
+        })
+        .eq('code', 'CIVENI2025FREE');
+
+      if (couponError) throw couponError;
+
+      // Atualizar a lista
+      await refreshParticipantTypes();
+
+      if (sorteadosCreated) {
+        toast.success('Tipo "Sorteados" criado e cupom CIVENI2025FREE atualizado com sucesso!');
+      } else {
+        toast.success('Tipo "Sorteados" já existia. Cupom CIVENI2025FREE atualizado com sucesso!');
+      }
+    } catch (error) {
+      console.error('Erro ao configurar Sorteados:', error);
+      toast.error('Erro ao configurar tipo Sorteados');
+    } finally {
+      setSetupLoading(false);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -121,7 +178,18 @@ const ParticipantTypesManager = () => {
           </p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleSetupSorteados} 
+            disabled={setupLoading}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            <Wand2 className="w-4 h-4" />
+            {setupLoading ? 'Configurando...' : 'Setup Sorteados'}
+          </Button>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
@@ -186,7 +254,8 @@ const ParticipantTypesManager = () => {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border">
