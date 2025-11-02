@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Users, Wand2 } from 'lucide-react';
 import { useParticipantTypes } from '@/hooks/useParticipantTypes';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -32,6 +33,7 @@ interface SetupSorteadosResponse {
 
 const ParticipantTypesManager = () => {
   const { participantTypes, loading, createParticipantType, updateParticipantType, deleteParticipantType, refreshParticipantTypes } = useParticipantTypes();
+  const { user, sessionToken } = useAdminAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingType, setEditingType] = useState<ParticipantType | null>(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -46,20 +48,14 @@ const ParticipantTypesManager = () => {
   const handleSetupSorteados = async () => {
     setSetupLoading(true);
     try {
-      // Obter credenciais do admin do localStorage
-      const adminData = localStorage.getItem('adminUser');
-      if (!adminData) {
+      // Verificar se o usuário está autenticado
+      if (!user || !sessionToken) {
         throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
-      }
-
-      const { email, sessionToken } = JSON.parse(adminData);
-      if (!email || !sessionToken) {
-        throw new Error('Sessão inválida. Por favor, faça login novamente.');
       }
 
       // Chamar a função RPC segura do banco de dados com autenticação
       const { data, error } = await supabase.rpc('setup_sorteados_type', {
-        user_email: email,
+        user_email: user.email,
         session_token: sessionToken
       });
 
