@@ -90,7 +90,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
       }
       
       // Para participante externo, mostrar APENAS a categoria específica de externo
-      if (formData.participantType === 'external') {
+      if (formData.participantType === 'Participante Externo') {
         return category.slug === 'participante-externo';
       }
       
