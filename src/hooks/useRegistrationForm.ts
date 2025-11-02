@@ -121,10 +121,6 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
       }
 
-      console.log("=== STARTING REGISTRATION ===");
-      console.log("Form data:", formData);
-      console.log("Current batch:", currentBatch);
-
       const payload = {
         email: formData.email,
         fullName: formData.fullName,
@@ -138,49 +134,36 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         currency: getCurrency(i18n.language)
       };
 
-      console.log("=== CALLING EDGE FUNCTION ===");
-      console.log("Payload:", payload);
+      console.log("Sending registration request:", payload);
       
       const { data, error } = await supabase.functions.invoke('create-registration-payment', {
         body: payload
       });
 
-      console.log("=== EDGE FUNCTION RESPONSE ===");
-      console.log("Data:", data);
-      console.log("Error:", error);
+      console.log("Server response:", { data, error });
 
       if (error) {
-        console.error("Edge function error:", error);
-        throw new Error(error.message || 'Erro ao processar inscrição. Tente novamente.');
+        throw new Error(error.message || 'Erro ao processar inscrição');
       }
 
-      if (!data) {
-        throw new Error('Nenhuma resposta recebida do servidor');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao criar inscrição');
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Erro desconhecido no servidor');
-      }
-
-      console.log("=== PROCESSING RESPONSE ===");
-      console.log("Payment required:", data.payment_required);
-      console.log("URL:", data.url);
-      
+      // Free registration
       if (data.payment_required === false) {
-        console.log("Free registration - redirecting to success");
         window.location.href = '/registration/success';
         return;
       }
       
       // Paid registration - redirect to Stripe
-      if (!data.url) {
-        throw new Error('URL de pagamento não disponível');
+      if (data.url) {
+        console.log("Redirecting to:", data.url);
+        window.location.href = data.url;
+        return;
       }
       
-      console.log("Redirecting to Stripe Checkout:", data.url);
-      
-      // Usar assign para redirecionamento mais robusto
-      window.location.assign(data.url);
+      throw new Error('URL de pagamento não disponível');
     } catch (error: any) {
       console.error('=== REGISTRATION ERROR ===');
       console.error('Error object:', error);
