@@ -73,19 +73,14 @@ const AdminDashboard = () => {
       try {
         const { data, error } = await supabase
           .from('stripe_charges')
-          .select('created_utc, amount, fee_amount, net_amount, currency, status, paid')
+          .select('created_utc, amount, fee_amount, net_amount')
           .eq('currency', 'BRL')
           .eq('status', 'succeeded')
           .eq('paid', true)
           .order('created_utc', { ascending: false });
 
         if (error) {
-          console.error('Erro ao buscar tendências:', error);
-          toast({
-            title: "Erro ao carregar tendências",
-            description: error.message,
-            variant: "destructive"
-          });
+          console.error('Erro:', error);
           setAllTimeseriesData([]);
           return;
         }
@@ -95,24 +90,18 @@ const AdminDashboard = () => {
           return;
         }
 
-        // Agrupar por dia usando conversão de timezone do PostgreSQL
-        const groupedByDay = new Map();
+        // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
+        const groupedByDay = new Map<string, any>();
         
         data.forEach(charge => {
-          // Criar data UTC e converter para Brasil
           const utcDate = new Date(charge.created_utc);
+          // Subtrair 3 horas para converter para horário de Brasília
+          const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
           
-          // Converter para string ISO e pegar só a data em Brasil (UTC-3)
-          // Criar um objeto Date no timezone do Brasil
-          const brasilDateStr = utcDate.toLocaleString('en-US', { 
-            timeZone: 'America/Fortaleza',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-          });
-          
-          // Parse MM/DD/YYYY para YYYY-MM-DD
-          const [month, day, year] = brasilDateStr.split('/');
+          // Extrair ano, mês e dia da data do Brasil
+          const year = brasilDate.getUTCFullYear();
+          const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
+          const day = String(brasilDate.getUTCDate()).padStart(2, '0');
           const dayKey = `${year}-${month}-${day}`;
           
           if (!groupedByDay.has(dayKey)) {
@@ -125,7 +114,7 @@ const AdminDashboard = () => {
             });
           }
           
-          const bucket = groupedByDay.get(dayKey);
+          const bucket = groupedByDay.get(dayKey)!;
           const amount = charge.amount / 100;
           const fee = (charge.fee_amount || 0) / 100;
           const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
@@ -136,12 +125,13 @@ const AdminDashboard = () => {
           bucket.transacoes += 1;
         });
         
+        // Ordenar por data mais recente primeiro
         const timeseriesData = Array.from(groupedByDay.values())
           .sort((a, b) => b.dia.localeCompare(a.dia));
         
         setAllTimeseriesData(timeseriesData);
       } catch (err) {
-        console.error('Erro ao processar tendências:', err);
+        console.error('Exceção:', err);
         setAllTimeseriesData([]);
       } finally {
         setLoadingAllTimeseries(false);
@@ -149,7 +139,7 @@ const AdminDashboard = () => {
     };
 
     fetchAllTimeseries();
-  }, [toast]);
+  }, []);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
