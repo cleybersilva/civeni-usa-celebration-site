@@ -158,7 +158,23 @@ serve(async (req) => {
     logStep("No duplicate registration found");
 
     // Validate coupon if provided using robust RPC
-    let finalPrice = category.is_free ? 0 : (category.price_cents || lote.price_cents);
+    // Determine price based on category type
+    let finalPrice = 0;
+    if (category.is_free) {
+      finalPrice = 0;
+    } else if (category.slug === 'participante-externo') {
+      // Fixed price for external participants: R$ 200.00
+      finalPrice = 20000; // 200.00 in cents
+      logStep("External participant - fixed price applied", { finalPrice });
+    } else if (category.slug === 'convidado') {
+      // Fixed price for guests: R$ 100.00
+      finalPrice = 10000; // 100.00 in cents
+      logStep("Guest - fixed price applied", { finalPrice });
+    } else {
+      // Use category price or lote price for regular participants
+      finalPrice = category.price_cents || lote.price_cents;
+      logStep("Regular price applied", { finalPrice });
+    }
     let validCoupon = null;
 
     if (couponCode) {

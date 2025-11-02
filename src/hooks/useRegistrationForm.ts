@@ -173,8 +173,8 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
           console.log("=== REDIRECTING TO STRIPE ===");
           console.log("URL received:", data.url);
           
-          // Abra em uma nova aba para evitar bloqueios do iframe
-          window.open(data.url, '_blank');
+          // Redirecionar diretamente na mesma janela para o checkout do Stripe
+          window.location.href = data.url;
           
         } else {
           console.log("=== NO URL PROVIDED ===");
