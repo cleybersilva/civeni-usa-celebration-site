@@ -276,7 +276,8 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                           : selectedCategory.slug === 'convidado'
                             ? 10000
                             : loteVigente?.price_cents ?? 0
-                    } 
+                    }
+                    participantType={formData.participantType}
                   />
                 )}
 
