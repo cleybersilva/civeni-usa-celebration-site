@@ -87,15 +87,6 @@ serve(async (req) => {
 
     logStep("Request body received", { email, categoryId, batchId, participantType });
 
-    // Initialize Supabase with service role for database operations
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
-    logStep("Supabase client initialized");
-
     // Get category details
     const { data: category, error: categoryError } = await supabase
       .from('event_category')
