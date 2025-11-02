@@ -188,9 +188,17 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         } else if (data.url) {
           console.log("=== REDIRECTING TO STRIPE ===");
           console.log("URL received:", data.url);
+          console.log("URL type:", typeof data.url);
+          console.log("URL valid:", data.url.startsWith('http'));
           
-          // Redirecionar diretamente na mesma janela para o checkout do Stripe
-          window.location.href = data.url;
+          // Garantir que o URL é válido
+          if (!data.url || typeof data.url !== 'string' || !data.url.startsWith('http')) {
+            throw new Error('URL de pagamento inválida recebida do servidor');
+          }
+          
+          // Redirecionar imediatamente
+          console.log("Executing redirect to:", data.url);
+          window.location.replace(data.url);
           
         } else {
           console.log("=== NO URL PROVIDED ===");
