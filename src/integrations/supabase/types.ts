@@ -1528,9 +1528,11 @@ export type Database = {
           currency: string | null
           curso_id: string | null
           email: string
+          email_norm: string | null
           full_name: string
           id: string
           installments: number | null
+          nome_norm: string | null
           participant_type: string | null
           payment_method: string | null
           payment_status: string | null
@@ -1553,9 +1555,11 @@ export type Database = {
           currency?: string | null
           curso_id?: string | null
           email: string
+          email_norm?: string | null
           full_name: string
           id?: string
           installments?: number | null
+          nome_norm?: string | null
           participant_type?: string | null
           payment_method?: string | null
           payment_status?: string | null
@@ -1578,9 +1582,11 @@ export type Database = {
           currency?: string | null
           curso_id?: string | null
           email?: string
+          email_norm?: string | null
           full_name?: string
           id?: string
           installments?: number | null
+          nome_norm?: string | null
           participant_type?: string | null
           payment_method?: string | null
           payment_status?: string | null
@@ -2078,6 +2084,39 @@ export type Database = {
           storage_path?: string
           updated_at?: string | null
           versioned_url?: string | null
+        }
+        Relationships: []
+      }
+      inscricoes_elegiveis: {
+        Row: {
+          computed_at: string
+          email: string
+          email_norm: string
+          full_name: string
+          id: string
+          inscricao_id: string
+          nome_norm: string
+          payment_status: string
+        }
+        Insert: {
+          computed_at?: string
+          email: string
+          email_norm: string
+          full_name: string
+          id?: string
+          inscricao_id: string
+          nome_norm: string
+          payment_status: string
+        }
+        Update: {
+          computed_at?: string
+          email?: string
+          email_norm?: string
+          full_name?: string
+          id?: string
+          inscricao_id?: string
+          nome_norm?: string
+          payment_status?: string
         }
         Relationships: []
       }
@@ -3345,8 +3384,10 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           email: string
+          email_norm: string | null
           id: string
           instituicao: string | null
+          nome_norm: string | null
           palavras_chave: string[] | null
           resumo: string | null
           status: string
@@ -3369,8 +3410,10 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           email: string
+          email_norm?: string | null
           id?: string
           instituicao?: string | null
+          nome_norm?: string | null
           palavras_chave?: string[] | null
           resumo?: string | null
           status?: string
@@ -3393,8 +3436,10 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           email?: string
+          email_norm?: string | null
           id?: string
           instituicao?: string | null
+          nome_norm?: string | null
           palavras_chave?: string[] | null
           resumo?: string | null
           status?: string
@@ -4336,7 +4381,12 @@ export type Database = {
         Returns: Json
       }
       can_submit_trabalho: {
-        Args: { p_email: string; p_nome: string; p_tipo: string }
+        Args: {
+          p_email: string
+          p_evento: string
+          p_nome: string
+          p_tipo: string
+        }
         Returns: {
           allowed: boolean
           reason: string
@@ -4468,6 +4518,7 @@ export type Database = {
         Args: { email_input: string; user_email: string }
         Returns: string
       }
+      refresh_inscricoes_elegiveis: { Args: never; Returns: undefined }
       request_password_reset: { Args: { user_email: string }; Returns: boolean }
       revoke_admin_session: {
         Args: { session_token: string; user_email: string }
@@ -4501,6 +4552,7 @@ export type Database = {
         Args: { user_email: string; user_password: string }
         Returns: Json
       }
+      unaccent: { Args: { "": string }; Returns: string }
       update_admin_user_password: {
         Args: { new_password: string; user_id: string }
         Returns: Json
