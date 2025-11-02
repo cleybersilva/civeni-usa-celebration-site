@@ -54,7 +54,7 @@ const LoteInfo = ({ lote }: LoteInfoProps) => {
             {formatPrice(lote.price_cents)}
           </div>
           <Badge variant="secondary" className="mt-1">
-            Preço atual da inscrição
+            Valor atual da inscrição "Exclusivo para Discentes VCCU"
           </Badge>
         </div>
 
