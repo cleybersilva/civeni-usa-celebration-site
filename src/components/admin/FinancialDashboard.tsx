@@ -147,11 +147,29 @@ const FinancialDashboard = () => {
       return;
     }
     
-    // Buscar dados completos
-    const { data: registrations } = await supabase
+    // Calcular período baseado no range
+    const now = new Date();
+    let fromDate: Date | null = null;
+    
+    if (range === '7d') {
+      fromDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (range === '30d') {
+      fromDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    } else if (range === '90d') {
+      fromDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    }
+    
+    // Buscar dados completos filtrados por período
+    let query = supabase
       .from('event_registrations')
       .select('*')
       .order('created_at', { ascending: false });
+    
+    if (fromDate) {
+      query = query.gte('created_at', fromDate.toISOString());
+    }
+    
+    const { data: registrations } = await query;
     
     try {
       const doc = new jsPDF();
@@ -461,11 +479,29 @@ const FinancialDashboard = () => {
       return;
     }
     
-    // Buscar dados completos das inscrições
-    const { data: registrations, error: regError } = await supabase
+    // Calcular período baseado no range
+    const now = new Date();
+    let fromDate: Date | null = null;
+    
+    if (range === '7d') {
+      fromDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (range === '30d') {
+      fromDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    } else if (range === '90d') {
+      fromDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    }
+    
+    // Buscar dados completos das inscrições filtrados por período
+    let regQuery = supabase
       .from('event_registrations')
       .select('*')
       .order('created_at', { ascending: false });
+    
+    if (fromDate) {
+      regQuery = regQuery.gte('created_at', fromDate.toISOString());
+    }
+    
+    const { data: registrations, error: regError } = await regQuery;
     
     if (regError) {
       toast({
@@ -476,11 +512,17 @@ const FinancialDashboard = () => {
       return;
     }
     
-    // Buscar dados do Stripe
-    const { data: stripeCharges, error: stripeError } = await supabase
+    // Buscar dados do Stripe filtrados por período
+    let stripeQuery = supabase
       .from('stripe_charges')
       .select('*')
       .order('created_at', { ascending: false });
+    
+    if (fromDate) {
+      stripeQuery = stripeQuery.gte('created_at', fromDate.toISOString());
+    }
+    
+    const { data: stripeCharges, error: stripeError } = await stripeQuery;
     
     if (stripeError) {
       console.warn('Aviso ao buscar charges:', stripeError);
