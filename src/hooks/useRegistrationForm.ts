@@ -165,17 +165,18 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
 
         console.log("=== PROCESSING RESPONSE ===");
+        console.log("Payment required:", data.payment_required);
+        console.log("Participant type:", formData.participantType);
         
         if (data.payment_required === false) {
-          console.log("Free registration completed");
+          console.log("Free registration completed - redirecting to success");
           window.location.href = '/registration/success';
         } else if (data.url) {
-          console.log("=== REDIRECTING TO STRIPE ===");
-          console.log("URL received:", data.url);
-          
-          // Abra em uma nova aba para evitar bloqueios do iframe
-          window.open(data.url, '_blank');
-          
+          console.log("=== REDIRECTING TO STRIPE CHECKOUT ===");
+          console.log("Stripe URL:", data.url);
+          console.log("Registration ID:", data.registration_id);
+          // Redirecionar diretamente para o checkout do Stripe na mesma janela
+          window.location.href = data.url;
         } else {
           console.log("=== NO URL PROVIDED ===");
           console.log("Full data object:", JSON.stringify(data, null, 2));
