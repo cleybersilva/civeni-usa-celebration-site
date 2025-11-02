@@ -147,31 +147,106 @@ const FinancialDashboard = () => {
       return;
     }
     
-    // Calcular período baseado no range
-    const now = new Date();
-    let fromDate: Date | null = null;
-    
-    if (range === '7d') {
-      fromDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    } else if (range === '30d') {
-      fromDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    } else if (range === '90d') {
-      fromDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-    }
-    
-    // Buscar dados completos filtrados por período
-    let query = supabase
-      .from('event_registrations')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (fromDate) {
-      query = query.gte('created_at', fromDate.toISOString());
-    }
-    
-    const { data: registrations } = await query;
-    
     try {
+      // Calcular período baseado no range
+      const now = new Date();
+      let fromDate: Date | null = null;
+      
+      if (range === '7d') {
+        fromDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (range === '30d') {
+        fromDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      } else if (range === '90d') {
+        fromDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      }
+      
+      // Buscar dados completos filtrados por período
+      let query = supabase
+        .from('event_registrations')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fromDate) {
+        query = query.gte('created_at', fromDate.toISOString());
+      }
+      
+      const { data: registrations } = await query;
+      
+      // Buscar dados atualizados de timeseries
+      const params = new URLSearchParams();
+      params.append('granularity', 'day');
+      params.append('currency', 'BRL');
+      if (fromDate) {
+        params.append('from', fromDate.toISOString());
+      }
+      params.append('to', now.toISOString());
+      
+      const { data: timeseriesData } = await supabase.functions.invoke(`finance-timeseries?${params.toString()}`, { 
+        method: 'GET'
+      });
+      
+      const { data: breakdownData } = await supabase.functions.invoke(`finance-breakdown?${params.toString()}`, { 
+        method: 'GET'
+      });
+      
+      // Processar dados de timeseries atualizados
+      const timeseriesArray = timeseriesData?.data || [];
+      const exportDailyRegistrations = timeseriesArray.map((d: any) => ({
+        name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+        inscricoes: d.transacoes || 0,
+        periodo: d.dia
+      }));
+      
+      const exportDailyRevenue = timeseriesArray.map((d: any) => ({
+        name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+        faturamento: d.receita_liquida || 0,
+        periodo: d.dia
+      }));
+      
+      // Agrupar dados semanais para inscrições
+      const weekMapInsc = new Map<string, { value: number; startDate: string }>();
+      exportDailyRegistrations.forEach((d) => {
+        const date = new Date(d.periodo);
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        const weekKey = weekStart.toISOString().split('T')[0];
+        
+        if (weekMapInsc.has(weekKey)) {
+          const existing = weekMapInsc.get(weekKey)!;
+          weekMapInsc.set(weekKey, { value: existing.value + d.inscricoes, startDate: weekKey });
+        } else {
+          weekMapInsc.set(weekKey, { value: d.inscricoes, startDate: weekKey });
+        }
+      });
+      
+      const exportWeeklyRegistrations = Array.from(weekMapInsc.values()).map(w => ({
+        name: new Date(w.startDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+        inscricoes: w.value,
+        periodo: w.startDate
+      }));
+      
+      // Agrupar dados semanais para faturamento
+      const weekMapFat = new Map<string, { value: number; startDate: string }>();
+      exportDailyRevenue.forEach((d) => {
+        const date = new Date(d.periodo);
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        const weekKey = weekStart.toISOString().split('T')[0];
+        
+        if (weekMapFat.has(weekKey)) {
+          const existing = weekMapFat.get(weekKey)!;
+          weekMapFat.set(weekKey, { value: existing.value + d.faturamento, startDate: weekKey });
+        } else {
+          weekMapFat.set(weekKey, { value: d.faturamento, startDate: weekKey });
+        }
+      });
+      
+      const exportWeeklyRevenue = Array.from(weekMapFat.values()).map(w => ({
+        name: new Date(w.startDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+        faturamento: w.value,
+        periodo: w.startDate
+      }));
+      
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       
@@ -264,13 +339,13 @@ const FinancialDashboard = () => {
       doc.text('Inscrições Diárias', 14, yPos);
       yPos += 6;
       
-      const totalInscricoesDia = dailyRegistrations.reduce((sum, d) => sum + d.inscricoes, 0);
+      const totalInscricoesDia = exportDailyRegistrations.reduce((sum, d) => sum + d.inscricoes, 0);
       
       autoTable(doc, {
         startY: yPos,
         head: [['Data', 'Quantidade']],
         body: [
-          ...dailyRegistrations.map(d => [d.name, d.inscricoes.toString()]),
+          ...exportDailyRegistrations.map(d => [d.name, d.inscricoes.toString()]),
           ['TOTAL', totalInscricoesDia.toString()]
         ],
         theme: 'striped',
@@ -278,7 +353,7 @@ const FinancialDashboard = () => {
         bodyStyles: { fontSize: 9 },
         margin: { left: 14, right: 14 },
         didParseCell: (data: any) => {
-          if (data.row.index === dailyRegistrations.length && data.section === 'body') {
+          if (data.row.index === exportDailyRegistrations.length && data.section === 'body') {
             data.cell.styles.fontStyle = 'bold';
             data.cell.styles.fillColor = [220, 252, 231];
           }
@@ -298,13 +373,13 @@ const FinancialDashboard = () => {
       doc.text('Faturamento Diário', 14, yPos);
       yPos += 6;
       
-      const totalFatDia = dailyRevenue.reduce((sum, d) => sum + d.faturamento, 0);
+      const totalFatDia = exportDailyRevenue.reduce((sum, d) => sum + d.faturamento, 0);
       
       autoTable(doc, {
         startY: yPos,
         head: [['Data', 'Valor (R$)']],
         body: [
-          ...dailyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
+          ...exportDailyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
           ['TOTAL', totalFatDia.toFixed(2)]
         ],
         theme: 'striped',
@@ -312,7 +387,7 @@ const FinancialDashboard = () => {
         bodyStyles: { fontSize: 9 },
         margin: { left: 14, right: 14 },
         didParseCell: (data: any) => {
-          if (data.row.index === dailyRevenue.length && data.section === 'body') {
+          if (data.row.index === exportDailyRevenue.length && data.section === 'body') {
             data.cell.styles.fontStyle = 'bold';
             data.cell.styles.fillColor = [243, 232, 255];
           }
@@ -331,13 +406,13 @@ const FinancialDashboard = () => {
       doc.text('Faturamento Semanal', 14, yPos);
       yPos += 6;
       
-      const totalFatSem = weeklyRevenue.reduce((sum, d) => sum + d.faturamento, 0);
+      const totalFatSem = exportWeeklyRevenue.reduce((sum, d) => sum + d.faturamento, 0);
       
       autoTable(doc, {
         startY: yPos,
         head: [['Semana', 'Valor (R$)']],
         body: [
-          ...weeklyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
+          ...exportWeeklyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
           ['TOTAL', totalFatSem.toFixed(2)]
         ],
         theme: 'grid',
@@ -345,7 +420,7 @@ const FinancialDashboard = () => {
         bodyStyles: { fontSize: 10 },
         margin: { left: 14, right: 14 },
         didParseCell: (data: any) => {
-          if (data.row.index === weeklyRevenue.length && data.section === 'body') {
+          if (data.row.index === exportWeeklyRevenue.length && data.section === 'body') {
             data.cell.styles.fontStyle = 'bold';
             data.cell.styles.fillColor = [243, 232, 255];
           }
@@ -527,6 +602,78 @@ const FinancialDashboard = () => {
     if (stripeError) {
       console.warn('Aviso ao buscar charges:', stripeError);
     }
+    
+    // Buscar dados atualizados de timeseries
+    const params = new URLSearchParams();
+    params.append('granularity', 'day');
+    params.append('currency', 'BRL');
+    if (fromDate) {
+      params.append('from', fromDate.toISOString());
+    }
+    params.append('to', now.toISOString());
+    
+    const { data: timeseriesData } = await supabase.functions.invoke(`finance-timeseries?${params.toString()}`, { 
+      method: 'GET'
+    });
+    
+    // Processar dados de timeseries atualizados
+    const timeseriesArray = timeseriesData?.data || [];
+    const exportExcelDailyRegistrations = timeseriesArray.map((d: any) => ({
+      name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+      inscricoes: d.transacoes || 0,
+      periodo: d.dia
+    }));
+    
+    const exportExcelDailyRevenue = timeseriesArray.map((d: any) => ({
+      name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+      faturamento: d.receita_liquida || 0,
+      periodo: d.dia
+    }));
+    
+    // Agrupar dados semanais para inscrições
+    const weekMapInscExcel = new Map<string, { value: number; startDate: string }>();
+    exportExcelDailyRegistrations.forEach((d) => {
+      const date = new Date(d.periodo);
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (weekMapInscExcel.has(weekKey)) {
+        const existing = weekMapInscExcel.get(weekKey)!;
+        weekMapInscExcel.set(weekKey, { value: existing.value + d.inscricoes, startDate: weekKey });
+      } else {
+        weekMapInscExcel.set(weekKey, { value: d.inscricoes, startDate: weekKey });
+      }
+    });
+    
+    const exportExcelWeeklyRegistrations = Array.from(weekMapInscExcel.values()).map(w => ({
+      name: new Date(w.startDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+      inscricoes: w.value,
+      periodo: w.startDate
+    }));
+    
+    // Agrupar dados semanais para faturamento
+    const weekMapFatExcel = new Map<string, { value: number; startDate: string }>();
+    exportExcelDailyRevenue.forEach((d) => {
+      const date = new Date(d.periodo);
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (weekMapFatExcel.has(weekKey)) {
+        const existing = weekMapFatExcel.get(weekKey)!;
+        weekMapFatExcel.set(weekKey, { value: existing.value + d.faturamento, startDate: weekKey });
+      } else {
+        weekMapFatExcel.set(weekKey, { value: d.faturamento, startDate: weekKey });
+      }
+    });
+    
+    const exportExcelWeeklyRevenue = Array.from(weekMapFatExcel.values()).map(w => ({
+      name: new Date(w.startDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+      faturamento: w.value,
+      periodo: w.startDate
+    }));
+    
     try {
       const wb = XLSX.utils.book_new();
       
@@ -579,9 +726,9 @@ const FinancialDashboard = () => {
         ['INSCRIÇÕES POR DIA'],
         [''],
         ['Data', 'Quantidade de Inscrições'],
-        ...dailyRegistrations.map(d => [d.name, d.inscricoes]),
+        ...exportExcelDailyRegistrations.map(d => [d.name, d.inscricoes]),
         [''],
-        ['Total', dailyRegistrations.reduce((sum, d) => sum + d.inscricoes, 0)]
+        ['Total', exportExcelDailyRegistrations.reduce((sum, d) => sum + d.inscricoes, 0)]
       ];
       const wsInscrDia = XLSX.utils.aoa_to_sheet(inscricoesData);
       XLSX.utils.book_append_sheet(wb, wsInscrDia, 'Inscrições Diárias');
@@ -591,9 +738,9 @@ const FinancialDashboard = () => {
         ['INSCRIÇÕES POR SEMANA'],
         [''],
         ['Semana', 'Quantidade de Inscrições'],
-        ...weeklyRegistrations.map(d => [d.name, d.inscricoes]),
+        ...exportExcelWeeklyRegistrations.map(d => [d.name, d.inscricoes]),
         [''],
-        ['Total', weeklyRegistrations.reduce((sum, d) => sum + d.inscricoes, 0)]
+        ['Total', exportExcelWeeklyRegistrations.reduce((sum, d) => sum + d.inscricoes, 0)]
       ];
       const wsInscrSem = XLSX.utils.aoa_to_sheet(inscricoesSemana);
       XLSX.utils.book_append_sheet(wb, wsInscrSem, 'Inscrições Semanais');
@@ -603,9 +750,9 @@ const FinancialDashboard = () => {
         ['FATURAMENTO POR DIA'],
         [''],
         ['Data', 'Valor (R$)'],
-        ...dailyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
+        ...exportExcelDailyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
         [''],
-        ['Total', dailyRevenue.reduce((sum, d) => sum + d.faturamento, 0).toFixed(2)]
+        ['Total', exportExcelDailyRevenue.reduce((sum, d) => sum + d.faturamento, 0).toFixed(2)]
       ];
       const wsFatDiario = XLSX.utils.aoa_to_sheet(fatDiario);
       XLSX.utils.book_append_sheet(wb, wsFatDiario, 'Faturamento Diário');
@@ -615,9 +762,9 @@ const FinancialDashboard = () => {
         ['FATURAMENTO POR SEMANA'],
         [''],
         ['Semana', 'Valor (R$)'],
-        ...weeklyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
+        ...exportExcelWeeklyRevenue.map(d => [d.name, d.faturamento.toFixed(2)]),
         [''],
-        ['Total', weeklyRevenue.reduce((sum, d) => sum + d.faturamento, 0).toFixed(2)]
+        ['Total', exportExcelWeeklyRevenue.reduce((sum, d) => sum + d.faturamento, 0).toFixed(2)]
       ];
       const wsFatSemanal = XLSX.utils.aoa_to_sheet(fatSemanal);
       XLSX.utils.book_append_sheet(wb, wsFatSemanal, 'Faturamento Semanal');
