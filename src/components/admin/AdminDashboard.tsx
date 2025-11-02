@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStripeDashboard } from '@/hooks/useStripeDashboard';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +29,8 @@ const AdminDashboard = () => {
   const [syncing, setSyncing] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
   const [timeseriesPage, setTimeseriesPage] = useState(1);
+  const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
+  const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
@@ -63,6 +65,33 @@ const AdminDashboard = () => {
     loading, 
     refresh 
   } = useStripeDashboard(filters);
+
+  // Buscar TODOS os dados históricos de receitas para a seção Tendências Temporais
+  useEffect(() => {
+    const fetchAllTimeseries = async () => {
+      setLoadingAllTimeseries(true);
+      try {
+        const { data, error } = await supabase
+          .from('v_fin_receita_diaria')
+          .select('*')
+          .eq('currency', 'BRL')
+          .order('dia', { ascending: false });
+
+        if (error) {
+          console.error('Erro ao buscar todas as tendências temporais:', error);
+        } else {
+          console.log('✅ Dados históricos carregados:', data?.length, 'registros');
+          setAllTimeseriesData(data || []);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar tendências temporais:', err);
+      } finally {
+        setLoadingAllTimeseries(false);
+      }
+    };
+
+    fetchAllTimeseries();
+  }, []);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -1169,15 +1198,17 @@ const AdminDashboard = () => {
             {/* Análise de Tendências */}
             <Card className="border-t-4 border-t-emerald-500">
               <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/20 dark:to-green-950/20">
-                <CardTitle className="text-emerald-700 dark:text-emerald-300">Tendências Temporais</CardTitle>
+                <CardTitle className="text-emerald-700 dark:text-emerald-300">Tendências Temporais - Histórico Completo</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                {timeseries && timeseries.length > 0 ? (
+                {loadingAllTimeseries ? (
+                  <div className="text-center py-8 text-muted-foreground">Carregando dados históricos...</div>
+                ) : allTimeseriesData && allTimeseriesData.length > 0 ? (
                   (() => {
-                    const totalPages = Math.ceil(timeseries.length / ITEMS_PER_PAGE);
+                    const totalPages = Math.ceil(allTimeseriesData.length / ITEMS_PER_PAGE);
                     const startIndex = (timeseriesPage - 1) * ITEMS_PER_PAGE;
                     const endIndex = startIndex + ITEMS_PER_PAGE;
-                    const currentData = [...timeseries].reverse().slice(startIndex, endIndex);
+                    const currentData = allTimeseriesData.slice(startIndex, endIndex);
                     
                     const getPageNumbers = () => {
                       const pages = [];
@@ -1220,7 +1251,7 @@ const AdminDashboard = () => {
                             <div className="text-right">Ticket Médio</div>
                           </div>
                           {currentData.map((item, idx) => {
-                            const dateValue = item.dia || item.timestamp;
+                            const dateValue = item.dia;
                             const receita = item.receita_liquida || 0;
                             const transacoes = item.transacoes || 0;
                             const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
@@ -1243,7 +1274,7 @@ const AdminDashboard = () => {
                         {totalPages > 1 && (
                           <div className="flex items-center justify-between pt-4 border-t">
                             <div className="text-sm text-muted-foreground">
-                              Mostrando {startIndex + 1} a {Math.min(endIndex, timeseries.length)} de {timeseries.length} registros
+                              Mostrando {startIndex + 1} a {Math.min(endIndex, allTimeseriesData.length)} de {allTimeseriesData.length} registros
                             </div>
                             <Pagination>
                               <PaginationContent>
