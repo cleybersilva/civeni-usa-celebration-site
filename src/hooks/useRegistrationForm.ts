@@ -181,30 +181,25 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
 
         console.log("=== PROCESSING RESPONSE ===");
+        console.log("Response data:", data);
         
         if (data.payment_required === false) {
-          console.log("Free registration completed");
+          console.log("Free registration - redirecting to success");
           window.location.href = '/registration/success';
-        } else if (data.url) {
-          console.log("=== REDIRECTING TO STRIPE ===");
-          console.log("URL received:", data.url);
-          console.log("URL type:", typeof data.url);
-          console.log("URL valid:", data.url.startsWith('http'));
-          
-          // Garantir que o URL é válido
-          if (!data.url || typeof data.url !== 'string' || !data.url.startsWith('http')) {
-            throw new Error('URL de pagamento inválida recebida do servidor');
-          }
-          
-          // Redirecionar imediatamente
-          console.log("Executing redirect to:", data.url);
-          window.location.replace(data.url);
-          
-        } else {
-          console.log("=== NO URL PROVIDED ===");
-          console.log("Full data object:", JSON.stringify(data, null, 2));
-          throw new Error('URL de pagamento não foi fornecida pelo servidor');
+          return;
         }
+        
+        // Paid registration - redirect to Stripe
+        if (data.url && typeof data.url === 'string') {
+          console.log("Redirecting to Stripe:", data.url);
+          // Use href para redirecionamento mais confiável
+          window.location.href = data.url;
+          return;
+        }
+        
+        // Fallback: se não tem URL, erro
+        console.error("No payment URL in response:", data);
+        throw new Error('URL de pagamento não disponível');
 
       } catch (functionError: any) {
         console.error("Function error:", functionError);
