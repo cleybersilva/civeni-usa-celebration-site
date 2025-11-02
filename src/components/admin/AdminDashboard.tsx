@@ -72,23 +72,61 @@ const AdminDashboard = () => {
       console.log('🔄 Iniciando busca de tendências temporais históricas...');
       setLoadingAllTimeseries(true);
       try {
+        // Buscar diretamente da tabela stripe_charges para ter dados atualizados
         const { data, error } = await supabase
-          .from('v_fin_receita_diaria')
-          .select('*')
+          .from('stripe_charges')
+          .select('created_utc, amount, fee_amount, net_amount, currency, status, paid')
           .eq('currency', 'BRL')
-          .order('dia', { ascending: false });
+          .eq('status', 'succeeded')
+          .eq('paid', true)
+          .order('created_utc', { ascending: false });
 
         if (error) {
-          console.error('❌ Erro ao buscar todas as tendências temporais:', error);
+          console.error('❌ Erro ao buscar tendências temporais:', error);
           toast({
             title: "Erro ao carregar tendências",
             description: error.message,
             variant: "destructive"
           });
         } else {
-          console.log('✅ Dados históricos carregados:', data?.length, 'registros');
-          console.log('📊 Primeiros 3 registros:', data?.slice(0, 3));
-          setAllTimeseriesData(data || []);
+          console.log('✅ Dados brutos carregados:', data?.length, 'charges');
+          
+          // Agrupar por dia (timezone local Brasil)
+          const groupedByDay = new Map();
+          
+          data?.forEach(charge => {
+            const date = new Date(charge.created_utc);
+            // Converter para data local (Brasil)
+            const localDate = new Date(date.getTime() - (3 * 60 * 60 * 1000)); // UTC-3
+            const dayKey = localDate.toISOString().split('T')[0];
+            
+            if (!groupedByDay.has(dayKey)) {
+              groupedByDay.set(dayKey, {
+                dia: dayKey,
+                receita_bruta: 0,
+                receita_liquida: 0,
+                taxas: 0,
+                transacoes: 0
+              });
+            }
+            
+            const bucket = groupedByDay.get(dayKey);
+            const amount = charge.amount / 100;
+            const fee = (charge.fee_amount || 0) / 100;
+            const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
+            
+            bucket.receita_bruta += amount;
+            bucket.taxas += fee;
+            bucket.receita_liquida += net;
+            bucket.transacoes += 1;
+          });
+          
+          const timeseriesData = Array.from(groupedByDay.values())
+            .sort((a, b) => b.dia.localeCompare(a.dia));
+          
+          console.log('📊 Dados agrupados por dia:', timeseriesData.length, 'dias');
+          console.log('📊 Primeiros 3 dias:', timeseriesData.slice(0, 3));
+          setAllTimeseriesData(timeseriesData);
         }
       } catch (err) {
         console.error('❌ Erro ao carregar tendências temporais:', err);
