@@ -349,6 +349,10 @@ serve(async (req) => {
       logStep("Existing customer found", { customerId });
     }
 
+    // Construir URLs de sucesso/cancelamento - usar origin do request ou fallback para domínio de produção
+    const baseUrl = req.headers.get("origin") || "https://civeni2025.com";
+    logStep("Base URL for Stripe redirect", { baseUrl, origin: req.headers.get("origin") });
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : email,
@@ -370,8 +374,8 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/registration/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/registration/canceled`,
+      success_url: `${baseUrl}/registration/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/registration/canceled`,
       metadata: {
         registration_id: registration.id,
         participant_email: email,
