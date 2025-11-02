@@ -35,6 +35,19 @@ serve(async (req) => {
       currency = 'BRL'
     } = body;
 
+    // Validate email format before sending to Stripe
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      logStep("Invalid email format", { email });
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Por favor, insira um e-mail válido (exemplo: seu.email@dominio.com)" 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
     logStep("Request body received", { email, categoryId, batchId, participantType });
 
     // Initialize Supabase with service role for database operations
@@ -302,6 +315,19 @@ serve(async (req) => {
         participant_email: email,
         participant_name: fullName,
       },
+    }).catch((stripeError: any) => {
+      logStep("Stripe session creation failed", { 
+        message: stripeError.message,
+        type: stripeError.type,
+        code: stripeError.code
+      });
+      
+      // Tratamento específico para erros de e-mail inválido
+      if (stripeError.message && stripeError.message.includes("email")) {
+        throw new Error("E-mail inválido. Por favor, verifique se digitou corretamente (exemplo: seu.email@dominio.com)");
+      }
+      
+      throw new Error(`Erro ao criar sessão de pagamento: ${stripeError.message}`);
     });
 
     // Update registration with Stripe session ID

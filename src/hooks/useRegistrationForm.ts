@@ -69,6 +69,13 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
     e.preventDefault();
     if (!currentBatch || !formData.categoryId) return;
     
+    // Validar formato do e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Por favor, insira um e-mail válido (exemplo: seu.email@dominio.com)');
+      return;
+    }
+    
     if (formData.participantType === 'vccu_student' && (!formData.cursoId || !formData.turmaId)) {
       setError('Para alunos da VCCU, os campos Curso e Turma são obrigatórios.');
       return;
@@ -130,8 +137,8 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         
         const { data, error } = await supabase.functions.invoke('create-registration-payment', {
           body: {
-            email: formData.email,
-            fullName: formData.fullName,
+            email: formData.email.trim().toLowerCase(),
+            fullName: formData.fullName.trim(),
             categoryId: formData.categoryId,
             batchId: currentBatch.id,
             couponCode: formData.couponCode || '',
