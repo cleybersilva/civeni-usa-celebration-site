@@ -71,67 +71,34 @@ const AdminDashboard = () => {
     const fetchAllTimeseries = async () => {
       setLoadingAllTimeseries(true);
       try {
-        const { data, error } = await supabase
-          .from('stripe_charges')
-          .select('created_utc, amount, fee_amount, net_amount')
-          .eq('currency', 'BRL')
-          .eq('status', 'succeeded')
-          .eq('paid', true)
-          .order('created_utc', { ascending: false });
+        const { data, error } = await supabase.functions.invoke('finance-timeseries', {
+          body: {
+            granularity: 'day',
+            currency: 'BRL',
+            from: '2024-01-01',
+            to: new Date().toISOString()
+          }
+        });
 
         if (error) {
-          console.error('Erro:', error);
+          console.error('Erro ao buscar timeseries:', error);
           setAllTimeseriesData([]);
           return;
         }
 
-        if (!data || data.length === 0) {
+        if (!data || !data.data || data.data.length === 0) {
           setAllTimeseriesData([]);
           return;
         }
 
-        // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
-        const groupedByDay = new Map<string, any>();
-        
-        data.forEach(charge => {
-          const utcDate = new Date(charge.created_utc);
-          // Subtrair 3 horas para converter para horário de Brasília
-          const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-          
-          // Extrair ano, mês e dia da data do Brasil
-          const year = brasilDate.getUTCFullYear();
-          const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
-          const day = String(brasilDate.getUTCDate()).padStart(2, '0');
-          const dayKey = `${year}-${month}-${day}`;
-          
-          if (!groupedByDay.has(dayKey)) {
-            groupedByDay.set(dayKey, {
-              dia: dayKey,
-              receita_bruta: 0,
-              receita_liquida: 0,
-              taxas: 0,
-              transacoes: 0
-            });
-          }
-          
-          const bucket = groupedByDay.get(dayKey)!;
-          const amount = charge.amount / 100;
-          const fee = (charge.fee_amount || 0) / 100;
-          const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
-          
-          bucket.receita_bruta += amount;
-          bucket.taxas += fee;
-          bucket.receita_liquida += net;
-          bucket.transacoes += 1;
-        });
-        
         // Ordenar por data mais recente primeiro
-        const timeseriesData = Array.from(groupedByDay.values())
-          .sort((a, b) => b.dia.localeCompare(a.dia));
+        const timeseriesData = data.data.sort((a: any, b: any) => 
+          b.dia.localeCompare(a.dia)
+        );
         
         setAllTimeseriesData(timeseriesData);
       } catch (err) {
-        console.error('Exceção:', err);
+        console.error('Exceção ao buscar timeseries:', err);
         setAllTimeseriesData([]);
       } finally {
         setLoadingAllTimeseries(false);
