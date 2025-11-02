@@ -476,7 +476,7 @@ const AdminDashboard = () => {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-      doc.text('📊 Resumo Executivo', 14, yPos);
+      doc.text('RESUMO EXECUTIVO', 14, yPos);
       yPos += 8;
       
       const resumoData = [
@@ -516,7 +516,7 @@ const AdminDashboard = () => {
       
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('💳 Análise por Bandeira de Cartão', 14, yPos);
+      doc.text('ANALISE POR BANDEIRA DE CARTAO', 14, yPos);
       yPos += 8;
       
       const bandeiraData = byBrand && byBrand.length > 0 
@@ -562,7 +562,7 @@ const AdminDashboard = () => {
       
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('📈 Tendências Temporais - Últimos 15 Dias', 14, yPos);
+      doc.text('TENDENCIAS TEMPORAIS - Ultimos 15 Dias', 14, yPos);
       yPos += 8;
       
       const tendenciasData = timeseries && timeseries.length > 0
@@ -609,7 +609,7 @@ const AdminDashboard = () => {
         
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('🔽 Funil de Conversão', 14, yPos);
+        doc.text('FUNIL DE CONVERSAO', 14, yPos);
         yPos += 8;
         
         const funnelData = funnel.map(stage => [
@@ -642,7 +642,7 @@ const AdminDashboard = () => {
         
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('📊 Histórico Completo - Tendências Temporais', 14, yPos);
+        doc.text('HISTORICO COMPLETO - Tendencias Temporais', 14, yPos);
         yPos += 5;
         
         doc.setFontSize(9);
@@ -1048,20 +1048,20 @@ const AdminDashboard = () => {
       csvRows.push(`Taxa de Falha: ${taxaFalha}%`);
       
       if (parseFloat(taxaFalha) > 10) {
-        csvRows.push('⚠️ ATENÇÃO: Taxa de falha acima de 10% - Investigar possíveis problemas de checkout');
+        csvRows.push('ATENCAO: Taxa de falha acima de 10% - Investigar possiveis problemas de checkout');
       }
       
       if (summary && summary.disputas > 0) {
-        csvRows.push(`⚠️ ATENÇÃO: ${summary.disputas} disputas abertas - Requer ação imediata`);
+        csvRows.push(`ATENCAO: ${summary.disputas} disputas abertas - Requer acao imediata`);
       }
       
       if (byBrand && byBrand.length > 0) {
         const topBrand = byBrand[0];
-        csvRows.push(`💳 Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
+        csvRows.push(`Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
       }
       
       if (summary && summary.ticketMedio) {
-        csvRows.push(`💰 Ticket médio: ${formatCurrency(summary.ticketMedio)}`);
+        csvRows.push(`Ticket medio: ${formatCurrency(summary.ticketMedio)}`);
       }
       
       csvRows.push('');
