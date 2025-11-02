@@ -91,23 +91,28 @@ const AdminDashboard = () => {
         }
 
         if (!data || data.length === 0) {
-          console.log('Nenhum dado encontrado');
           setAllTimeseriesData([]);
           return;
         }
 
-        // Agrupar por dia (timezone Brasil UTC-3)
+        // Agrupar por dia usando conversão de timezone do PostgreSQL
         const groupedByDay = new Map();
         
         data.forEach(charge => {
-          // Converter UTC para Brasil (UTC-3)
+          // Criar data UTC e converter para Brasil
           const utcDate = new Date(charge.created_utc);
-          const brasilTimestamp = utcDate.getTime() - (3 * 60 * 60 * 1000);
-          const brasilDate = new Date(brasilTimestamp);
           
-          const year = brasilDate.getUTCFullYear();
-          const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
-          const day = String(brasilDate.getUTCDate()).padStart(2, '0');
+          // Converter para string ISO e pegar só a data em Brasil (UTC-3)
+          // Criar um objeto Date no timezone do Brasil
+          const brasilDateStr = utcDate.toLocaleString('en-US', { 
+            timeZone: 'America/Fortaleza',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          });
+          
+          // Parse MM/DD/YYYY para YYYY-MM-DD
+          const [month, day, year] = brasilDateStr.split('/');
           const dayKey = `${year}-${month}-${day}`;
           
           if (!groupedByDay.has(dayKey)) {
