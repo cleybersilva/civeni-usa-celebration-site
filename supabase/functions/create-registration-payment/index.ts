@@ -359,6 +359,19 @@ serve(async (req) => {
         participant_email: email,
         participant_name: fullName,
       },
+      locale: 'pt-BR', // Força idioma português
+      billing_address_collection: 'required', // Coleta endereço de cobrança
+    });
+
+    logStep("Stripe session details", { 
+      sessionId: session.id, 
+      url: session.url,
+      mode: session.mode,
+      amount: finalPrice,
+      currency: currency.toLowerCase(),
+      customer: customerId || 'new',
+      success_url: `${req.headers.get("origin")}/registration/success`,
+      cancel_url: `${req.headers.get("origin")}/registration/canceled`
     });
 
     // Update registration with Stripe session ID
