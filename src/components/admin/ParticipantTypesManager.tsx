@@ -22,6 +22,14 @@ interface ParticipantType {
   updated_at: string;
 }
 
+interface SetupSorteadosResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+  sorteados_id?: string;
+  created?: boolean;
+}
+
 const ParticipantTypesManager = () => {
   const { participantTypes, loading, createParticipantType, updateParticipantType, deleteParticipantType, refreshParticipantTypes } = useParticipantTypes();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -38,53 +46,33 @@ const ParticipantTypesManager = () => {
   const handleSetupSorteados = async () => {
     setSetupLoading(true);
     try {
-      // Verificar se "Sorteados" já existe
-      const { data: existingType } = await supabase
-        .from('participant_types')
-        .select('*')
-        .eq('type_name', 'Sorteados')
-        .single();
+      // Chamar a função RPC segura do banco de dados
+      const { data, error } = await supabase.rpc('setup_sorteados_type');
 
-      let sorteadosCreated = false;
-
-      if (!existingType) {
-        // Criar o tipo "Sorteados"
-        const { error: typeError } = await supabase
-          .from('participant_types')
-          .insert({
-            type_name: 'Sorteados',
-            description: 'Participantes sorteados com 100% de desconto',
-            requires_course_selection: false,
-            is_active: true
-          });
-
-        if (typeError) throw typeError;
-        sorteadosCreated = true;
+      if (error) {
+        console.error('Erro RPC:', error);
+        throw new Error(error.message || 'Erro ao configurar tipo Sorteados');
       }
 
-      // Atualizar o cupom CIVENI2025FREE
-      const { error: couponError } = await supabase
-        .from('coupon_codes')
-        .update({
-          participant_type: 'Professor(a),Palestrantes,Sorteados',
-          description: 'Cupom de 100% de desconto para Professor(a), Palestrantes e Sorteados',
-          updated_at: new Date().toISOString()
-        })
-        .eq('code', 'CIVENI2025FREE');
+      if (!data) {
+        throw new Error('Nenhuma resposta recebida do servidor');
+      }
 
-      if (couponError) throw couponError;
+      // Type assertion para a resposta
+      const response = data as unknown as SetupSorteadosResponse;
 
-      // Atualizar a lista
+      if (!response.success) {
+        throw new Error(response.error || 'Erro desconhecido ao configurar tipo Sorteados');
+      }
+
+      // Atualizar a lista de tipos
       await refreshParticipantTypes();
 
-      if (sorteadosCreated) {
-        toast.success('Tipo "Sorteados" criado e cupom CIVENI2025FREE atualizado com sucesso!');
-      } else {
-        toast.success('Tipo "Sorteados" já existia. Cupom CIVENI2025FREE atualizado com sucesso!');
-      }
-    } catch (error) {
+      // Mostrar mensagem de sucesso
+      toast.success(response.message || 'Configuração concluída com sucesso');
+    } catch (error: any) {
       console.error('Erro ao configurar Sorteados:', error);
-      toast.error('Erro ao configurar tipo Sorteados');
+      toast.error(error.message || 'Erro ao configurar tipo Sorteados');
     } finally {
       setSetupLoading(false);
     }

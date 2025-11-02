@@ -4544,6 +4544,7 @@ export type Database = {
         Args: { session_token: string; user_email: string }
         Returns: boolean
       }
+      setup_sorteados_type: { Args: never; Returns: Json }
       submit_partner_application_secure: {
         Args: { application_data: Json; user_ip?: string }
         Returns: Json
