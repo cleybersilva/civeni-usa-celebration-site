@@ -7,9 +7,11 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Wand2 } from 'lucide-react';
 import { useParticipantTypes } from '@/hooks/useParticipantTypes';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ParticipantType {
   id: string;
@@ -21,17 +23,70 @@ interface ParticipantType {
   updated_at: string;
 }
 
+interface SetupSorteadosResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+  sorteados_id?: string;
+  created?: boolean;
+}
+
 const ParticipantTypesManager = () => {
-  const { participantTypes, loading, createParticipantType, updateParticipantType, deleteParticipantType } = useParticipantTypes();
+  const { participantTypes, loading, createParticipantType, updateParticipantType, deleteParticipantType, refreshParticipantTypes } = useParticipantTypes();
+  const { user, sessionToken } = useAdminAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingType, setEditingType] = useState<ParticipantType | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [setupLoading, setSetupLoading] = useState(false);
   const [formData, setFormData] = useState({
     type_name: '',
     description: '',
     requires_course_selection: false,
     is_active: true,
   });
+
+  const handleSetupSorteados = async () => {
+    setSetupLoading(true);
+    try {
+      // Verificar se o usuário está autenticado
+      if (!user || !sessionToken) {
+        throw new Error('Usuário não autenticado. Por favor, faça login novamente.');
+      }
+
+      // Chamar a função RPC segura do banco de dados com autenticação
+      const { data, error } = await supabase.rpc('setup_sorteados_type', {
+        user_email: user.email,
+        session_token: sessionToken
+      });
+
+      if (error) {
+        console.error('Erro RPC:', error);
+        throw new Error(error.message || 'Erro ao configurar tipo Sorteados');
+      }
+
+      if (!data) {
+        throw new Error('Nenhuma resposta recebida do servidor');
+      }
+
+      // Type assertion para a resposta
+      const response = data as unknown as SetupSorteadosResponse;
+
+      if (!response.success) {
+        throw new Error(response.error || 'Erro desconhecido ao configurar tipo Sorteados');
+      }
+
+      // Atualizar a lista de tipos
+      await refreshParticipantTypes();
+
+      // Mostrar mensagem de sucesso
+      toast.success(response.message || 'Configuração concluída com sucesso');
+    } catch (error: any) {
+      console.error('Erro ao configurar Sorteados:', error);
+      toast.error(error.message || 'Erro ao configurar tipo Sorteados');
+    } finally {
+      setSetupLoading(false);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -121,7 +176,18 @@ const ParticipantTypesManager = () => {
           </p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleSetupSorteados} 
+            disabled={setupLoading}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            <Wand2 className="w-4 h-4" />
+            {setupLoading ? 'Configurando...' : 'Setup Sorteados'}
+          </Button>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
@@ -186,7 +252,8 @@ const ParticipantTypesManager = () => {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border">

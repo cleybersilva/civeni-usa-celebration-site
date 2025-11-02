@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStripeDashboard } from '@/hooks/useStripeDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText } from 'lucide-react';
@@ -27,6 +28,10 @@ const AdminDashboard = () => {
   const { user, sessionToken } = useAdminAuth();
   const [syncing, setSyncing] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
+  const [timeseriesPage, setTimeseriesPage] = useState(1);
+  const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
+  const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
+  const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
     range: '30d',
@@ -60,6 +65,81 @@ const AdminDashboard = () => {
     loading, 
     refresh 
   } = useStripeDashboard(filters);
+
+  // Buscar TODOS os dados históricos de receitas para a seção Tendências Temporais
+  useEffect(() => {
+    const fetchAllTimeseries = async () => {
+      setLoadingAllTimeseries(true);
+      try {
+        const { data, error } = await supabase
+          .from('stripe_charges')
+          .select('created_utc, amount, fee_amount, net_amount')
+          .eq('currency', 'BRL')
+          .eq('status', 'succeeded')
+          .eq('paid', true)
+          .order('created_utc', { ascending: false });
+
+        if (error) {
+          console.error('Erro:', error);
+          setAllTimeseriesData([]);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          setAllTimeseriesData([]);
+          return;
+        }
+
+        // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
+        const groupedByDay = new Map<string, any>();
+        
+        data.forEach(charge => {
+          const utcDate = new Date(charge.created_utc);
+          // Subtrair 3 horas para converter para horário de Brasília
+          const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
+          
+          // Extrair ano, mês e dia da data do Brasil
+          const year = brasilDate.getUTCFullYear();
+          const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
+          const day = String(brasilDate.getUTCDate()).padStart(2, '0');
+          const dayKey = `${year}-${month}-${day}`;
+          
+          if (!groupedByDay.has(dayKey)) {
+            groupedByDay.set(dayKey, {
+              dia: dayKey,
+              receita_bruta: 0,
+              receita_liquida: 0,
+              taxas: 0,
+              transacoes: 0
+            });
+          }
+          
+          const bucket = groupedByDay.get(dayKey)!;
+          const amount = charge.amount / 100;
+          const fee = (charge.fee_amount || 0) / 100;
+          const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
+          
+          bucket.receita_bruta += amount;
+          bucket.taxas += fee;
+          bucket.receita_liquida += net;
+          bucket.transacoes += 1;
+        });
+        
+        // Ordenar por data mais recente primeiro
+        const timeseriesData = Array.from(groupedByDay.values())
+          .sort((a, b) => b.dia.localeCompare(a.dia));
+        
+        setAllTimeseriesData(timeseriesData);
+      } catch (err) {
+        console.error('Exceção:', err);
+        setAllTimeseriesData([]);
+      } finally {
+        setLoadingAllTimeseries(false);
+      }
+    };
+
+    fetchAllTimeseries();
+  }, []);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -1166,37 +1246,130 @@ const AdminDashboard = () => {
             {/* Análise de Tendências */}
             <Card className="border-t-4 border-t-emerald-500">
               <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/20 dark:to-green-950/20">
-                <CardTitle className="text-emerald-700 dark:text-emerald-300">Tendências Temporais</CardTitle>
+                <CardTitle className="text-emerald-700 dark:text-emerald-300">Tendências Temporais - Histórico Completo</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                {timeseries && timeseries.length > 0 ? (
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-muted-foreground pb-2 border-b">
-                      <div>Data</div>
-                      <div className="text-right">Receita</div>
-                      <div className="text-right">Transações</div>
-                      <div className="text-right">Ticket Médio</div>
-                    </div>
-                    {timeseries.slice(-10).map((item, idx) => {
-                      const dateValue = item.dia || item.timestamp;
-                      const receita = item.receita_liquida || 0;
-                      const transacoes = item.transacoes || 0;
-                      const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+                {loadingAllTimeseries ? (
+                  <div className="text-center py-8 text-muted-foreground">Carregando dados históricos...</div>
+                ) : allTimeseriesData && allTimeseriesData.length > 0 ? (
+                  (() => {
+                    const totalPages = Math.ceil(allTimeseriesData.length / ITEMS_PER_PAGE);
+                    const startIndex = (timeseriesPage - 1) * ITEMS_PER_PAGE;
+                    const endIndex = startIndex + ITEMS_PER_PAGE;
+                    const currentData = allTimeseriesData.slice(startIndex, endIndex);
+                    
+                    const getPageNumbers = () => {
+                      const pages = [];
+                      const maxPagesToShow = 5;
                       
-                      return (
-                        <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
-                          <div>
-                            {dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'}
+                      if (totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= totalPages; i++) {
+                          pages.push(i);
+                        }
+                      } else {
+                        if (timeseriesPage <= 3) {
+                          for (let i = 1; i <= 4; i++) pages.push(i);
+                          pages.push('...');
+                          pages.push(totalPages);
+                        } else if (timeseriesPage >= totalPages - 2) {
+                          pages.push(1);
+                          pages.push('...');
+                          for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+                        } else {
+                          pages.push(1);
+                          pages.push('...');
+                          pages.push(timeseriesPage - 1);
+                          pages.push(timeseriesPage);
+                          pages.push(timeseriesPage + 1);
+                          pages.push('...');
+                          pages.push(totalPages);
+                        }
+                      }
+                      
+                      return pages;
+                    };
+                    
+                    return (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-muted-foreground pb-2 border-b">
+                            <div>Data</div>
+                            <div className="text-right">Receita</div>
+                            <div className="text-right">Transações</div>
+                            <div className="text-right">Ticket Médio</div>
                           </div>
-                          <div className="text-right font-medium">{formatCurrency(receita)}</div>
-                          <div className="text-right">{transacoes}</div>
-                          <div className="text-right text-muted-foreground">
-                            {formatCurrency(ticketMedio)}
-                          </div>
+                          {currentData.map((item, idx) => {
+                            const dateValue = item.dia;
+                            const receita = item.receita_liquida || 0;
+                            const transacoes = item.transacoes || 0;
+                            const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+                            
+                            return (
+                              <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
+                                <div>
+                                  {dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'}
+                                </div>
+                                <div className="text-right font-medium">{formatCurrency(receita)}</div>
+                                <div className="text-right">{transacoes}</div>
+                                <div className="text-right text-muted-foreground">
+                                  {formatCurrency(ticketMedio)}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
+                        
+                        {totalPages > 1 && (
+                          <div className="flex items-center justify-between pt-4 border-t">
+                            <div className="text-sm text-muted-foreground">
+                              Mostrando {startIndex + 1} a {Math.min(endIndex, allTimeseriesData.length)} de {allTimeseriesData.length} registros
+                            </div>
+                            <Pagination>
+                              <PaginationContent>
+                                <PaginationItem>
+                                  <PaginationPrevious 
+                                    onClick={() => {
+                                      if (timeseriesPage > 1) {
+                                        setTimeseriesPage(timeseriesPage - 1);
+                                      }
+                                    }}
+                                    className={timeseriesPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                  />
+                                </PaginationItem>
+                                
+                                {getPageNumbers().map((page, index) => (
+                                  <PaginationItem key={index}>
+                                    {page === '...' ? (
+                                      <span className="px-4">...</span>
+                                    ) : (
+                                      <PaginationLink
+                                        onClick={() => setTimeseriesPage(page as number)}
+                                        isActive={timeseriesPage === page}
+                                        className="cursor-pointer"
+                                      >
+                                        {page}
+                                      </PaginationLink>
+                                    )}
+                                  </PaginationItem>
+                                ))}
+                                
+                                <PaginationItem>
+                                  <PaginationNext 
+                                    onClick={() => {
+                                      if (timeseriesPage < totalPages) {
+                                        setTimeseriesPage(timeseriesPage + 1);
+                                      }
+                                    }}
+                                    className={timeseriesPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                  />
+                                </PaginationItem>
+                              </PaginationContent>
+                            </Pagination>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
                 ) : (
                   <p className="text-center text-muted-foreground py-8">Nenhum dado temporal disponível</p>
                 )}

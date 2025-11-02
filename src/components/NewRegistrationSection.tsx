@@ -84,6 +84,11 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         return category.is_free && category.slug === 'palestrantes-vccu-gratuito';
       }
       
+      // Para sorteados, mostrar APENAS a categoria gratuita VCCU (mesmo comportamento que Professor)
+      if (formData.participantType === 'Sorteados') {
+        return category.is_free && category.slug === 'professor-vccu-gratuito';
+      }
+      
       // Para participante externo, mostrar APENAS a categoria específica de externo
       if (formData.participantType === 'external') {
         return category.slug === 'participante-externo';
@@ -181,8 +186,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                     <SelectContent>
                       <SelectItem value="vccu_student">Aluno(a) VCCU</SelectItem>
                       <SelectItem value="guest">Convidado(a)</SelectItem>
-                      <SelectItem value="external">Participante Externo</SelectItem>
-                      {participantTypes.filter(pt => pt.is_active).map((pt) => (
+                      {participantTypes.filter(pt => pt.is_active && pt.type_name !== 'Aluno(a) VCCU').map((pt) => (
                         <SelectItem key={pt.id} value={pt.type_name}>
                           {pt.type_name}
                         </SelectItem>
@@ -272,7 +276,8 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                           : selectedCategory.slug === 'convidado'
                             ? 10000
                             : loteVigente?.price_cents ?? 0
-                    } 
+                    }
+                    participantType={formData.participantType}
                   />
                 )}
 
@@ -285,7 +290,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       !formData.participantType || 
                       (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || 
                       (selectedCategory?.is_free && !formData.couponCode) ||
-                      ((formData.participantType === 'Professor(a)' || formData.participantType === 'Palestrantes') && !formData.couponCode)
+                      ((formData.participantType === 'Professor(a)' || formData.participantType === 'Palestrantes' || formData.participantType === 'Sorteados') && !formData.couponCode)
                     }
                 >
                   {loading ? t('registration.processing') : t('registration.registerNow')}
