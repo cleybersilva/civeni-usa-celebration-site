@@ -317,7 +317,25 @@ serve(async (req) => {
     }
 
     // For paid registrations, create Stripe session
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    // IMPORTANTE: Verificar se está usando chaves de teste ou produção
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not found");
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Configuração de pagamento inválida. Contate o suporte." 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
+    }
+    
+    // Detectar se é chave de teste ou produção
+    const isTestMode = stripeKey.startsWith('sk_test_');
+    logStep("Stripe mode detected", { isTestMode });
+    
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2023-10-16",
     });
 
