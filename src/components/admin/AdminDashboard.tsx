@@ -69,6 +69,7 @@ const AdminDashboard = () => {
   // Buscar TODOS os dados históricos de receitas para a seção Tendências Temporais
   useEffect(() => {
     const fetchAllTimeseries = async () => {
+      console.log('🔄 Iniciando busca de tendências temporais históricas...');
       setLoadingAllTimeseries(true);
       try {
         const { data, error } = await supabase
@@ -78,20 +79,26 @@ const AdminDashboard = () => {
           .order('dia', { ascending: false });
 
         if (error) {
-          console.error('Erro ao buscar todas as tendências temporais:', error);
+          console.error('❌ Erro ao buscar todas as tendências temporais:', error);
+          toast({
+            title: "Erro ao carregar tendências",
+            description: error.message,
+            variant: "destructive"
+          });
         } else {
           console.log('✅ Dados históricos carregados:', data?.length, 'registros');
+          console.log('📊 Primeiros 3 registros:', data?.slice(0, 3));
           setAllTimeseriesData(data || []);
         }
       } catch (err) {
-        console.error('Erro ao carregar tendências temporais:', err);
+        console.error('❌ Erro ao carregar tendências temporais:', err);
       } finally {
         setLoadingAllTimeseries(false);
       }
     };
 
     fetchAllTimeseries();
-  }, []);
+  }, [toast]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
