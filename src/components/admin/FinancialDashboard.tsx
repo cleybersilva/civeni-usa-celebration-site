@@ -185,10 +185,25 @@ const FinancialDashboard = () => {
         method: 'GET'
       });
       
-      console.log('🔍 PDF Export - Timeseries response:', { timeseriesData, timeseriesError, params: params.toString() });
+      let timeseriesArray: any[] = [];
       
-      // Processar dados de timeseries atualizados
-      const timeseriesArray = (timeseriesData?.data || timeseriesData || []) as any[];
+      if (timeseriesError) {
+        console.error('❌ Erro ao buscar timeseries:', timeseriesError);
+        toast({
+          title: "Erro ao buscar dados",
+          description: "Não foi possível obter dados de tendências temporais. Usando dados locais.",
+          variant: "destructive"
+        });
+        // Fallback para dados locais se a API falhar
+        timeseriesArray = registrationSeries.map(s => ({
+          dia: s.date,
+          transacoes: s.value,
+          receita_liquida: revenueSeries.find(r => r.date === s.date)?.value || 0
+        }));
+      } else {
+        console.log('✅ PDF Export - Timeseries OK:', { timeseriesData, params: params.toString() });
+        timeseriesArray = (timeseriesData?.data || timeseriesData || []) as any[];
+      }
       console.log('🔍 PDF Export - Timeseries array length:', timeseriesArray.length);
       console.log('🔍 PDF Export - First item:', timeseriesArray[0]);
       
@@ -620,10 +635,20 @@ const FinancialDashboard = () => {
       method: 'GET'
     });
     
-    console.log('🔍 Excel Export - Timeseries response:', { timeseriesData, timeseriesError, params: params.toString() });
+    let timeseriesArray: any[] = [];
     
-    // Processar dados de timeseries atualizados
-    const timeseriesArray = (timeseriesData?.data || timeseriesData || []) as any[];
+    if (timeseriesError) {
+      console.error('❌ Erro ao buscar timeseries:', timeseriesError);
+      toast({
+        title: "Erro ao buscar dados",
+        description: "Não foi possível obter dados de tendências temporais. Tente novamente.",
+        variant: "destructive"
+      });
+      return;
+    } else {
+      console.log('✅ Excel Export - Timeseries OK:', { timeseriesData, params: params.toString() });
+      timeseriesArray = (timeseriesData?.data || timeseriesData || []) as any[];
+    }
     const exportExcelDailyRegistrations = timeseriesArray.map((d: any) => ({
       name: new Date(d.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
       inscricoes: d.transacoes || 0,
