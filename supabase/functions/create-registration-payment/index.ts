@@ -349,9 +349,9 @@ serve(async (req) => {
       logStep("Existing customer found", { customerId });
     }
 
-    // Construir URLs de sucesso/cancelamento - usar origin do request ou fallback para domínio de produção
-    const baseUrl = req.headers.get("origin") || "https://civeni2025.com";
-    logStep("Base URL for Stripe redirect", { baseUrl, origin: req.headers.get("origin") });
+    // PRODUÇÃO: Usar sempre o domínio de produção para Stripe aceitar
+    const baseUrl = "https://civeni2025.com";
+    logStep("Using production URL for Stripe", { baseUrl });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -392,8 +392,8 @@ serve(async (req) => {
       amount: finalPrice,
       currency: currency.toLowerCase(),
       customer: customerId || 'new',
-      success_url: `${req.headers.get("origin")}/registration/success`,
-      cancel_url: `${req.headers.get("origin")}/registration/canceled`
+      success_url: `${baseUrl}/registration/success`,
+      cancel_url: `${baseUrl}/registration/canceled`
     });
 
     // Update registration with Stripe session ID
