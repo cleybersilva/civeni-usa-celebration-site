@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText } from 'lucide-react';
@@ -27,6 +28,8 @@ const AdminDashboard = () => {
   const { user, sessionToken } = useAdminAuth();
   const [syncing, setSyncing] = useState(false);
   const [deletingCustomer, setDeletingCustomer] = useState<string | null>(null);
+  const [timeseriesPage, setTimeseriesPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
     range: '30d',
@@ -1170,33 +1173,124 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 {timeseries && timeseries.length > 0 ? (
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-muted-foreground pb-2 border-b">
-                      <div>Data</div>
-                      <div className="text-right">Receita</div>
-                      <div className="text-right">Transações</div>
-                      <div className="text-right">Ticket Médio</div>
-                    </div>
-                    {timeseries.slice(-10).map((item, idx) => {
-                      const dateValue = item.dia || item.timestamp;
-                      const receita = item.receita_liquida || 0;
-                      const transacoes = item.transacoes || 0;
-                      const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+                  (() => {
+                    const totalPages = Math.ceil(timeseries.length / ITEMS_PER_PAGE);
+                    const startIndex = (timeseriesPage - 1) * ITEMS_PER_PAGE;
+                    const endIndex = startIndex + ITEMS_PER_PAGE;
+                    const currentData = [...timeseries].reverse().slice(startIndex, endIndex);
+                    
+                    const getPageNumbers = () => {
+                      const pages = [];
+                      const maxPagesToShow = 5;
                       
-                      return (
-                        <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
-                          <div>
-                            {dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'}
+                      if (totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= totalPages; i++) {
+                          pages.push(i);
+                        }
+                      } else {
+                        if (timeseriesPage <= 3) {
+                          for (let i = 1; i <= 4; i++) pages.push(i);
+                          pages.push('...');
+                          pages.push(totalPages);
+                        } else if (timeseriesPage >= totalPages - 2) {
+                          pages.push(1);
+                          pages.push('...');
+                          for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+                        } else {
+                          pages.push(1);
+                          pages.push('...');
+                          pages.push(timeseriesPage - 1);
+                          pages.push(timeseriesPage);
+                          pages.push(timeseriesPage + 1);
+                          pages.push('...');
+                          pages.push(totalPages);
+                        }
+                      }
+                      
+                      return pages;
+                    };
+                    
+                    return (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-muted-foreground pb-2 border-b">
+                            <div>Data</div>
+                            <div className="text-right">Receita</div>
+                            <div className="text-right">Transações</div>
+                            <div className="text-right">Ticket Médio</div>
                           </div>
-                          <div className="text-right font-medium">{formatCurrency(receita)}</div>
-                          <div className="text-right">{transacoes}</div>
-                          <div className="text-right text-muted-foreground">
-                            {formatCurrency(ticketMedio)}
-                          </div>
+                          {currentData.map((item, idx) => {
+                            const dateValue = item.dia || item.timestamp;
+                            const receita = item.receita_liquida || 0;
+                            const transacoes = item.transacoes || 0;
+                            const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+                            
+                            return (
+                              <div key={idx} className="grid grid-cols-4 gap-2 text-sm py-2 hover:bg-muted/50 rounded">
+                                <div>
+                                  {dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'}
+                                </div>
+                                <div className="text-right font-medium">{formatCurrency(receita)}</div>
+                                <div className="text-right">{transacoes}</div>
+                                <div className="text-right text-muted-foreground">
+                                  {formatCurrency(ticketMedio)}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
+                        
+                        {totalPages > 1 && (
+                          <div className="flex items-center justify-between pt-4 border-t">
+                            <div className="text-sm text-muted-foreground">
+                              Mostrando {startIndex + 1} a {Math.min(endIndex, timeseries.length)} de {timeseries.length} registros
+                            </div>
+                            <Pagination>
+                              <PaginationContent>
+                                <PaginationItem>
+                                  <PaginationPrevious 
+                                    onClick={() => {
+                                      if (timeseriesPage > 1) {
+                                        setTimeseriesPage(timeseriesPage - 1);
+                                      }
+                                    }}
+                                    className={timeseriesPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                  />
+                                </PaginationItem>
+                                
+                                {getPageNumbers().map((page, index) => (
+                                  <PaginationItem key={index}>
+                                    {page === '...' ? (
+                                      <span className="px-4">...</span>
+                                    ) : (
+                                      <PaginationLink
+                                        onClick={() => setTimeseriesPage(page as number)}
+                                        isActive={timeseriesPage === page}
+                                        className="cursor-pointer"
+                                      >
+                                        {page}
+                                      </PaginationLink>
+                                    )}
+                                  </PaginationItem>
+                                ))}
+                                
+                                <PaginationItem>
+                                  <PaginationNext 
+                                    onClick={() => {
+                                      if (timeseriesPage < totalPages) {
+                                        setTimeseriesPage(timeseriesPage + 1);
+                                      }
+                                    }}
+                                    className={timeseriesPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                  />
+                                </PaginationItem>
+                              </PaginationContent>
+                            </Pagination>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
                 ) : (
                   <p className="text-center text-muted-foreground py-8">Nenhum dado temporal disponível</p>
                 )}
