@@ -80,8 +80,7 @@ const SubmissaoTrabalhos = () => {
       console.log('🔍 Validando limite de submissões via RPC...', { 
         email: formData.email.toLowerCase().trim(),
         nome: formData.author_name.trim(),
-        tipo: activeTab,
-        evento: 'civeni-2025'
+        tipo: activeTab
       });
 
       // Chamar função RPC para validar inscrição e limite
@@ -90,7 +89,7 @@ const SubmissaoTrabalhos = () => {
         p_nome: formData.author_name.trim(),
         p_tipo: activeTab,
         p_evento: 'civeni-2025'
-      });
+      } as any);
 
       if (error) {
         console.error('❌ Erro ao chamar RPC:', error);
