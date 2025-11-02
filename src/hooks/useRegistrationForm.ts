@@ -127,6 +127,19 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
 
       try {
         console.log("=== CALLING EDGE FUNCTION ===");
+        console.log("Function name: create-registration-payment");
+        console.log("Payload:", {
+          email: formData.email,
+          fullName: formData.fullName,
+          categoryId: formData.categoryId,
+          batchId: currentBatch.id,
+          couponCode: formData.couponCode || '',
+          cursoId: formData.cursoId || null,
+          turmaId: formData.turmaId || null,
+          participantType: formData.participantType,
+          registrationType: registrationType || 'geral',
+          currency: getCurrency(i18n.language)
+        });
         
         const { data, error } = await supabase.functions.invoke('create-registration-payment', {
           body: {
@@ -146,9 +159,12 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         console.log("=== EDGE FUNCTION RESPONSE ===");
         console.log("Data:", data);
         console.log("Error:", error);
+        console.log("Error details:", error ? JSON.stringify(error, null, 2) : 'No error');
 
         if (error) {
           console.error("Edge function error:", error);
+          console.error("Error type:", typeof error);
+          console.error("Error keys:", error ? Object.keys(error) : 'none');
           // Check if there's a specific error message in the response
           if (error.message) {
             throw new Error(error.message);
