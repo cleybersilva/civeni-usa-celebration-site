@@ -12,6 +12,33 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-REGISTRATION-PAYMENT] ${step}${detailsStr}`);
 };
 
+// Persistent database-backed rate limiting
+async function checkRateLimit(supabase: any, ip: string, endpoint: string): Promise<{ allowed: boolean; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc('check_rate_limit', {
+      p_ip_address: ip,
+      p_endpoint: endpoint,
+      p_max_requests: 5,
+      p_window_minutes: 5,
+      p_block_minutes: 30
+    });
+
+    if (error) {
+      console.error('Rate limit check error:', error);
+      return { allowed: true }; // Fail open
+    }
+
+    if (!data.allowed) {
+      return { allowed: false, error: 'Too many registration attempts. Please try again later.' };
+    }
+
+    return { allowed: true };
+  } catch (error) {
+    console.error('Rate limit check exception:', error);
+    return { allowed: true };
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -20,6 +47,29 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
+
+    // Initialize Supabase with service role for database operations
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    logStep("Supabase client initialized");
+
+    // Rate limiting check
+    const clientIP = req.headers.get("x-forwarded-for")?.split(',')[0].trim() || 
+                      req.headers.get("x-real-ip") || 
+                      "unknown";
+    
+    const rateLimitCheck = await checkRateLimit(supabase, clientIP, 'create-registration');
+    if (!rateLimitCheck.allowed) {
+      logStep("Rate limit exceeded", { ip: clientIP });
+      return new Response(
+        JSON.stringify({ success: false, error: rateLimitCheck.error }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 429 }
+      );
+    }
 
     const body = await req.json();
     const {

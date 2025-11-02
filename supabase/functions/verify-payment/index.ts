@@ -8,35 +8,35 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Simple in-memory rate limiting
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 10; // 10 requests per minute per IP
+// Persistent database-backed rate limiting
+async function checkRateLimit(supabaseAdmin: any, ip: string, endpoint: string): Promise<{ allowed: boolean; error?: string; retryAfter?: number }> {
+  try {
+    const { data, error } = await supabaseAdmin.rpc('check_rate_limit', {
+      p_ip_address: ip,
+      p_endpoint: endpoint,
+      p_max_requests: 10,
+      p_window_minutes: 1,
+      p_block_minutes: 15
+    });
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const key = ip || 'unknown';
-  
-  if (!rateLimitMap.has(key)) {
-    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return true;
+    if (error) {
+      console.error('Rate limit check error:', error);
+      return { allowed: true }; // Fail open to not block legitimate traffic
+    }
+
+    if (!data.allowed) {
+      return { 
+        allowed: false, 
+        error: data.reason === 'blocked' ? 'IP temporarily blocked' : 'Rate limit exceeded',
+        retryAfter: data.retry_after
+      };
+    }
+
+    return { allowed: true };
+  } catch (error) {
+    console.error('Rate limit check exception:', error);
+    return { allowed: true }; // Fail open
   }
-  
-  const limits = rateLimitMap.get(key)!;
-  
-  if (now > limits.resetTime) {
-    // Reset the counter
-    limits.count = 1;
-    limits.resetTime = now + RATE_LIMIT_WINDOW;
-    return true;
-  }
-  
-  if (limits.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return false;
-  }
-  
-  limits.count++;
-  return true;
 }
 
 serve(async (req) => {
@@ -44,10 +44,21 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Basic rate limiting
-  const clientIP = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
-  if (!checkRateLimit(clientIP)) {
-    return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+  // Persistent database-backed rate limiting
+  const clientIP = req.headers.get("x-forwarded-for")?.split(',')[0].trim() || 
+                    req.headers.get("x-real-ip") || 
+                    "unknown";
+  
+  const rateLimitCheck = await checkRateLimit(supabaseAdmin, clientIP, 'verify-payment');
+  if (!rateLimitCheck.allowed) {
+    return new Response(JSON.stringify({ 
+      error: rateLimitCheck.error,
+      retry_after: rateLimitCheck.retryAfter 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 429,
     });
