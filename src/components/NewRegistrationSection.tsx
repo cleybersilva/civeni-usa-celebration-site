@@ -186,8 +186,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                     <SelectContent>
                       <SelectItem value="vccu_student">Aluno(a) VCCU</SelectItem>
                       <SelectItem value="guest">Convidado(a)</SelectItem>
-                      <SelectItem value="external">Participante Externo</SelectItem>
-                      {participantTypes.filter(pt => pt.is_active).map((pt) => (
+                      {participantTypes.filter(pt => pt.is_active && pt.type_name !== 'Aluno(a) VCCU').map((pt) => (
                         <SelectItem key={pt.id} value={pt.type_name}>
                           {pt.type_name}
                         </SelectItem>
