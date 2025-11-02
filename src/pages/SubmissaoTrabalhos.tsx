@@ -80,14 +80,16 @@ const SubmissaoTrabalhos = () => {
       console.log('🔍 Validando limite de submissões via RPC...', { 
         email: formData.email.toLowerCase().trim(),
         nome: formData.author_name.trim(),
-        tipo: activeTab
+        tipo: activeTab,
+        evento: 'civeni-2025'
       });
 
       // Chamar função RPC para validar inscrição e limite
       const { data, error } = await supabase.rpc('can_submit_trabalho', {
         p_email: formData.email.toLowerCase().trim(),
         p_nome: formData.author_name.trim(),
-        p_tipo: activeTab
+        p_tipo: activeTab,
+        p_evento: 'civeni-2025'
       });
 
       if (error) {
