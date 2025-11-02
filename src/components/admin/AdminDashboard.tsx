@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useStripeDashboard } from '@/hooks/useStripeDashboard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { toZonedTime, format } from 'date-fns-tz';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
@@ -96,10 +95,14 @@ const AdminDashboard = () => {
           const groupedByDay = new Map();
           
           data?.forEach(charge => {
-            // Converter UTC para timezone do Brasil (America/Fortaleza = UTC-3)
+            // Converter UTC para timezone do Brasil (UTC-3)
             const utcDate = new Date(charge.created_utc);
-            const brasilDate = toZonedTime(utcDate, 'America/Fortaleza');
-            const dayKey = format(brasilDate, 'yyyy-MM-dd', { timeZone: 'America/Fortaleza' });
+            // Ajustar para horário do Brasil (UTC-3)
+            const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
+            const year = brasilDate.getUTCFullYear();
+            const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(brasilDate.getUTCDate()).padStart(2, '0');
+            const dayKey = `${year}-${month}-${day}`;
             
             if (!groupedByDay.has(dayKey)) {
               groupedByDay.set(dayKey, {
