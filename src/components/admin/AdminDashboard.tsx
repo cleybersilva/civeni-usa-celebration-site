@@ -554,11 +554,18 @@ const AdminDashboard = () => {
       doc.text('Tendencias Temporais - Historico Completo', 14, yPos);
       yPos += 8;
       
-      const tendenciasData = allTimeseriesData && allTimeseriesData.length > 0
-        ? allTimeseriesData.map(item => {
-            const dateValue = item.dia;
-            const receita = item.receita_liquida || 0;
-            const transacoes = item.transacoes || 0;
+      // Usar os dados de timeseries ou allTimeseriesData, o que tiver dados
+      const dataParaTendencias = (allTimeseriesData && allTimeseriesData.length > 0) 
+        ? allTimeseriesData 
+        : (timeseries && timeseries.length > 0) 
+          ? timeseries 
+          : [];
+      
+      const tendenciasData = dataParaTendencias.length > 0
+        ? dataParaTendencias.map(item => {
+            const dateValue = item.dia || item.date;
+            const receita = item.receita_liquida || item.liquido || 0;
+            const transacoes = item.transacoes || item.count || 0;
             const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
             return [
               dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
@@ -567,7 +574,7 @@ const AdminDashboard = () => {
               formatCurrency(ticketMedio)
             ];
           })
-        : [['Nenhum dado disponivel', '', '', '']];
+        : [['Nenhum dado temporal disponivel', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
@@ -667,13 +674,20 @@ const AdminDashboard = () => {
         ['Data', 'Receita Liquida', 'Receita Bruta', 'Taxas', 'Transacoes', 'Ticket Medio']
       ];
       
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        allTimeseriesData.forEach(item => {
-          const dateValue = item.dia;
-          const receita = item.receita_liquida || 0;
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
-          const transacoes = item.transacoes || 0;
+      // Usar os dados de timeseries ou allTimeseriesData, o que tiver dados
+      const dataParaTendencias = (allTimeseriesData && allTimeseriesData.length > 0) 
+        ? allTimeseriesData 
+        : (timeseries && timeseries.length > 0) 
+          ? timeseries 
+          : [];
+      
+      if (dataParaTendencias.length > 0) {
+        dataParaTendencias.forEach(item => {
+          const dateValue = item.dia || item.date;
+          const receita = item.receita_liquida || item.liquido || 0;
+          const receitaBruta = item.receita_bruta || item.bruto || 0;
+          const taxas = item.taxas || item.fees || 0;
+          const transacoes = item.transacoes || item.count || 0;
           const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
           tendenciasData.push([
             dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
@@ -685,7 +699,7 @@ const AdminDashboard = () => {
           ]);
         });
       } else {
-        tendenciasData.push(['Nenhum dado disponivel', '', '', '', '', '']);
+        tendenciasData.push(['Nenhum dado temporal disponivel', '', '', '', '', '']);
       }
       
       const wsTendencias = XLSX.utils.aoa_to_sheet(tendenciasData);
@@ -756,16 +770,26 @@ const AdminDashboard = () => {
       // Análise Temporal - Usar histórico completo
       csvRows.push('=== ANALISE DE TENDENCIAS TEMPORAIS - HISTORICO COMPLETO ===');
       csvRows.push('Data,Receita Liquida,Receita Bruta,Taxas,Quantidade de Transacoes,Ticket Medio');
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        allTimeseriesData.forEach(item => {
-          const dateValue = item.dia;
-          const receita = item.receita_liquida || 0;
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
-          const transacoes = item.transacoes || 0;
+      
+      // Usar os dados de timeseries ou allTimeseriesData, o que tiver dados
+      const dataParaTendencias = (allTimeseriesData && allTimeseriesData.length > 0) 
+        ? allTimeseriesData 
+        : (timeseries && timeseries.length > 0) 
+          ? timeseries 
+          : [];
+      
+      if (dataParaTendencias.length > 0) {
+        dataParaTendencias.forEach(item => {
+          const dateValue = item.dia || item.date;
+          const receita = item.receita_liquida || item.liquido || 0;
+          const receitaBruta = item.receita_bruta || item.bruto || 0;
+          const taxas = item.taxas || item.fees || 0;
+          const transacoes = item.transacoes || item.count || 0;
           const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
           csvRows.push(`${dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'},${receita},${receitaBruta},${taxas},${transacoes},${ticketMedio}`);
         });
+      } else {
+        csvRows.push('Nenhum dado temporal disponivel,0,0,0,0,0');
       }
       csvRows.push('');
       
