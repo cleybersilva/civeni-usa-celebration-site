@@ -468,77 +468,46 @@ const AdminDashboard = () => {
   };
 
   const handleExportAnalysisPDF = () => {
-    if (loading) {
-      toast({
-        title: "Aguarde",
-        description: "Os dados ainda estao sendo carregados...",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       const doc = new jsPDF();
       let yPos = 20;
       
       // Header
-      doc.setFillColor(219, 39, 119);
-      doc.rect(0, 0, doc.internal.pageSize.getWidth(), 35, 'F');
-      doc.setTextColor(255, 255, 255);
       doc.setFontSize(18);
-      doc.text('Relatorio de Analises Avancadas - CIVENI 2025', 105, 15, { align: 'center' });
+      doc.setTextColor(219, 39, 119); // pink-600
+      doc.text('Relatório de Análises Avançadas - CIVENI 2025', 105, yPos, { align: 'center' });
+      yPos += 10;
+      
       doc.setFontSize(10);
-      doc.text(`Data de Geracao: ${new Date().toLocaleString('pt-BR')}`, 105, 23, { align: 'center' });
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Data de Geração: ${new Date().toLocaleString('pt-BR')}`, 105, yPos, { align: 'center' });
+      yPos += 15;
       
-      // Filtros aplicados
-      let filtrosStr = `Periodo: ${filters.range === 'custom' && filters.customFrom && filters.customTo 
-        ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
-        : filters.range === '7d' ? 'Ultimos 7 dias' : filters.range === '30d' ? 'Ultimos 30 dias' : filters.range === '90d' ? 'Ultimos 90 dias' : 'Todos os periodos'}`;
-      if (filters.status !== 'all') filtrosStr += ` | Status: ${filters.status}`;
-      if (filters.lote) filtrosStr += ` | Lote: ${filters.lote}`;
-      if (filters.cupom) filtrosStr += ` | Cupom: ${filters.cupom}`;
-      if (filters.brand !== 'all') filtrosStr += ` | Bandeira: ${filters.brand}`;
-      doc.setFontSize(8);
-      doc.text(filtrosStr, 105, 30, { align: 'center' });
-      
-      yPos = 45;
-      
-      // Resumo Executivo
+      // Resumo Executivo - Cards
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
       doc.text('Resumo Executivo', 14, yPos);
       yPos += 8;
       
       const resumoData = [
-        ['Receita Bruta', formatCurrency(summary?.bruto || 0), `${summary?.pagos || 0} pagamentos confirmados`],
-        ['Taxas Stripe', formatCurrency(summary?.taxas || 0), 'Custos operacionais'],
-        ['Receita Liquida', formatCurrency(summary?.liquido || 0), 'Valor final recebido'],
-        ['Taxa de Conversao', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
-        ['Ticket Medio', formatCurrency(summary?.ticketMedio || 0), 'Por transacao paga'],
-        ['Falhas', `${summary?.falhas || 0}`, 'Pagamentos recusados'],
-        ['Reembolsos', `${summary?.reembolsos || 0}`, 'Valores devolvidos'],
-        ['Disputas', `${summary?.disputas || 0}`, 'Contestacoes abertas'],
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
       ];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Metrica', 'Valor', 'Descricao']],
+        head: [['Métrica', 'Valor', 'Descrição']],
         body: resumoData,
         theme: 'grid',
-        headStyles: { fillColor: [219, 39, 119], fontSize: 10 },
-        bodyStyles: { fontSize: 9 },
+        headStyles: { fillColor: [219, 39, 119] },
       });
       
       yPos = (doc as any).lastAutoTable.finalY + 10;
       
       // Análise por Bandeira
-      if (yPos > 250) {
-        doc.addPage();
-        yPos = 20;
-      }
-      
       doc.setFontSize(14);
-      doc.text('Analise por Bandeira de Cartao', 14, yPos);
+      doc.text('Análise por Bandeira de Cartão', 14, yPos);
       yPos += 8;
       
       const bandeiraData = byBrand && byBrand.length > 0 
@@ -547,22 +516,21 @@ const AdminDashboard = () => {
               ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
               : '0';
             return [
-              `${brand.bandeira || 'Nao especificado'} ${brand.funding ? `(${brand.funding})` : ''}`,
+              `${brand.bandeira || 'Não especificado'} ${brand.funding ? `(${brand.funding})` : ''}`,
               `${brand.qtd || 0}`,
               formatCurrency(brand.receita_liquida || 0),
               formatCurrency(brand.receita_bruta || 0),
               `${percentage}%`
             ];
           })
-        : [['Nenhum dado disponivel', '', '', '', '']];
+        : [['Nenhum dado disponível', '', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Bandeira', 'Qtd', 'Receita Liquida', 'Receita Bruta', '% do Total']],
+        head: [['Bandeira', 'Qtd', 'Receita Líquida', 'Receita Bruta', '% do Total']],
         body: bandeiraData,
         theme: 'striped',
-        headStyles: { fillColor: [99, 102, 241], fontSize: 10 },
-        bodyStyles: { fontSize: 9 },
+        headStyles: { fillColor: [99, 102, 241] }, // indigo
       });
       
       yPos = (doc as any).lastAutoTable.finalY + 10;
@@ -574,12 +542,12 @@ const AdminDashboard = () => {
       }
       
       doc.setFontSize(14);
-      doc.text('Tendencias Temporais (Ultimas 20 datas)', 14, yPos);
+      doc.text('Tendências Temporais', 14, yPos);
       yPos += 8;
       
-      const tendenciasData = allTimeseriesData && allTimeseriesData.length > 0
-        ? allTimeseriesData.slice(0, 20).map(item => {
-            const dateValue = item.dia;
+      const tendenciasData = timeseries && timeseries.length > 0
+        ? timeseries.slice(-10).map(item => {
+            const dateValue = item.dia || item.timestamp;
             const receita = item.receita_liquida || 0;
             const transacoes = item.transacoes || 0;
             const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
@@ -590,122 +558,58 @@ const AdminDashboard = () => {
               formatCurrency(ticketMedio)
             ];
           })
-        : [['Nenhum dado disponivel', '', '', '']];
+        : [['Nenhum dado disponível', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Data', 'Receita Liquida', 'Transacoes', 'Ticket Medio']],
+        head: [['Data', 'Receita', 'Transações', 'Ticket Médio']],
         body: tendenciasData,
         theme: 'striped',
-        headStyles: { fillColor: [16, 185, 129], fontSize: 10 },
-        bodyStyles: { fontSize: 8 },
+        headStyles: { fillColor: [16, 185, 129] }, // emerald
       });
       
-      // Funil de Conversão
-      if (funnel && funnel.length > 0) {
-        yPos = (doc as any).lastAutoTable.finalY + 10;
-        
-        if (yPos > 250) {
-          doc.addPage();
-          yPos = 20;
-        }
-        
-        doc.setFontSize(14);
-        doc.text('Funil de Conversao', 14, yPos);
-        yPos += 8;
-        
-        const funnelData = funnel.map(stage => [
-          stage.estagio || '-',
-          `${stage.quantidade || 0}`,
-          formatCurrency(stage.valor || 0)
-        ]);
-        
-        autoTable(doc, {
-          startY: yPos,
-          head: [['Estagio', 'Quantidade', 'Valor Total']],
-          body: funnelData,
-          theme: 'grid',
-          headStyles: { fillColor: [168, 85, 247], fontSize: 10 },
-          bodyStyles: { fontSize: 9 },
-        });
-      }
-      
-      // Rodapé em todas as páginas
-      const pageCount = (doc as any).internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(128, 128, 128);
-        doc.text(`Pagina ${i} de ${pageCount}`, doc.internal.pageSize.getWidth() / 2, 287, { align: 'center' });
-        doc.text('III Civeni USA 2025 - Dashboard Financeiro Stripe', 14, 287);
-        doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, doc.internal.pageSize.getWidth() - 14, 287, { align: 'right' });
-      }
-      
-      doc.save(`analise-stripe-civeni-${new Date().toISOString().split('T')[0]}.pdf`);
+      // Save PDF
+      doc.save(`analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.pdf`);
       
       toast({
-        title: "PDF exportado com sucesso",
-        description: `Relatorio completo de ${pageCount} paginas baixado`,
+        title: "PDF exportado!",
+        description: "O relatório de análises foi gerado com sucesso.",
       });
     } catch (error) {
       console.error('Erro ao exportar PDF:', error);
       toast({
         title: "Erro ao exportar",
-        description: "Nao foi possivel gerar o relatorio PDF",
+        description: "Não foi possível gerar o relatório PDF.",
         variant: "destructive",
       });
     }
   };
 
   const handleExportAnalysisXLSX = () => {
-    if (loading) {
-      toast({
-        title: "Aguarde",
-        description: "Os dados ainda estao sendo carregados...",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       const wb = XLSX.utils.book_new();
       
       // Sheet 1: Resumo Executivo
       const resumoData = [
-        ['Relatorio de Analises Avancadas - CIVENI 2025'],
+        ['Relatório de Análises Avançadas - CIVENI 2025'],
         [''],
-        [`Data de Geracao: ${new Date().toLocaleString('pt-BR')}`],
-        [''],
-        ['Filtros Aplicados:'],
-        [`Periodo: ${filters.range === 'custom' && filters.customFrom && filters.customTo 
-          ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
-          : filters.range === '7d' ? 'Ultimos 7 dias' : filters.range === '30d' ? 'Ultimos 30 dias' : filters.range === '90d' ? 'Ultimos 90 dias' : 'Todos os periodos'}`],
-        [`Status: ${filters.status !== 'all' ? filters.status : 'Todos'}`],
-        [`Lote: ${filters.lote || 'Todos'}`],
-        [`Cupom: ${filters.cupom || 'Todos'}`],
-        [`Bandeira: ${filters.brand !== 'all' ? filters.brand : 'Todas'}`],
+        [`Data de Geração: ${new Date().toLocaleString('pt-BR')}`],
         [''],
         ['=== RESUMO EXECUTIVO ==='],
         [''],
-        ['Metrica', 'Valor', 'Descricao'],
-        ['Receita Bruta', formatCurrency(summary?.bruto || 0), `${summary?.pagos || 0} pagamentos confirmados`],
-        ['Taxas Stripe', formatCurrency(summary?.taxas || 0), 'Custos operacionais'],
-        ['Receita Liquida', formatCurrency(summary?.liquido || 0), 'Valor final recebido'],
-        ['Taxa de Conversao', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
-        ['Ticket Medio', formatCurrency(summary?.ticketMedio || 0), 'Por transacao paga'],
-        ['Pagamentos Pendentes', `${summary?.naoPagos || 0}`, 'Aguardando confirmacao'],
-        ['Falhas', `${summary?.falhas || 0}`, 'Pagamentos recusados'],
-        ['Reembolsos', `${summary?.reembolsos || 0}`, 'Valores devolvidos'],
-        ['Disputas', `${summary?.disputas || 0}`, 'Contestacoes abertas'],
+        ['Métrica', 'Valor', 'Descrição'],
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
       ];
       const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
       XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo Executivo');
       
       // Sheet 2: Análise por Bandeira
       const bandeiraData = [
-        ['Analise por Bandeira de Cartao'],
+        ['Análise por Bandeira de Cartão'],
         [''],
-        ['Bandeira', 'Funding', 'Quantidade', 'Receita Liquida', 'Receita Bruta', '% do Total']
+        ['Bandeira', 'Funding', 'Quantidade', 'Receita Líquida', 'Receita Bruta', '% do Total']
       ];
       
       if (byBrand && byBrand.length > 0) {
@@ -714,7 +618,7 @@ const AdminDashboard = () => {
             ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
             : '0';
           bandeiraData.push([
-            brand.bandeira || 'Nao especificado',
+            brand.bandeira || 'Não especificado',
             brand.funding || '-',
             brand.qtd || 0,
             formatCurrency(brand.receita_liquida || 0),
@@ -722,243 +626,143 @@ const AdminDashboard = () => {
             `${percentage}%`
           ]);
         });
-        
-        // Totais
-        bandeiraData.push(['']);
-        bandeiraData.push([
-          'TOTAL',
-          '',
-          byBrand.reduce((sum, b) => sum + (b.qtd || 0), 0),
-          formatCurrency(byBrand.reduce((sum, b) => sum + (b.receita_liquida || 0), 0)),
-          formatCurrency(byBrand.reduce((sum, b) => sum + (b.receita_bruta || 0), 0)),
-          '100%'
-        ]);
       } else {
-        bandeiraData.push(['Nenhum dado disponivel', '', '', '', '', '']);
+        bandeiraData.push(['Nenhum dado disponível', '', '', '', '', '']);
       }
       
       const wsBandeira = XLSX.utils.aoa_to_sheet(bandeiraData);
-      XLSX.utils.book_append_sheet(wb, wsBandeira, 'Analise por Bandeira');
+      XLSX.utils.book_append_sheet(wb, wsBandeira, 'Análise por Bandeira');
       
-      // Sheet 3: Tendências Temporais (TODAS)
+      // Sheet 3: Tendências Temporais
       const tendenciasData = [
-        ['Tendencias Temporais - Dados Completos'],
+        ['Tendências Temporais'],
         [''],
-        ['Data', 'Receita Bruta', 'Taxas', 'Receita Liquida', 'Transacoes', 'Ticket Medio']
+        ['Data', 'Receita', 'Transações', 'Ticket Médio']
       ];
       
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        allTimeseriesData.forEach(item => {
-          const dateValue = item.dia;
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
+      if (timeseries && timeseries.length > 0) {
+        timeseries.forEach(item => {
+          const dateValue = item.dia || item.timestamp;
           const receita = item.receita_liquida || 0;
           const transacoes = item.transacoes || 0;
           const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
           tendenciasData.push([
             dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
-            formatCurrency(receitaBruta),
-            formatCurrency(taxas),
             formatCurrency(receita),
             transacoes,
             formatCurrency(ticketMedio)
           ]);
         });
-        
-        // Totais
-        tendenciasData.push(['']);
-        tendenciasData.push([
-          'TOTAL',
-          formatCurrency(allTimeseriesData.reduce((sum, item) => sum + (item.receita_bruta || 0), 0)),
-          formatCurrency(allTimeseriesData.reduce((sum, item) => sum + (item.taxas || 0), 0)),
-          formatCurrency(allTimeseriesData.reduce((sum, item) => sum + (item.receita_liquida || 0), 0)),
-          allTimeseriesData.reduce((sum, item) => sum + (item.transacoes || 0), 0),
-          ''
-        ]);
       } else {
-        tendenciasData.push(['Nenhum dado disponivel', '', '', '', '', '']);
+        tendenciasData.push(['Nenhum dado disponível', '', '', '']);
       }
       
       const wsTendencias = XLSX.utils.aoa_to_sheet(tendenciasData);
-      XLSX.utils.book_append_sheet(wb, wsTendencias, 'Tendencias Temporais');
-      
-      // Sheet 4: Funil de Conversão
-      if (funnel && funnel.length > 0) {
-        const funnelData = [
-          ['Funil de Conversao'],
-          [''],
-          ['Estagio', 'Quantidade', 'Valor Total']
-        ];
-        
-        funnel.forEach(stage => {
-          funnelData.push([
-            stage.estagio || '-',
-            stage.quantidade || 0,
-            formatCurrency(stage.valor || 0)
-          ]);
-        });
-        
-        const wsFunnel = XLSX.utils.aoa_to_sheet(funnelData);
-        XLSX.utils.book_append_sheet(wb, wsFunnel, 'Funil de Conversao');
-      }
-      
-      // Sheet 5: Transações (primeiras 500)
-      if (charges && charges.length > 0) {
-        const chargesData = [
-          ['Transacoes Detalhadas (Primeiras 500)'],
-          [''],
-          ['ID', 'Data', 'Cliente', 'Valor', 'Status', 'Metodo', 'Bandeira', 'Ultimos 4 Digitos']
-        ];
-        
-        charges.slice(0, 500).forEach((charge: any) => {
-          const created = new Date(charge.created * 1000);
-          chargesData.push([
-            charge.id || '',
-            created.toLocaleString('pt-BR'),
-            charge.customer_email || '-',
-            formatCurrency(charge.amount / 100),
-            charge.status || '',
-            charge.payment_method_type || '-',
-            charge.brand || '-',
-            charge.last4 || '-'
-          ]);
-        });
-        
-        const wsCharges = XLSX.utils.aoa_to_sheet(chargesData);
-        XLSX.utils.book_append_sheet(wb, wsCharges, 'Transacoes');
-      }
+      XLSX.utils.book_append_sheet(wb, wsTendencias, 'Tendências Temporais');
       
       // Save XLSX
-      XLSX.writeFile(wb, `analise-stripe-civeni-${new Date().toISOString().split('T')[0]}.xlsx`);
+      XLSX.writeFile(wb, `analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.xlsx`);
       
       toast({
-        title: "Excel exportado com sucesso",
-        description: "Relatorio completo de analises gerado",
+        title: "Excel exportado!",
+        description: "O relatório de análises foi gerado com sucesso.",
       });
     } catch (error) {
       console.error('Erro ao exportar XLSX:', error);
       toast({
         title: "Erro ao exportar",
-        description: "Nao foi possivel gerar o relatorio Excel",
+        description: "Não foi possível gerar o relatório Excel.",
         variant: "destructive",
       });
     }
   };
 
   const handleExportAnalysisCSV = () => {
-    if (loading) {
-      toast({
-        title: "Aguarde",
-        description: "Os dados ainda estao sendo carregados...",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       const csvRows: string[] = [];
       
       // Header
-      csvRows.push('=== RELATORIO DE ANALISES AVANCADAS - CIVENI 2025 ===');
-      csvRows.push(`Data de Geracao: ${new Date().toLocaleString('pt-BR')}`);
-      csvRows.push('');
-      
-      // Filtros aplicados
-      csvRows.push('=== FILTROS APLICADOS ===');
-      csvRows.push(`Periodo,${filters.range === 'custom' && filters.customFrom && filters.customTo 
-        ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
-        : filters.range === '7d' ? 'Ultimos 7 dias' : filters.range === '30d' ? 'Ultimos 30 dias' : filters.range === '90d' ? 'Ultimos 90 dias' : 'Todos os periodos'}`);
-      csvRows.push(`Status,${filters.status !== 'all' ? filters.status : 'Todos'}`);
-      csvRows.push(`Lote,${filters.lote || 'Todos'}`);
-      csvRows.push(`Cupom,${filters.cupom || 'Todos'}`);
-      csvRows.push(`Bandeira,${filters.brand !== 'all' ? filters.brand : 'Todas'}`);
+      csvRows.push('=== RELATÓRIO DE ANÁLISES AVANÇADAS - CIVENI 2025 ===');
+      csvRows.push(`Data de Geração: ${new Date().toLocaleString('pt-BR')}`);
       csvRows.push('');
       
       // Resumo Executivo
       csvRows.push('=== RESUMO EXECUTIVO ===');
-      csvRows.push('Metrica,Valor,Descricao');
-      csvRows.push(`Receita Bruta,${formatCurrency(summary?.bruto || 0)},${summary?.pagos || 0} pagamentos confirmados`);
-      csvRows.push(`Taxas Stripe,${formatCurrency(summary?.taxas || 0)},Custos operacionais`);
-      csvRows.push(`Receita Liquida,${formatCurrency(summary?.liquido || 0)},Valor final recebido`);
-      csvRows.push(`Pagamentos Concluidos,${summary?.pagos || 0},Transacoes aprovadas`);
-      csvRows.push(`Pagamentos Pendentes,${summary?.naoPagos || 0},Aguardando confirmacao`);
-      csvRows.push(`Falhas de Pagamento,${summary?.falhas || 0},Transacoes recusadas`);
-      csvRows.push(`Reembolsos,${summary?.reembolsos || 0},Valores devolvidos`);
-      csvRows.push(`Disputas,${summary?.disputas || 0},Contestacoes abertas`);
-      csvRows.push(`Ticket Medio,${formatCurrency(summary?.ticketMedio || 0)},Por transacao paga`);
-      csvRows.push(`Taxa de Conversao,${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(2) : 0}%,${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`);
+      csvRows.push('Métrica,Valor');
+      csvRows.push(`Receita Bruta,${formatCurrency(summary?.bruto || 0)}`);
+      csvRows.push(`Taxas Stripe,${formatCurrency(summary?.taxas || 0)}`);
+      csvRows.push(`Receita Líquida,${formatCurrency(summary?.liquido || 0)}`);
+      csvRows.push(`Pagamentos Concluídos,${summary?.pagos || 0}`);
+      csvRows.push(`Pagamentos Pendentes,${summary?.naoPagos || 0}`);
+      csvRows.push(`Falhas de Pagamento,${summary?.falhas || 0}`);
+      csvRows.push(`Reembolsos,${summary?.reembolsos || 0}`);
+      csvRows.push(`Disputas,${summary?.disputas || 0}`);
+      csvRows.push(`Ticket Médio,${formatCurrency(summary?.ticketMedio || 0)}`);
+      csvRows.push(`Taxa de Conversão,${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(2) : 0}%`);
       csvRows.push('');
       
       // Análise por Bandeira
-      csvRows.push('=== ANALISE POR BANDEIRA DE CARTAO ===');
-      csvRows.push('Bandeira,Funding,Quantidade,Receita Liquida,Receita Bruta,% do Total');
+      csvRows.push('=== ANÁLISE POR BANDEIRA DE CARTÃO ===');
+      csvRows.push('Bandeira,Funding,Quantidade,Receita Líquida,Receita Bruta,% do Total');
       if (byBrand && byBrand.length > 0) {
         const totalReceita = summary?.bruto || 1;
         byBrand.forEach(brand => {
           const percentage = (((brand.receita_bruta || 0) / totalReceita) * 100).toFixed(2);
-          csvRows.push(`${brand.bandeira || 'Nao especificado'},${brand.funding || '-'},${brand.qtd || 0},${formatCurrency(brand.receita_liquida || 0)},${formatCurrency(brand.receita_bruta || 0)},${percentage}%`);
+          csvRows.push(`${brand.bandeira || 'Não especificado'},${brand.funding || '-'},${brand.qtd || 0},${formatCurrency(brand.receita_liquida || 0)},${formatCurrency(brand.receita_bruta || 0)},${percentage}%`);
         });
-        
-        // Total
-        csvRows.push(`TOTAL,,${byBrand.reduce((sum, b) => sum + (b.qtd || 0), 0)},${formatCurrency(byBrand.reduce((sum, b) => sum + (b.receita_liquida || 0), 0))},${formatCurrency(byBrand.reduce((sum, b) => sum + (b.receita_bruta || 0), 0))},100%`);
       }
       csvRows.push('');
       
-      // Análise Temporal (TODOS os dados)
-      csvRows.push('=== ANALISE DE TENDENCIAS TEMPORAIS - DADOS COMPLETOS ===');
-      csvRows.push('Data,Receita Bruta,Taxas,Receita Liquida,Quantidade de Transacoes,Ticket Medio');
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        allTimeseriesData.forEach(item => {
-          const dateValue = item.dia;
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
+      // Análise Temporal
+      csvRows.push('=== ANÁLISE DE TENDÊNCIAS TEMPORAIS ===');
+      csvRows.push('Data,Receita Líquida,Quantidade de Transações,Ticket Médio');
+      if (timeseries && timeseries.length > 0) {
+        timeseries.forEach(item => {
+          const dateValue = item.dia || item.timestamp;
           const receita = item.receita_liquida || 0;
           const transacoes = item.transacoes || 0;
           const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
-          csvRows.push(`${dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'},${formatCurrency(receitaBruta)},${formatCurrency(taxas)},${formatCurrency(receita)},${transacoes},${formatCurrency(ticketMedio)}`);
+          csvRows.push(`${dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'},${formatCurrency(receita)},${transacoes},${formatCurrency(ticketMedio)}`);
         });
-        
-        // Total
-        csvRows.push(`TOTAL,${formatCurrency(allTimeseriesData.reduce((sum, item) => sum + (item.receita_bruta || 0), 0))},${formatCurrency(allTimeseriesData.reduce((sum, item) => sum + (item.taxas || 0), 0))},${formatCurrency(allTimeseriesData.reduce((sum, item) => sum + (item.receita_liquida || 0), 0))},${allTimeseriesData.reduce((sum, item) => sum + (item.transacoes || 0), 0)},`);
       }
       csvRows.push('');
       
       // Análise de Funil
+      csvRows.push('=== ANÁLISE DE FUNIL DE CONVERSÃO ===');
+      csvRows.push('Estágio,Quantidade,Valor Total');
       if (funnel && funnel.length > 0) {
-        csvRows.push('=== ANALISE DE FUNIL DE CONVERSAO ===');
-        csvRows.push('Estagio,Quantidade,Valor Total');
         funnel.forEach(stage => {
           csvRows.push(`${stage.estagio},${stage.quantidade},${formatCurrency(stage.valor)}`);
         });
-        csvRows.push('');
       }
+      csvRows.push('');
       
-      // Transações Detalhadas (primeiras 500)
+      // Transações Detalhadas
+      csvRows.push('=== TRANSAÇÕES DETALHADAS ===');
+      csvRows.push('ID,Data,Cliente,Email,Valor,Status,Método,Bandeira,Descrição');
       if (charges && charges.length > 0) {
-        csvRows.push('=== TRANSACOES DETALHADAS (Primeiras 500) ===');
-        csvRows.push('ID,Data,Cliente,Email,Valor,Status,Metodo,Bandeira,Ultimos 4 Digitos');
-        charges.slice(0, 500).forEach(charge => {
+        charges.forEach(charge => {
           const row = [
             charge.id || '',
             new Date(charge.created * 1000).toLocaleString('pt-BR'),
-            (charge.customer?.nome || 'N/A').replace(/,/g, ';'),
+            charge.customer?.nome || 'N/A',
             charge.customer?.email || 'N/A',
             formatCurrency(charge.amount / 100),
             charge.status || 'N/A',
             charge.payment_method_type || 'N/A',
             charge.brand || 'N/A',
-            charge.last4 || 'N/A'
+            (charge.description || '').replace(/,/g, ';')
           ].join(',');
           csvRows.push(row);
         });
-        csvRows.push('');
       }
+      csvRows.push('');
       
-      // Participantes (primeiros 500)
+      // Participantes
+      csvRows.push('=== ANÁLISE DE PARTICIPANTES ===');
+      csvRows.push('Nome,Email,Curso,Turma,Valor Pago,Status,Método de Pagamento,Data de Registro');
       if (customers && customers.length > 0) {
-        csvRows.push('=== ANALISE DE PARTICIPANTES (Primeiros 500) ===');
-        csvRows.push('Nome,Email,Curso,Turma,Valor Pago,Status,Metodo de Pagamento,Data de Registro');
-        customers.slice(0, 500).forEach(customer => {
+        customers.forEach(customer => {
           const row = [
             (customer.nome || 'N/A').replace(/,/g, ';'),
             customer.email || 'N/A',
@@ -971,38 +775,38 @@ const AdminDashboard = () => {
           ].join(',');
           csvRows.push(row);
         });
-        csvRows.push('');
       }
+      csvRows.push('');
       
-      // Insights e Recomendações (SEM EMOJIS)
-      csvRows.push('=== INSIGHTS E RECOMENDACOES ===');
+      // Insights e Recomendações
+      csvRows.push('=== INSIGHTS E RECOMENDAÇÕES ===');
       
       // Calcular insights
       const taxaFalha = summary && summary.pagos > 0 
         ? ((summary.falhas / (summary.pagos + summary.falhas)) * 100).toFixed(2)
         : '0';
       
-      csvRows.push(`Taxa de Falha,${taxaFalha}%`);
+      csvRows.push(`Taxa de Falha: ${taxaFalha}%`);
       
       if (parseFloat(taxaFalha) > 10) {
-        csvRows.push('ATENCAO: Taxa de falha acima de 10% - Investigar possiveis problemas de checkout');
+        csvRows.push('⚠️ ATENÇÃO: Taxa de falha acima de 10% - Investigar possíveis problemas de checkout');
       }
       
       if (summary && summary.disputas > 0) {
-        csvRows.push(`ATENCAO: ${summary.disputas} disputas abertas - Requer acao imediata`);
+        csvRows.push(`⚠️ ATENÇÃO: ${summary.disputas} disputas abertas - Requer ação imediata`);
       }
       
       if (byBrand && byBrand.length > 0) {
         const topBrand = byBrand[0];
-        csvRows.push(`Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
+        csvRows.push(`💳 Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
       }
       
       if (summary && summary.ticketMedio) {
-        csvRows.push(`Ticket medio: ${formatCurrency(summary.ticketMedio)}`);
+        csvRows.push(`💰 Ticket médio: ${formatCurrency(summary.ticketMedio)}`);
       }
       
       csvRows.push('');
-      csvRows.push('=== FIM DO RELATORIO ===');
+      csvRows.push('=== FIM DO RELATÓRIO ===');
       
       // Criar e baixar CSV
       const csvContent = csvRows.join('\n');
@@ -1011,7 +815,7 @@ const AdminDashboard = () => {
       const url = URL.createObjectURL(blob);
       
       link.setAttribute('href', url);
-      link.setAttribute('download', `analise-stripe-civeni-${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       
       document.body.appendChild(link);
@@ -1019,14 +823,14 @@ const AdminDashboard = () => {
       document.body.removeChild(link);
       
       toast({
-        title: "CSV exportado com sucesso",
-        description: "Relatorio completo de analises gerado",
+        title: "Relatório exportado!",
+        description: "O relatório de análises foi gerado com sucesso.",
       });
     } catch (error) {
-      console.error('Erro ao exportar analises:', error);
+      console.error('Erro ao exportar análises:', error);
       toast({
         title: "Erro ao exportar",
-        description: "Nao foi possivel gerar o relatorio CSV",
+        description: "Não foi possível gerar o relatório de análises.",
         variant: "destructive",
       });
     }
