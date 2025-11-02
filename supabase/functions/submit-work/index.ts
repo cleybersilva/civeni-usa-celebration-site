@@ -10,31 +10,27 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-// Persistent database-backed rate limiting
-async function checkRateLimit(supabase: any, ip: string, email: string, endpoint: string): Promise<{ allowed: boolean; error?: string }> {
-  try {
-    const { data, error } = await supabase.rpc('check_rate_limit', {
-      p_ip_address: `${ip}:${email}`,
-      p_endpoint: endpoint,
-      p_max_requests: 3,
-      p_window_minutes: 5,
-      p_block_minutes: 60
-    });
+// Rate limiting
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 300000; // 5 minutes
+const RATE_LIMIT_MAX = 3;
 
-    if (error) {
-      console.error('Rate limit check error:', error);
-      return { allowed: true }; // Fail open
-    }
-
-    if (!data.allowed) {
-      return { allowed: false, error: 'Too many submission attempts. Please try again later.' };
-    }
-
-    return { allowed: true };
-  } catch (error) {
-    console.error('Rate limit check exception:', error);
-    return { allowed: true };
+function checkRateLimit(clientIP: string, email: string): boolean {
+  const now = Date.now();
+  const key = `${clientIP}:${email}`;
+  const current = rateLimitMap.get(key);
+  
+  if (!current || now > current.resetTime) {
+    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
   }
+  
+  if (current.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  current.count++;
+  return true;
 }
 
 function sanitizeText(text: string): string {
@@ -78,9 +74,7 @@ serve(async (req) => {
   }
 
   // Rate limiting
-  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
-                    req.headers.get('x-real-ip') || 
-                    'unknown';
+  const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   
   try {
     // Check if body exists and is not empty
@@ -112,17 +106,10 @@ serve(async (req) => {
 
     const { email } = body;
     
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Check rate limit with database-backed system
-    const rateLimitCheck = await checkRateLimit(supabase, clientIP, email || 'no-email', 'submit-work');
-    if (!rateLimitCheck.allowed) {
+    if (!checkRateLimit(clientIP, email || 'no-email')) {
       return new Response(JSON.stringify({ 
         success: false, 
-        error: rateLimitCheck.error 
+        error: 'Muitas tentativas. Aguarde 5 minutos antes de tentar novamente.' 
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 429,
@@ -140,6 +127,13 @@ serve(async (req) => {
         status: 400,
       });
     }
+
+    // Initialize Supabase client with service role
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      { auth: { persistSession: false } }
+    );
 
     // Sanitize and insert the work submission
     const sanitizedData = {

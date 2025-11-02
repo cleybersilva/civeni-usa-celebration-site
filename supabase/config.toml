@@ -48,23 +48,5 @@ verify_jwt = true
 [functions.finance-breakdown]
 verify_jwt = true
 
-[functions.finance-timeseries]
-verify_jwt = true
-
-[functions.finance-summary]
-verify_jwt = true
-
-[functions.finance-by-brand]
-verify_jwt = true
-
-[functions.finance-funnel]
-verify_jwt = true
-
-[functions.finance-charges]
-verify_jwt = true
-
-[functions.finance-customers]
-verify_jwt = true
-
 [functions.delete-customer-registrations]
 verify_jwt = false

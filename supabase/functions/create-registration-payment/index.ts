@@ -12,33 +12,6 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-REGISTRATION-PAYMENT] ${step}${detailsStr}`);
 };
 
-// Persistent database-backed rate limiting
-async function checkRateLimit(supabase: any, ip: string, endpoint: string): Promise<{ allowed: boolean; error?: string }> {
-  try {
-    const { data, error } = await supabase.rpc('check_rate_limit', {
-      p_ip_address: ip,
-      p_endpoint: endpoint,
-      p_max_requests: 5,
-      p_window_minutes: 5,
-      p_block_minutes: 30
-    });
-
-    if (error) {
-      console.error('Rate limit check error:', error);
-      return { allowed: true }; // Fail open
-    }
-
-    if (!data.allowed) {
-      return { allowed: false, error: 'Too many registration attempts. Please try again later.' };
-    }
-
-    return { allowed: true };
-  } catch (error) {
-    console.error('Rate limit check exception:', error);
-    return { allowed: true };
-  }
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -47,29 +20,6 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
-
-    // Initialize Supabase with service role for database operations
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
-    logStep("Supabase client initialized");
-
-    // Rate limiting check
-    const clientIP = req.headers.get("x-forwarded-for")?.split(',')[0].trim() || 
-                      req.headers.get("x-real-ip") || 
-                      "unknown";
-    
-    const rateLimitCheck = await checkRateLimit(supabase, clientIP, 'create-registration');
-    if (!rateLimitCheck.allowed) {
-      logStep("Rate limit exceeded", { ip: clientIP });
-      return new Response(
-        JSON.stringify({ success: false, error: rateLimitCheck.error }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 429 }
-      );
-    }
 
     const body = await req.json();
     const {
@@ -86,6 +36,15 @@ serve(async (req) => {
     } = body;
 
     logStep("Request body received", { email, categoryId, batchId, participantType });
+
+    // Initialize Supabase with service role for database operations
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    logStep("Supabase client initialized");
 
     // Get category details
     const { data: category, error: categoryError } = await supabase
@@ -149,23 +108,7 @@ serve(async (req) => {
     logStep("No duplicate registration found");
 
     // Validate coupon if provided using robust RPC
-    // Determine price based on category type
-    let finalPrice = 0;
-    if (category.is_free) {
-      finalPrice = 0;
-    } else if (category.slug === 'participante-externo') {
-      // Fixed price for external participants: R$ 200.00
-      finalPrice = 20000; // 200.00 in cents
-      logStep("External participant - fixed price applied", { finalPrice });
-    } else if (category.slug === 'convidado') {
-      // Fixed price for guests: R$ 100.00
-      finalPrice = 10000; // 100.00 in cents
-      logStep("Guest - fixed price applied", { finalPrice });
-    } else {
-      // Use category price or lote price for regular participants
-      finalPrice = category.price_cents || lote.price_cents;
-      logStep("Regular price applied", { finalPrice });
-    }
+    let finalPrice = category.is_free ? 0 : (category.price_cents || lote.price_cents);
     let validCoupon = null;
 
     if (couponCode) {
@@ -317,25 +260,7 @@ serve(async (req) => {
     }
 
     // For paid registrations, create Stripe session
-    // IMPORTANTE: Verificar se está usando chaves de teste ou produção
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
-    
-    if (!stripeKey) {
-      logStep("ERROR: STRIPE_SECRET_KEY not found");
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: "Configuração de pagamento inválida. Contate o suporte." 
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-      );
-    }
-    
-    // Detectar se é chave de teste ou produção
-    const isTestMode = stripeKey.startsWith('sk_test_');
-    logStep("Stripe mode detected", { isTestMode });
-    
-    const stripe = new Stripe(stripeKey, {
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
 
@@ -348,10 +273,6 @@ serve(async (req) => {
       customerId = customers.data[0].id;
       logStep("Existing customer found", { customerId });
     }
-
-    // PRODUÇÃO: Usar sempre o domínio de produção para Stripe aceitar
-    const baseUrl = "https://civeni2025.com";
-    logStep("Using production URL for Stripe", { baseUrl });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -374,26 +295,13 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${baseUrl}/registration/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/registration/canceled`,
+      success_url: `${req.headers.get("origin")}/registration/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/registration/canceled`,
       metadata: {
         registration_id: registration.id,
         participant_email: email,
         participant_name: fullName,
       },
-      locale: 'pt-BR', // Força idioma português
-      billing_address_collection: 'required', // Coleta endereço de cobrança
-    });
-
-    logStep("Stripe session details", { 
-      sessionId: session.id, 
-      url: session.url,
-      mode: session.mode,
-      amount: finalPrice,
-      currency: currency.toLowerCase(),
-      customer: customerId || 'new',
-      success_url: `${baseUrl}/registration/success`,
-      cancel_url: `${baseUrl}/registration/canceled`
     });
 
     // Update registration with Stripe session ID

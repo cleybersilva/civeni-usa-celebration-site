@@ -71,34 +71,67 @@ const AdminDashboard = () => {
     const fetchAllTimeseries = async () => {
       setLoadingAllTimeseries(true);
       try {
-        const { data, error } = await supabase.functions.invoke('finance-timeseries', {
-          body: {
-            granularity: 'day',
-            currency: 'BRL',
-            from: '2024-01-01',
-            to: new Date().toISOString()
-          }
-        });
+        const { data, error } = await supabase
+          .from('stripe_charges')
+          .select('created_utc, amount, fee_amount, net_amount')
+          .eq('currency', 'BRL')
+          .eq('status', 'succeeded')
+          .eq('paid', true)
+          .order('created_utc', { ascending: false });
 
         if (error) {
-          console.error('Erro ao buscar timeseries:', error);
+          console.error('Erro:', error);
           setAllTimeseriesData([]);
           return;
         }
 
-        if (!data || !data.data || data.data.length === 0) {
+        if (!data || data.length === 0) {
           setAllTimeseriesData([]);
           return;
         }
 
+        // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
+        const groupedByDay = new Map<string, any>();
+        
+        data.forEach(charge => {
+          const utcDate = new Date(charge.created_utc);
+          // Subtrair 3 horas para converter para horário de Brasília
+          const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
+          
+          // Extrair ano, mês e dia da data do Brasil
+          const year = brasilDate.getUTCFullYear();
+          const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
+          const day = String(brasilDate.getUTCDate()).padStart(2, '0');
+          const dayKey = `${year}-${month}-${day}`;
+          
+          if (!groupedByDay.has(dayKey)) {
+            groupedByDay.set(dayKey, {
+              dia: dayKey,
+              receita_bruta: 0,
+              receita_liquida: 0,
+              taxas: 0,
+              transacoes: 0
+            });
+          }
+          
+          const bucket = groupedByDay.get(dayKey)!;
+          const amount = charge.amount / 100;
+          const fee = (charge.fee_amount || 0) / 100;
+          const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
+          
+          bucket.receita_bruta += amount;
+          bucket.taxas += fee;
+          bucket.receita_liquida += net;
+          bucket.transacoes += 1;
+        });
+        
         // Ordenar por data mais recente primeiro
-        const timeseriesData = data.data.sort((a: any, b: any) => 
-          b.dia.localeCompare(a.dia)
-        );
+        const timeseriesData = Array.from(groupedByDay.values())
+          .sort((a, b) => b.dia.localeCompare(a.dia));
         
         setAllTimeseriesData(timeseriesData);
       } catch (err) {
-        console.error('Exceção ao buscar timeseries:', err);
+        console.error('Exceção:', err);
         setAllTimeseriesData([]);
       } finally {
         setLoadingAllTimeseries(false);
@@ -439,57 +472,27 @@ const AdminDashboard = () => {
       const doc = new jsPDF();
       let yPos = 20;
       
-      // Header com logo e timestamp
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(219, 39, 119);
-      doc.text('Dashboard Financeiro Stripe - Análises', 105, yPos, { align: 'center' });
-      yPos += 7;
-      
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100, 100, 100);
-      doc.text('III CIVENI USA 2025 • Relatório em Tempo Real', 105, yPos, { align: 'center' });
-      yPos += 5;
-      
-      doc.setFontSize(9);
-      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' })}`, 105, yPos, { align: 'center' });
-      yPos += 3;
-      
-      // Filtros Aplicados
-      let filtrosTexto = 'Filtros: ';
-      if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
-        filtrosTexto += `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
-      } else {
-        filtrosTexto += `Últimos ${parseInt(filters.range) || 30} dias`;
-      }
-      if (filters.lote) filtrosTexto += ` | Lote: ${filters.lote}`;
-      if (filters.cupom) filtrosTexto += ` | Cupom: ${filters.cupom}`;
-      if (filters.brand && filters.brand !== 'all') filtrosTexto += ` | Bandeira: ${filters.brand}`;
-      if (filters.status && filters.status !== 'all') filtrosTexto += ` | Status: ${filters.status}`;
-      
-      doc.setTextColor(60, 60, 60);
-      doc.text(filtrosTexto, 105, yPos, { align: 'center' });
+      // Header
+      doc.setFontSize(18);
+      doc.setTextColor(219, 39, 119); // pink-600
+      doc.text('Relatório de Análises Avançadas - CIVENI 2025', 105, yPos, { align: 'center' });
       yPos += 10;
       
-      // Resumo Executivo com mais métricas
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Data de Geração: ${new Date().toLocaleString('pt-BR')}`, 105, yPos, { align: 'center' });
+      yPos += 15;
+      
+      // Resumo Executivo - Cards
       doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-      doc.text('RESUMO EXECUTIVO', 14, yPos);
+      doc.text('Resumo Executivo', 14, yPos);
       yPos += 8;
       
       const resumoData = [
-        ['Receita Bruta', formatCurrency(summary?.bruto || 0), `Total cobrado dos clientes`],
-        ['Taxas Stripe', formatCurrency(summary?.taxas || 0), `Fees de processamento`],
-        ['Receita Líquida', formatCurrency(summary?.liquido || 0), `Receita após taxas`],
-        ['Pagamentos Confirmados', `${summary?.pagos || 0}`, `Transações bem-sucedidas`],
-        ['Pagamentos Pendentes', `${summary?.naoPagos || 0}`, `Aguardando confirmação`],
-        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
-        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), `Valor médio por transação paga`],
-        ['Falhas', `${summary?.falhas || 0}`, `Transações recusadas`],
-        ['Reembolsos', `${summary?.reembolsos || 0}`, `Valores devolvidos`],
-        ['Disputas', `${summary?.disputas || 0}`, `Chargebacks abertos`],
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
       ];
       
       autoTable(doc, {
@@ -497,26 +500,14 @@ const AdminDashboard = () => {
         head: [['Métrica', 'Valor', 'Descrição']],
         body: resumoData,
         theme: 'grid',
-        headStyles: { 
-          fillColor: [219, 39, 119],
-          fontSize: 10,
-          fontStyle: 'bold'
-        },
-        bodyStyles: { fontSize: 9 },
-        alternateRowStyles: { fillColor: [250, 250, 250] }
+        headStyles: { fillColor: [219, 39, 119] },
       });
       
       yPos = (doc as any).lastAutoTable.finalY + 10;
       
       // Análise por Bandeira
-      if (yPos > 240) {
-        doc.addPage();
-        yPos = 20;
-      }
-      
       doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('ANALISE POR BANDEIRA DE CARTAO', 14, yPos);
+      doc.text('Análise por Bandeira de Cartão', 14, yPos);
       yPos += 8;
       
       const bandeiraData = byBrand && byBrand.length > 0 
@@ -524,156 +515,58 @@ const AdminDashboard = () => {
             const percentage = summary?.bruto && summary.bruto > 0 
               ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
               : '0';
-            const ticketMedio = brand.qtd > 0 ? (brand.receita_liquida || 0) / brand.qtd : 0;
             return [
-              `${brand.bandeira || 'Não especificado'}`,
-              brand.funding || '-',
+              `${brand.bandeira || 'Não especificado'} ${brand.funding ? `(${brand.funding})` : ''}`,
               `${brand.qtd || 0}`,
-              formatCurrency(brand.receita_bruta || 0),
-              formatCurrency((brand.receita_bruta || 0) - (brand.receita_liquida || 0)),
               formatCurrency(brand.receita_liquida || 0),
-              formatCurrency(ticketMedio),
+              formatCurrency(brand.receita_bruta || 0),
               `${percentage}%`
             ];
           })
-        : [['Nenhum dado disponível', '', '', '', '', '', '', '']];
+        : [['Nenhum dado disponível', '', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Bandeira', 'Tipo', 'Qtd', 'Bruto', 'Taxas', 'Líquido', 'Ticket Médio', '% Total']],
+        head: [['Bandeira', 'Qtd', 'Receita Líquida', 'Receita Bruta', '% do Total']],
         body: bandeiraData,
         theme: 'striped',
-        headStyles: { 
-          fillColor: [99, 102, 241],
-          fontSize: 9,
-          fontStyle: 'bold'
-        },
-        bodyStyles: { fontSize: 8 },
-        alternateRowStyles: { fillColor: [248, 250, 252] }
+        headStyles: { fillColor: [99, 102, 241] }, // indigo
       });
       
       yPos = (doc as any).lastAutoTable.finalY + 10;
       
-      // Tendências Temporais (últimos 15 dias filtrados)
-      if (yPos > 230) {
+      // Tendências Temporais
+      if (yPos > 250) {
         doc.addPage();
         yPos = 20;
       }
       
       doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('TENDENCIAS TEMPORAIS - Ultimos 15 Dias', 14, yPos);
+      doc.text('Tendências Temporais', 14, yPos);
       yPos += 8;
       
       const tendenciasData = timeseries && timeseries.length > 0
-        ? timeseries.slice(-15).map(item => {
+        ? timeseries.slice(-10).map(item => {
             const dateValue = item.dia || item.timestamp;
-            const receitaBruta = item.receita_bruta || 0;
-            const taxas = item.taxas || 0;
-            const receitaLiquida = item.receita_liquida || 0;
+            const receita = item.receita_liquida || 0;
             const transacoes = item.transacoes || 0;
-            const ticketMedio = transacoes > 0 ? receitaLiquida / transacoes : 0;
+            const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
             return [
-              dateValue ? new Date(dateValue).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }) : '-',
+              dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
+              formatCurrency(receita),
               `${transacoes}`,
-              formatCurrency(receitaBruta),
-              formatCurrency(taxas),
-              formatCurrency(receitaLiquida),
               formatCurrency(ticketMedio)
             ];
           })
-        : [['Nenhum dado disponível', '', '', '', '', '']];
+        : [['Nenhum dado disponível', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Data', 'Qtd', 'Receita Bruta', 'Taxas', 'Receita Líquida', 'Ticket Médio']],
+        head: [['Data', 'Receita', 'Transações', 'Ticket Médio']],
         body: tendenciasData,
         theme: 'striped',
-        headStyles: { 
-          fillColor: [16, 185, 129],
-          fontSize: 9,
-          fontStyle: 'bold'
-        },
-        bodyStyles: { fontSize: 8 },
-        alternateRowStyles: { fillColor: [240, 253, 244] }
+        headStyles: { fillColor: [16, 185, 129] }, // emerald
       });
-      
-      yPos = (doc as any).lastAutoTable.finalY + 10;
-      
-      // Funil de Conversão
-      if (funnel && funnel.length > 0) {
-        if (yPos > 240) {
-          doc.addPage();
-          yPos = 20;
-        }
-        
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('FUNIL DE CONVERSAO', 14, yPos);
-        yPos += 8;
-        
-        const funnelData = funnel.map(stage => [
-          stage.estagio || '-',
-          `${stage.quantidade || 0}`,
-          formatCurrency(stage.valor || 0),
-          stage.taxa ? `${stage.taxa.toFixed(1)}%` : '0%'
-        ]);
-        
-        autoTable(doc, {
-          startY: yPos,
-          head: [['Estágio', 'Quantidade', 'Valor Total', 'Taxa de Conversão']],
-          body: funnelData,
-          theme: 'grid',
-          headStyles: { 
-            fillColor: [234, 88, 12],
-            fontSize: 9,
-            fontStyle: 'bold'
-          },
-          bodyStyles: { fontSize: 8 }
-        });
-        
-        yPos = (doc as any).lastAutoTable.finalY + 10;
-      }
-      
-      // Histórico Completo de Tendências (todas as datas)
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        doc.addPage();
-        yPos = 20;
-        
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('HISTORICO COMPLETO - Tendencias Temporais', 14, yPos);
-        yPos += 5;
-        
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Total de ${allTimeseriesData.length} dias com transações`, 14, yPos);
-        yPos += 8;
-        doc.setTextColor(0, 0, 0);
-        
-        const historicoData = allTimeseriesData.map(item => [
-          new Date(item.dia).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }),
-          `${item.transacoes || 0}`,
-          formatCurrency(item.receita_bruta || 0),
-          formatCurrency(item.taxas || 0),
-          formatCurrency(item.receita_liquida || 0)
-        ]);
-        
-        autoTable(doc, {
-          startY: yPos,
-          head: [['Data', 'Transações', 'Receita Bruta', 'Taxas', 'Receita Líquida']],
-          body: historicoData,
-          theme: 'striped',
-          headStyles: { 
-            fillColor: [79, 70, 229],
-            fontSize: 8,
-            fontStyle: 'bold'
-          },
-          bodyStyles: { fontSize: 7 },
-          alternateRowStyles: { fillColor: [245, 243, 255] }
-        });
-      }
       
       // Save PDF
       doc.save(`analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -696,44 +589,27 @@ const AdminDashboard = () => {
     try {
       const wb = XLSX.utils.book_new();
       
-      // Sheet 1: Resumo Executivo Completo
+      // Sheet 1: Resumo Executivo
       const resumoData = [
-        ['DASHBOARD FINANCEIRO STRIPE - ANÁLISES AVANÇADAS'],
-        ['III CIVENI USA 2025 • Relatório em Tempo Real'],
+        ['Relatório de Análises Avançadas - CIVENI 2025'],
         [''],
-        [`Gerado em: ${new Date().toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' })}`],
-        [''],
-        ['Filtros Aplicados:'],
-        ['Período', filters.range === 'custom' && filters.customFrom && filters.customTo 
-          ? `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`
-          : `Últimos ${parseInt(filters.range) || 30} dias`],
-        ['Lote', filters.lote || 'Todos'],
-        ['Cupom', filters.cupom || 'Todos'],
-        ['Bandeira', filters.brand === 'all' ? 'Todas' : filters.brand],
-        ['Status', filters.status === 'all' ? 'Todos' : filters.status],
+        [`Data de Geração: ${new Date().toLocaleString('pt-BR')}`],
         [''],
         ['=== RESUMO EXECUTIVO ==='],
         [''],
         ['Métrica', 'Valor', 'Descrição'],
-        ['Receita Bruta', formatCurrency(summary?.bruto || 0), 'Total cobrado dos clientes'],
-        ['Taxas Stripe', formatCurrency(summary?.taxas || 0), 'Fees de processamento'],
-        ['Receita Líquida', formatCurrency(summary?.liquido || 0), 'Receita após taxas'],
-        ['Pagamentos Confirmados', summary?.pagos || 0, 'Transações bem-sucedidas'],
-        ['Pagamentos Pendentes', summary?.naoPagos || 0, 'Aguardando confirmação'],
-        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
-        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Valor médio por transação paga'],
-        ['Falhas', summary?.falhas || 0, 'Transações recusadas'],
-        ['Reembolsos', summary?.reembolsos || 0, 'Valores devolvidos'],
-        ['Disputas', summary?.disputas || 0, 'Chargebacks abertos'],
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
       ];
       const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
       XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo Executivo');
       
       // Sheet 2: Análise por Bandeira
       const bandeiraData = [
-        ['ANÁLISE POR BANDEIRA DE CARTÃO'],
+        ['Análise por Bandeira de Cartão'],
         [''],
-        ['Bandeira', 'Tipo', 'Quantidade', 'Receita Bruta', 'Taxas', 'Receita Líquida', 'Ticket Médio', '% do Total']
+        ['Bandeira', 'Funding', 'Quantidade', 'Receita Líquida', 'Receita Bruta', '% do Total']
       ];
       
       if (byBrand && byBrand.length > 0) {
@@ -741,145 +617,48 @@ const AdminDashboard = () => {
           const percentage = summary?.bruto && summary.bruto > 0 
             ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
             : '0';
-          const taxas = (brand.receita_bruta || 0) - (brand.receita_liquida || 0);
-          const ticketMedio = brand.qtd > 0 ? (brand.receita_liquida || 0) / brand.qtd : 0;
           bandeiraData.push([
             brand.bandeira || 'Não especificado',
             brand.funding || '-',
             brand.qtd || 0,
-            formatCurrency(brand.receita_bruta || 0),
-            formatCurrency(taxas),
             formatCurrency(brand.receita_liquida || 0),
-            formatCurrency(ticketMedio),
+            formatCurrency(brand.receita_bruta || 0),
             `${percentage}%`
           ]);
         });
-        
-        // Totais
-        const totalQtd = byBrand.reduce((sum, b) => sum + (b.qtd || 0), 0);
-        const totalBruto = byBrand.reduce((sum, b) => sum + (b.receita_bruta || 0), 0);
-        const totalLiquido = byBrand.reduce((sum, b) => sum + (b.receita_liquida || 0), 0);
-        const totalTaxas = totalBruto - totalLiquido;
-        bandeiraData.push([
-          'TOTAL',
-          '',
-          totalQtd,
-          formatCurrency(totalBruto),
-          formatCurrency(totalTaxas),
-          formatCurrency(totalLiquido),
-          formatCurrency(totalLiquido / totalQtd),
-          '100%'
-        ]);
       } else {
-        bandeiraData.push(['Nenhum dado disponível', '', '', '', '', '', '', '']);
+        bandeiraData.push(['Nenhum dado disponível', '', '', '', '', '']);
       }
       
       const wsBandeira = XLSX.utils.aoa_to_sheet(bandeiraData);
       XLSX.utils.book_append_sheet(wb, wsBandeira, 'Análise por Bandeira');
       
-      // Sheet 3: Tendências Temporais (Filtradas)
+      // Sheet 3: Tendências Temporais
       const tendenciasData = [
-        ['TENDÊNCIAS TEMPORAIS - ÚLTIMOS 15 DIAS (FILTRADOS)'],
+        ['Tendências Temporais'],
         [''],
-        ['Data', 'Dia da Semana', 'Transações', 'Receita Bruta', 'Taxas', 'Receita Líquida', 'Ticket Médio']
+        ['Data', 'Receita', 'Transações', 'Ticket Médio']
       ];
       
       if (timeseries && timeseries.length > 0) {
-        timeseries.slice(-15).forEach(item => {
+        timeseries.forEach(item => {
           const dateValue = item.dia || item.timestamp;
-          const date = new Date(dateValue);
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
-          const receitaLiquida = item.receita_liquida || 0;
+          const receita = item.receita_liquida || 0;
           const transacoes = item.transacoes || 0;
-          const ticketMedio = transacoes > 0 ? receitaLiquida / transacoes : 0;
+          const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
           tendenciasData.push([
-            date.toLocaleDateString('pt-BR'),
-            date.toLocaleDateString('pt-BR', { weekday: 'long' }),
+            dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-',
+            formatCurrency(receita),
             transacoes,
-            formatCurrency(receitaBruta),
-            formatCurrency(taxas),
-            formatCurrency(receitaLiquida),
             formatCurrency(ticketMedio)
           ]);
         });
       } else {
-        tendenciasData.push(['Nenhum dado disponível', '', '', '', '', '', '']);
+        tendenciasData.push(['Nenhum dado disponível', '', '', '']);
       }
       
       const wsTendencias = XLSX.utils.aoa_to_sheet(tendenciasData);
-      XLSX.utils.book_append_sheet(wb, wsTendencias, 'Tendências (Filtradas)');
-      
-      // Sheet 4: Histórico Completo
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        const historicoData = [
-          ['HISTÓRICO COMPLETO - TODAS AS DATAS'],
-          [''],
-          [`Total de ${allTimeseriesData.length} dias com transações`],
-          [''],
-          ['Data', 'Dia da Semana', 'Transações', 'Receita Bruta', 'Taxas', 'Receita Líquida', 'Ticket Médio']
-        ];
-        
-        allTimeseriesData.forEach(item => {
-          const date = new Date(item.dia);
-          const transacoes = item.transacoes || 0;
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
-          const receitaLiquida = item.receita_liquida || 0;
-          const ticketMedio = transacoes > 0 ? receitaLiquida / transacoes : 0;
-          historicoData.push([
-            date.toLocaleDateString('pt-BR'),
-            date.toLocaleDateString('pt-BR', { weekday: 'long' }),
-            transacoes,
-            formatCurrency(receitaBruta),
-            formatCurrency(taxas),
-            formatCurrency(receitaLiquida),
-            formatCurrency(ticketMedio)
-          ]);
-        });
-        
-        // Totais
-        const totalTransacoes = allTimeseriesData.reduce((sum, i) => sum + (i.transacoes || 0), 0);
-        const totalBruto = allTimeseriesData.reduce((sum, i) => sum + (i.receita_bruta || 0), 0);
-        const totalTaxas = allTimeseriesData.reduce((sum, i) => sum + (i.taxas || 0), 0);
-        const totalLiquido = allTimeseriesData.reduce((sum, i) => sum + (i.receita_liquida || 0), 0);
-        historicoData.push([
-          'TOTAL',
-          '',
-          totalTransacoes,
-          formatCurrency(totalBruto),
-          formatCurrency(totalTaxas),
-          formatCurrency(totalLiquido),
-          formatCurrency(totalLiquido / totalTransacoes)
-        ]);
-        
-        const wsHistorico = XLSX.utils.aoa_to_sheet(historicoData);
-        XLSX.utils.book_append_sheet(wb, wsHistorico, 'Histórico Completo');
-      }
-      
-      // Sheet 5: Funil de Conversão
-      if (funnel && funnel.length > 0) {
-        const funnelData = [
-          ['FUNIL DE CONVERSÃO'],
-          [''],
-          ['Estágio', 'Quantidade', 'Valor Total', 'Taxa de Conversão', '% do Total']
-        ];
-        
-        const totalInicio = funnel[0]?.quantidade || 1;
-        funnel.forEach(stage => {
-          const percentualTotal = ((stage.quantidade / totalInicio) * 100).toFixed(1);
-          funnelData.push([
-            stage.estagio || '-',
-            stage.quantidade || 0,
-            formatCurrency(stage.valor || 0),
-            stage.taxa ? `${stage.taxa.toFixed(1)}%` : '0%',
-            `${percentualTotal}%`
-          ]);
-        });
-        
-        const wsFunnel = XLSX.utils.aoa_to_sheet(funnelData);
-        XLSX.utils.book_append_sheet(wb, wsFunnel, 'Funil de Conversão');
-      }
+      XLSX.utils.book_append_sheet(wb, wsTendencias, 'Tendências Temporais');
       
       // Save XLSX
       XLSX.writeFile(wb, `analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.xlsx`);
@@ -902,89 +681,51 @@ const AdminDashboard = () => {
     try {
       const csvRows: string[] = [];
       
-      // Header com informações completas
-      csvRows.push('=== DASHBOARD FINANCEIRO STRIPE - ANÁLISES AVANÇADAS ===');
-      csvRows.push('III CIVENI USA 2025 • Relatório em Tempo Real');
-      csvRows.push(`Gerado em: ${new Date().toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' })}`);
-      csvRows.push('');
-      csvRows.push('=== FILTROS APLICADOS ===');
-      
-      let periodo = '';
-      if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
-        periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
-      } else {
-        periodo = `Últimos ${parseInt(filters.range) || 30} dias`;
-      }
-      csvRows.push(`Período: ${periodo}`);
-      if (filters.lote) csvRows.push(`Lote: ${filters.lote}`);
-      if (filters.cupom) csvRows.push(`Cupom: ${filters.cupom}`);
-      if (filters.brand && filters.brand !== 'all') csvRows.push(`Bandeira: ${filters.brand}`);
-      if (filters.status && filters.status !== 'all') csvRows.push(`Status: ${filters.status}`);
+      // Header
+      csvRows.push('=== RELATÓRIO DE ANÁLISES AVANÇADAS - CIVENI 2025 ===');
+      csvRows.push(`Data de Geração: ${new Date().toLocaleString('pt-BR')}`);
       csvRows.push('');
       
-      // Resumo Executivo Completo
+      // Resumo Executivo
       csvRows.push('=== RESUMO EXECUTIVO ===');
-      csvRows.push('Métrica,Valor,Descrição');
-      csvRows.push(`Receita Bruta,${formatCurrency(summary?.bruto || 0)},Total cobrado dos clientes`);
-      csvRows.push(`Taxas Stripe,${formatCurrency(summary?.taxas || 0)},Fees de processamento`);
-      csvRows.push(`Receita Líquida,${formatCurrency(summary?.liquido || 0)},Receita após taxas`);
-      csvRows.push(`Pagamentos Confirmados,${summary?.pagos || 0},Transações bem-sucedidas`);
-      csvRows.push(`Pagamentos Pendentes,${summary?.naoPagos || 0},Aguardando confirmação`);
-      csvRows.push(`Taxa de Conversão,${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(2) : 0}%,${summary?.pagos || 0} de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`);
-      csvRows.push(`Ticket Médio,${formatCurrency(summary?.ticketMedio || 0)},Valor médio por transação paga`);
-      csvRows.push(`Falhas,${summary?.falhas || 0},Transações recusadas`);
-      csvRows.push(`Reembolsos,${summary?.reembolsos || 0},Valores devolvidos`);
-      csvRows.push(`Disputas,${summary?.disputas || 0},Chargebacks abertos`);
+      csvRows.push('Métrica,Valor');
+      csvRows.push(`Receita Bruta,${formatCurrency(summary?.bruto || 0)}`);
+      csvRows.push(`Taxas Stripe,${formatCurrency(summary?.taxas || 0)}`);
+      csvRows.push(`Receita Líquida,${formatCurrency(summary?.liquido || 0)}`);
+      csvRows.push(`Pagamentos Concluídos,${summary?.pagos || 0}`);
+      csvRows.push(`Pagamentos Pendentes,${summary?.naoPagos || 0}`);
+      csvRows.push(`Falhas de Pagamento,${summary?.falhas || 0}`);
+      csvRows.push(`Reembolsos,${summary?.reembolsos || 0}`);
+      csvRows.push(`Disputas,${summary?.disputas || 0}`);
+      csvRows.push(`Ticket Médio,${formatCurrency(summary?.ticketMedio || 0)}`);
+      csvRows.push(`Taxa de Conversão,${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(2) : 0}%`);
       csvRows.push('');
       
       // Análise por Bandeira
       csvRows.push('=== ANÁLISE POR BANDEIRA DE CARTÃO ===');
-      csvRows.push('Bandeira,Tipo,Quantidade,Receita Bruta,Taxas,Receita Líquida,Ticket Médio,% do Total');
+      csvRows.push('Bandeira,Funding,Quantidade,Receita Líquida,Receita Bruta,% do Total');
       if (byBrand && byBrand.length > 0) {
         const totalReceita = summary?.bruto || 1;
         byBrand.forEach(brand => {
           const percentage = (((brand.receita_bruta || 0) / totalReceita) * 100).toFixed(2);
-          const taxas = (brand.receita_bruta || 0) - (brand.receita_liquida || 0);
-          const ticketMedio = brand.qtd > 0 ? (brand.receita_liquida || 0) / brand.qtd : 0;
-          csvRows.push(`${brand.bandeira || 'Não especificado'},${brand.funding || '-'},${brand.qtd || 0},${formatCurrency(brand.receita_bruta || 0)},${formatCurrency(taxas)},${formatCurrency(brand.receita_liquida || 0)},${formatCurrency(ticketMedio)},${percentage}%`);
+          csvRows.push(`${brand.bandeira || 'Não especificado'},${brand.funding || '-'},${brand.qtd || 0},${formatCurrency(brand.receita_liquida || 0)},${formatCurrency(brand.receita_bruta || 0)},${percentage}%`);
         });
       }
       csvRows.push('');
       
-      // Tendências Temporais (Filtradas - Últimos 15 dias)
-      csvRows.push('=== TENDÊNCIAS TEMPORAIS - ÚLTIMOS 15 DIAS (FILTRADOS) ===');
-      csvRows.push('Data,Dia da Semana,Transações,Receita Bruta,Taxas,Receita Líquida,Ticket Médio');
+      // Análise Temporal
+      csvRows.push('=== ANÁLISE DE TENDÊNCIAS TEMPORAIS ===');
+      csvRows.push('Data,Receita Líquida,Quantidade de Transações,Ticket Médio');
       if (timeseries && timeseries.length > 0) {
-        timeseries.slice(-15).forEach(item => {
+        timeseries.forEach(item => {
           const dateValue = item.dia || item.timestamp;
-          const date = new Date(dateValue);
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
-          const receitaLiquida = item.receita_liquida || 0;
+          const receita = item.receita_liquida || 0;
           const transacoes = item.transacoes || 0;
-          const ticketMedio = transacoes > 0 ? receitaLiquida / transacoes : 0;
-          csvRows.push(`${date.toLocaleDateString('pt-BR')},${date.toLocaleDateString('pt-BR', { weekday: 'long' })},${transacoes},${formatCurrency(receitaBruta)},${formatCurrency(taxas)},${formatCurrency(receitaLiquida)},${formatCurrency(ticketMedio)}`);
+          const ticketMedio = transacoes > 0 ? receita / transacoes : 0;
+          csvRows.push(`${dateValue ? new Date(dateValue).toLocaleDateString('pt-BR') : '-'},${formatCurrency(receita)},${transacoes},${formatCurrency(ticketMedio)}`);
         });
       }
       csvRows.push('');
-      
-      // Histórico Completo
-      if (allTimeseriesData && allTimeseriesData.length > 0) {
-        csvRows.push('=== HISTÓRICO COMPLETO - TODAS AS DATAS ===');
-        csvRows.push(`Total de ${allTimeseriesData.length} dias com transações`);
-        csvRows.push('Data,Dia da Semana,Transações,Receita Bruta,Taxas,Receita Líquida,Ticket Médio');
-        
-        allTimeseriesData.forEach(item => {
-          const date = new Date(item.dia);
-          const transacoes = item.transacoes || 0;
-          const receitaBruta = item.receita_bruta || 0;
-          const taxas = item.taxas || 0;
-          const receitaLiquida = item.receita_liquida || 0;
-          const ticketMedio = transacoes > 0 ? receitaLiquida / transacoes : 0;
-          csvRows.push(`${date.toLocaleDateString('pt-BR')},${date.toLocaleDateString('pt-BR', { weekday: 'long' })},${transacoes},${formatCurrency(receitaBruta)},${formatCurrency(taxas)},${formatCurrency(receitaLiquida)},${formatCurrency(ticketMedio)}`);
-        });
-        csvRows.push('');
-      }
       
       // Análise de Funil
       csvRows.push('=== ANÁLISE DE FUNIL DE CONVERSÃO ===');
@@ -1048,20 +789,20 @@ const AdminDashboard = () => {
       csvRows.push(`Taxa de Falha: ${taxaFalha}%`);
       
       if (parseFloat(taxaFalha) > 10) {
-        csvRows.push('ATENCAO: Taxa de falha acima de 10% - Investigar possiveis problemas de checkout');
+        csvRows.push('⚠️ ATENÇÃO: Taxa de falha acima de 10% - Investigar possíveis problemas de checkout');
       }
       
       if (summary && summary.disputas > 0) {
-        csvRows.push(`ATENCAO: ${summary.disputas} disputas abertas - Requer acao imediata`);
+        csvRows.push(`⚠️ ATENÇÃO: ${summary.disputas} disputas abertas - Requer ação imediata`);
       }
       
       if (byBrand && byBrand.length > 0) {
         const topBrand = byBrand[0];
-        csvRows.push(`Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
+        csvRows.push(`💳 Bandeira principal: ${topBrand.bandeira} (${(((topBrand.receita_bruta || 0) / (summary?.bruto || 1)) * 100).toFixed(1)}% da receita)`);
       }
       
       if (summary && summary.ticketMedio) {
-        csvRows.push(`Ticket medio: ${formatCurrency(summary.ticketMedio)}`);
+        csvRows.push(`💰 Ticket médio: ${formatCurrency(summary.ticketMedio)}`);
       }
       
       csvRows.push('');

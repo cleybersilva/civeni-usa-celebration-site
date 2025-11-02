@@ -121,49 +121,71 @@ export const useRegistrationForm = (registrationType?: 'presencial' | 'online') 
         }
       }
 
-      const payload = {
-        email: formData.email,
-        fullName: formData.fullName,
-        categoryId: formData.categoryId,
-        batchId: currentBatch.id,
-        couponCode: formData.couponCode || '',
-        cursoId: formData.cursoId || null,
-        turmaId: formData.turmaId || null,
-        participantType: formData.participantType,
-        registrationType: registrationType || 'geral',
-        currency: getCurrency(i18n.language)
-      };
+      console.log("=== STARTING REGISTRATION ===");
+      console.log("Form data:", formData);
+      console.log("Current batch:", currentBatch);
 
-      console.log("Sending registration request:", payload);
-      
-      const { data, error } = await supabase.functions.invoke('create-registration-payment', {
-        body: payload
-      });
+      try {
+        console.log("=== CALLING EDGE FUNCTION ===");
+        
+        const { data, error } = await supabase.functions.invoke('create-registration-payment', {
+          body: {
+            email: formData.email,
+            fullName: formData.fullName,
+            categoryId: formData.categoryId,
+            batchId: currentBatch.id,
+            couponCode: formData.couponCode || '',
+            cursoId: formData.cursoId || null,
+            turmaId: formData.turmaId || null,
+            participantType: formData.participantType,
+            registrationType: registrationType || 'geral',
+            currency: getCurrency(i18n.language)
+          }
+        });
 
-      console.log("Server response:", { data, error });
+        console.log("=== EDGE FUNCTION RESPONSE ===");
+        console.log("Data:", data);
+        console.log("Error:", error);
 
-      if (error) {
-        throw new Error(error.message || 'Erro ao processar inscrição');
+        if (error) {
+          console.error("Edge function error:", error);
+          // Check if there's a specific error message in the response
+          if (error.message) {
+            throw new Error(error.message);
+          }
+          throw new Error('Erro ao processar inscrição. Tente novamente.');
+        }
+
+        if (!data) {
+          throw new Error('Nenhuma resposta recebida do servidor');
+        }
+
+        if (!data.success) {
+          throw new Error(data.error || 'Erro desconhecido no servidor');
+        }
+
+        console.log("=== PROCESSING RESPONSE ===");
+        
+        if (data.payment_required === false) {
+          console.log("Free registration completed");
+          window.location.href = '/registration/success';
+        } else if (data.url) {
+          console.log("=== REDIRECTING TO STRIPE ===");
+          console.log("URL received:", data.url);
+          
+          // Abra em uma nova aba para evitar bloqueios do iframe
+          window.open(data.url, '_blank');
+          
+        } else {
+          console.log("=== NO URL PROVIDED ===");
+          console.log("Full data object:", JSON.stringify(data, null, 2));
+          throw new Error('URL de pagamento não foi fornecida pelo servidor');
+        }
+
+      } catch (functionError: any) {
+        console.error("Function error:", functionError);
+        throw functionError;
       }
-
-      if (!data?.success) {
-        throw new Error(data?.error || 'Erro ao criar inscrição');
-      }
-
-      // Free registration
-      if (data.payment_required === false) {
-        window.location.href = '/registration/success';
-        return;
-      }
-      
-      // Paid registration - redirect to Stripe
-      if (data.url) {
-        console.log("Redirecting to:", data.url);
-        window.location.href = data.url;
-        return;
-      }
-      
-      throw new Error('URL de pagamento não disponível');
     } catch (error: any) {
       console.error('=== REGISTRATION ERROR ===');
       console.error('Error object:', error);
