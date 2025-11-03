@@ -130,20 +130,19 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
             />
           </div>
 
-          {/* Bandeira */}
+          {/* Forma de Pagamento */}
           <div className="space-y-2">
-            <Label className="text-indigo-700 dark:text-indigo-300 font-semibold">Bandeira</Label>
+            <Label className="text-indigo-700 dark:text-indigo-300 font-semibold">Forma de Pagamento</Label>
             <Select value={filters.brand} onValueChange={(v) => onFilterChange('brand', v)}>
               <SelectTrigger className="border-indigo-300 dark:border-indigo-700 focus:ring-indigo-500">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="visa">Visa</SelectItem>
-                <SelectItem value="mastercard">Mastercard</SelectItem>
-                <SelectItem value="amex">American Express</SelectItem>
-                <SelectItem value="elo">Elo</SelectItem>
-                <SelectItem value="hipercard">Hipercard</SelectItem>
+                <SelectItem value="card">Cartão</SelectItem>
+                <SelectItem value="boleto">Boleto</SelectItem>
+                <SelectItem value="pix">Pix</SelectItem>
+                <SelectItem value="other">Outros</SelectItem>
               </SelectContent>
             </Select>
           </div>

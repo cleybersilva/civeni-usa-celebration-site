@@ -22,68 +22,70 @@ serve(async (req) => {
     const to = url.searchParams.get('to');
     const currency = url.searchParams.get('currency') || 'BRL';
 
-    console.log(`💳 Finance by brand requested: from=${from}, to=${to}`);
+    console.log(`💳 Finance by payment method requested: from=${from}, to=${to}`);
 
-    // Query view otimizada
-    let query = supabaseClient
-      .from('v_fin_por_bandeira')
-      .select('*')
+    // Query charges com payment_method_details
+    let chargeQuery = supabaseClient
+      .from('stripe_charges')
+      .select('amount, fee_amount, net_amount, status, paid, payment_method_details, stripe_balance_transactions(fee, net)')
+      .eq('status', 'succeeded')
+      .eq('paid', true)
       .eq('currency', currency.toUpperCase());
 
-    const { data, error } = await query;
+    if (from) chargeQuery = chargeQuery.gte('created_utc', from);
+    if (to) chargeQuery = chargeQuery.lte('created_utc', to);
 
-    if (error) throw error;
+    const { data: charges, error: chargeError } = await chargeQuery;
+    if (chargeError) throw chargeError;
 
-    // Se precisar filtrar por data (view não tem filtro temporal), fazer query manual
-    if (from || to) {
-      let chargeQuery = supabaseClient
-        .from('stripe_charges')
-        .select('brand, funding, amount, fee_amount, net_amount, stripe_balance_transactions(fee, net)')
-        .eq('status', 'succeeded')
-        .eq('paid', true)
-        .eq('currency', currency.toUpperCase());
+    // Mapear por forma de pagamento
+    const methodMap = new Map();
+    (charges || []).forEach(charge => {
+      let paymentType = 'Outros';
+      let paymentDetails = {};
+      
+      try {
+        paymentDetails = typeof charge.payment_method_details === 'string' 
+          ? JSON.parse(charge.payment_method_details) 
+          : charge.payment_method_details || {};
+      } catch (e) {
+        console.error('Error parsing payment_method_details:', e);
+      }
 
-      if (from) chargeQuery = chargeQuery.gte('created_utc', from);
-      if (to) chargeQuery = chargeQuery.lte('created_utc', to);
+      const type = paymentDetails?.type || 'other';
+      
+      if (type === 'card') {
+        paymentType = 'Cartão';
+      } else if (type === 'boleto') {
+        paymentType = 'Boleto';
+      } else if (type === 'pix') {
+        paymentType = 'Pix';
+      }
 
-      const { data: charges, error: chargeError } = await chargeQuery;
-      if (chargeError) throw chargeError;
+      if (!methodMap.has(paymentType)) {
+        methodMap.set(paymentType, {
+          forma_pagamento: paymentType,
+          currency: currency.toUpperCase(),
+          qtd: 0,
+          receita_liquida: 0,
+          receita_bruta: 0
+        });
+      }
+      
+      const bucket = methodMap.get(paymentType);
+      const bt = charge.stripe_balance_transactions;
+      const net = bt?.net || charge.net_amount || (charge.amount - (bt?.fee || charge.fee_amount || 0));
+      
+      bucket.qtd++;
+      bucket.receita_bruta += charge.amount / 100;
+      bucket.receita_liquida += net / 100;
+    });
 
-      // Agregar
-      const brandMap = new Map();
-      (charges || []).forEach(charge => {
-        const key = `${charge.brand || 'unknown'}_${charge.funding || 'unknown'}`;
-        if (!brandMap.has(key)) {
-          brandMap.set(key, {
-            bandeira: charge.brand || 'unknown',
-            funding: charge.funding || 'unknown',
-            currency: currency.toUpperCase(),
-            qtd: 0,
-            receita_liquida: 0,
-            receita_bruta: 0
-          });
-        }
-        
-        const bucket = brandMap.get(key);
-        const bt = charge.stripe_balance_transactions;
-        const net = bt?.net || charge.net_amount || (charge.amount - (bt?.fee || charge.fee_amount || 0));
-        
-        bucket.qtd++;
-        bucket.receita_bruta += charge.amount / 100;
-        bucket.receita_liquida += net / 100;
-      });
+    const aggregated = Array.from(methodMap.values()).sort((a, b) => 
+      b.receita_liquida - a.receita_liquida
+    );
 
-      const aggregated = Array.from(brandMap.values()).sort((a, b) => 
-        b.receita_liquida - a.receita_liquida
-      );
-
-      return new Response(JSON.stringify({ data: aggregated }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    return new Response(JSON.stringify({ data: data || [] }), {
+    return new Response(JSON.stringify({ data: aggregated }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
