@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
 import { CreditCard } from 'lucide-react';
 
@@ -9,6 +10,8 @@ interface BrandChartProps {
 }
 
 export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
+  console.log('🎨 BrandChart render:', { loading, dataLength: data?.length, data });
+
   if (loading) {
     return (
       <Card>
@@ -21,6 +24,24 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
         <CardContent>
           <div className="h-[300px] flex items-center justify-center">
             <p className="text-muted-foreground">Carregando...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Receita por Forma de Pagamento
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground">Nenhum dado disponível</p>
           </div>
         </CardContent>
       </Card>

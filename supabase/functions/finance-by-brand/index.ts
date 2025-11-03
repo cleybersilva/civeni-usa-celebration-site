@@ -36,7 +36,12 @@ serve(async (req) => {
     if (to) chargeQuery = chargeQuery.lte('created_utc', to);
 
     const { data: charges, error: chargeError } = await chargeQuery;
-    if (chargeError) throw chargeError;
+    if (chargeError) {
+      console.error('❌ Error fetching charges:', chargeError);
+      throw chargeError;
+    }
+
+    console.log(`📊 Found ${charges?.length || 0} charges to process`);
 
     // Mapear por forma de pagamento
     const methodMap = new Map();
@@ -84,6 +89,8 @@ serve(async (req) => {
     const aggregated = Array.from(methodMap.values()).sort((a, b) => 
       b.receita_liquida - a.receita_liquida
     );
+
+    console.log(`✅ Aggregated ${aggregated.length} payment methods:`, aggregated);
 
     return new Response(JSON.stringify({ data: aggregated }), {
       status: 200,
