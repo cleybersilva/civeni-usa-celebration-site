@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, CreditCard, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Trash2, RefreshCw, AlertTriangle, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { PaymentMethodCell } from './PaymentMethodCell';
 
 interface ParticipantsTableProps {
   data: any[];
@@ -248,11 +247,11 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
               className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[180px]"
             >
               <option value="">Todas as Formas</option>
-              <option value="card">Cartão</option>
-              <option value="boleto">Boleto</option>
-              <option value="pix">Pix</option>
               <option value="voucher">Voucher/Gratuito</option>
-              <option value="other">Outros</option>
+              <option value="visa">Visa</option>
+              <option value="mastercard">Mastercard</option>
+              <option value="elo">Elo</option>
+              <option value="amex">Amex</option>
             </select>
             <Input
               type="date"
@@ -351,13 +350,21 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                       {getPaymentStatusBadge(participant.payment_status)}
                     </TableCell>
                     <TableCell>
-                      <PaymentMethodCell 
-                        participantName={participant.nome}
-                        expectedAmount={participant.total_gasto}
-                        cardBrand={participant.card_brand}
-                        last4={participant.last4}
-                        paymentStatus={participant.payment_status}
-                      />
+                      <div className="flex items-center gap-2">
+                        {participant.card_brand ? (
+                          <>
+                            <CreditCard className="h-4 w-4" />
+                            <span className="font-medium capitalize">{participant.card_brand}</span>
+                            {participant.last4 && (
+                              <span className="text-muted-foreground">•••• {participant.last4}</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            {participant.payment_status === 'completed' ? 'Voucher/Gratuito' : 'Não definida'}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {participant.criado}

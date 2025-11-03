@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
 import { CreditCard } from 'lucide-react';
 
@@ -10,38 +9,18 @@ interface BrandChartProps {
 }
 
 export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
-  console.log('🎨 BrandChart render:', { loading, dataLength: data?.length, data });
-
   if (loading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            Receita por Forma de Pagamento
+            Receita por Bandeira
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px] flex items-center justify-center">
             <p className="text-muted-foreground">Carregando...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Receita por Forma de Pagamento
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center">
-            <p className="text-muted-foreground">Nenhum dado disponível</p>
           </div>
         </CardContent>
       </Card>
@@ -57,25 +36,29 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
   };
 
   const brandColors: Record<string, string> = {
-    'Cartão': '#1434CB',
-    'Boleto': '#FF6B00',
-    'Pix': '#00C896',
-    'Outros': '#64748b'
+    visa: '#1434CB',
+    mastercard: '#EB001B',
+    amex: '#006FCF',
+    elo: '#FFCB05',
+    hipercard: '#E31E24',
+    unknown: '#64748b'
   };
 
   const brandBgColors: Record<string, string> = {
-    'Cartão': 'bg-blue-600',
-    'Boleto': 'bg-orange-600',
-    'Pix': 'bg-green-600',
-    'Outros': 'bg-gray-500'
+    visa: 'bg-blue-600',
+    mastercard: 'bg-red-600',
+    amex: 'bg-blue-700',
+    elo: 'bg-yellow-500',
+    hipercard: 'bg-red-600',
+    unknown: 'bg-gray-500'
   };
 
-  const getBrandColor = (method: string) => {
-    return brandColors[method] || brandColors['Outros'];
+  const getBrandColor = (brand: string) => {
+    return brandColors[brand.toLowerCase()] || brandColors.unknown;
   };
 
-  const getBrandBgColor = (method: string) => {
-    return brandBgColors[method] || brandBgColors['Outros'];
+  const getBrandBgColor = (brand: string) => {
+    return brandBgColors[brand.toLowerCase()] || brandBgColors.unknown;
   };
 
   return (
@@ -83,7 +66,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
       <CardHeader style={{ background: 'linear-gradient(to right, hsl(33 100% 96%), hsl(48 100% 96%))' }}>
         <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
           <CreditCard className="h-5 w-5" />
-          Receita por Forma de Pagamento
+          Receita por Bandeira
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
@@ -93,7 +76,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
             <XAxis type="number" tickFormatter={formatCurrency} className="text-xs" />
             <YAxis 
               type="category" 
-              dataKey="forma_pagamento" 
+              dataKey="bandeira" 
               width={100}
               className="text-xs font-medium"
             />
@@ -111,7 +94,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
               name="Receita Líquida"
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getBrandColor(entry.forma_pagamento || 'Outros')} />
+                <Cell key={`cell-${index}`} fill={getBrandColor(entry.bandeira)} />
               ))}
             </Bar>
           </BarChart>
@@ -119,17 +102,18 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
         
         {/* Legend com badges coloridos */}
         <div className="flex flex-wrap gap-2 mt-4">
-          {data.map((item, idx) => (
+          {data.map((item) => (
             <div 
-              key={`${idx}`}
+              key={`${item.bandeira}-${item.funding}`}
               className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border-2 shadow-sm hover:shadow-md transition-shadow"
-              style={{ borderColor: getBrandColor(item.forma_pagamento || 'Outros') }}
+              style={{ borderColor: getBrandColor(item.bandeira) }}
             >
               <div 
                 className="w-4 h-4 rounded-full shadow-sm" 
-                style={{ backgroundColor: getBrandColor(item.forma_pagamento || 'Outros') }}
+                style={{ backgroundColor: getBrandColor(item.bandeira) }}
               />
-              <span className="font-semibold">{item.forma_pagamento || 'Outros'}</span>
+              <span className="font-semibold capitalize">{item.bandeira}</span>
+              <span className="text-muted-foreground font-medium">({item.funding})</span>
               <span className="font-bold text-gray-900 dark:text-gray-100">{item.qtd}</span>
             </div>
           ))}
