@@ -224,7 +224,17 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
       }
 
       if (timeseriesRes.data) setTimeseries(timeseriesRes.data.data || timeseriesRes.data || []);
-      if (brandRes.data) setByBrand(brandRes.data.data || brandRes.data || []);
+      
+      if (brandRes.error) {
+        console.error('💥 By-brand error:', brandRes.error);
+      } else {
+        console.log('💳 By-brand raw response:', brandRes);
+        console.log('💳 By-brand data:', brandRes.data);
+        const brandData = brandRes.data?.data || brandRes.data || [];
+        console.log('💳 Setting byBrand to:', brandData);
+        setByBrand(brandData);
+      }
+      
       if (funnelRes.data) setFunnel(funnelRes.data);
       if (chargesRes.data) {
         setCharges(chargesRes.data.data || chargesRes.data || []);

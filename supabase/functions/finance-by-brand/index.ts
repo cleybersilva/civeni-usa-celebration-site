@@ -22,12 +22,12 @@ serve(async (req) => {
     const to = url.searchParams.get('to');
     const currency = url.searchParams.get('currency') || 'BRL';
 
-    console.log(`💳 Finance by payment method requested: from=${from}, to=${to}`);
+    console.log(`💳 Finance by payment method requested: from=${from}, to=${to}, currency=${currency}`);
 
-    // Query charges com payment_method_details
+    // Query charges com brand e funding (colunas que existem)
     let chargeQuery = supabaseClient
       .from('stripe_charges')
-      .select('amount, fee_amount, net_amount, status, paid, payment_method_details, stripe_balance_transactions(fee, net)')
+      .select('amount, fee_amount, net_amount, status, paid, brand, funding, stripe_balance_transactions(fee, net)')
       .eq('status', 'succeeded')
       .eq('paid', true)
       .eq('currency', currency.toUpperCase());
@@ -35,36 +35,39 @@ serve(async (req) => {
     if (from) chargeQuery = chargeQuery.gte('created_utc', from);
     if (to) chargeQuery = chargeQuery.lte('created_utc', to);
 
+    console.log('🔍 Executing charges query...');
     const { data: charges, error: chargeError } = await chargeQuery;
+    
     if (chargeError) {
       console.error('❌ Error fetching charges:', chargeError);
       throw chargeError;
     }
 
     console.log(`📊 Found ${charges?.length || 0} charges to process`);
+    
+    // Se não há charges, retornar array vazio
+    if (!charges || charges.length === 0) {
+      console.log('⚠️ No charges found, returning empty array');
+      return new Response(JSON.stringify({ data: [] }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Mapear por forma de pagamento
     const methodMap = new Map();
-    (charges || []).forEach(charge => {
+    (charges || []).forEach((charge, index) => {
       let paymentType = 'Outros';
-      let paymentDetails = {};
       
-      try {
-        paymentDetails = typeof charge.payment_method_details === 'string' 
-          ? JSON.parse(charge.payment_method_details) 
-          : charge.payment_method_details || {};
-      } catch (e) {
-        console.error('Error parsing payment_method_details:', e);
-      }
-
-      const type = paymentDetails?.type || 'other';
-      
-      if (type === 'card') {
+      // Se tem brand preenchido, é cartão
+      if (charge.brand && charge.brand.trim() !== '') {
         paymentType = 'Cartão';
-      } else if (type === 'boleto') {
-        paymentType = 'Boleto';
-      } else if (type === 'pix') {
-        paymentType = 'Pix';
+      }
+      // Charges sem brand podem ser Boleto, Pix ou outras formas
+      // Por enquanto classificamos como "Outros" até termos esses dados
+      
+      if (index < 3) {
+        console.log(`📝 Sample charge ${index + 1}:`, { brand: charge.brand, funding: charge.funding, type: paymentType });
       }
 
       if (!methodMap.has(paymentType)) {
@@ -90,7 +93,7 @@ serve(async (req) => {
       b.receita_liquida - a.receita_liquida
     );
 
-    console.log(`✅ Aggregated ${aggregated.length} payment methods:`, aggregated);
+    console.log(`✅ Aggregated ${aggregated.length} payment methods:`, JSON.stringify(aggregated));
 
     return new Response(JSON.stringify({ data: aggregated }), {
       status: 200,
