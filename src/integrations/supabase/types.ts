@@ -1529,7 +1529,9 @@ export type Database = {
           curso_id: string | null
           email: string
           email_norm: string | null
+          email_normalized: string | null
           full_name: string
+          full_name_normalized: string | null
           id: string
           installments: number | null
           nome_norm: string | null
@@ -1556,7 +1558,9 @@ export type Database = {
           curso_id?: string | null
           email: string
           email_norm?: string | null
+          email_normalized?: string | null
           full_name: string
+          full_name_normalized?: string | null
           id?: string
           installments?: number | null
           nome_norm?: string | null
@@ -1583,7 +1587,9 @@ export type Database = {
           curso_id?: string | null
           email?: string
           email_norm?: string | null
+          email_normalized?: string | null
           full_name?: string
+          full_name_normalized?: string | null
           id?: string
           installments?: number | null
           nome_norm?: string | null
@@ -2444,6 +2450,39 @@ export type Database = {
           sort_order?: number | null
           type?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          blocked_until: string | null
+          created_at: string
+          endpoint: string
+          id: string
+          ip_address: unknown
+          request_count: number
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string
+          endpoint: string
+          id?: string
+          ip_address: unknown
+          request_count?: number
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          request_count?: number
+          updated_at?: string
+          window_start?: string
         }
         Relationships: []
       }
@@ -3380,6 +3419,7 @@ export type Database = {
           arquivo_path: string
           arquivo_size: number
           autor_principal: string
+          autor_principal_normalized: string | null
           autores: Json | null
           created_at: string
           deleted_at: string | null
@@ -3406,6 +3446,7 @@ export type Database = {
           arquivo_path: string
           arquivo_size: number
           autor_principal: string
+          autor_principal_normalized?: string | null
           autores?: Json | null
           created_at?: string
           deleted_at?: string | null
@@ -3432,6 +3473,7 @@ export type Database = {
           arquivo_path?: string
           arquivo_size?: number
           autor_principal?: string
+          autor_principal_normalized?: string | null
           autores?: Json | null
           created_at?: string
           deleted_at?: string | null
@@ -4383,7 +4425,7 @@ export type Database = {
       can_submit_trabalho: {
         Args: {
           p_email: string
-          p_evento: string
+          p_evento?: string
           p_nome: string
           p_tipo: string
         }
@@ -4397,6 +4439,16 @@ export type Database = {
         Args: { user_email: string; user_ip: unknown }
         Returns: boolean
       }
+      check_rate_limit: {
+        Args: {
+          p_block_minutes?: number
+          p_endpoint: string
+          p_ip_address: unknown
+          p_max_requests?: number
+          p_window_minutes?: number
+        }
+        Returns: Json
+      }
       check_user_permission: {
         Args: { permission_type: string; resource: string; user_email: string }
         Returns: boolean
@@ -4407,6 +4459,7 @@ export type Database = {
       }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
       cleanup_old_login_attempts: { Args: never; Returns: undefined }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       create_admin_user: {
         Args: {
           user_email: string
@@ -4518,6 +4571,8 @@ export type Database = {
         Args: { email_input: string; user_email: string }
         Returns: string
       }
+      normalize_email: { Args: { txt: string }; Returns: string }
+      normalize_text: { Args: { txt: string }; Returns: string }
       refresh_inscricoes_elegiveis: { Args: never; Returns: undefined }
       request_password_reset: { Args: { user_email: string }; Returns: boolean }
       revoke_admin_session: {
