@@ -54,11 +54,16 @@ const RevenueCharts = ({ dailyData, weeklyData, batchData }: RevenueChartsProps)
 
         if (error) {
           console.error('Erro ao buscar dados de receita:', error);
+          // Define array vazio em caso de erro para evitar estado undefined
+          setAllRevenueData([]);
         } else {
+          // Normaliza: sempre array, nunca null/undefined
           setAllRevenueData(data || []);
         }
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
+        // Fallback seguro para não quebrar UI
+        setAllRevenueData([]);
       } finally {
         setLoading(false);
       }

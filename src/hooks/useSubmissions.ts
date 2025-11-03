@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuthReady } from './useAuthReady';
 
 export interface Submission {
   id: string;
@@ -37,6 +38,7 @@ export interface SubmissionFilters {
 }
 
 export const useSubmissions = () => {
+  const { ready } = useAuthReady();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SubmissionFilters>({});
@@ -277,12 +279,17 @@ export const useSubmissions = () => {
     }
   };
 
+  // Fetch inicial e quando filtros mudarem - apenas quando auth estiver pronto
   useEffect(() => {
-    fetchSubmissions();
-  }, [filters]);
+    if (ready) {
+      fetchSubmissions();
+    }
+  }, [ready, filters]);
 
-  // Realtime subscription
+  // Realtime subscription - apenas quando auth estiver pronto
   useEffect(() => {
+    if (!ready) return;
+
     const channel = supabase
       .channel('submissions-changes')
       .on(
@@ -301,7 +308,7 @@ export const useSubmissions = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [ready]);
 
   return {
     submissions,

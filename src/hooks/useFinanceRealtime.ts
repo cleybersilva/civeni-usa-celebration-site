@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuthReady } from './useAuthReady';
 
 interface FinanceKPIs {
   total_inscricoes: number;
@@ -27,6 +28,7 @@ interface BreakdownItem {
 }
 
 export const useFinanceRealtime = (range: string = '30d') => {
+  const { ready } = useAuthReady();
   const [kpis, setKpis] = useState<FinanceKPIs | null>(null);
   const [registrationSeries, setRegistrationSeries] = useState<SeriesDataPoint[]>([]);
   const [revenueSeries, setRevenueSeries] = useState<SeriesDataPoint[]>([]);
@@ -132,10 +134,12 @@ export const useFinanceRealtime = (range: string = '30d') => {
     }
   }, [fetchKPIs, fetchSeries, fetchBreakdowns]);
 
-  // Carregar dados iniciais
+  // Fetch inicial - apenas quando auth estiver pronto
   useEffect(() => {
-    refreshAll();
-  }, [refreshAll]);
+    if (ready) {
+      refreshAll();
+    }
+  }, [ready, refreshAll]);
 
   // Configurar realtime para stripe_payments e event_registrations
   useEffect(() => {
