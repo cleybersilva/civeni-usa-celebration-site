@@ -47,9 +47,18 @@ const WorkSubmissionSuccess = () => {
                   Obrigado por submeter seu trabalho ao III CIVENI 2025
                 </p>
 
-                <p className="text-base text-foreground font-semibold">
-                  Fique ligado(a)! Não será permitido reenvio de Artigo/Consórcio, envio único por usuário para o III Civeni 2025 - Celebration/Florida-EUA.
-                </p>
+                <div className="text-base text-foreground space-y-3">
+                  <p className="font-bold text-lg">
+                    📢 Aviso Importante — Submissão de Trabalhos
+                  </p>
+                  <p>
+                    Cada participante inscrito no III CIVENI 2025 – Celebration/Florida-EUA poderá enviar até 3 (três) Artigos e até 3 (três) Consórcios por inscrição.
+                    Essa limitação garante que todas as submissões sejam devidamente avaliadas pela comissão científica e que o processo mantenha qualidade, equidade e organização.
+                  </p>
+                  <p className="font-medium">
+                    📎 Dica: verifique as normas e o formato exigido antes de enviar seu trabalho para evitar reprovações por formato incorreto.
+                  </p>
+                </div>
               </div>
               
               {/* Next Steps Info Box */}
