@@ -136,17 +136,17 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
             </div>
             
             {/* Aviso de Atenção */}
-            <div className="mt-6 text-center lg:text-left space-y-2">
-              <p className="text-orange-600 font-medium" style={{ fontSize: '1rem' }}>
+            <div className="mt-6 space-y-2">
+              <p className="text-orange-600 font-medium text-center" style={{ fontSize: '1rem' }}>
                 ⚠️ Atenção antes de prosseguir com sua inscrição
               </p>
-              <p className="text-gray-700" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+              <p className="text-gray-700 text-center lg:text-left" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
                 Antes de clicar em <strong>"Inscrever-se Agora"</strong>, verifique com atenção se o <strong>Nome Completo e o E-mail informados estão corretos.</strong>
               </p>
-              <p className="text-gray-700" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+              <p className="text-gray-700 text-center lg:text-left" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
                 Esses dados serão usados para gerar sua <strong>inscrição oficial</strong>, exibir a mensagem confirmação da inscrição e do pagamento e o link de acesso à programação do <strong>III Civeni 2025 no dia 10/12/2025 - 24h antes do início do evento.</strong>
               </p>
-              <p className="text-red-600 font-semibold" style={{ fontSize: '0.95rem' }}>
+              <p className="text-red-600 font-semibold text-center lg:text-left" style={{ fontSize: '0.95rem' }}>
                 Alterações após o envio podem causar atrasos ou inconsistências na validação da sua participação.
               </p>
             </div>
