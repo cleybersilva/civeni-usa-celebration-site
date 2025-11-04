@@ -4,8 +4,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const ALLOWED = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-const MAX = 15 * 1024 * 1024; // 15 MB
+const ALLOWED = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+const MAX = 50 * 1024 * 1024; // 50 MB
 
 const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
@@ -63,11 +63,35 @@ serve(async (req) => {
     if (!["artigo", "consorcio"].includes(tipo)) return badRequest("Tipo inválido");
     if (!titulo.trim()) return badRequest("Título obrigatório");
     if (!Array.isArray(autores) || autores.length === 0) return badRequest("Autores obrigatórios");
-    if (!ALLOWED.includes(file.type)) return badRequest("MIME não permitido. Use PDF ou DOCX");
-    if (file.size > MAX) return badRequest(`Arquivo excede o limite de ${Math.round(MAX / 1024 / 1024)} MB`);
+    
+    // Validar tipo de arquivo
+    if (file.type === "application/pdf") {
+      return badRequest("Formato não permitido. Envie o arquivo somente em DOCX. PDFs não são aceitos para possibilitar correções pelos avaliadores.");
+    }
+    if (!ALLOWED.includes(file.type)) {
+      return badRequest("Tipo de arquivo inválido. Envie um DOCX.");
+    }
+    
+    // Validar tamanho
+    if (file.size > MAX) {
+      return badRequest(`Arquivo muito grande. O limite é ${Math.round(MAX / 1024 / 1024)} MB para DOCX.`);
+    }
+    
+    // Validar resumo (máximo 1500 caracteres)
+    if (resumo && resumo.length > 1500) {
+      return badRequest("Resumo muito longo. Use até 1500 caracteres.");
+    }
 
     // Processar arquivo
     const buf = new Uint8Array(await file.arrayBuffer());
+    
+    // Validar assinatura binária do DOCX (deve ser um arquivo ZIP)
+    // DOCX files start with PK signature (50 4B 03 04)
+    if (buf.length < 4 || buf[0] !== 0x50 || buf[1] !== 0x4B || buf[2] !== 0x03 || buf[3] !== 0x04) {
+      console.error("❌ Assinatura binária inválida. Esperado: ZIP (DOCX)");
+      return badRequest("Arquivo inválido ou corrompido. Envie um DOCX válido.");
+    }
+    
     const sha256 = await calculateSHA256(buf);
 
     const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;

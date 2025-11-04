@@ -54,15 +54,27 @@ const SubmissaoTrabalhos = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const allowedType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      const maxSize = 50 * 1024 * 1024; // 50 MB
       
-      if (!allowedTypes.includes(selectedFile.type)) {
-        toast.error('Por favor, envie apenas arquivos PDF ou DOCX');
+      // Verificar se é PDF
+      if (selectedFile.type === 'application/pdf') {
+        toast.error('Formato não permitido. Envie o arquivo somente em DOCX. PDFs não são aceitos para possibilitar correções pelos avaliadores.');
+        e.target.value = '';
         return;
       }
       
-      if (selectedFile.size > 15 * 1024 * 1024) {
-        toast.error('O arquivo deve ter no máximo 15MB');
+      // Verificar se é DOCX
+      if (selectedFile.type !== allowedType && !selectedFile.name.toLowerCase().endsWith('.docx')) {
+        toast.error('Tipo de arquivo inválido. Envie um DOCX.');
+        e.target.value = '';
+        return;
+      }
+      
+      // Verificar tamanho
+      if (selectedFile.size > maxSize) {
+        toast.error('Arquivo muito grande. O limite é 50 MB para DOCX.');
+        e.target.value = '';
         return;
       }
       
@@ -185,6 +197,12 @@ const SubmissaoTrabalhos = () => {
     
     if (!file) {
       toast.error('Por favor, anexe um arquivo');
+      return;
+    }
+    
+    // Validação adicional do resumo
+    if (formData.abstract.trim().length > 1500) {
+      toast.error('Resumo muito longo. Use até 1500 caracteres.');
       return;
     }
 
@@ -430,19 +448,19 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Resumo * (máximo 500 caracteres)
+                        Resumo * (máximo 1500 caracteres)
                       </label>
                       <textarea
                         name="abstract"
                         value={formData.abstract}
                         onChange={handleInputChange}
                         required
-                        maxLength={500}
-                        rows={4}
+                        maxLength={1500}
+                        rows={6}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
                       />
-                      <div className="text-right text-sm text-gray-500 mt-1">
-                        {formData.abstract.length}/500
+                      <div className={`text-right text-sm mt-1 ${formData.abstract.length > 1500 ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>
+                        {formData.abstract.length}/1500
                       </div>
                     </div>
 
@@ -463,13 +481,18 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Arquivo do Trabalho * (PDF ou DOCX, máximo 15MB)
+                        Arquivo do Trabalho * (DOCX, máximo 50MB)
                       </label>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                        <p className="text-sm text-blue-800">
+                          <strong>Importante:</strong> Somente DOCX é aceito. PDFs não serão recebidos para permitir correções e ajustes pelos avaliadores.
+                        </p>
+                      </div>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
                         <input
                           type="file"
                           onChange={handleFileChange}
-                          accept=".pdf,.docx"
+                          accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                           className="hidden"
                           id="file-upload-artigo"
                         />
@@ -483,7 +506,7 @@ const SubmissaoTrabalhos = () => {
                             <div>
                               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                               <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
-                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 15MB</p>
+                              <p className="text-sm text-gray-400 mt-1">Apenas DOCX, máximo 50MB</p>
                             </div>
                           )}
                         </label>
@@ -616,19 +639,19 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Descrição do Consórcio * (máximo 500 caracteres)
+                        Descrição do Consórcio * (máximo 1500 caracteres)
                       </label>
                       <textarea
                         name="abstract"
                         value={formData.abstract}
                         onChange={handleInputChange}
                         required
-                        maxLength={500}
-                        rows={4}
+                        maxLength={1500}
+                        rows={6}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-civeni-blue focus:border-civeni-blue"
                       />
-                      <div className="text-right text-sm text-gray-500 mt-1">
-                        {formData.abstract.length}/500
+                      <div className={`text-right text-sm mt-1 ${formData.abstract.length > 1500 ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>
+                        {formData.abstract.length}/1500
                       </div>
                     </div>
 
@@ -649,13 +672,18 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Proposta do Consórcio * (PDF ou DOCX, máximo 15MB)
+                        Proposta do Consórcio * (DOCX, máximo 50MB)
                       </label>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                        <p className="text-sm text-blue-800">
+                          <strong>Importante:</strong> Somente DOCX é aceito. PDFs não serão recebidos para permitir correções e ajustes pelos avaliadores.
+                        </p>
+                      </div>
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-civeni-blue transition-colors">
                         <input
                           type="file"
                           onChange={handleFileChange}
-                          accept=".pdf,.docx"
+                          accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                           className="hidden"
                           id="file-upload-consorcio"
                         />
@@ -669,7 +697,7 @@ const SubmissaoTrabalhos = () => {
                             <div>
                               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                               <p className="text-gray-600">Clique para selecionar ou arraste um arquivo</p>
-                              <p className="text-sm text-gray-400 mt-1">PDF ou DOCX, máximo 15MB</p>
+                              <p className="text-sm text-gray-400 mt-1">Apenas DOCX, máximo 50MB</p>
                             </div>
                           )}
                         </label>
