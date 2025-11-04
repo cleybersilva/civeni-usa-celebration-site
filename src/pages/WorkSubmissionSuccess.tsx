@@ -52,8 +52,7 @@ const WorkSubmissionSuccess = () => {
                     📢 Aviso Importante — Submissão de Trabalhos
                   </p>
                   <p>
-                    Cada participante inscrito no III CIVENI 2025 – Celebration/Florida-EUA poderá enviar até 3 (três) Artigos e até 3 (três) Consórcios por inscrição.
-                    Essa limitação garante que todas as submissões sejam devidamente avaliadas pela comissão científica e que o processo mantenha qualidade, equidade e organização.
+                    Cada participante do III CIVENI 2025 – Celebration/Florida-EUA pode enviar até 3 Artigos e 3 Consórcios por inscrição, garantindo avaliação justa e organizada pela comissão científica.
                   </p>
                   <p className="font-medium">
                     📎 Dica: verifique as normas e o formato exigido antes de enviar seu trabalho para evitar reprovações por formato incorreto.
