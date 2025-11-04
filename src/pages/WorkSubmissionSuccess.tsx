@@ -67,11 +67,11 @@ const WorkSubmissionSuccess = () => {
                   <FileText className="w-6 h-6 text-civeni-blue flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-semibold text-foreground mb-2">
-                      Próximos Passos
+                      🚀 Próximos Passos
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Seu trabalho está sendo analisado pela nossa equipe de avaliadores. 
-                      Você receberá atualizações sobre o status da avaliação por e-mail e ou WhatsApp realizado na inscrição do Civeni 2025.
+                      Seu trabalho está em avaliação pela equipe de avaliadores do Civeni 2025.
+                      Você receberá notificações sobre o andamento da análise diretamente no e-mail e/ou WhatsApp informados durante a inscrição.
                     </p>
                   </div>
                 </div>
