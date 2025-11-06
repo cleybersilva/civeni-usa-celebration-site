@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -84,7 +84,9 @@ function App() {
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
                 <Route path="/sessoes-poster" element={<SessoesPoster />} />
-                <Route path="/manuscritos" element={<EnvioVideos />} />
+                {/* Redirect /manuscritos para /envio-de-videos */}
+                <Route path="/manuscritos" element={<Navigate to="/envio-de-videos" replace />} />
+                <Route path="/envio-de-videos" element={<EnvioVideos />} />
                 <Route path="/templates-artigos-slides" element={<TemplatesArtigosSlides />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />

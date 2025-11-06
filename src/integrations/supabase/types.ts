@@ -3889,49 +3889,58 @@ export type Database = {
       }
       video_submissions: {
         Row: {
+          avaliador_id: string | null
           created_at: string
+          curso: string | null
           email: string
-          full_name: string
           id: string
-          internal_notes: string | null
-          message: string | null
-          participant_type: string
-          reviewed_at: string | null
-          reviewed_by: string | null
+          nome: string
+          observacoes: string | null
+          parecer: string | null
           status: string
-          submission_type: string
+          submitted_ip: unknown
+          tipo_participante: string
+          turma: string | null
           updated_at: string
-          video_link: string | null
+          user_agent: string | null
+          video_url_normalized: string
+          video_url_original: string
         }
         Insert: {
+          avaliador_id?: string | null
           created_at?: string
+          curso?: string | null
           email: string
-          full_name: string
           id?: string
-          internal_notes?: string | null
-          message?: string | null
-          participant_type: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          nome: string
+          observacoes?: string | null
+          parecer?: string | null
           status?: string
-          submission_type: string
+          submitted_ip?: unknown
+          tipo_participante: string
+          turma?: string | null
           updated_at?: string
-          video_link?: string | null
+          user_agent?: string | null
+          video_url_normalized: string
+          video_url_original: string
         }
         Update: {
+          avaliador_id?: string | null
           created_at?: string
+          curso?: string | null
           email?: string
-          full_name?: string
           id?: string
-          internal_notes?: string | null
-          message?: string | null
-          participant_type?: string
-          reviewed_at?: string | null
-          reviewed_by?: string | null
+          nome?: string
+          observacoes?: string | null
+          parecer?: string | null
           status?: string
-          submission_type?: string
+          submitted_ip?: unknown
+          tipo_participante?: string
+          turma?: string | null
           updated_at?: string
-          video_link?: string | null
+          user_agent?: string | null
+          video_url_normalized?: string
+          video_url_original?: string
         }
         Relationships: []
       }

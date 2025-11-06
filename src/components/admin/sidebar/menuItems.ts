@@ -135,6 +135,13 @@ export const createMenuItems = (
       isPriority: false
     },
     {
+      id: 'envio-videos',
+      label: 'Envio de Vídeos',
+      icon: Play,
+      show: hasPermission('submissoes') || isAdmin,
+      isPriority: false
+    },
+    {
       id: 'textos',
       label: t('admin.menu.texts', 'Textos'),
       icon: Type,

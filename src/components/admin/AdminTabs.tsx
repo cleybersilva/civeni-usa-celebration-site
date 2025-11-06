@@ -16,6 +16,7 @@ import UsersManager from './UsersManager';
 import SimpleEventsManager from './SimpleEventsManager';
 import WorkSubmissionsManager from './WorkSubmissionsManager';
 import { SubmissionsManager } from './SubmissionsManager';
+import VideoSubmissionsManager from './VideoSubmissionsManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -77,6 +78,9 @@ const AdminTabs = () => {
         )}
         {hasPermission('submissoes') && (
           <TabsTrigger value="submissoes">Submissões</TabsTrigger>
+        )}
+        {hasPermission('submissoes') && (
+          <TabsTrigger value="envio-videos">Envio de Vídeos</TabsTrigger>
         )}
         {hasPermission('trabalhos') && (
           <TabsTrigger value="trabalhos">Trabalhos</TabsTrigger>
@@ -169,6 +173,12 @@ const AdminTabs = () => {
       {hasPermission('submissoes') && (
         <TabsContent value="submissoes">
           <SubmissionsManager />
+        </TabsContent>
+      )}
+
+      {hasPermission('submissoes') && (
+        <TabsContent value="envio-videos">
+          <VideoSubmissionsManager />
         </TabsContent>
       )}
 
