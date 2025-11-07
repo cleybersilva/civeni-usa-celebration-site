@@ -305,7 +305,7 @@ const EnvioVideos = () => {
                   required
                   value={formData.video_url}
                   onChange={handleInputChange}
-                  placeholder="https://youtube.com/... ou https://drive.google.com/..."
+                  placeholder="Cole aqui o link do seu vídeo"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   Aceito: YouTube, Vimeo, Google Drive, OneDrive ou outros serviços com HTTPS
