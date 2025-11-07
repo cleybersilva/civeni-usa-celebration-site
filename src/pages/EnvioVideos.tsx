@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, Video, CheckCircle, BookOpen, Users } from 'lucide-react';
+import { useCursos, useTurmas } from '@/hooks/useCursos';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 const EnvioVideos = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cursoId, setCursoId] = useState<string>('');
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -26,6 +28,9 @@ const EnvioVideos = () => {
     concordo: false
   });
 
+  const { cursos } = useCursos();
+  const { turmas } = useTurmas(cursoId);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -33,6 +38,24 @@ const EnvioVideos = () => {
 
   const handleSelectChange = (value: string) => {
     setFormData(prev => ({ ...prev, tipo_participante: value }));
+  };
+
+  const handleCursoChange = (value: string) => {
+    setCursoId(value);
+    const cursoSelecionado = cursos.find(c => c.id === value);
+    setFormData(prev => ({ 
+      ...prev, 
+      curso: cursoSelecionado?.nome_curso || '',
+      turma: '' // Limpa turma ao mudar curso
+    }));
+  };
+
+  const handleTurmaChange = (value: string) => {
+    const turmaSelecionada = turmas.find(t => t.id === value);
+    setFormData(prev => ({ 
+      ...prev, 
+      turma: turmaSelecionada?.nome_turma || ''
+    }));
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -45,6 +68,14 @@ const EnvioVideos = () => {
     if (!formData.concordo) {
       toast.error('Você precisa concordar com os termos de uso para prosseguir.');
       return;
+    }
+
+    // Validação adicional para alunos VCCU
+    if (formData.tipo_participante === 'Aluno(a) VCCU') {
+      if (!formData.curso || !formData.turma) {
+        toast.error('Curso e Turma são obrigatórios para alunos VCCU.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -112,9 +143,13 @@ const EnvioVideos = () => {
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              Envio de Vídeos
-            </h1>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+              <h1 className="text-4xl md:text-6xl font-bold font-poppins">
+                Envio de Vídeos
+              </h1>
+              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+            </div>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
               Envie seu material em vídeo para análise pela banca avaliadora do III CIVENI 2025
             </p>
@@ -194,27 +229,44 @@ const EnvioVideos = () => {
                 {mostrarCursoTurma && (
                   <>
                     <div>
-                      <Label htmlFor="curso">Curso</Label>
-                      <Input
-                        id="curso"
-                        name="curso"
-                        type="text"
-                        value={formData.curso}
-                        onChange={handleInputChange}
-                        placeholder="Ex: Engenharia de Software"
-                      />
+                      <Label htmlFor="curso">Curso *</Label>
+                      <Select 
+                        required 
+                        value={cursoId} 
+                        onValueChange={handleCursoChange}
+                      >
+                        <SelectTrigger id="curso">
+                          <SelectValue placeholder="Selecione o curso" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cursos.map((curso) => (
+                            <SelectItem key={curso.id} value={curso.id}>
+                              {curso.nome_curso}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
-                      <Label htmlFor="turma">Turma</Label>
-                      <Input
-                        id="turma"
-                        name="turma"
-                        type="text"
-                        value={formData.turma}
-                        onChange={handleInputChange}
-                        placeholder="Ex: 2025.1"
-                      />
+                      <Label htmlFor="turma">Turma *</Label>
+                      <Select 
+                        required 
+                        value={formData.turma} 
+                        onValueChange={handleTurmaChange}
+                        disabled={!cursoId}
+                      >
+                        <SelectTrigger id="turma">
+                          <SelectValue placeholder={cursoId ? "Selecione a turma" : "Selecione o curso primeiro"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {turmas.map((turma) => (
+                            <SelectItem key={turma.id} value={turma.id}>
+                              {turma.nome_turma}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </>
                 )}
