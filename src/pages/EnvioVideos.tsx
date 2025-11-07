@@ -17,6 +17,7 @@ const EnvioVideos = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cursoId, setCursoId] = useState<string>('');
+  const [emailWarning, setEmailWarning] = useState<string>('');
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -34,6 +35,22 @@ const EnvioVideos = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEmailBlur = async () => {
+    if (formData.email) {
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('email', formData.email)
+        .maybeSingle();
+
+      if (!data && !error) {
+        setEmailWarning('⚠️ Este e-mail não está cadastrado no sistema de inscrições do CIVENI.');
+      } else {
+        setEmailWarning('');
+      }
+    }
   };
 
   const handleSelectChange = (value: string) => {
@@ -188,7 +205,7 @@ const EnvioVideos = () => {
                   required
                   value={formData.nome}
                   onChange={handleInputChange}
-                  placeholder="Seu nome completo"
+                  placeholder="Nome completo conforme inscrição no Civeni"
                 />
               </div>
 
@@ -202,8 +219,14 @@ const EnvioVideos = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="seu@email.com"
+                  onBlur={handleEmailBlur}
+                  placeholder="email_inscricao_civeni@email.com"
                 />
+                {emailWarning && (
+                  <p className="text-sm text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                    {emailWarning}
+                  </p>
+                )}
               </div>
 
               {/* Tipo de Participante, Curso e Turma em 3 colunas */}
