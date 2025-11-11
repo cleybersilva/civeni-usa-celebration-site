@@ -17,7 +17,6 @@ const EnvioVideos = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cursoId, setCursoId] = useState<string>('');
-  const [emailWarning, setEmailWarning] = useState<string>('');
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -35,22 +34,6 @@ const EnvioVideos = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleEmailBlur = async () => {
-    if (formData.email) {
-      const { data, error } = await supabase
-        .from('registrations')
-        .select('id')
-        .eq('email', formData.email)
-        .maybeSingle();
-
-      if (!data && !error) {
-        setEmailWarning('⚠️ Este e-mail não está cadastrado no sistema de inscrições do CIVENI.');
-      } else {
-        setEmailWarning('');
-      }
-    }
   };
 
   const handleSelectChange = (value: string) => {
@@ -81,20 +64,6 @@ const EnvioVideos = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.concordo) {
-      toast.error('Você precisa concordar com os termos de uso para prosseguir.');
-      return;
-    }
-
-    // Validação adicional para alunos VCCU
-    if (formData.tipo_participante === 'Aluno(a) VCCU') {
-      if (!formData.curso || !formData.turma) {
-        toast.error('Curso e Turma são obrigatórios para alunos VCCU.');
-        return;
-      }
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -219,14 +188,8 @@ const EnvioVideos = () => {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  onBlur={handleEmailBlur}
                   placeholder="email_inscricao_civeni@email.com"
                 />
-                {emailWarning && (
-                  <p className="text-sm text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
-                    {emailWarning}
-                  </p>
-                )}
               </div>
 
               {/* Tipo de Participante, Curso e Turma em 3 colunas */}
