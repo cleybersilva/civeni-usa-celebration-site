@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Upload, Video, CheckCircle, BookOpen, Users } from 'lucide-react';
 import { useCursos, useTurmas } from '@/hooks/useCursos';
+import { useParticipantTypes } from '@/hooks/useParticipantTypes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,7 @@ const EnvioVideos = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cursoId, setCursoId] = useState<string>('');
+  const [turmaId, setTurmaId] = useState<string>('');
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -30,6 +32,7 @@ const EnvioVideos = () => {
 
   const { cursos } = useCursos();
   const { turmas } = useTurmas(cursoId);
+  const { participantTypes } = useParticipantTypes();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -42,6 +45,7 @@ const EnvioVideos = () => {
 
   const handleCursoChange = (value: string) => {
     setCursoId(value);
+    setTurmaId(''); // Limpa turmaId ao mudar curso
     const cursoSelecionado = cursos.find(c => c.id === value);
     setFormData(prev => ({ 
       ...prev, 
@@ -51,6 +55,7 @@ const EnvioVideos = () => {
   };
 
   const handleTurmaChange = (value: string) => {
+    setTurmaId(value);
     const turmaSelecionada = turmas.find(t => t.id === value);
     setFormData(prev => ({ 
       ...prev, 
@@ -88,6 +93,8 @@ const EnvioVideos = () => {
       toast.success('Vídeo enviado com sucesso! Seu material será analisado pela banca.');
       
       // Resetar formulário
+      setCursoId('');
+      setTurmaId('');
       setFormData({
         nome: '',
         email: '',
@@ -205,9 +212,13 @@ const EnvioVideos = () => {
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Aluno(a) VCCU">Aluno(a) VCCU</SelectItem>
-                      <SelectItem value="Participante Externo">Participante Externo</SelectItem>
-                      <SelectItem value="Convidado(a)">Convidado(a)</SelectItem>
+                      {participantTypes
+                        .filter(type => type.is_active)
+                        .map((type) => (
+                          <SelectItem key={type.id} value={type.type_name}>
+                            {type.type_name}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -238,7 +249,7 @@ const EnvioVideos = () => {
                       <Label htmlFor="turma">Turma *</Label>
                       <Select 
                         required 
-                        value={formData.turma} 
+                        value={turmaId} 
                         onValueChange={handleTurmaChange}
                         disabled={!cursoId}
                       >
