@@ -136,6 +136,12 @@ serve(async (req) => {
     }
 
     // Preparar dados para inserção
+    // Pegar apenas o primeiro IP de x-forwarded-for caso haja múltiplos IPs
+    const forwardedFor = req.headers.get('x-forwarded-for')
+    const submittedIp = forwardedFor 
+      ? forwardedFor.split(',')[0].trim() 
+      : req.headers.get('x-real-ip')
+    
     const submissionData: any = {
       nome: body.nome.trim(),
       email: body.email.toLowerCase().trim(),
@@ -143,7 +149,7 @@ serve(async (req) => {
       video_url_original: body.video_url,
       video_url_normalized: urlValidation.normalized,
       observacoes: body.observacoes?.trim() || null,
-      submitted_ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
+      submitted_ip: submittedIp,
       user_agent: req.headers.get('user-agent'),
     }
 
