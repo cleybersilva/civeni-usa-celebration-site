@@ -82,7 +82,7 @@ const Palestrantes = () => {
             </p>
           </div>
           
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
             {content.speakers.map((speaker) => {
               return <SpeakerCard key={speaker.id} speaker={speaker} />;
             })}
