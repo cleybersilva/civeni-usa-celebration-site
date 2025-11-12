@@ -12,13 +12,13 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
   const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
 
   return (
-    <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100/50 backdrop-blur-sm">
+    <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 border border-gray-100/50 backdrop-blur-sm">
       {/* Gradient overlay for visual depth */}
       <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue/5 via-transparent to-civeni-red/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       <div className="relative z-10">
-        <div className="flex justify-center items-center p-6 bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="w-48 h-48 rounded-full overflow-hidden relative bg-white shadow-lg">
+        <div className="flex justify-center items-center py-6 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="w-40 h-40 rounded-full overflow-hidden relative bg-white shadow-lg">
             {hasError ? (
               <SpeakerImagePlaceholder
                 name={speaker.name}
@@ -65,25 +65,25 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
           </div>
         </div>
         
-        <div className="p-6">
-          <div className="space-y-3">
+        <div className="p-5">
+          <div className="space-y-2.5">
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1.5 font-poppins leading-tight group-hover:text-civeni-blue transition-colors duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-1 font-poppins leading-tight group-hover:text-civeni-blue transition-colors duration-300">
                 {speaker.name}
               </h3>
-              <div className="h-1 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-3 group-hover:w-16 transition-all duration-500"></div>
+              <div className="h-0.5 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-2.5 group-hover:w-16 transition-all duration-500"></div>
             </div>
             
-            <h4 className="text-base font-semibold text-civeni-red mb-1.5 leading-relaxed">
+            <h4 className="text-sm font-semibold text-civeni-red mb-1 leading-relaxed">
               {speaker.title}
             </h4>
             
-            <p className="text-gray-600 font-medium text-sm mb-3 flex items-center">
-              <span className="w-2 h-2 bg-civeni-blue rounded-full mr-2 flex-shrink-0"></span>
+            <p className="text-gray-600 font-medium text-xs mb-2 flex items-center">
+              <span className="w-1.5 h-1.5 bg-civeni-blue rounded-full mr-2 flex-shrink-0"></span>
               {speaker.institution}
             </p>
             
-            <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 hover:line-clamp-none transition-all duration-300">
+            <p className="text-gray-700 text-xs leading-relaxed line-clamp-3 hover:line-clamp-none transition-all duration-300">
               {speaker.bio}
             </p>
           </div>
