@@ -17,7 +17,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
       <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue/5 via-transparent to-civeni-red/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       <div className="relative z-10">
-        <div className="aspect-[3/4] overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="aspect-[4/3] overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
           {hasError ? (
             <SpeakerImagePlaceholder
               name={speaker.name}
