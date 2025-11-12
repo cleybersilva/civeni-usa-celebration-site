@@ -17,7 +17,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
       <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue/5 via-transparent to-civeni-red/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       <div className="relative z-10">
-        <div className="aspect-[4/5] overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="aspect-[3/4] overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
           {hasError ? (
             <SpeakerImagePlaceholder
               name={speaker.name}
@@ -66,25 +66,25 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
           )}
         </div>
         
-        <div className="p-8">
-          <div className="space-y-4">
+        <div className="p-6">
+          <div className="space-y-3">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2 font-poppins leading-tight group-hover:text-civeni-blue transition-colors duration-300">
+              <h3 className="text-xl font-bold text-gray-900 mb-1.5 font-poppins leading-tight group-hover:text-civeni-blue transition-colors duration-300">
                 {speaker.name}
               </h3>
-              <div className="h-1 w-12 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-4 group-hover:w-20 transition-all duration-500"></div>
+              <div className="h-1 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-3 group-hover:w-16 transition-all duration-500"></div>
             </div>
             
-            <h4 className="text-lg font-semibold text-civeni-red mb-2 leading-relaxed">
+            <h4 className="text-base font-semibold text-civeni-red mb-1.5 leading-relaxed">
               {speaker.title}
             </h4>
             
-            <p className="text-gray-600 font-medium text-base mb-4 flex items-center">
-              <span className="w-2 h-2 bg-civeni-blue rounded-full mr-3 flex-shrink-0"></span>
+            <p className="text-gray-600 font-medium text-sm mb-3 flex items-center">
+              <span className="w-2 h-2 bg-civeni-blue rounded-full mr-2 flex-shrink-0"></span>
               {speaker.institution}
             </p>
             
-            <p className="text-gray-700 text-sm leading-relaxed line-clamp-4 hover:line-clamp-none transition-all duration-300">
+            <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 hover:line-clamp-none transition-all duration-300">
               {speaker.bio}
             </p>
           </div>
