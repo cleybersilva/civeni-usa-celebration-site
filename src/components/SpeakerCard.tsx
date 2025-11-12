@@ -17,53 +17,52 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
       <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue/5 via-transparent to-civeni-red/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       <div className="relative z-10">
-        <div className="aspect-video overflow-hidden relative bg-gradient-to-br from-gray-50 to-gray-100">
-          {hasError ? (
-            <SpeakerImagePlaceholder
-              name={speaker.name}
-              showError={true}
-              onRetry={retryLoad}
-              isLoading={isLoading}
-            />
-          ) : (
-            <>
-              <img 
-                src={imageSrc} 
-                alt={speaker.name}
-                className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${
-                  isLoading ? 'opacity-50 blur-sm' : 'opacity-100 blur-0'
-                }`}
-                loading="lazy"
-                style={{ 
-                  objectPosition: 'center top',
-                  filter: 'contrast(1.1) saturate(1.1)'
-                }}
+        <div className="flex justify-center items-center p-6 bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="w-48 h-48 rounded-full overflow-hidden relative bg-white shadow-lg">
+            {hasError ? (
+              <SpeakerImagePlaceholder
+                name={speaker.name}
+                showError={true}
+                onRetry={retryLoad}
+                isLoading={isLoading}
               />
+            ) : (
+              <>
+                <img 
+                  src={imageSrc} 
+                  alt={speaker.name}
+                  className={`w-full h-full object-contain transition-all duration-700 group-hover:scale-105 ${
+                    isLoading ? 'opacity-50 blur-sm' : 'opacity-100 blur-0'
+                  }`}
+                  loading="lazy"
+                  style={{ 
+                    objectPosition: 'center center',
+                    filter: 'contrast(1.1) saturate(1.1)'
+                  }}
+                />
               
-              {/* Subtle gradient overlay on image */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
-              
-              {/* Loading indicator */}
-              {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-                  <div className="animate-spin rounded-full h-10 w-10 border-3 border-civeni-blue border-t-transparent shadow-lg"></div>
-                </div>
-              )}
-              
-              {/* Retry button */}
-              {hasError && !isLoading && (
-                <div className="absolute top-4 right-4">
-                  <button
-                    onClick={retryLoad}
-                    className="bg-white/90 text-civeni-blue p-3 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/50"
-                    title="Tentar carregar imagem novamente"
-                  >
-                    <RefreshCw size={18} />
-                  </button>
-                </div>
-              )}
-            </>
-          )}
+                {/* Loading indicator */}
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full">
+                    <div className="animate-spin rounded-full h-10 w-10 border-3 border-civeni-blue border-t-transparent shadow-lg"></div>
+                  </div>
+                )}
+                
+                {/* Retry button */}
+                {hasError && !isLoading && (
+                  <div className="absolute top-2 right-2">
+                    <button
+                      onClick={retryLoad}
+                      className="bg-white/90 text-civeni-blue p-2 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/50"
+                      title="Tentar carregar imagem novamente"
+                    >
+                      <RefreshCw size={16} />
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
         
         <div className="p-6">
