@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react-swc";GORA
+import react from "@vitejs/plugin-react-swc";
 import { componentTagger } from "lovable-tagger";
 import path from "path";
 import { defineConfig } from "vite";
