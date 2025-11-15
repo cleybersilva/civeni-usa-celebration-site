@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users, Youtube, MapPin, ChevronRight } from 'lucide-react';
+import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users, Youtube, MapPin, ChevronRight, Monitor, Mail } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import {
   pickLang,
   formatTimezone,
 } from '@/hooks/useTransmission';
+import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 
 const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
@@ -449,44 +450,70 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="agenda">
-            <Card className="p-16 text-center bg-gradient-to-br from-white to-gray-50 shadow-lg border-gray-200 rounded-2xl">
-              <div className="max-w-2xl mx-auto space-y-8">
-                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-civeni-blue/10 to-civeni-red/10 rounded-full flex items-center justify-center">
-                  <Calendar className="w-12 h-12 text-civeni-blue" />
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                  <h2 className="text-3xl font-bold text-gray-900">Agenda Online</h2>
                 </div>
-                <div className="space-y-3">
-                  <h3 className="text-3xl font-bold text-gray-900">Programação Completa</h3>
-                  <p className="text-lg text-gray-600">
-                    Confira a agenda detalhada do evento com todos os horários, palestras e atividades programadas.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex gap-3">
                   <Button 
-                    size="lg" 
-                    className="bg-civeni-blue hover:bg-civeni-blue/90 group shadow-lg"
+                    variant="outline" 
+                    size="sm"
+                    className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white"
                     asChild
                   >
-                    <a href={transmission.schedule_url || '/programacao-online'}>
-                      <Calendar className="w-5 h-5 mr-2" />
-                      Ver Programação Online
-                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                    </a>
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline"
-                    className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300 group"
-                    asChild
-                  >
-                    <a href="/programacao-presencial">
-                      <MapPin className="w-5 h-5 mr-2" />
-                      Ver Programação Presencial
-                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    <a href="/programacao-online">
+                      Ver todas as sessões
+                      <ChevronRight className="w-4 h-4 ml-1" />
                     </a>
                   </Button>
                 </div>
               </div>
-            </Card>
+              
+              <TransmissionAgenda />
+              
+              <Card className="p-8 bg-gradient-to-br from-civeni-blue/5 to-civeni-red/5 border-civeni-blue/20">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="shrink-0">
+                    <div className="w-16 h-16 bg-civeni-blue/10 rounded-full flex items-center justify-center">
+                      <Calendar className="w-8 h-8 text-civeni-blue" />
+                    </div>
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Programação completa disponível
+                    </h3>
+                    <p className="text-gray-600">
+                      Acesse a programação completa presencial e online com todos os detalhes das atividades
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+                    <Button 
+                      size="lg"
+                      className="bg-civeni-blue hover:bg-civeni-blue/90"
+                      asChild
+                    >
+                      <a href="/programacao-online">
+                        <Monitor className="w-5 h-5 mr-2" />
+                        Online
+                      </a>
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white"
+                      asChild
+                    >
+                      <a href="/programacao-presencial">
+                        <MapPin className="w-5 h-5 mr-2" />
+                        Presencial
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="salas">
