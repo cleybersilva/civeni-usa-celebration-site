@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users } from 'lucide-react';
+import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users, Youtube, MapPin, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -155,38 +155,60 @@ const TransmissaoAoVivo = () => {
 
       <Header />
 
-      {/* Hero Banner with Gradient */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
-        <div className="absolute inset-0 bg-black/20" />
+      {/* Hero Banner */}
+      <section className="relative bg-gradient-to-br from-civeni-blue via-civeni-blue/95 to-civeni-red text-white py-24 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-civeni-red/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+        </div>
+
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
           <nav className="mb-8 text-sm">
-            <ol className="flex items-center space-x-2">
-              <li><a href="/" className="hover:text-blue-200 transition-colors">Home</a></li>
-              <li className="text-blue-200">›</li>
-              <li><a href="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</a></li>
-              <li className="text-blue-200">›</li>
-              <li>Transmissão ao Vivo</li>
+            <ol className="flex items-center space-x-2 text-white/80">
+              <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
+              <li>›</li>
+              <li><a href="/programacao-online" className="hover:text-white transition-colors">Programação</a></li>
+              <li>›</li>
+              <li className="text-white">Transmissão ao Vivo</li>
             </ol>
           </nav>
           
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              {title}
-            </h1>
-            {description && (
-              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-                {description}
-              </p>
-            )}
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            {/* Title Section */}
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                <Play className="w-4 h-4 animate-pulse" />
+                <span className="text-sm font-medium">{t('transmission.title')}</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                {title || t('transmission.title')}
+              </h1>
+              
+              {subtitle && (
+                <p className="text-xl md:text-2xl text-white/90 font-medium">
+                  {subtitle}
+                </p>
+              )}
+              
+              {description && (
+                <p className="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
+                  {description}
+                </p>
+              )}
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 items-center justify-center">
               {primaryCTA && (
                 primaryCTA.external ? (
                   <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
-                    <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                    <button className="group bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                       {primaryCTA.icon}
                       {primaryCTA.label}
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </a>
                 ) : (
@@ -194,25 +216,28 @@ const TransmissaoAoVivo = () => {
                     onClick={() => {
                       document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
+                    className="group bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     {primaryCTA.icon}
                     {primaryCTA.label}
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 )
               )}
               <a href="/inscricoes">
-                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                <button className="group border-white/80 text-white hover:bg-white/10 border-2 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-3 backdrop-blur-sm">
                   <Users className="w-5 h-5" />
                   Fazer Inscrição
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </a>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center justify-center">
+            {/* Status Info */}
+            <div className="flex flex-wrap gap-4 items-center justify-center pt-4">
               {statusBadge}
               {timezoneText && (
-                <div className="flex items-center gap-2 text-sm opacity-80">
+                <div className="flex items-center gap-2 text-sm bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
                   <Clock className="w-4 h-4" />
                   <span>{timezoneText}</span>
                 </div>
@@ -223,32 +248,44 @@ const TransmissaoAoVivo = () => {
       </section>
 
       {/* Tabs Section */}
-      <section className="container mx-auto px-4 py-12">
+      <section className="container mx-auto px-4 py-16">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="ao-vivo" className="flex items-center gap-2">
-              <Play className="w-4 h-4" />
-              Ao vivo
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4 mb-12 h-auto p-1 bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-xl">
+            <TabsTrigger 
+              value="ao-vivo" 
+              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+            >
+              <Play className="w-5 h-5" />
+              <span className="text-sm md:text-base font-semibold">Ao Vivo</span>
             </TabsTrigger>
-            <TabsTrigger value="agenda" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Agenda
+            <TabsTrigger 
+              value="agenda" 
+              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+            >
+              <Calendar className="w-5 h-5" />
+              <span className="text-sm md:text-base font-semibold">Agenda</span>
             </TabsTrigger>
-            <TabsTrigger value="salas" className="flex items-center gap-2">
-              <Video className="w-4 h-4" />
-              Salas
+            <TabsTrigger 
+              value="salas" 
+              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+            >
+              <Video className="w-5 h-5" />
+              <span className="text-sm md:text-base font-semibold">Salas</span>
             </TabsTrigger>
-            <TabsTrigger value="faq" className="flex items-center gap-2">
-              <HelpCircle className="w-4 h-4" />
-              FAQ
+            <TabsTrigger 
+              value="faq" 
+              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+            >
+              <HelpCircle className="w-5 h-5" />
+              <span className="text-sm md:text-base font-semibold">FAQ</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="ao-vivo" className="space-y-8">
+          <TabsContent value="ao-vivo" className="space-y-10">
             {/* YouTube Player */}
             {transmission.youtube_video_id ? (
-              <div id="player" className="space-y-4">
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+              <div id="player" className="space-y-6">
+                <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-gray-200 transform transition-all hover:scale-[1.01] duration-300">
                   <iframe
                     width="100%"
                     height="100%"
@@ -261,149 +298,349 @@ const TransmissaoAoVivo = () => {
                     className="w-full h-full"
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    Canal: {transmission.channel_handle}
-                  </p>
-                  <Button variant="ghost" size="sm" asChild>
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-100 rounded-lg">
+                        <Youtube className="w-6 h-6 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">
+                          Canal Oficial
+                        </p>
+                        <p className="text-base font-semibold text-gray-900">
+                          {transmission.channel_handle}
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="default" 
+                      size="lg" 
+                      className="bg-civeni-blue hover:bg-civeni-blue/90 group" 
+                      asChild
+                    >
+                      <a
+                        href={`https://www.youtube.com/${transmission.channel_handle}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Abrir no YouTube
+                        <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            ) : (
+              <Card className="p-16 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
+                <div className="max-w-md mx-auto space-y-6">
+                  <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                    <Video className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-bold text-gray-900">Nenhum vídeo disponível</h3>
+                    <p className="text-gray-600 text-base">
+                      A transmissão ainda não começou ou não há replay disponível.
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300 group"
+                    asChild
+                  >
                     <a
-                      href={`https://www.youtube.com/${transmission.channel_handle}`}
+                      href="https://www.youtube.com/@veniuniversity"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Abrir no YouTube
+                      <Youtube className="w-5 h-5 mr-2" />
+                      Visite o canal
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <Card className="p-12 text-center">
-                <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">Nenhum vídeo disponível</h3>
-                <p className="text-muted-foreground mb-4">
-                  A transmissão ainda não começou ou não há replay disponível.
-                </p>
-                <Button variant="outline" asChild>
-                  <a
-                    href="https://www.youtube.com/@veniuniversity"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Visite o canal
-                  </a>
-                </Button>
               </Card>
             )}
 
             {/* Upcoming Transmissions */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Próximas transmissões</h2>
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-3xl font-bold text-gray-900">Próximas Transmissões</h2>
+              </div>
               {upcomingLoading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-32" />
+                    <Skeleton key={i} className="h-48 rounded-xl" />
                   ))}
                 </div>
               ) : upcoming.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {upcoming.map((tx) => (
-                    <Card key={tx.id} className="p-4">
-                      <h3 className="font-semibold mb-2">{pickLang(tx.title, locale)}</h3>
-                      {tx.start_at && (
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {new Date(tx.start_at).toLocaleString(locale, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          })}
-                        </p>
-                      )}
-                      <Button size="sm" variant="outline" className="w-full" asChild>
-                        <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
-                          Detalhes
-                        </Link>
-                      </Button>
+                    <Card 
+                      key={tx.id} 
+                      className="group p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:-translate-y-1 cursor-pointer"
+                    >
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <Badge variant="outline" className="bg-civeni-blue/10 text-civeni-blue border-civeni-blue/20">
+                            Agendado
+                          </Badge>
+                          <Calendar className="w-5 h-5 text-civeni-blue" />
+                        </div>
+                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-civeni-blue transition-colors line-clamp-2">
+                          {pickLang(tx.title, locale)}
+                        </h3>
+                        {tx.start_at && (
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Clock className="w-4 h-4" />
+                            <span>
+                              {new Date(tx.start_at).toLocaleString(locale, {
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
+                              })}
+                            </span>
+                          </div>
+                        )}
+                        <Button 
+                          size="sm" 
+                          className="w-full bg-civeni-blue hover:bg-civeni-blue/90 group-hover:shadow-md transition-all" 
+                          asChild
+                        >
+                          <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
+                            Ver Detalhes
+                            <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                          </Link>
+                        </Button>
+                      </div>
                     </Card>
                   ))}
                 </div>
               ) : (
-                <Card className="p-8 text-center">
-                  <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                  <p className="text-muted-foreground mb-4">
-                    Sem próximas transmissões agendadas
-                  </p>
-                  <Button variant="outline" asChild>
-                    <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
-                      Veja o canal no YouTube
-                    </a>
-                  </Button>
+                <Card className="p-12 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
+                  <div className="max-w-md mx-auto space-y-6">
+                    <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                      <Calendar className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-gray-900">Sem próximas transmissões agendadas</h3>
+                      <p className="text-gray-600">
+                        Fique atento ao nosso canal no YouTube para futuras transmissões
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline"
+                      size="lg"
+                      className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300 group"
+                      asChild
+                    >
+                      <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
+                        <Youtube className="w-5 h-5 mr-2" />
+                        Veja o canal no YouTube
+                        <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    </Button>
+                  </div>
                 </Card>
               )}
             </div>
           </TabsContent>
 
           <TabsContent value="agenda">
-            <Card className="p-8 text-center">
-              <Calendar className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2">Programação completa</h3>
-              <p className="text-muted-foreground mb-6">
-                Veja a agenda completa do evento na programação online.
-              </p>
-              <Button asChild>
-                <a href={transmission.schedule_url || '/programacao-online'}>
-                  Ver programação
-                </a>
-              </Button>
+            <Card className="p-16 text-center bg-gradient-to-br from-white to-gray-50 shadow-lg border-gray-200 rounded-2xl">
+              <div className="max-w-2xl mx-auto space-y-8">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-civeni-blue/10 to-civeni-red/10 rounded-full flex items-center justify-center">
+                  <Calendar className="w-12 h-12 text-civeni-blue" />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-3xl font-bold text-gray-900">Programação Completa</h3>
+                  <p className="text-lg text-gray-600">
+                    Confira a agenda detalhada do evento com todos os horários, palestras e atividades programadas.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button 
+                    size="lg" 
+                    className="bg-civeni-blue hover:bg-civeni-blue/90 group shadow-lg"
+                    asChild
+                  >
+                    <a href={transmission.schedule_url || '/programacao-online'}>
+                      <Calendar className="w-5 h-5 mr-2" />
+                      Ver Programação Online
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300 group"
+                    asChild
+                  >
+                    <a href="/programacao-presencial">
+                      <MapPin className="w-5 h-5 mr-2" />
+                      Ver Programação Presencial
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </Button>
+                </div>
+              </div>
             </Card>
           </TabsContent>
 
           <TabsContent value="salas">
-            {roomsLoading ? (
-              <div className="grid md:grid-cols-2 gap-4">
-                {[1, 2].map((i) => (
-                  <Skeleton key={i} className="h-32" />
-                ))}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-3xl font-bold text-gray-900">Salas de Reunião</h2>
               </div>
-            ) : rooms.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-4">
-                {rooms.map((room) => (
-                  <Card key={room.id} className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="font-semibold text-lg">
-                        {pickLang(room.name, locale)}
-                      </h3>
-                      {room.is_live && (
-                        <Badge className="bg-red-600 text-white">Ao vivo</Badge>
-                      )}
+              <p className="text-gray-600 text-lg max-w-3xl">
+                Acesse as salas virtuais exclusivas para participantes inscritos. Interaja diretamente com palestrantes e outros participantes.
+              </p>
+              {roomsLoading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-48 rounded-xl" />
+                  ))}
+                </div>
+              ) : rooms.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {rooms.map((room) => (
+                    <Card 
+                      key={room.id} 
+                      className="group p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:-translate-y-1"
+                    >
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-civeni-blue transition-colors line-clamp-2">
+                            {pickLang(room.name, locale)}
+                          </h3>
+                          {room.is_live && (
+                            <Badge className="bg-red-600 text-white animate-pulse flex items-center gap-1 shrink-0">
+                              <span className="w-2 h-2 bg-white rounded-full"></span>
+                              Ao vivo
+                            </Badge>
+                          )}
+                        </div>
+                        <Button 
+                          className="w-full bg-civeni-blue hover:bg-civeni-blue/90 group-hover:shadow-md transition-all" 
+                          asChild
+                        >
+                          <a href={room.meet_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Entrar na sala
+                            <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                          </a>
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="p-12 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
+                  <div className="max-w-md mx-auto space-y-6">
+                    <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                      <Video className="w-10 h-10 text-gray-400" />
                     </div>
-                    <Button className="w-full" asChild>
-                      <a href={room.meet_url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Entrar na sala
-                      </a>
-                    </Button>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <Video className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="text-muted-foreground">Nenhuma sala disponível no momento</p>
-              </Card>
-            )}
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-gray-900">Nenhuma sala disponível no momento</h3>
+                      <p className="text-gray-600">
+                        As salas serão abertas durante o evento. Fique atento aos horários da programação.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="faq">
-            <Card className="p-8 text-center">
-              <HelpCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2">Perguntas frequentes</h3>
-              <p className="text-muted-foreground mb-6">
-                Veja as perguntas mais comuns sobre a transmissão.
-              </p>
-              <Button variant="outline" asChild>
-                <Link to="/transmissao-ao-vivo/faq">Ver FAQ</Link>
-              </Button>
-            </Card>
+            <div className="space-y-8">
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-3xl font-bold text-gray-900">Perguntas Frequentes</h2>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* FAQ Items */}
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.tech.title')}</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.tech.answer')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.access.title')}</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.access.answer')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.recording.title')}</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.recording.answer')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.support.title')}</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.support.answer')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Additional help CTA */}
+              <Card className="p-10 text-center bg-gradient-to-br from-civeni-blue/5 to-civeni-red/5 border-civeni-blue/20 shadow-md">
+                <div className="max-w-2xl mx-auto space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-900">Ainda tem dúvidas?</h3>
+                  <p className="text-gray-600">
+                    Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.
+                  </p>
+                  <Button 
+                    size="lg"
+                    className="bg-civeni-blue hover:bg-civeni-blue/90 group shadow-lg"
+                    asChild
+                  >
+                    <Link to="/contato">
+                      Entre em Contato
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </section>
