@@ -12,13 +12,18 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
   const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
 
   return (
-    <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 border border-gray-100/50 backdrop-blur-sm">
+    <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border border-gray-100/50 backdrop-blur-sm cursor-pointer">
       {/* Gradient overlay for visual depth */}
       <div className="absolute inset-0 bg-gradient-to-br from-civeni-blue/5 via-transparent to-civeni-red/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
+      {/* Animated border glow effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-r from-civeni-blue/20 via-civeni-red/20 to-civeni-blue/20 blur-xl"></div>
+      </div>
+      
       <div className="relative z-10">
-        <div className="flex justify-center items-center py-6 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="w-40 h-40 rounded-full overflow-hidden relative bg-white shadow-lg">
+        <div className="flex justify-center items-center py-6 px-4 bg-gradient-to-br from-gray-50 to-gray-100 transition-colors duration-500 group-hover:from-civeni-blue/5 group-hover:to-civeni-red/5">
+          <div className="w-40 h-40 rounded-full overflow-hidden relative bg-white shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110 ring-0 group-hover:ring-4 group-hover:ring-civeni-blue/20">
             {hasError ? (
               <SpeakerImagePlaceholder
                 name={speaker.name}
@@ -31,7 +36,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
                 <img 
                   src={imageSrc} 
                   alt={speaker.name}
-                  className={`w-full h-full object-contain transition-all duration-700 group-hover:scale-105 ${
+                  className={`w-full h-full object-contain transition-all duration-700 group-hover:scale-110 group-hover:rotate-2 ${
                     isLoading ? 'opacity-50 blur-sm' : 'opacity-100 blur-0'
                   }`}
                   loading="lazy"
@@ -68,22 +73,22 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
         <div className="p-5">
           <div className="space-y-2.5">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1 font-poppins leading-tight group-hover:text-civeni-blue transition-colors duration-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-1 font-poppins leading-tight group-hover:text-civeni-blue transition-all duration-500 group-hover:translate-x-1">
                 {speaker.name}
               </h3>
-              <div className="h-0.5 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-2.5 group-hover:w-16 transition-all duration-500"></div>
+              <div className="h-0.5 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-2.5 group-hover:w-full transition-all duration-500"></div>
             </div>
             
-            <h4 className="text-sm font-semibold text-civeni-red mb-1 leading-relaxed">
+            <h4 className="text-sm font-semibold text-civeni-red mb-1 leading-relaxed transition-all duration-500 group-hover:text-civeni-red group-hover:translate-x-1">
               {speaker.title}
             </h4>
             
-            <p className="text-gray-600 font-medium text-xs mb-2 flex items-center">
-              <span className="w-1.5 h-1.5 bg-civeni-blue rounded-full mr-2 flex-shrink-0"></span>
+            <p className="text-gray-600 font-medium text-xs mb-2 flex items-center transition-all duration-500 group-hover:text-gray-800 group-hover:translate-x-1">
+              <span className="w-1.5 h-1.5 bg-civeni-blue rounded-full mr-2 flex-shrink-0 group-hover:scale-150 transition-transform duration-500"></span>
               {speaker.institution}
             </p>
             
-            <p className="text-gray-700 text-xs leading-relaxed line-clamp-3 hover:line-clamp-none transition-all duration-300">
+            <p className="text-gray-700 text-xs leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-500 group-hover:text-gray-900">
               {speaker.bio}
             </p>
           </div>
