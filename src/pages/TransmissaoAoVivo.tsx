@@ -157,59 +157,48 @@ const TransmissaoAoVivo = () => {
       <Header />
 
       {/* Hero Banner */}
-      <section className="relative bg-gradient-to-br from-civeni-blue via-civeni-blue/95 to-civeni-red text-white py-24 overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-civeni-red/10 rounded-full blur-3xl animate-pulse delay-700"></div>
-        </div>
-
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
           <nav className="mb-8 text-sm">
-            <ol className="flex items-center space-x-2 text-white/80">
-              <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
-              <li>›</li>
-              <li><a href="/programacao-online" className="hover:text-white transition-colors">Programação</a></li>
-              <li>›</li>
-              <li className="text-white">Transmissão ao Vivo</li>
+            <ol className="flex items-center space-x-2">
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li className="text-blue-200">›</li>
+              <li><Link to="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</Link></li>
+              <li className="text-blue-200">›</li>
+              <li>Transmissão ao Vivo</li>
             </ol>
           </nav>
           
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            {/* Title Section */}
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
-                <Play className="w-4 h-4 animate-pulse" />
-                <span className="text-sm font-medium">{t('transmission.title')}</span>
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                {title || t('transmission.title')}
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+              <h1 className="text-4xl md:text-6xl font-bold font-poppins">
+                {title || 'Transmissão ao vivo'}
               </h1>
-              
-              {subtitle && (
-                <p className="text-xl md:text-2xl text-white/90 font-medium">
-                  {subtitle}
-                </p>
-              )}
-              
-              {description && (
-                <p className="text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-                  {description}
-                </p>
-              )}
+              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
             </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 items-center justify-center">
+            
+            {subtitle && (
+              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+                {subtitle}
+              </p>
+            )}
+            
+            {description && (
+              <p className="text-lg mb-8 max-w-3xl mx-auto text-blue-100">
+                {description}
+              </p>
+            )}
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               {primaryCTA && (
                 primaryCTA.external ? (
                   <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
-                    <button className="group bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                       {primaryCTA.icon}
                       {primaryCTA.label}
-                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </a>
                 ) : (
@@ -217,33 +206,34 @@ const TransmissaoAoVivo = () => {
                     onClick={() => {
                       document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="group bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
                   >
                     {primaryCTA.icon}
                     {primaryCTA.label}
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 )
               )}
-              <a href="/inscricoes">
-                <button className="group border-white/80 text-white hover:bg-white/10 border-2 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center gap-3 backdrop-blur-sm">
+              
+              <Link to="/inscricoes">
+                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
                   <Users className="w-5 h-5" />
                   Fazer Inscrição
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-              </a>
+              </Link>
             </div>
 
-            {/* Status Info */}
-            <div className="flex flex-wrap gap-4 items-center justify-center pt-4">
-              {statusBadge}
-              {timezoneText && (
-                <div className="flex items-center gap-2 text-sm bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
-                  <Clock className="w-4 h-4" />
-                  <span>{timezoneText}</span>
-                </div>
-              )}
-            </div>
+            {/* Status info */}
+            {(statusBadge || timezoneText) && (
+              <div className="flex flex-wrap gap-4 items-center justify-center text-sm">
+                {statusBadge}
+                {timezoneText && (
+                  <span className="text-blue-100">
+                    <Clock className="w-4 h-4 inline mr-2" />
+                    {timezoneText}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
