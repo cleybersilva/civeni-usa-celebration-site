@@ -11,8 +11,9 @@ const SpeakersSection = () => {
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
   // Filtrar apenas palestrantes em destaque (mesmos da página /palestrantes)
-  const speakers = content.speakers
-    .filter(speaker => speaker.isFeatured)
+  // Se não houver palestrantes em destaque, mostrar todos como fallback
+  const featuredSpeakers = content.speakers.filter(speaker => speaker.isFeatured);
+  const speakers = (featuredSpeakers.length > 0 ? featuredSpeakers : content.speakers)
     .sort((a, b) => a.order - b.order);
 
   // Componente para a imagem do speaker atual
@@ -58,7 +59,7 @@ const SpeakersSection = () => {
   };
 
   if (speakers.length === 0) {
-    return <div>Loading speakers...</div>;
+    return null; // Não renderizar a seção se não houver palestrantes
   }
 
   return (
