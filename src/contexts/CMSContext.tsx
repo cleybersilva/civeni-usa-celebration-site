@@ -168,44 +168,7 @@ interface CMSContextType {
 }
 
 const defaultContent: CMSContent = {
-  speakers: [
-    {
-      id: '1',
-      name: "Dr. Maria Rodriguez",
-      title: "Professor of Biomedical Engineering",
-      institution: "Harvard Medical School",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Leading researcher in regenerative medicine and tissue engineering with over 20 years of experience.",
-      order: 1
-    },
-    {
-      id: '2',
-      name: "Prof. James Chen",
-      title: "Director of AI Research",
-      institution: "Stanford University",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Pioneer in artificial intelligence and machine learning applications in healthcare.",
-      order: 2
-    },
-    {
-      id: '3',
-      name: "Dr. Elena Kowalski",
-      title: "Environmental Scientist",
-      institution: "MIT",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Expert in climate change research and sustainable technology development.",
-      order: 3
-    },
-    {
-      id: '4',
-      name: "Dr. Ahmed Hassan",
-      title: "Professor of Psychology",
-      institution: "Oxford University",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Renowned researcher in cognitive psychology and behavioral sciences.",
-      order: 4
-    }
-  ],
+  speakers: [],
   bannerSlides: [
     {
       id: '1',
@@ -514,7 +477,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         order: speaker.order_index,
         photoVersion: speaker.photo_version,
         updatedAt: speaker.updated_at
-      })) || defaultContent.speakers;
+      })) || [];
+      
+      console.log('Speakers loaded from database:', speakers.length);
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
