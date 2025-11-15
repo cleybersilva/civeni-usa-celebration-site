@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users, Youtube, MapPin, ChevronRight, Monitor, Mail } from 'lucide-react';
+import { Play, Calendar, Video, HelpCircle, ExternalLink, Clock, Users, Youtube, MapPin, ChevronRight, Monitor, Mail, User, FileText } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,10 @@ import {
   pickLang,
   formatTimezone,
 } from '@/hooks/useTransmission';
+import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentationRooms';
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
@@ -33,6 +36,7 @@ const TransmissaoAoVivo = () => {
   const { data: transmission, isLoading: txLoading } = useTransmission();
   const { data: rooms = [], isLoading: roomsLoading } = useTransmissionRooms(transmission?.id);
   const { data: upcoming = [], isLoading: upcomingLoading } = useUpcomingTransmissions();
+  const { data: presentationRooms = [], isLoading: presentationRoomsLoading } = usePublicPresentationRoomsWithAssignments();
 
   // Sync hash with active tab
   useEffect(() => {
@@ -510,46 +514,121 @@ const TransmissaoAoVivo = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Salas de Reunião</h2>
+                <h2 className="text-3xl font-bold text-gray-900">Salas de Apresentação de Trabalhos</h2>
               </div>
               <p className="text-gray-600 text-lg max-w-3xl">
-                Acesse as salas virtuais exclusivas para participantes inscritos. Interaja diretamente com palestrantes e outros participantes.
+                Confira a programação das apresentações de trabalhos aprovados. Cada sala possui link para acesso via Google Meet.
               </p>
-              {roomsLoading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-48 rounded-xl" />
+              
+              {presentationRoomsLoading ? (
+                <div className="grid gap-6">
+                  {[1, 2].map((i) => (
+                    <Skeleton key={i} className="h-64 rounded-xl" />
                   ))}
                 </div>
-              ) : rooms.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {rooms.map((room) => (
+              ) : presentationRooms.length > 0 ? (
+                <div className="space-y-6">
+                  {presentationRooms.map((room) => (
                     <Card 
                       key={room.id} 
-                      className="group p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:-translate-y-1"
+                      className="p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200"
                     >
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-civeni-blue transition-colors line-clamp-2">
-                            {pickLang(room.name, locale)}
-                          </h3>
-                          {room.is_live && (
-                            <Badge className="bg-red-600 text-white animate-pulse flex items-center gap-1 shrink-0">
-                              <span className="w-2 h-2 bg-white rounded-full"></span>
-                              Ao vivo
-                            </Badge>
-                          )}
+                      <div className="space-y-6">
+                        {/* Cabeçalho da sala */}
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 pb-4 border-b border-gray-200">
+                          <div className="space-y-2">
+                            <h3 className="font-bold text-2xl text-gray-900">
+                              {room.nome_sala}
+                            </h3>
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-civeni-blue" />
+                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-civeni-blue" />
+                                {room.horario_inicio_sala} - {room.horario_fim_sala}
+                              </div>
+                              {room.responsavel_sala && (
+                                <div className="flex items-center gap-2">
+                                  <User className="w-4 h-4 text-civeni-blue" />
+                                  {room.responsavel_sala}
+                                </div>
+                              )}
+                            </div>
+                            {room.descricao_sala && (
+                              <p className="text-gray-600 text-sm mt-2">
+                                {room.descricao_sala}
+                              </p>
+                            )}
+                          </div>
+                          <Button 
+                            className="bg-civeni-blue hover:bg-civeni-blue/90 shrink-0" 
+                            asChild
+                          >
+                            <a href={room.meet_link} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              Entrar no Google Meet
+                            </a>
+                          </Button>
                         </div>
-                        <Button 
-                          className="w-full bg-civeni-blue hover:bg-civeni-blue/90 group-hover:shadow-md transition-all" 
-                          asChild
-                        >
-                          <a href={room.meet_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Entrar na sala
-                            <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                          </a>
-                        </Button>
+
+                        {/* Lista de trabalhos */}
+                        {room.assignments && room.assignments.length > 0 ? (
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-lg text-gray-800">
+                              Trabalhos desta sala ({room.assignments.length})
+                            </h4>
+                            <div className="space-y-3">
+                              {room.assignments.map((assignment: any, idx: number) => (
+                                <div 
+                                  key={assignment.id} 
+                                  className="p-4 bg-white rounded-lg border border-gray-200 hover:border-civeni-blue transition-colors"
+                                >
+                                  <div className="flex items-start gap-4">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-civeni-blue/10 text-civeni-blue font-bold shrink-0">
+                                      {idx + 1}
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <Clock className="w-4 h-4" />
+                                        {format(new Date(assignment.inicio_apresentacao), 'HH:mm')} - {format(new Date(assignment.fim_apresentacao), 'HH:mm')}
+                                        {assignment.submission?.tipo && (
+                                          <Badge variant="outline" className="ml-2">
+                                            {assignment.submission.tipo}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <div className="space-y-1">
+                                        <div className="flex items-start gap-2">
+                                          <User className="w-4 h-4 mt-1 text-civeni-blue shrink-0" />
+                                          <span className="font-semibold text-gray-900">
+                                            {assignment.submission?.autor_principal || 'N/A'}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                          <FileText className="w-4 h-4 mt-1 text-civeni-red shrink-0" />
+                                          <span className="text-gray-700">
+                                            {assignment.submission?.titulo || 'Título não disponível'}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      {assignment.observacoes && (
+                                        <p className="text-sm text-gray-600 italic">
+                                          {assignment.observacoes}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-center py-4">
+                            Nenhum trabalho agendado para esta sala ainda.
+                          </p>
+                        )}
                       </div>
                     </Card>
                   ))}
@@ -563,7 +642,7 @@ const TransmissaoAoVivo = () => {
                     <div className="space-y-2">
                       <h3 className="text-xl font-bold text-gray-900">Nenhuma sala disponível no momento</h3>
                       <p className="text-gray-600">
-                        As salas serão abertas durante o evento. Fique atento aos horários da programação.
+                        As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.
                       </p>
                     </div>
                   </div>

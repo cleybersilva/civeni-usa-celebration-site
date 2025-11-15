@@ -163,6 +163,13 @@ export const createMenuItems = (
       isPriority: false
     },
     {
+      id: 'salas-apresentacao',
+      label: 'Salas de Apresentação',
+      icon: Users,
+      show: hasPermission('cronograma') || isAdminRoot(),
+      isPriority: false
+    },
+    {
       id: 'comite',
       label: t('admin.menu.committee', 'Comissão Organizadora'),
       icon: Users,

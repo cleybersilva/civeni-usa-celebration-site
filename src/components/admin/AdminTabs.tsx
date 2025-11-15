@@ -17,6 +17,7 @@ import SimpleEventsManager from './SimpleEventsManager';
 import WorkSubmissionsManager from './WorkSubmissionsManager';
 import { SubmissionsManager } from './SubmissionsManager';
 import VideoSubmissionsManager from './VideoSubmissionsManager';
+import { PresentationRoomsManager } from './PresentationRoomsManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -90,6 +91,9 @@ const AdminTabs = () => {
         )}
         {hasPermission('videos') && (
           <TabsTrigger value="videos">Vídeos</TabsTrigger>
+        )}
+        {hasPermission('cronograma') && (
+          <TabsTrigger value="salas-apresentacao">Salas de Apresentação</TabsTrigger>
         )}
       </TabsList>
 
@@ -197,6 +201,12 @@ const AdminTabs = () => {
       {hasPermission('videos') && (
         <TabsContent value="videos">
           <VideosManager />
+        </TabsContent>
+      )}
+
+      {hasPermission('cronograma') && (
+        <TabsContent value="salas-apresentacao">
+          <PresentationRoomsManager />
         </TabsContent>
       )}
     </Tabs>
