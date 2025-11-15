@@ -69,10 +69,24 @@ export const PresentationRoomsManager = () => {
 
   const createMutation = useMutation({
     mutationFn: async (data: RoomFormData) => {
-      const { error } = await supabase
-        .from('presentation_rooms')
-        .insert([data]);
+      const email = localStorage.getItem('admin_email');
+      const token = localStorage.getItem('admin_token');
+      
+      if (!email || !token) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_upsert_presentation_room',
+        {
+          room_data: data as any,
+          user_email: email,
+          session_token: token,
+        }
+      );
+      
       if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['presentation-rooms'] });
@@ -87,11 +101,24 @@ export const PresentationRoomsManager = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: RoomFormData }) => {
-      const { error } = await supabase
-        .from('presentation_rooms')
-        .update(data)
-        .eq('id', id);
+      const email = localStorage.getItem('admin_email');
+      const token = localStorage.getItem('admin_token');
+      
+      if (!email || !token) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_upsert_presentation_room',
+        {
+          room_data: { ...data, id } as any,
+          user_email: email,
+          session_token: token,
+        }
+      );
+      
       if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['presentation-rooms'] });
@@ -106,11 +133,24 @@ export const PresentationRoomsManager = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('presentation_rooms')
-        .delete()
-        .eq('id', id);
+      const email = localStorage.getItem('admin_email');
+      const token = localStorage.getItem('admin_token');
+      
+      if (!email || !token) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_delete_presentation_room',
+        {
+          room_id: id,
+          user_email: email,
+          session_token: token,
+        }
+      );
+      
       if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['presentation-rooms'] });

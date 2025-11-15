@@ -85,10 +85,24 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
 
   const createAssignmentMutation = useMutation({
     mutationFn: async (data: AssignmentFormData) => {
-      const { error } = await supabase
-        .from('presentation_room_assignments')
-        .insert([{ ...data, room_id: roomId }]);
+      const email = localStorage.getItem('admin_email');
+      const token = localStorage.getItem('admin_token');
+      
+      if (!email || !token) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_upsert_presentation_assignment',
+        {
+          assignment_data: { ...data, room_id: roomId } as any,
+          user_email: email,
+          session_token: token,
+        }
+      );
+      
       if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['presentation-room-details'] });
@@ -110,11 +124,24 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
 
   const deleteAssignmentMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('presentation_room_assignments')
-        .delete()
-        .eq('id', id);
+      const email = localStorage.getItem('admin_email');
+      const token = localStorage.getItem('admin_token');
+      
+      if (!email || !token) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_delete_presentation_assignment',
+        {
+          assignment_id: id,
+          user_email: email,
+          session_token: token,
+        }
+      );
+      
       if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['presentation-room-details'] });
