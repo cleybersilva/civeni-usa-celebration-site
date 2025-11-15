@@ -588,8 +588,10 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.tech.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.tech.answer')}</p>
+                        <h4 className="font-bold text-gray-900">Quais são os requisitos técnicos?</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Você precisa de um navegador atualizado (Chrome, Firefox, Safari ou Edge) e uma conexão de internet estável de pelo menos 5 Mbps para melhor experiência.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -602,8 +604,10 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.access.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.access.answer')}</p>
+                        <h4 className="font-bold text-gray-900">Como acesso as transmissões?</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          As transmissões ao vivo são públicas e podem ser acessadas diretamente nesta página. Para acessar as salas de reunião, você precisa estar inscrito no evento.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -616,8 +620,10 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.recording.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.recording.answer')}</p>
+                        <h4 className="font-bold text-gray-900">As sessões serão gravadas?</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Sim, todas as sessões principais serão gravadas e disponibilizadas posteriormente no canal oficial do YouTube do CIVENI.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -630,8 +636,10 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.support.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">{t('transmission.faq.support.answer')}</p>
+                        <h4 className="font-bold text-gray-900">Preciso de suporte técnico. O que faço?</h4>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Entre em contato com nossa equipe de suporte através do email suporte@civeni.org ou pelo WhatsApp disponível na página de contato.
+                        </p>
                       </div>
                     </div>
                   </div>
