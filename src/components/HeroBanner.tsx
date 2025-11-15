@@ -57,7 +57,7 @@ const HeroBanner = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ 
-              backgroundImage: `url(${slide.bgImage})`,
+              backgroundImage: `url(${slide.bgImage}?v=${slide.imageVersion || 1}&t=${slide.updatedAt ? new Date(slide.updatedAt).getTime() : Date.now()})`,
               backgroundPosition: 'center',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat'

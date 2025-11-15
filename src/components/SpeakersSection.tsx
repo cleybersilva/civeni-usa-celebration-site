@@ -10,7 +10,10 @@ const SpeakersSection = () => {
   const { content } = useCMS();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
-  const speakers = content.speakers.sort((a, b) => a.order - b.order);
+  // Filtrar apenas palestrantes em destaque (mesmos da página /palestrantes)
+  const speakers = content.speakers
+    .filter(speaker => speaker.isFeatured)
+    .sort((a, b) => a.order - b.order);
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {

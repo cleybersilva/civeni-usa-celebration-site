@@ -12,6 +12,7 @@ export interface Speaker {
   order: number;
   photoVersion?: number;
   updatedAt?: string;
+  isFeatured?: boolean;
 }
 
 export interface BannerSlide {
@@ -513,7 +514,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         bio: speaker.bio,
         order: speaker.order_index,
         photoVersion: speaker.photo_version,
-        updatedAt: speaker.updated_at
+        updatedAt: speaker.updated_at,
+        isFeatured: (speaker as any).is_featured || false
       })) || defaultContent.speakers;
 
       // Carregar configurações do evento do Supabase
