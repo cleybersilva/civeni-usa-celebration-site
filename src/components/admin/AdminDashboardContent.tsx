@@ -34,6 +34,7 @@ import TransmissionStreamsManager from '@/components/admin/TransmissionStreamsMa
 import TransmissionScheduleManager from '@/components/admin/TransmissionScheduleManager';
 import TransmissionFAQManager from '@/components/admin/TransmissionFAQManager';
 import { SubmissionsManager } from '@/components/admin/SubmissionsManager';
+import { PresentationRoomsManager } from '@/components/admin/PresentationRoomsManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -228,6 +229,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('submissoes') || isAdmin) ? (
           <PermissionGuard resource="submissoes">
             <SubmissionsManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'salas-apresentacao':
+        return (hasPermission('cronograma') || isAdminRoot()) ? (
+          <PermissionGuard resource="cronograma">
+            <PresentationRoomsManager />
           </PermissionGuard>
         ) : null;
       

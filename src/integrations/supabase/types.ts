@@ -2453,6 +2453,99 @@ export type Database = {
         }
         Relationships: []
       }
+      presentation_room_assignments: {
+        Row: {
+          created_at: string
+          fim_apresentacao: string
+          id: string
+          inicio_apresentacao: string
+          observacoes: string | null
+          ordem_apresentacao: number
+          room_id: string
+          submission_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fim_apresentacao: string
+          id?: string
+          inicio_apresentacao: string
+          observacoes?: string | null
+          ordem_apresentacao: number
+          room_id: string
+          submission_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fim_apresentacao?: string
+          id?: string
+          inicio_apresentacao?: string
+          observacoes?: string | null
+          ordem_apresentacao?: number
+          room_id?: string
+          submission_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presentation_room_assignments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "presentation_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presentation_room_assignments_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presentation_rooms: {
+        Row: {
+          created_at: string
+          data_apresentacao: string
+          descricao_sala: string | null
+          horario_fim_sala: string
+          horario_inicio_sala: string
+          id: string
+          meet_link: string
+          nome_sala: string
+          responsavel_sala: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_apresentacao: string
+          descricao_sala?: string | null
+          horario_fim_sala: string
+          horario_inicio_sala: string
+          id?: string
+          meet_link: string
+          nome_sala: string
+          responsavel_sala?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_apresentacao?: string
+          descricao_sala?: string | null
+          horario_fim_sala?: string
+          horario_inicio_sala?: string
+          id?: string
+          meet_link?: string
+          nome_sala?: string
+          responsavel_sala?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           blocked_until: string | null
