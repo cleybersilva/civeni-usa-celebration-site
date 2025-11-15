@@ -10,11 +10,7 @@ const SpeakersSection = () => {
   const { content } = useCMS();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
-  // Filtrar apenas palestrantes em destaque (mesmos da página /palestrantes)
-  // Se não houver palestrantes em destaque, mostrar todos como fallback
-  const featuredSpeakers = content.speakers.filter(speaker => speaker.isFeatured);
-  const speakers = (featuredSpeakers.length > 0 ? featuredSpeakers : content.speakers)
-    .sort((a, b) => a.order - b.order);
+  const speakers = content.speakers.sort((a, b) => a.order - b.order);
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {
@@ -59,7 +55,7 @@ const SpeakersSection = () => {
   };
 
   if (speakers.length === 0) {
-    return null; // Não renderizar a seção se não houver palestrantes
+    return <div>Loading speakers...</div>;
   }
 
   return (
