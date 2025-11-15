@@ -69,10 +69,13 @@ export const PresentationRoomsManager = () => {
 
   const createMutation = useMutation({
     mutationFn: async (data: RoomFormData) => {
-      const email = localStorage.getItem('admin_email');
-      const token = localStorage.getItem('admin_token');
-      
-      if (!email || !token) {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
 
@@ -80,8 +83,8 @@ export const PresentationRoomsManager = () => {
         'admin_upsert_presentation_room',
         {
           room_data: data as any,
-          user_email: email,
-          session_token: token,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
         }
       );
       
@@ -101,10 +104,13 @@ export const PresentationRoomsManager = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: RoomFormData }) => {
-      const email = localStorage.getItem('admin_email');
-      const token = localStorage.getItem('admin_token');
-      
-      if (!email || !token) {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
 
@@ -112,8 +118,8 @@ export const PresentationRoomsManager = () => {
         'admin_upsert_presentation_room',
         {
           room_data: { ...data, id } as any,
-          user_email: email,
-          session_token: token,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
         }
       );
       
@@ -133,10 +139,13 @@ export const PresentationRoomsManager = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const email = localStorage.getItem('admin_email');
-      const token = localStorage.getItem('admin_token');
-      
-      if (!email || !token) {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
 
@@ -144,8 +153,8 @@ export const PresentationRoomsManager = () => {
         'admin_delete_presentation_room',
         {
           room_id: id,
-          user_email: email,
-          session_token: token,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
         }
       );
       

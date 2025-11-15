@@ -85,10 +85,13 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
 
   const createAssignmentMutation = useMutation({
     mutationFn: async (data: AssignmentFormData) => {
-      const email = localStorage.getItem('admin_email');
-      const token = localStorage.getItem('admin_token');
-      
-      if (!email || !token) {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
 
@@ -96,8 +99,8 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
         'admin_upsert_presentation_assignment',
         {
           assignment_data: { ...data, room_id: roomId } as any,
-          user_email: email,
-          session_token: token,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
         }
       );
       
@@ -124,10 +127,13 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
 
   const deleteAssignmentMutation = useMutation({
     mutationFn: async (id: string) => {
-      const email = localStorage.getItem('admin_email');
-      const token = localStorage.getItem('admin_token');
-      
-      if (!email || !token) {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
 
@@ -135,8 +141,8 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
         'admin_delete_presentation_assignment',
         {
           assignment_id: id,
-          user_email: email,
-          session_token: token,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
         }
       );
       
