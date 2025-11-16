@@ -4,10 +4,12 @@ import { useCMS } from '@/contexts/CMSContext';
 import { useFixedSpeakerImage } from '@/hooks/useFixedSpeakerImage';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const SpeakersSection = () => {
   const { t } = useTranslation();
   const { content } = useCMS();
+  const navigate = useNavigate();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
   const speakers = content.speakers.sort((a, b) => a.order - b.order);
@@ -70,10 +72,13 @@ const SpeakersSection = () => {
           </p>
         </div>
         
-        <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div className="md:flex">
-              <div className="md:w-1/3">
+              <div 
+                className="md:w-1/3 cursor-pointer" 
+                onClick={() => navigate('/palestrantes')}
+              >
                 <CurrentSpeakerImage />
               </div>
               <div className="md:w-2/3 p-8">
