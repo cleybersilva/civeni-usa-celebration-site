@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const SpeakersSection = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
+  const { content, loading } = useCMS();
   const navigate = useNavigate();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
@@ -56,8 +56,9 @@ const SpeakersSection = () => {
     setCurrentSpeaker((prev) => (prev - 1 + speakers.length) % speakers.length);
   };
 
-  if (speakers.length === 0) {
-    return <div>Loading speakers...</div>;
+  // Não renderizar nada se ainda estiver carregando ou não houver speakers
+  if (loading || speakers.length === 0) {
+    return null;
   }
 
   return (

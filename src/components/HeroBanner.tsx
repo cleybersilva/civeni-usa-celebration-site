@@ -5,7 +5,7 @@ import { useCMS } from '@/contexts/CMSContext';
 
 const HeroBanner = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
+  const { content, loading } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
   
   // Filtrar apenas slides ativos para exibição pública
@@ -25,7 +25,7 @@ const HeroBanner = () => {
   }, [slides.length]);
 
 
-  if (slides.length === 0) {
+  if (loading || slides.length === 0) {
     return (
       <section className="relative h-screen overflow-hidden bg-gradient-to-br from-civeni-blue to-blue-800">
         <div className="relative z-10 flex items-center justify-center h-full">
@@ -36,9 +36,11 @@ const HeroBanner = () => {
             <p className="text-xl md:text-2xl mb-4">
               Congresso Internacional Virtual de Enfermagem
             </p>
-            <p className="text-lg md:text-xl mb-8">
-              Carregando banner...
-            </p>
+            {loading && (
+              <p className="text-lg md:text-xl mb-8">
+                Carregando...
+              </p>
+            )}
           </div>
         </div>
       </section>
