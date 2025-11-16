@@ -356,6 +356,7 @@ const CMSContext = createContext<CMSContextType | undefined>(undefined);
 export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<CMSContent>(defaultContent);
   const [loading, setLoading] = useState(true);
+  const loadingRef = React.useRef(false); // Previne múltiplas chamadas simultâneas
 
   useEffect(() => {
     // Detectar se estamos em contexto admin (URL contém /admin)
@@ -363,6 +364,10 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     // Force reload with timestamp to bypass cache
     const forceReload = () => {
+      if (loadingRef.current) {
+        console.log('⚠️ Bloqueando loadContent duplicado');
+        return;
+      }
       console.log('Forcing content reload due to date update...');
       loadContent(isAdminContext);
     };
@@ -379,7 +384,14 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const loadContent = async (adminMode = false) => {
+    if (loadingRef.current) {
+      console.log('⚠️ loadContent já está em execução, ignorando chamada duplicada');
+      return;
+    }
+    
     try {
+      loadingRef.current = true;
+      setLoading(true);
       console.log('Loading content with fresh data...', Date.now());
       // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
       let bannerQuery = supabase
@@ -447,9 +459,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         photoVersion: speaker.photo_version,
         updatedAt: speaker.updated_at
       })) || [];
-      
-      console.log('✅ CMSContext - Speakers carregados do DB:', speakers.length);
-      console.log('✅ CMSContext - Primeiro speaker:', speakers[0]);
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
@@ -553,23 +562,27 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const hybridActivities = hybridData || [];
       
-      console.log('✅ CMSContext - Antes do setContent, speakers:', speakers.length);
-      
-      // Fazer merge com estado anterior para preservar dados já carregados
-      setContent(prev => ({
-        ...prev,
-        bannerSlides: bannerSlides.length > 0 ? bannerSlides : prev.bannerSlides,
-        speakers: speakers.length > 0 ? speakers : prev.speakers,
+      // Atualizar conteúdo SEMPRE com dados carregados (não fazer merge condicional)
+      setContent({
+        bannerSlides: bannerSlides.length > 0 ? bannerSlides : defaultContent.bannerSlides,
+        speakers: speakers,  // SEMPRE usar speakers carregados, mesmo que vazio
         eventConfig: eventConfig,
-        hybridActivities: hybridActivities.length > 0 ? hybridActivities : prev.hybridActivities,
-        videos: videosFormatted.length > 0 ? videosFormatted : prev.videos,
-        counterSettings: counterSettings || prev.counterSettings
-      }));
+        hybridActivities: hybridActivities,
+        videos: videosFormatted.length > 0 ? videosFormatted : defaultContent.videos,
+        counterSettings: counterSettings || defaultContent.counterSettings,
+        registrationTiers: content.registrationTiers,
+        batchInfo: content.batchInfo,
+        venueConfig: content.venueConfig,
+        onlineConfig: content.onlineConfig,
+        partners: content.partners,
+        siteTexts: content.siteTexts
+      });
     } catch (error) {
       console.error('Error loading content:', error);
       // Não resetar o conteúdo completamente em caso de erro
     } finally {
       setLoading(false);
+      loadingRef.current = false;
     }
   };
 

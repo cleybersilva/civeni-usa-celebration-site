@@ -13,12 +13,6 @@ const SpeakersSection = () => {
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
   const speakers = content.speakers.filter(s => s.id).sort((a, b) => a.order - b.order);
-  
-  console.log('🎤 SpeakersSection RENDER');
-  console.log('🎤 Loading:', loading);
-  console.log('🎤 content.speakers:', content.speakers);
-  console.log('🎤 Filtered speakers:', speakers.length);
-  console.log('🎤 First speaker:', speakers[0]);
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {
