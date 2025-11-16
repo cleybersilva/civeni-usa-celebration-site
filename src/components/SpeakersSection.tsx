@@ -12,6 +12,8 @@ const SpeakersSection = () => {
   const navigate = useNavigate();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
+  console.log('🎤 SpeakersSection RENDER - loading:', loading, 'content.speakers:', content.speakers.length, content.speakers);
+  
   const speakers = content.speakers.sort((a, b) => a.order - b.order);
 
   // Componente para a imagem do speaker atual
