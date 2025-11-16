@@ -695,6 +695,7 @@ export type Database = {
           image_url: string | null
           institution: string
           is_active: boolean
+          is_featured: boolean
           name: string
           order_index: number
           photo_version: number
@@ -708,6 +709,7 @@ export type Database = {
           image_url?: string | null
           institution: string
           is_active?: boolean
+          is_featured?: boolean
           name: string
           order_index?: number
           photo_version?: number
@@ -721,6 +723,7 @@ export type Database = {
           image_url?: string | null
           institution?: string
           is_active?: boolean
+          is_featured?: boolean
           name?: string
           order_index?: number
           photo_version?: number

@@ -90,14 +90,14 @@ const SpeakersSection = () => {
                   {speakers[currentSpeaker].bio}
                 </p>
                 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-4">
                   <button
                     onClick={prevSpeaker}
-                    className="bg-civeni-blue text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-poppins"
+                    className="bg-civeni-blue text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-poppins flex-shrink-0"
                   >
                     {t('speakers.previous')}
                   </button>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 justify-center flex-1">
                     {speakers.map((_, index) => (
                       <button
                         key={index}
@@ -110,7 +110,7 @@ const SpeakersSection = () => {
                   </div>
                   <button
                     onClick={nextSpeaker}
-                    className="bg-civeni-blue text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-poppins"
+                    className="bg-civeni-blue text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-poppins flex-shrink-0"
                   >
                     {t('speakers.next')}
                   </button>
