@@ -56,8 +56,11 @@ const SpeakersSection = () => {
     setCurrentSpeaker((prev) => (prev - 1 + speakers.length) % speakers.length);
   };
 
+  console.log('SpeakersSection render - loading:', loading, 'speakers:', speakers.length);
+
   // Não renderizar nada se não houver speakers (mas renderizar skeleton durante loading)
   if (!loading && speakers.length === 0) {
+    console.log('SpeakersSection: No speakers available, returning null');
     return null;
   }
 
