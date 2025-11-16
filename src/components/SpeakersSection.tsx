@@ -13,8 +13,6 @@ const SpeakersSection = () => {
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
   const speakers = content.speakers.sort((a, b) => a.order - b.order);
-  
-  console.log('SpeakersSection - loading:', loading, 'speakers count:', speakers.length, 'content.speakers:', content.speakers.length);
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {
@@ -58,13 +56,10 @@ const SpeakersSection = () => {
     setCurrentSpeaker((prev) => (prev - 1 + speakers.length) % speakers.length);
   };
 
-  console.log('SpeakersSection render - loading:', loading, 'speakers:', speakers.length);
-
-  // Sempre renderizar, mesmo se não houver speakers (para debug)
-  // if (!loading && speakers.length === 0) {
-  //   console.log('SpeakersSection: No speakers available, returning null');
-  //   return null;
-  // }
+  // Não renderizar nada se não houver speakers (mas renderizar skeleton durante loading)
+  if (!loading && speakers.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-20 bg-civeni-blue">
@@ -98,12 +93,7 @@ const SpeakersSection = () => {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
-            {speakers.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden p-8 text-center">
-                <p className="text-gray-600">Nenhum palestrante disponível no momento. (Debug: loading={loading.toString()}, speakers.length={speakers.length})</p>
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                 <div className="md:flex">
                   <div 
                     className="md:w-1/3 cursor-pointer" 
@@ -155,8 +145,7 @@ const SpeakersSection = () => {
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
         )}
       </div>
     </section>
