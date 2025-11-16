@@ -446,10 +446,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         order: speaker.order_index,
         photoVersion: speaker.photo_version,
         updatedAt: speaker.updated_at
-      })) || defaultContent.speakers;
-      
-      console.log('🔍 SPEAKERS DEBUG - Raw data from DB:', speakersData?.length, 'speakers');
-      console.log('🔍 SPEAKERS DEBUG - Mapped speakers:', speakers.length, speakers);
+      })) || [];
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
@@ -552,25 +549,21 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.log('Counter settings from DB:', counterSettings);
 
       const hybridActivities = hybridData || [];
-
-      console.log('🔍 BEFORE setContent - speakers:', speakers.length, speakers);
       
       // Merge completo com defaultContent para garantir que nenhum campo fique vazio
-      const newContent = { 
+      setContent(prev => ({ 
         ...defaultContent,
+        ...prev,
         bannerSlides, 
         speakers,
         eventConfig, 
         hybridActivities,
         videos: videosFormatted,
         counterSettings
-      };
-      
-      console.log('🔍 NEW CONTENT - speakers:', newContent.speakers.length, newContent.speakers);
-      setContent(newContent);
+      }));
     } catch (error) {
       console.error('Error loading content:', error);
-      setContent(defaultContent);
+      // Não resetar o conteúdo completamente em caso de erro
     } finally {
       setLoading(false);
     }
