@@ -56,8 +56,8 @@ const SpeakersSection = () => {
     setCurrentSpeaker((prev) => (prev - 1 + speakers.length) % speakers.length);
   };
 
-  // Não renderizar nada se ainda estiver carregando ou não houver speakers
-  if (loading || speakers.length === 0) {
+  // Não renderizar nada se não houver speakers (mas renderizar skeleton durante loading)
+  if (!loading && speakers.length === 0) {
     return null;
   }
 
@@ -73,6 +73,25 @@ const SpeakersSection = () => {
           </p>
         </div>
         
+        {loading ? (
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-pulse">
+              <div className="md:flex">
+                <div className="md:w-1/3 bg-gray-200 h-64 md:h-96"></div>
+                <div className="md:w-2/3 p-8 space-y-4">
+                  <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
           <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div className="md:flex">
@@ -127,6 +146,7 @@ const SpeakersSection = () => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </section>
   );
