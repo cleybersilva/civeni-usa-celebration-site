@@ -448,17 +448,28 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Converter dados do Supabase para o formato do contexto
-      const speakers: Speaker[] = speakersData?.map(speaker => ({
-        id: speaker.id,
-        name: speaker.name,
-        title: speaker.title,
-        institution: speaker.institution,
-        image: speaker.image_url || '',
-        bio: speaker.bio,
-        order: speaker.order_index,
-        photoVersion: speaker.photo_version,
-        updatedAt: speaker.updated_at
-      })) || [];
+      const speakers: Speaker[] = speakersData?.map(speaker => {
+        // Filtrar data URLs - usar string vazia para forçar uso de placeholder
+        let imageUrl = speaker.image_url || '';
+        if (imageUrl.startsWith('data:image')) {
+          console.warn(`Speaker ${speaker.name} tem data URL como imagem, usando fallback`);
+          imageUrl = '';
+        }
+        
+        return {
+          id: speaker.id,
+          name: speaker.name,
+          title: speaker.title,
+          institution: speaker.institution,
+          image: imageUrl,
+          bio: speaker.bio,
+          order: speaker.order_index,
+          photoVersion: speaker.photo_version,
+          updatedAt: speaker.updated_at
+        };
+      }) || [];
+      
+      console.log(`CMSContext - Loaded ${speakers.length} speakers from DB`);
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
@@ -562,16 +573,16 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const hybridActivities = hybridData || [];
       
-      // Fazer merge correto com estado anterior para preservar dados não carregados aqui
-      setContent(prev => ({
-        ...prev,  // Manter todos os dados do estado anterior
-        bannerSlides: bannerSlides.length > 0 ? bannerSlides : prev.bannerSlides,
-        speakers: speakers,  // Atualizar speakers
+      // Atualizar conteúdo - sempre usar dados carregados, não fazer merge com prev
+      setContent({
+        ...defaultContent,  // Iniciar com default
+        bannerSlides: bannerSlides.length > 0 ? bannerSlides : defaultContent.bannerSlides,
+        speakers: speakers.length > 0 ? speakers : defaultContent.speakers,  // Usar speakers carregados
         eventConfig: eventConfig,
         hybridActivities: hybridActivities,
-        videos: videosFormatted.length > 0 ? videosFormatted : prev.videos,
-        counterSettings: counterSettings || prev.counterSettings
-      }));
+        videos: videosFormatted.length > 0 ? videosFormatted : defaultContent.videos,
+        counterSettings: counterSettings || defaultContent.counterSettings
+      });
     } catch (error) {
       console.error('Error loading content:', error);
       // Não resetar o conteúdo completamente em caso de erro
