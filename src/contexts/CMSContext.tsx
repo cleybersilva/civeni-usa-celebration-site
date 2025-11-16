@@ -448,8 +448,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updatedAt: speaker.updated_at
       })) || defaultContent.speakers;
 
-      console.log('CMSContext loaded speakers:', speakers.length, 'speakers', { adminMode, speakersData: speakersData?.length });
-
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
         .from('event_config')
@@ -551,19 +549,17 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.log('Counter settings from DB:', counterSettings);
 
       const hybridActivities = hybridData || [];
-      console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
 
-      setContent(prev => ({ 
-        ...prev, 
+      // Merge completo com defaultContent para garantir que nenhum campo fique vazio
+      setContent({ 
+        ...defaultContent,
         bannerSlides, 
         speakers,
         eventConfig, 
         hybridActivities,
         videos: videosFormatted,
         counterSettings
-      }));
-      
-      console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
+      });
     } catch (error) {
       console.error('Error loading content:', error);
       setContent(defaultContent);
