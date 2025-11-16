@@ -281,7 +281,9 @@ export const enTranslations = {
     partners: {
       title: "Our Partners",
       organizedBy: "Organized By",
+      partnerOrganizers: "Partner Organizers",
       academicPartners: "Academic Partners",
+      sponsors: "Sponsors",
       becomePartner: "Become a Partner",
       partnerDesc: "Join us in shaping the future of education",
       partnerButton: "Partner with Us"
