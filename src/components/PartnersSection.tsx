@@ -25,10 +25,10 @@ const PartnersSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            {content.siteTexts.partnersTitle}
+            {t('partners.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {content.siteTexts.partnersDescription}
+            {t('partners.partnerDesc')}
           </p>
         </div>
         
