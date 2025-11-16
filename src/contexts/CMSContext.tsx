@@ -448,6 +448,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updatedAt: speaker.updated_at
       })) || defaultContent.speakers;
 
+      console.log('CMSContext loaded speakers:', speakers.length, 'speakers', { adminMode, speakersData: speakersData?.length });
+
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
         .from('event_config')
