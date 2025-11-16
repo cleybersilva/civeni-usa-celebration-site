@@ -562,21 +562,16 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const hybridActivities = hybridData || [];
       
-      // Atualizar conteúdo SEMPRE com dados carregados (não fazer merge condicional)
-      setContent({
-        bannerSlides: bannerSlides.length > 0 ? bannerSlides : defaultContent.bannerSlides,
-        speakers: speakers,  // SEMPRE usar speakers carregados, mesmo que vazio
+      // Fazer merge correto com estado anterior para preservar dados não carregados aqui
+      setContent(prev => ({
+        ...prev,  // Manter todos os dados do estado anterior
+        bannerSlides: bannerSlides.length > 0 ? bannerSlides : prev.bannerSlides,
+        speakers: speakers,  // Atualizar speakers
         eventConfig: eventConfig,
         hybridActivities: hybridActivities,
-        videos: videosFormatted.length > 0 ? videosFormatted : defaultContent.videos,
-        counterSettings: counterSettings || defaultContent.counterSettings,
-        registrationTiers: content.registrationTiers,
-        batchInfo: content.batchInfo,
-        venueConfig: content.venueConfig,
-        onlineConfig: content.onlineConfig,
-        partners: content.partners,
-        siteTexts: content.siteTexts
-      });
+        videos: videosFormatted.length > 0 ? videosFormatted : prev.videos,
+        counterSettings: counterSettings || prev.counterSettings
+      }));
     } catch (error) {
       console.error('Error loading content:', error);
       // Não resetar o conteúdo completamente em caso de erro
