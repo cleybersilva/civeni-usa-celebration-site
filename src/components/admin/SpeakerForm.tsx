@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Speaker } from '@/contexts/CMSContext';
-import ImageUploadField from './ImageUploadField';
+import OptimizedImageUpload from './OptimizedImageUpload';
 
 interface SpeakerFormProps {
   formData: {
@@ -56,11 +56,15 @@ const SpeakerForm = ({
         />
       </div>
       <div>
-        <ImageUploadField
+        <OptimizedImageUpload
           value={formData.image}
           onChange={(imageValue) => setFormData({...formData, image: imageValue})}
           label="Imagem do Palestrante"
-          type="speaker"
+          maxWidth={800}
+          maxHeight={800}
+          quality={90}
+          bucket="images"
+          folder="speakers"
         />
       </div>
       <div>
