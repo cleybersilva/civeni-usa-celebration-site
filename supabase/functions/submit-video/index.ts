@@ -118,7 +118,7 @@ serve(async (req) => {
     }
 
     // Validar tipo_participante
-    const tiposValidos = ['Aluno(a) VCCU', 'Participante Externo', 'Convidado(a)']
+    const tiposValidos = ['Aluno(a) VCCU', 'Participante Externo', 'Convidado(a)', 'Palestrantes', 'Professor(a)', 'Sorteados']
     if (!tiposValidos.includes(body.tipo_participante)) {
       return new Response(
         JSON.stringify({ error: 'Tipo de participante inválido' }),
