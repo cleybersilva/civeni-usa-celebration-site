@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../components/Header';
 import HeroBanner from '../components/HeroBanner';
 import CountdownTimer from '../components/CountdownTimer';
@@ -15,6 +15,12 @@ import PartnersSection from '../components/PartnersSection';
 import Footer from '../components/Footer';
 
 const Index = () => {
+  useEffect(() => {
+    // Force reload content on mount to ensure fresh data
+    console.log('Index page mounted - forcing content reload');
+    window.dispatchEvent(new CustomEvent('forceContentReload'));
+  }, []);
+
   return (
     <div className="min-h-screen bg-white font-poppins p-0 m-0">
       <Header />
