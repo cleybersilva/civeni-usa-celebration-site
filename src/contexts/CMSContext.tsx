@@ -448,7 +448,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loadContent = async (adminMode = false) => {
     try {
-      console.log('Loading content with fresh data...', Date.now());
+      const timestamp = Date.now(); // Cache busting
+      console.log('Loading content with fresh data... timestamp:', timestamp);
       // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
       let bannerQuery = supabase
         .from('banner_slides')
@@ -487,7 +488,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       }) || defaultContent.bannerSlides;
 
-      // Carregar speakers do Supabase
+      // Carregar speakers do Supabase com cache busting
+      console.log('CMSContext: Loading speakers from DB... (adminMode:', adminMode, ')');
       let speakersQuery = supabase
         .from('cms_speakers')
         .select('*')
@@ -501,6 +503,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (speakersError) {
         console.error('Error loading speakers:', speakersError);
+      } else {
+        console.log('CMSContext: Raw speakers data from DB:', speakersData?.length || 0);
       }
 
       // Converter dados do Supabase para o formato do contexto
@@ -515,6 +519,8 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         photoVersion: speaker.photo_version,
         updatedAt: speaker.updated_at
       })) || defaultContent.speakers;
+
+      console.log('CMSContext: Loaded speakers from DB:', speakers.length, speakers.map(s => s.name));
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
@@ -629,9 +635,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         counterSettings
       }));
       
+      console.log('CMSContext - Final content updated with speakers:', speakers.length);
       console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
     } catch (error) {
-      console.error('Error loading content:', error);
+      console.error('CRITICAL ERROR loading content:', error);
+      console.error('Falling back to defaultContent');
       setContent(defaultContent);
     } finally {
       setLoading(false);

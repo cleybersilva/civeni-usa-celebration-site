@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const SpeakersSection = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
+  const { content, loading } = useCMS();
   const navigate = useNavigate();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
@@ -16,6 +16,8 @@ const SpeakersSection = () => {
   const speakers = [...content.speakers]
     .filter(speaker => speaker.id && speaker.id !== 'new')
     .sort((a, b) => a.order - b.order);
+  
+  console.log('SpeakersSection: Loaded speakers:', speakers.length, speakers.map(s => s.name));
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {
@@ -63,8 +65,15 @@ const SpeakersSection = () => {
     setCurrentSpeaker((prev) => (prev - 1 + speakers.length) % speakers.length);
   };
 
-  if (speakers.length === 0) {
-    return <div>Loading speakers...</div>;
+  if (loading || speakers.length === 0) {
+    return (
+      <section className="py-20 bg-civeni-blue">
+        <div className="container mx-auto px-4 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
+          <p className="text-white mt-4 text-xl">Carregando palestrantes...</p>
+        </div>
+      </section>
+    );
   }
 
   return (
