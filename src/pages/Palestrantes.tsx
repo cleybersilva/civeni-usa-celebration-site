@@ -83,9 +83,12 @@ const Palestrantes = () => {
           </div>
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
-            {content.speakers.map((speaker) => {
-              return <SpeakerCard key={speaker.id} speaker={speaker} />;
-            })}
+            {content.speakers
+              .filter(speaker => speaker.id && speaker.id !== 'new')
+              .sort((a, b) => a.order - b.order)
+              .map((speaker) => {
+                return <SpeakerCard key={speaker.id} speaker={speaker} />;
+              })}
           </div>
 
           
