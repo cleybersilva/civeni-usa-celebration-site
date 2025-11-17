@@ -90,21 +90,8 @@ const EnvioVideos = () => {
         return;
       }
 
-      toast.success('Vídeo enviado com sucesso! Seu material será analisado pela banca.');
-      
-      // Resetar formulário
-      setCursoId('');
-      setTurmaId('');
-      setFormData({
-        nome: '',
-        email: '',
-        tipo_participante: '',
-        curso: '',
-        turma: '',
-        video_url: '',
-        observacoes: '',
-        concordo: false
-      });
+      // Redirecionar para página de sucesso
+      navigate('/video-submission/success');
 
     } catch (error) {
       console.error('Erro ao enviar:', error);
