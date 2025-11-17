@@ -17,6 +17,7 @@ import ScheduleOnline from "./pages/ScheduleOnline";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import RegistrationCanceled from "./pages/RegistrationCanceled";
 import WorkSubmissionSuccess from "./pages/WorkSubmissionSuccess";
+import VideoSubmissionSuccess from "./pages/VideoSubmissionSuccess";
 import NotFound from "./pages/NotFound";
 import InscricaoPresencial from "./pages/InscricaoPresencial";
 import InscricaoOnline from "./pages/InscricaoOnline";
@@ -98,6 +99,7 @@ function App() {
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="/work-submission/success" element={<WorkSubmissionSuccess />} />
+                <Route path="/video-submission/success" element={<VideoSubmissionSuccess />} />
                 <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
