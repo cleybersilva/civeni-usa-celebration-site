@@ -10,8 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, Eye, Move, ExternalLink, Mail } from 'lucide-react';
-import OptimizedImageUpload from '../OptimizedImageUpload';
+import { Plus, Edit, Trash2, Eye, Users, Move, ExternalLink, Mail } from 'lucide-react';
+import SimpleImageUpload from '../SimpleImageUpload';
 
 interface Committee {
   id?: string;
@@ -730,15 +730,10 @@ const CMSCommitteesManager = () => {
 
             <div>
               <Label>Foto</Label>
-              <OptimizedImageUpload
+              <SimpleImageUpload
                 value={memberForm.photo_url || ''}
                 onChange={(url) => setMemberForm(prev => ({ ...prev, photo_url: url }))}
                 label="Foto do Membro"
-                maxWidth={600}
-                maxHeight={600}
-                quality={85}
-                bucket="images"
-                folder="committee"
               />
             </div>
           </div>

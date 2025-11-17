@@ -281,9 +281,7 @@ export const trTranslations = {
     partners: {
       title: "Ortaklarımız",
       organizedBy: "Düzenleyen",
-      partnerOrganizers: "Ortak Organizatörler",
       academicPartners: "Akademik Ortaklar",
-      sponsors: "Sponsorlar",
       becomePartner: "Ortak Olun",
       partnerDesc: "Eğitimin geleceğini şekillendirmede bize katılın",
       partnerButton: "Bizimle Ortaklık Kurun"

@@ -25,69 +25,64 @@ const PartnersSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
-            {t('partners.title')}
+            {content.siteTexts.partnersTitle}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {t('partners.partnerDesc')}
+            {content.siteTexts.partnersDescription}
           </p>
         </div>
         
         <div className="max-w-6xl mx-auto">
-          {/* Organizers Section - Side by Side */}
+          {/* Main Organizer - VCCU */}
           <div className="mb-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Main Organizer - VCCU */}
-              <div>
-                <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-                  {t('partners.organizedBy')}
-                </h3>
-                <div className="flex justify-center items-center">
-                  <div className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-110">
-                    <div className="bg-white rounded-2xl shadow-lg p-8 w-64 h-40 flex flex-col items-center justify-center group-hover:shadow-2xl group-hover:bg-civeni-blue transition-all duration-300">
-                      <img 
-                        src={resolveAssetUrl(mainOrganizer.logo)} 
-                        alt={mainOrganizer.name}
-                        className="max-w-full max-h-20 object-contain mb-4"
-                        onError={(e) => {
-                          console.warn('Failed to load partner logo:', mainOrganizer.logo);
-                          e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOUNBM0FGIj5MT0dPPC90ZXh0Pgo8L3N2Zz4K';
-                        }}
-                      />
-                      <h4 className="font-bold text-civeni-blue group-hover:text-white transition-colors duration-300 text-sm">
-                        Veni Creator Christian University
+            <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
+              {t('partners.organizedBy')}
+            </h3>
+            <div className="flex justify-center items-center">
+              <div className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-110">
+                <div className="bg-white rounded-2xl shadow-lg p-8 w-64 h-40 flex flex-col items-center justify-center group-hover:shadow-2xl group-hover:bg-civeni-blue transition-all duration-300">
+                  <img 
+                    src={resolveAssetUrl(mainOrganizer.logo)} 
+                    alt={mainOrganizer.name}
+                    className="max-w-full max-h-20 object-contain mb-4"
+                    onError={(e) => {
+                      console.warn('Failed to load partner logo:', mainOrganizer.logo);
+                      e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOUNBM0FGIj5MT0dPPC90ZXh0Pgo8L3N2Zz4K';
+                    }}
+                  />
+                  <h4 className="font-bold text-civeni-blue group-hover:text-white transition-colors duration-300 text-sm">
+                    Veni Creator Christian University
+                  </h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Other Organizers */}
+          {organizers.length > 0 && (
+            <div className="mb-16">
+              <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
+                Organizadores Parceiros
+              </h3>
+              <div className="flex justify-center items-center space-x-12">
+                {organizers.map((org, index) => (
+                  <div
+                    key={index}
+                    className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-110"
+                  >
+                    <div className="bg-white rounded-2xl shadow-lg p-8 w-40 h-40 flex flex-col items-center justify-center group-hover:shadow-2xl group-hover:bg-civeni-blue transition-all duration-300">
+                      <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                        {org.logo}
+                      </div>
+                      <h4 className="font-bold text-civeni-blue group-hover:text-white transition-colors duration-300">
+                        {org.name}
                       </h4>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-
-              {/* Other Organizers */}
-              {organizers.length > 0 && (
-                <div>
-                  <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-                    {t('partners.partnerOrganizers')}
-                  </h3>
-                  <div className="flex justify-center items-center space-x-12">
-                    {organizers.map((org, index) => (
-                      <div
-                        key={index}
-                        className="text-center group cursor-pointer transform transition-all duration-300 hover:scale-110"
-                      >
-                        <div className="bg-white rounded-2xl shadow-lg p-8 w-40 h-40 flex flex-col items-center justify-center group-hover:shadow-2xl group-hover:bg-civeni-blue transition-all duration-300">
-                          <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                            {org.logo}
-                          </div>
-                          <h4 className="font-bold text-civeni-blue group-hover:text-white transition-colors duration-300">
-                            {org.name}
-                          </h4>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
+          )}
           
           {academicPartners.length > 0 && (
             <div className="mb-16">
@@ -119,7 +114,7 @@ const PartnersSection = () => {
           {sponsors.length > 0 && (
             <div className="mb-16">
               <h3 className="text-2xl font-bold text-civeni-red text-center mb-8 font-poppins">
-                {t('partners.sponsors')}
+                Patrocinadores
               </h3>
               <div className="flex justify-center">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl">

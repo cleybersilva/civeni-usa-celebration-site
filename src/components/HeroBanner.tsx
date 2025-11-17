@@ -5,7 +5,7 @@ import { useCMS } from '@/contexts/CMSContext';
 
 const HeroBanner = () => {
   const { t } = useTranslation();
-  const { content, loading } = useCMS();
+  const { content } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
   
   // Filtrar apenas slides ativos para exibição pública
@@ -25,7 +25,7 @@ const HeroBanner = () => {
   }, [slides.length]);
 
 
-  if (loading || slides.length === 0) {
+  if (slides.length === 0) {
     return (
       <section className="relative h-screen overflow-hidden bg-gradient-to-br from-civeni-blue to-blue-800">
         <div className="relative z-10 flex items-center justify-center h-full">
@@ -36,11 +36,9 @@ const HeroBanner = () => {
             <p className="text-xl md:text-2xl mb-4">
               Congresso Internacional Virtual de Enfermagem
             </p>
-            {loading && (
-              <p className="text-lg md:text-xl mb-8">
-                Carregando...
-              </p>
-            )}
+            <p className="text-lg md:text-xl mb-8">
+              Carregando banner...
+            </p>
           </div>
         </div>
       </section>
@@ -56,13 +54,14 @@ const HeroBanner = () => {
             index === currentSlide ? 'is-visible opacity-100' : 'opacity-0'
           }`}
         >
-          <img
-            src={slide.bgImage}
-            alt={slide.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading={index === 0 ? 'eager' : 'lazy'}
-            fetchPriority={index === 0 ? 'high' : 'low'}
-            decoding={index === 0 ? 'sync' : 'async'}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: `url(${slide.bgImage})`,
+              backgroundPosition: 'center',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat'
+            }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
           

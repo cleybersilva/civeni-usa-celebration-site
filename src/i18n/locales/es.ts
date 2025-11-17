@@ -281,9 +281,7 @@ export const esTranslations = {
     partners: {
       title: "Nuestros Socios",
       organizedBy: "Organizado Por",
-      partnerOrganizers: "Organizadores Asociados",
       academicPartners: "Socios Académicos",
-      sponsors: "Patrocinadores",
       becomePartner: "Conviértete en Socio",
       partnerDesc: "Únete a nosotros en la formación del futuro de la educación",
       partnerButton: "Asóciate con Nosotros"

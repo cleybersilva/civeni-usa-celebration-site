@@ -284,9 +284,7 @@ export const ptTranslations = {
     partners: {
       title: "Nossos Parceiros",
       organizedBy: "Organizado Por",
-      partnerOrganizers: "Organizadores Parceiros",
       academicPartners: "Parceiros Acadêmicos",
-      sponsors: "Patrocinadores",
       becomePartner: "Torne-se um Parceiro",
       partnerDesc: "Junte-se a nós na formação do futuro da educação",
       partnerButton: "Seja Nosso Parceiro"

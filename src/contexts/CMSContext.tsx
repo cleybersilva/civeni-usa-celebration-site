@@ -168,8 +168,76 @@ interface CMSContextType {
 }
 
 const defaultContent: CMSContent = {
-  speakers: [],
-  bannerSlides: [],
+  speakers: [
+    {
+      id: '1',
+      name: "Dr. Maria Rodriguez",
+      title: "Professor of Biomedical Engineering",
+      institution: "Harvard Medical School",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
+      bio: "Leading researcher in regenerative medicine and tissue engineering with over 20 years of experience.",
+      order: 1
+    },
+    {
+      id: '2',
+      name: "Prof. James Chen",
+      title: "Director of AI Research",
+      institution: "Stanford University",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
+      bio: "Pioneer in artificial intelligence and machine learning applications in healthcare.",
+      order: 2
+    },
+    {
+      id: '3',
+      name: "Dr. Elena Kowalski",
+      title: "Environmental Scientist",
+      institution: "MIT",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
+      bio: "Expert in climate change research and sustainable technology development.",
+      order: 3
+    },
+    {
+      id: '4',
+      name: "Dr. Ahmed Hassan",
+      title: "Professor of Psychology",
+      institution: "Oxford University",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
+      bio: "Renowned researcher in cognitive psychology and behavioral sciences.",
+      order: 4
+    }
+  ],
+  bannerSlides: [
+    {
+      id: '1',
+      title: "III International Multidisciplinary Congress",
+      subtitle: "Join us for three days of innovation and discovery",
+      description: "December 8-10, 2025 • Celebration, Florida",
+      bgImage: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Register Here",
+      buttonLink: "#registration",
+      order: 1
+    },
+    {
+      id: '2',
+      title: "World-Class Speakers",
+      subtitle: "Learn from international experts in various fields",
+      description: "Keynote presentations and panel discussions",
+      bgImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Register Here",
+      buttonLink: "#registration",
+      order: 2
+    },
+    {
+      id: '3',
+      title: "Submit Your Research",
+      subtitle: "Share your work with the global community",
+      description: "Oral presentations and poster sessions available",
+      bgImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=2000&q=80",
+      buttonText: "Register Here",
+      buttonLink: "#registration",
+      order: 3
+    }
+  ],
   registrationTiers: [
     {
       id: '1',
@@ -356,7 +424,6 @@ const CMSContext = createContext<CMSContextType | undefined>(undefined);
 export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<CMSContent>(defaultContent);
   const [loading, setLoading] = useState(true);
-  const loadingRef = React.useRef(false); // Previne múltiplas chamadas simultâneas
 
   useEffect(() => {
     // Detectar se estamos em contexto admin (URL contém /admin)
@@ -364,10 +431,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     // Force reload with timestamp to bypass cache
     const forceReload = () => {
-      if (loadingRef.current) {
-        console.log('⚠️ Bloqueando loadContent duplicado');
-        return;
-      }
       console.log('Forcing content reload due to date update...');
       loadContent(isAdminContext);
     };
@@ -384,14 +447,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const loadContent = async (adminMode = false) => {
-    if (loadingRef.current) {
-      console.log('⚠️ loadContent já está em execução, ignorando chamada duplicada');
-      return;
-    }
-    
     try {
-      loadingRef.current = true;
-      setLoading(true);
       console.log('Loading content with fresh data...', Date.now());
       // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
       let bannerQuery = supabase
@@ -448,28 +504,17 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Converter dados do Supabase para o formato do contexto
-      const speakers: Speaker[] = speakersData?.map(speaker => {
-        // Filtrar data URLs - usar string vazia para forçar uso de placeholder
-        let imageUrl = speaker.image_url || '';
-        if (imageUrl.startsWith('data:image')) {
-          console.warn(`Speaker ${speaker.name} tem data URL, usando placeholder`);
-          imageUrl = '';
-        }
-        
-        return {
-          id: speaker.id,
-          name: speaker.name,
-          title: speaker.title,
-          institution: speaker.institution,
-          image: imageUrl,
-          bio: speaker.bio,
-          order: speaker.order_index,
-          photoVersion: speaker.photo_version,
-          updatedAt: speaker.updated_at
-        };
-      }) || [];
-      
-      console.log(`✅ CMSContext - Speakers carregados: ${speakers.length}`, speakers.map(s => s.name));
+      const speakers: Speaker[] = speakersData?.map(speaker => ({
+        id: speaker.id,
+        name: speaker.name,
+        title: speaker.title,
+        institution: speaker.institution,
+        image: speaker.image_url || '',
+        bio: speaker.bio,
+        order: speaker.order_index,
+        photoVersion: speaker.photo_version,
+        updatedAt: speaker.updated_at
+      })) || defaultContent.speakers;
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
@@ -572,23 +617,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.log('Counter settings from DB:', counterSettings);
 
       const hybridActivities = hybridData || [];
+      console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
+
+      setContent(prev => ({ 
+        ...prev, 
+        bannerSlides, 
+        speakers,
+        eventConfig, 
+        hybridActivities,
+        videos: videosFormatted,
+        counterSettings
+      }));
       
-      // Atualizar conteúdo - SEMPRE usar dados carregados do banco
-      setContent({
-        ...defaultContent,  // Base com defaults
-        bannerSlides: bannerSlides,  // Sempre usar dados do banco
-        speakers: speakers,  // SEMPRE usar speakers carregados (mesmo que vazio)
-        eventConfig: eventConfig,
-        hybridActivities: hybridActivities,
-        videos: videosFormatted,  // Sempre usar dados do banco
-        counterSettings: counterSettings || defaultContent.counterSettings
-      });
+      console.log('CMSContext - Final content state hybridActivities:', hybridActivities);
     } catch (error) {
       console.error('Error loading content:', error);
-      // Não resetar o conteúdo completamente em caso de erro
+      setContent(defaultContent);
     } finally {
       setLoading(false);
-      loadingRef.current = false;
     }
   };
 
