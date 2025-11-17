@@ -56,14 +56,13 @@ const HeroBanner = () => {
             index === currentSlide ? 'is-visible opacity-100' : 'opacity-0'
           }`}
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ 
-              backgroundImage: `url(${slide.bgImage})`,
-              backgroundPosition: 'center',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat'
-            }}
+          <img
+            src={slide.bgImage}
+            alt={slide.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'low'}
+            decoding={index === 0 ? 'sync' : 'async'}
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
           

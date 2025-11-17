@@ -452,7 +452,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Filtrar data URLs - usar string vazia para forçar uso de placeholder
         let imageUrl = speaker.image_url || '';
         if (imageUrl.startsWith('data:image')) {
-          console.warn(`Speaker ${speaker.name} tem data URL como imagem, usando fallback`);
+          console.warn(`Speaker ${speaker.name} tem data URL, usando placeholder`);
           imageUrl = '';
         }
         
@@ -469,7 +469,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       }) || [];
       
-      console.log(`CMSContext - Loaded ${speakers.length} speakers from DB`);
+      console.log(`✅ CMSContext - Speakers carregados: ${speakers.length}`, speakers.map(s => s.name));
 
       // Carregar configurações do evento do Supabase
       const { data: eventConfigData, error: eventError } = await supabase
@@ -573,14 +573,14 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const hybridActivities = hybridData || [];
       
-      // Atualizar conteúdo - sempre usar dados carregados, não fazer merge com prev
+      // Atualizar conteúdo - SEMPRE usar dados carregados do banco
       setContent({
-        ...defaultContent,  // Iniciar com default
-        bannerSlides: bannerSlides.length > 0 ? bannerSlides : defaultContent.bannerSlides,
-        speakers: speakers.length > 0 ? speakers : defaultContent.speakers,  // Usar speakers carregados
+        ...defaultContent,  // Base com defaults
+        bannerSlides: bannerSlides,  // Sempre usar dados do banco
+        speakers: speakers,  // SEMPRE usar speakers carregados (mesmo que vazio)
         eventConfig: eventConfig,
         hybridActivities: hybridActivities,
-        videos: videosFormatted.length > 0 ? videosFormatted : defaultContent.videos,
+        videos: videosFormatted,  // Sempre usar dados do banco
         counterSettings: counterSettings || defaultContent.counterSettings
       });
     } catch (error) {
