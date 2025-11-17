@@ -17,7 +17,8 @@ const SpeakersSection = () => {
     .filter(speaker => speaker.id && speaker.id !== 'new')
     .sort((a, b) => a.order - b.order);
   
-  console.log('SpeakersSection: Loaded speakers:', speakers.length, speakers.map(s => s.name));
+  console.log('🎤 SpeakersSection: Rendering with', speakers.length, 'speakers');
+  console.log('📋 First 3 speakers:', speakers.slice(0, 3).map(s => ({ name: s.name, id: s.id })));
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {
