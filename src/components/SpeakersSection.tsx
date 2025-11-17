@@ -12,17 +12,21 @@ const SpeakersSection = () => {
   const navigate = useNavigate();
   const [currentSpeaker, setCurrentSpeaker] = useState(0);
   
-  const speakers = content.speakers.sort((a, b) => a.order - b.order);
+  // Usar exatamente os mesmos speakers da página /palestrantes
+  const speakers = [...content.speakers]
+    .filter(speaker => speaker.id && speaker.id !== 'new')
+    .sort((a, b) => a.order - b.order);
 
   // Componente para a imagem do speaker atual
   const CurrentSpeakerImage = () => {
-    const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speakers[currentSpeaker]);
+    const speaker = speakers[currentSpeaker];
+    const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
     
     return (
       <div className="relative w-full h-64 md:h-full bg-gradient-to-br from-civeni-blue/10 to-civeni-red/10">
         {hasError ? (
           <SpeakerImagePlaceholder
-            name={speakers[currentSpeaker].name}
+            name={speaker.name}
             showError={true}
             onRetry={retryLoad}
             isLoading={isLoading}
@@ -31,15 +35,18 @@ const SpeakersSection = () => {
           <>
             <img
               src={imageSrc}
-              alt={speakers[currentSpeaker].name}
+              alt={speaker.name}
               className={`w-full h-full object-contain transition-all duration-300 ${
                 isLoading ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
               }`}
+              loading="eager"
+              decoding="sync"
+              fetchPriority="high"
               style={{ objectPosition: 'center top' }}
             />
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-civeni-blue"></div>
               </div>
             )}
           </>

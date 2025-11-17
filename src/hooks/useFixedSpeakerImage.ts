@@ -28,60 +28,17 @@ export const useFixedSpeakerImage = (speaker: Speaker): FixedSpeakerImageResult 
   };
 
   const fixSupabaseUrl = (originalUrl: string): string[] => {
-    // Usar a função de produção que inclui cache busting
-    const productionUrls = fixSupabaseUrlForProduction(originalUrl);
-    
-    if (productionUrls.length > 0) {
-      return productionUrls;
-    }
-    
-    // Fallback para método original se a função de produção falhar
     const urls: string[] = [];
     
     if (!originalUrl) return urls;
     
-    // URL original primeiro
-    urls.push(originalUrl);
+    // Sempre usar as URLs de produção com cache busting
+    const productionUrls = fixSupabaseUrlForProduction(originalUrl);
+    urls.push(...productionUrls);
     
-    // Se for do Supabase, tentar corrigir
-    if (originalUrl.includes('supabase.co')) {
-      try {
-        // Método 1: Converter signed para public
-        const publicUrl = originalUrl.replace('/object/sign/', '/object/public/').split('?')[0];
-        urls.push(publicUrl);
-        
-        // Método 2: Extrair caminho e usar SDK
-        const pathMatch = originalUrl.match(/\/site-civeni\/(.+?)(?:\?|$)/);
-        if (pathMatch && pathMatch[1]) {
-          const filePath = pathMatch[1];
-          const sdkUrl = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
-          urls.push(sdkUrl);
-        }
-        
-        // Método 3: Se for um path de speakers, tentar variações
-        if (originalUrl.includes('speakers/')) {
-          const filename = originalUrl.split('/').pop()?.split('?')[0];
-          if (filename) {
-            const directUrl = supabase.storage.from('site-civeni').getPublicUrl(`speakers/${filename}`).data.publicUrl;
-            urls.push(directUrl);
-          }
-        }
-      } catch (error) {
-        console.warn('Error fixing Supabase URL:', error);
-      }
-    }
-    
-    // URLs de fallback conhecidas (das migrações)
-    const fallbacks = [
-      'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80',
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80',
-      'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80'
-    ];
-    
-    // Só adicionar fallbacks se a URL original não for deles
-    if (!originalUrl.includes('unsplash.com')) {
-      urls.push(...fallbacks);
+    // Se não for do Supabase, adicionar URL original
+    if (!originalUrl.includes('supabase.co')) {
+      urls.push(originalUrl);
     }
     
     // Remover duplicatas
