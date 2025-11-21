@@ -50,7 +50,7 @@ const SpeakersManager = () => {
         };
       } else {
         const newSpeaker: Speaker = {
-          id: 'new',
+          id: `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           ...formData,
           order: speakers.length + 1
         };
@@ -170,60 +170,17 @@ const SpeakersManager = () => {
     const newIndex = content.speakers.findIndex(s => s.id === over.id);
 
     if (oldIndex === -1 || newIndex === -1) {
+      console.warn('Drag end com índices inválidos', { activeId: active.id, overId: over.id });
       return;
     }
 
-    const reorderedSpeakers = arrayMove(content.speakers, oldIndex, newIndex);
-    
-    // Atualizar a ordem localmente primeiro para feedback imediato
-    const speakersWithNewOrder = reorderedSpeakers.map((speaker, index) => ({
+    const speakersWithNewOrder = arrayMove(content.speakers, oldIndex, newIndex).map((speaker, index) => ({
       ...speaker,
-      order: index + 1
+      order: index + 1,
     }));
 
-    // Atualizar contexto imediatamente para feedback visual
-    await updateSpeakers(speakersWithNewOrder);
-
-    // Salvar nova ordem no banco em background
     try {
-      const sessionRaw = localStorage.getItem('adminSession');
-      let sessionEmail = '';
-      let sessionToken: string | undefined;
-      
-      if (sessionRaw) {
-        try {
-          const parsed = JSON.parse(sessionRaw);
-          sessionEmail = parsed?.user?.email || '';
-          sessionToken = parsed?.session_token || parsed?.sessionToken;
-        } catch (e) {
-          console.warn('Falha ao ler a sessão admin');
-        }
-      }
-
-      if (!sessionEmail || !sessionToken) {
-        toast.error('Sessão administrativa inválida');
-        return;
-      }
-
-      // Atualizar ordem de cada speaker no banco
-      const updatePromises = speakersWithNewOrder.map(speaker =>
-        supabase.rpc('admin_upsert_speaker', {
-          speaker_data: {
-            id: speaker.id,
-            name: speaker.name,
-            title: speaker.title,
-            institution: speaker.institution,
-            bio: speaker.bio,
-            image_url: speaker.image,
-            order_index: speaker.order,
-            is_active: true
-          },
-          user_email: sessionEmail,
-          session_token: sessionToken
-        })
-      );
-
-      await Promise.all(updatePromises);
+      await updateSpeakers(speakersWithNewOrder);
       toast.success('Ordem dos palestrantes atualizada!');
     } catch (error) {
       console.error('Erro ao reordenar palestrantes:', error);
