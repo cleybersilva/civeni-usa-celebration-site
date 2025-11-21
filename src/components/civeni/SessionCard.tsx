@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, MapPin, Users, ExternalLink, Download } from 'lucide-react';
+import { Clock, MapPin, Users, ExternalLink, Download, Globe } from 'lucide-react';
+import TimezonesDisplay from './TimezonesDisplay';
 
 interface Session {
   id: string;
@@ -26,6 +27,8 @@ interface SessionCardProps {
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) => {
+  const [showTimezones, setShowTimezones] = useState(false);
+  
   const formatTime = (timeString: string) => {
     return new Date(timeString).toLocaleTimeString('pt-BR', {
       hour: '2-digit',
@@ -104,23 +107,44 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <span className="font-mono text-sm">
-                {formatTime(session.start_at)}
-                {session.end_at && ` - ${formatTime(session.end_at)}`}
-              </span>
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="font-mono text-sm">
+                  {formatTime(session.start_at)}
+                  {session.end_at && ` - ${formatTime(session.end_at)}`}
+                </span>
+                
+                {isLive && (
+                  <Badge variant="destructive" className="ml-2">
+                    AO VIVO
+                  </Badge>
+                )}
+                
+                {isNext && (
+                  <Badge variant="secondary" className="ml-2">
+                    PRÓXIMA
+                  </Badge>
+                )}
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTimezones(!showTimezones)}
+                  className="ml-auto text-xs"
+                >
+                  <Globe className="w-3 h-3 mr-1" />
+                  {showTimezones ? 'Ocultar' : 'Ver'} todos os horários
+                </Button>
+              </div>
               
-              {isLive && (
-                <Badge variant="destructive" className="ml-2">
-                  AO VIVO
-                </Badge>
-              )}
-              
-              {isNext && (
-                <Badge variant="secondary" className="ml-2">
-                  PRÓXIMA
-                </Badge>
+              {showTimezones && (
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                  <TimezonesDisplay 
+                    startTime={session.start_at} 
+                    endTime={session.end_at}
+                  />
+                </div>
               )}
             </div>
 
