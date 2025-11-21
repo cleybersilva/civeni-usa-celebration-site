@@ -169,6 +169,10 @@ const SpeakersManager = () => {
     const oldIndex = content.speakers.findIndex(s => s.id === active.id);
     const newIndex = content.speakers.findIndex(s => s.id === over.id);
 
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+
     const reorderedSpeakers = arrayMove(content.speakers, oldIndex, newIndex);
     
     // Atualizar a ordem localmente primeiro para feedback imediato
@@ -177,7 +181,10 @@ const SpeakersManager = () => {
       order: index + 1
     }));
 
-    // Salvar nova ordem no banco
+    // Atualizar contexto imediatamente para feedback visual
+    await updateSpeakers(speakersWithNewOrder);
+
+    // Salvar nova ordem no banco em background
     try {
       const sessionRaw = localStorage.getItem('adminSession');
       let sessionEmail = '';
@@ -198,9 +205,9 @@ const SpeakersManager = () => {
         return;
       }
 
-      // Atualizar ordem de cada speaker
-      for (const speaker of speakersWithNewOrder) {
-        await supabase.rpc('admin_upsert_speaker', {
+      // Atualizar ordem de cada speaker no banco
+      const updatePromises = speakersWithNewOrder.map(speaker =>
+        supabase.rpc('admin_upsert_speaker', {
           speaker_data: {
             id: speaker.id,
             name: speaker.name,
@@ -213,14 +220,14 @@ const SpeakersManager = () => {
           },
           user_email: sessionEmail,
           session_token: sessionToken
-        });
-      }
+        })
+      );
 
-      await updateSpeakers(speakersWithNewOrder);
+      await Promise.all(updatePromises);
       toast.success('Ordem dos palestrantes atualizada!');
     } catch (error) {
       console.error('Erro ao reordenar palestrantes:', error);
-      toast.error('Erro ao reordenar palestrantes');
+      toast.error('Erro ao salvar a nova ordem');
     }
   };
 
