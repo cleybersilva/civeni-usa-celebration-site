@@ -24,7 +24,7 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-8">
+      <TabsList className={`grid w-full mb-8 ${days.length === 3 ? 'grid-cols-3' : days.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
         {days.map((day) => (
           <TabsTrigger 
             key={day.id} 
