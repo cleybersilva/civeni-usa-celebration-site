@@ -177,7 +177,7 @@ const SpeakersManager = () => {
         isLoading={isLoading}
       />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {content.speakers.map((speaker) => (
           <SpeakerCard
             key={speaker.id}

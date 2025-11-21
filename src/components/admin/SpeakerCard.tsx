@@ -21,28 +21,28 @@ const SpeakerCard = ({ speaker, onEdit, onDelete }: SpeakerCardProps) => {
             speaker.image
           }
           alt={speaker.name}
-          className="w-full h-48 object-cover rounded-lg"
+          className="w-full h-32 object-cover rounded-lg"
         />
       </CardHeader>
-      <CardContent>
-        <CardTitle className="text-lg mb-2">{speaker.name}</CardTitle>
-        <p className="text-sm text-civeni-red font-semibold mb-1">{speaker.title}</p>
-        <p className="text-sm text-gray-600 mb-2">{speaker.institution}</p>
-        <p className="text-sm text-gray-700 mb-4 line-clamp-3">{speaker.bio}</p>
-        <div className="flex justify-end space-x-2">
+      <CardContent className="space-y-2">
+        <CardTitle className="text-sm font-semibold">{speaker.name}</CardTitle>
+        <p className="text-xs text-civeni-red font-semibold">{speaker.title}</p>
+        <p className="text-xs text-gray-600">{speaker.institution}</p>
+        <p className="text-xs text-gray-700 line-clamp-2">{speaker.bio}</p>
+        <div className="flex justify-end space-x-2 pt-2">
           <Button
             size="sm"
             variant="outline"
             onClick={() => onEdit(speaker)}
           >
-            <Edit className="w-4 h-4" />
+            <Edit className="w-3 h-3" />
           </Button>
           <Button
             size="sm"
             variant="destructive"
             onClick={() => onDelete(speaker.id)}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3 h-3" />
           </Button>
         </div>
       </CardContent>
