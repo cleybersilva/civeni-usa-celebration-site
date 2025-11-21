@@ -678,37 +678,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         throw new Error('Sessão administrativa inválida ou expirada. Faça login novamente.');
       }
 
-      const isTempId = (id?: string) => !id || id === 'new' || id.startsWith('temp-');
-
-      // Remover speakers antigos que não estão mais na lista atual
-      const { data: existingSpeakers, error: existingError } = await supabase
-        .from('cms_speakers')
-        .select('id');
-
-      if (existingError) {
-        console.error('Erro ao carregar speakers existentes para limpeza:', existingError);
-      } else if (existingSpeakers) {
-        const incomingIds = speakers
-          .filter(s => !isTempId(s.id))
-          .map(s => s.id as string);
-
-        const idsToDelete = existingSpeakers
-          .map(s => s.id as string)
-          .filter(id => !incomingIds.includes(id));
-
-        if (idsToDelete.length > 0) {
-          console.log('Removendo speakers antigos:', idsToDelete.length);
-          const deletePromises = idsToDelete.map(id =>
-            supabase.rpc('admin_delete_speaker', {
-              speaker_id: id,
-              user_email: sessionEmail,
-              session_token: sessionToken,
-            })
-          );
-          await Promise.all(deletePromises);
-        }
-      }
-
       const dataUrlToBlob = (dataUrl: string): { blob: Blob; mime: string; extension: string } => {
         const parts = dataUrl.split(',');
         const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
@@ -717,7 +686,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const u8arr = new Uint8Array(n);
         while (n--) u8arr[n] = bstr.charCodeAt(n);
         const blob = new Blob([u8arr], { type: mime });
-        const extension = (mime.split('/')[1] || 'jpg').replace('+xml', '');
+        const extension = (mime.split('/')[1] || 'jpg').replace('+xml','');
         return { blob, mime, extension };
       };
 
@@ -742,7 +711,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
 
         const speakerPayload: any = {
-          id: isTempId(speaker.id) ? null : speaker.id,
+          id: speaker.id !== 'new' ? speaker.id : null,
           name: speaker.name || '',
           title: speaker.title || '',
           institution: speaker.institution || '',
@@ -783,7 +752,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           institution: speaker.institution,
           image: speaker.image_url || '',
           bio: speaker.bio,
-          order: speaker.order_index,
+          order: speaker.order_index
         })) || [];
         
         setContent(prev => ({ ...prev, speakers: speakersFormatted }));

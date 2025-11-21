@@ -2,10 +2,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Trash2, GripVertical } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Speaker } from '@/contexts/CMSContext';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
 interface SpeakerCardProps {
   speaker: Speaker;
@@ -14,35 +12,9 @@ interface SpeakerCardProps {
 }
 
 const SpeakerCard = ({ speaker, onEdit, onDelete }: SpeakerCardProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: speaker.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
   return (
-    <Card 
-      ref={setNodeRef}
-      style={style}
-      className={isDragging ? 'shadow-lg ring-2 ring-civeni-blue' : ''}
-    >
-      <CardHeader className="pb-2 relative">
-        <div 
-          {...attributes} 
-          {...listeners}
-          className="absolute top-2 right-2 cursor-grab active:cursor-grabbing z-10 bg-white/80 rounded p-1 hover:bg-white"
-        >
-          <GripVertical className="w-4 h-4 text-gray-500" />
-        </div>
+    <Card key={speaker.id}>
+      <CardHeader className="pb-2">
         <img
           src={speaker.name.includes('Maria Rodriguez') ? 
             'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' : 
