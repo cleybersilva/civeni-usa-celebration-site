@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useCMS, Speaker } from '@/contexts/CMSContext';
 import { Plus } from 'lucide-react';
@@ -15,6 +15,12 @@ const SpeakersManager = () => {
   const [editingSpeaker, setEditingSpeaker] = useState<Speaker | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [localSpeakers, setLocalSpeakers] = useState<Speaker[]>(content.speakers);
+
+  useEffect(() => {
+    setLocalSpeakers(content.speakers);
+  }, [content.speakers]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -161,23 +167,26 @@ const SpeakersManager = () => {
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (!over || active.id === over.id) {
       return;
     }
 
-    const oldIndex = content.speakers.findIndex(s => s.id === active.id);
-    const newIndex = content.speakers.findIndex(s => s.id === over.id);
+    const oldIndex = localSpeakers.findIndex(s => s.id === active.id);
+    const newIndex = localSpeakers.findIndex(s => s.id === over.id);
 
     if (oldIndex === -1 || newIndex === -1) {
       console.warn('Drag end com índices inválidos', { activeId: active.id, overId: over.id });
       return;
     }
 
-    const speakersWithNewOrder = arrayMove(content.speakers, oldIndex, newIndex).map((speaker, index) => ({
+    const speakersWithNewOrder = arrayMove(localSpeakers, oldIndex, newIndex).map((speaker, index) => ({
       ...speaker,
       order: index + 1,
     }));
+
+    // Atualiza imediatamente a ordem local para refletir o arraste
+    setLocalSpeakers(speakersWithNewOrder);
 
     try {
       await updateSpeakers(speakersWithNewOrder);
@@ -209,9 +218,9 @@ const SpeakersManager = () => {
       />
 
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={content.speakers.map(s => s.id)} strategy={rectSortingStrategy}>
+        <SortableContext items={localSpeakers.map(s => s.id)} strategy={rectSortingStrategy}>
           <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {content.speakers.map((speaker) => (
+            {localSpeakers.map((speaker) => (
               <SpeakerCard
                 key={speaker.id}
                 speaker={speaker}
