@@ -53,7 +53,18 @@ export const useCiveniOnlineProgramData = () => {
   });
 
   const getSessionsForDay = (dayId: string) => {
-    return sessions?.filter(session => session.day_id === dayId) || [];
+    const daySessions = sessions?.filter(session => session.day_id === dayId) || [];
+    
+    // Deduplicate sessions by day_id + start_at + title
+    const uniqueSessions = daySessions.reduce((acc, session) => {
+      const key = `${session.day_id}-${session.start_at}-${session.title}`;
+      if (!acc.has(key)) {
+        acc.set(key, session);
+      }
+      return acc;
+    }, new Map());
+    
+    return Array.from(uniqueSessions.values());
   };
 
   return {
