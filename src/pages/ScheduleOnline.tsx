@@ -158,11 +158,13 @@ const ScheduleOnline = () => {
                 />
                 
                 {days.map(day => (
-                  <DayTimeline
-                    key={day.id}
-                    day={day}
-                    sessions={getSessionsForDay(day.id)}
-                  />
+                  day.id === activeDay && (
+                    <DayTimeline
+                      key={day.id}
+                      day={day}
+                      sessions={getSessionsForDay(day.id)}
+                    />
+                  )
                 ))}
               </Tabs>
             )}
