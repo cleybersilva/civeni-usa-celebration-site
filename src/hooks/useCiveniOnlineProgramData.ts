@@ -36,7 +36,13 @@ export const useCiveniOnlineProgramData = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('civeni_program_sessions')
-        .select('*')
+        .select(`
+          *,
+          civeni_program_days!inner (
+            event_slug
+          )
+        `)
+        .eq('civeni_program_days.event_slug', 'iii-civeni-2025-online')
         .eq('is_published', true)
         .order('order_in_day');
       
