@@ -7,6 +7,8 @@ import SpeakerCard from './SpeakerCard';
 import SpeakerFormDialog from './SpeakerFormDialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 
 const SpeakersManager = () => {
   const { content, updateSpeakers } = useCMS();
@@ -157,6 +159,71 @@ const SpeakersManager = () => {
     setIsDialogOpen(true);
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = content.speakers.findIndex(s => s.id === active.id);
+    const newIndex = content.speakers.findIndex(s => s.id === over.id);
+
+    const reorderedSpeakers = arrayMove(content.speakers, oldIndex, newIndex);
+    
+    // Atualizar a ordem localmente primeiro para feedback imediato
+    const speakersWithNewOrder = reorderedSpeakers.map((speaker, index) => ({
+      ...speaker,
+      order: index + 1
+    }));
+
+    // Salvar nova ordem no banco
+    try {
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+      
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Falha ao ler a sessão admin');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        toast.error('Sessão administrativa inválida');
+        return;
+      }
+
+      // Atualizar ordem de cada speaker
+      for (const speaker of speakersWithNewOrder) {
+        await supabase.rpc('admin_upsert_speaker', {
+          speaker_data: {
+            id: speaker.id,
+            name: speaker.name,
+            title: speaker.title,
+            institution: speaker.institution,
+            bio: speaker.bio,
+            image_url: speaker.image,
+            order_index: speaker.order,
+            is_active: true
+          },
+          user_email: sessionEmail,
+          session_token: sessionToken
+        });
+      }
+
+      await updateSpeakers(speakersWithNewOrder);
+      toast.success('Ordem dos palestrantes atualizada!');
+    } catch (error) {
+      console.error('Erro ao reordenar palestrantes:', error);
+      toast.error('Erro ao reordenar palestrantes');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -177,16 +244,20 @@ const SpeakersManager = () => {
         isLoading={isLoading}
       />
 
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {content.speakers.map((speaker) => (
-          <SpeakerCard
-            key={speaker.id}
-            speaker={speaker}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={content.speakers.map(s => s.id)} strategy={rectSortingStrategy}>
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {content.speakers.map((speaker) => (
+              <SpeakerCard
+                key={speaker.id}
+                speaker={speaker}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
