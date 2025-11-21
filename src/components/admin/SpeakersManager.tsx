@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useCMS, Speaker } from '@/contexts/CMSContext';
 import { Plus } from 'lucide-react';
@@ -7,12 +7,62 @@ import SpeakerCard from './SpeakerCard';
 import SpeakerFormDialog from './SpeakerFormDialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 
 const SpeakersManager = () => {
   const { content, updateSpeakers } = useCMS();
   const [editingSpeaker, setEditingSpeaker] = useState<Speaker | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [localSpeakers, setLocalSpeakers] = useState<Speaker[]>(content.speakers);
+
+  // Mantém os dados do contexto sincronizados com o estado local
+  useEffect(() => {
+    setLocalSpeakers(content.speakers);
+  }, [content.speakers]);
+
+  // Fallback defensivo: caso o contexto não carregue os palestrantes,
+  // carrega diretamente do Supabase apenas para este gerenciador
+  useEffect(() => {
+    if (content.speakers && content.speakers.length > 0) {
+      return;
+    }
+
+    const loadSpeakersFromDb = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cms_speakers')
+          .select('*')
+          .eq('is_active', true)
+          .order('order_index', { ascending: true });
+
+        if (error) {
+          console.error('Erro ao carregar palestrantes diretamente:', error);
+          toast.error('Erro ao carregar palestrantes');
+          return;
+        }
+
+        const speakersFormatted: Speaker[] = (data || []).map((speaker: any) => ({
+          id: speaker.id,
+          name: speaker.name,
+          title: speaker.title,
+          institution: speaker.institution,
+          image: speaker.image_url || '',
+          bio: speaker.bio,
+          order: speaker.order_index,
+        }));
+
+        setLocalSpeakers(speakersFormatted);
+      } catch (err) {
+        console.error('Erro inesperado ao carregar palestrantes diretamente:', err);
+      }
+    };
+
+    loadSpeakersFromDb();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -38,7 +88,7 @@ const SpeakersManager = () => {
     setIsLoading(true);
     
     try {
-      const speakers = [...content.speakers];
+      const speakers = [...localSpeakers];
       
       if (editingSpeaker) {
         const index = speakers.findIndex(s => s.id === editingSpeaker.id);
@@ -48,7 +98,7 @@ const SpeakersManager = () => {
         };
       } else {
         const newSpeaker: Speaker = {
-          id: 'new',
+          id: `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           ...formData,
           order: speakers.length + 1
         };
@@ -157,6 +207,38 @@ const SpeakersManager = () => {
     setIsDialogOpen(true);
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = localSpeakers.findIndex(s => s.id === active.id);
+    const newIndex = localSpeakers.findIndex(s => s.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) {
+      console.warn('Drag end com índices inválidos', { activeId: active.id, overId: over.id });
+      return;
+    }
+
+    const speakersWithNewOrder = arrayMove(localSpeakers, oldIndex, newIndex).map((speaker, index) => ({
+      ...speaker,
+      order: index + 1,
+    }));
+
+    // Atualiza imediatamente a ordem local para refletir o arraste
+    setLocalSpeakers(speakersWithNewOrder);
+
+    try {
+      await updateSpeakers(speakersWithNewOrder);
+      toast.success('Ordem dos palestrantes atualizada!');
+    } catch (error) {
+      console.error('Erro ao reordenar palestrantes:', error);
+      toast.error('Erro ao salvar a nova ordem');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -177,16 +259,20 @@ const SpeakersManager = () => {
         isLoading={isLoading}
       />
 
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {content.speakers.map((speaker) => (
-          <SpeakerCard
-            key={speaker.id}
-            speaker={speaker}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={localSpeakers.map(s => s.id)} strategy={rectSortingStrategy}>
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {localSpeakers.map((speaker) => (
+              <SpeakerCard
+                key={speaker.id}
+                speaker={speaker}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
