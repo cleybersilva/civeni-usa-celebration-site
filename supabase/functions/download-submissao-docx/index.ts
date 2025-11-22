@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
 
     // Buscar dados da submissão
     const { data: submission, error: fetchError } = await supabaseClient
-      .from('civeni_submissoes')
+      .from('submissions')
       .select('*')
       .eq('id', submissionId)
       .single();
@@ -210,7 +210,7 @@ Deno.serve(async (req) => {
 
     // Atualizar registro no banco com o caminho do DOCX
     const { error: updateError } = await supabaseClient
-      .from('civeni_submissoes')
+      .from('submissions')
       .update({
         file_path_docx: `submissions/${docxPath}`,
         docx_converted_at: new Date().toISOString()
