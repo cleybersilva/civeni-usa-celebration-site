@@ -3525,8 +3525,10 @@ export type Database = {
           autores: Json | null
           created_at: string
           deleted_at: string | null
+          docx_converted_at: string | null
           email: string
           email_norm: string | null
+          file_path_docx: string | null
           id: string
           instituicao: string | null
           nome_norm: string | null
@@ -3552,8 +3554,10 @@ export type Database = {
           autores?: Json | null
           created_at?: string
           deleted_at?: string | null
+          docx_converted_at?: string | null
           email: string
           email_norm?: string | null
+          file_path_docx?: string | null
           id?: string
           instituicao?: string | null
           nome_norm?: string | null
@@ -3579,8 +3583,10 @@ export type Database = {
           autores?: Json | null
           created_at?: string
           deleted_at?: string | null
+          docx_converted_at?: string | null
           email?: string
           email_norm?: string | null
+          file_path_docx?: string | null
           id?: string
           instituicao?: string | null
           nome_norm?: string | null
