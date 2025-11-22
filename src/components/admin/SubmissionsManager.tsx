@@ -29,7 +29,8 @@ import {
   RotateCcw,
   MoreVertical,
   FileText,
-  Clock
+  Clock,
+  Printer
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -331,6 +332,16 @@ export const SubmissionsManager = () => {
                               Restaurar
                             </DropdownMenuItem>
                           )}
+                          
+                          <DropdownMenuItem
+                            onClick={() => {
+                              const filename = submission.arquivo_path.split('/').pop();
+                              handleDownload(submission.id, filename || 'arquivo');
+                            }}
+                          >
+                            <Printer className="h-4 w-4 mr-2" />
+                            Imprimir
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
