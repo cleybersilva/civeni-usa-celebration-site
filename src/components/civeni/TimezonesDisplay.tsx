@@ -35,11 +35,17 @@ const TimezonesDisplay: React.FC<TimezonesDisplayProps> = ({ startTime, endTime,
   };
 
   return (
-    <div className={`space-y-1 text-sm ${className}`}>
+    <div className={`space-y-1.5 text-sm ${className}`}>
       {TIMEZONES.map((tz) => (
-        <div key={tz.country} className="flex items-center gap-2">
-          <span className="text-2xl leading-none" role="img" aria-label={tz.country}>{tz.emoji}</span>
-          <span className="font-medium min-w-[80px]">{tz.country}</span>
+        <div key={tz.country} className="flex items-center gap-3">
+          <span 
+            className="text-2xl leading-none flex-shrink-0 w-8 text-center" 
+            role="img" 
+            aria-label={tz.country}
+          >
+            {tz.emoji}
+          </span>
+          <span className="font-medium min-w-[90px]">{tz.country}</span>
           <span className="font-mono text-muted-foreground">
             {formatTimeForTimezone(startTime, tz.timezone)}
             {endTime && ` - ${formatTimeForTimezone(endTime, tz.timezone)}`}
