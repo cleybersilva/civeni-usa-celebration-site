@@ -505,7 +505,9 @@ export type Database = {
           autores: Json
           created_at: string
           created_by: string | null
+          docx_converted_at: string | null
           file_path: string
+          file_path_docx: string | null
           file_sha256: string | null
           file_size_bytes: number | null
           id: string
@@ -522,7 +524,9 @@ export type Database = {
           autores?: Json
           created_at?: string
           created_by?: string | null
+          docx_converted_at?: string | null
           file_path: string
+          file_path_docx?: string | null
           file_sha256?: string | null
           file_size_bytes?: number | null
           id?: string
@@ -539,7 +543,9 @@ export type Database = {
           autores?: Json
           created_at?: string
           created_by?: string | null
+          docx_converted_at?: string | null
           file_path?: string
+          file_path_docx?: string | null
           file_sha256?: string | null
           file_size_bytes?: number | null
           id?: string
