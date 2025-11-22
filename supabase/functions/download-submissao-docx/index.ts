@@ -6,6 +6,7 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -27,30 +28,45 @@ Deno.serve(async (req) => {
     // Buscar dados da submissão
     const { data: submission, error: fetchError } = await supabaseClient
       .from('submissions')
-      .select('*')
+      .select('id, arquivo_path, arquivo_mime, file_path_docx, docx_converted_at')
       .eq('id', submissionId)
       .single();
 
     if (fetchError || !submission) {
+      console.error('Erro ao buscar submissão:', fetchError);
       throw new Error('Submissão não encontrada');
     }
 
+    const arquivoPath = (submission as any).arquivo_path as string | null;
+    const arquivoMime = (submission as any).arquivo_mime as string | null;
+    const existingDocxPath = (submission as any).file_path_docx as string | null;
+
     console.log('Submissão encontrada:', {
       id: submission.id,
-      mime_type: submission.mime_type,
-      file_path: submission.file_path,
-      file_path_docx: submission.file_path_docx
+      arquivo_mime: arquivoMime,
+      arquivo_path: arquivoPath,
+      file_path_docx: existingDocxPath,
+      docx_converted_at: (submission as any).docx_converted_at ?? null,
     });
 
+    if (!arquivoPath) {
+      throw new Error('Submissão não possui arquivo vinculado');
+    }
+
+    const bucketId = 'civeni-submissoes';
+
     // Se já existe DOCX convertido, retornar ele
-    if (submission.file_path_docx) {
+    if (existingDocxPath) {
       console.log('DOCX já existe, gerando URL assinada...');
       const { data: signedUrlData, error: signedUrlError } = await supabaseClient
         .storage
-        .from('submissions')
-        .createSignedUrl(submission.file_path_docx.replace('submissions/', ''), 3600);
+        .from(bucketId)
+        .createSignedUrl(existingDocxPath.replace(/^submissions\//, ''), 3600);
 
-      if (signedUrlError) throw signedUrlError;
+      if (signedUrlError || !signedUrlData?.signedUrl) {
+        console.error('Erro ao gerar URL assinada para DOCX existente:', signedUrlError);
+        throw new Error('Falha ao gerar URL assinada para DOCX existente');
+      }
 
       return new Response(
         JSON.stringify({ url: signedUrlData.signedUrl, type: 'docx' }),
@@ -59,14 +75,20 @@ Deno.serve(async (req) => {
     }
 
     // Se o arquivo original já é DOCX, retornar ele
-    if (submission.mime_type?.includes('wordprocessingml') || submission.file_path?.endsWith('.docx')) {
+    if (
+      (arquivoMime && arquivoMime.includes('wordprocessingml')) ||
+      arquivoPath.toLowerCase().endsWith('.docx')
+    ) {
       console.log('Arquivo original já é DOCX, gerando URL assinada...');
       const { data: signedUrlData, error: signedUrlError } = await supabaseClient
         .storage
-        .from('submissions')
-        .createSignedUrl(submission.file_path.replace('submissions/', ''), 3600);
+        .from(bucketId)
+        .createSignedUrl(arquivoPath, 3600);
 
-      if (signedUrlError) throw signedUrlError;
+      if (signedUrlError || !signedUrlData?.signedUrl) {
+        console.error('Erro ao gerar URL assinada para DOCX original:', signedUrlError);
+        throw new Error('Falha ao gerar URL assinada para DOCX original');
+      }
 
       return new Response(
         JSON.stringify({ url: signedUrlData.signedUrl, type: 'docx' }),
@@ -80,11 +102,12 @@ Deno.serve(async (req) => {
     // Baixar o PDF do storage
     const { data: pdfData, error: downloadError } = await supabaseClient
       .storage
-      .from('submissions')
-      .download(submission.file_path.replace('submissions/', ''));
+      .from(bucketId)
+      .download(arquivoPath);
 
     if (downloadError || !pdfData) {
-      throw new Error('Erro ao baixar arquivo PDF: ' + downloadError?.message);
+      console.error('Erro ao baixar arquivo PDF:', downloadError);
+      throw new Error('Erro ao baixar arquivo PDF');
     }
 
     console.log('PDF baixado, convertendo com CloudConvert...');
@@ -105,21 +128,21 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         tasks: {
           'upload-pdf': {
-            operation: 'import/upload'
+            operation: 'import/upload',
           },
           'convert-to-docx': {
             operation: 'convert',
             input: 'upload-pdf',
             output_format: 'docx',
             engine: 'office',
-            optimize_print: false
+            optimize_print: false,
           },
           'export-docx': {
             operation: 'export/url',
-            input: 'convert-to-docx'
-          }
-        }
-      })
+            input: 'convert-to-docx',
+          },
+        },
+      }),
     });
 
     if (!createJobResponse.ok) {
@@ -133,7 +156,7 @@ Deno.serve(async (req) => {
     // Upload do PDF
     const uploadTask = jobData.data.tasks.find((t: any) => t.name === 'upload-pdf');
     const uploadFormData = new FormData();
-    uploadFormData.append('file', pdfData);
+    uploadFormData.append('file', pdfData as Blob);
 
     const uploadResponse = await fetch(uploadTask.result.form.url, {
       method: 'POST',
@@ -152,18 +175,18 @@ Deno.serve(async (req) => {
     const maxAttempts = 30; // 30 segundos de timeout
 
     while (jobStatus === 'processing' && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar 1 segundo
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Aguardar 1 segundo
+
       const statusResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${jobData.data.id}`, {
         headers: {
           'Authorization': `Bearer ${cloudConvertApiKey}`,
-        }
+        },
       });
 
       const statusData = await statusResponse.json();
       jobStatus = statusData.data.status;
       attempts++;
-      
+
       console.log(`Status da conversão (tentativa ${attempts}):`, jobStatus);
     }
 
@@ -175,7 +198,7 @@ Deno.serve(async (req) => {
     const finalJobResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${jobData.data.id}`, {
       headers: {
         'Authorization': `Bearer ${cloudConvertApiKey}`,
-      }
+      },
     });
 
     const finalJobData = await finalJobResponse.json();
@@ -189,20 +212,22 @@ Deno.serve(async (req) => {
     const docxBlob = await docxResponse.blob();
 
     // Salvar o DOCX no storage
-    const docxFileName = submission.file_path.replace('.pdf', '.docx').replace('submissions/', '');
+    const originalFileName = arquivoPath.split('/').pop() || `${submission.id}.pdf`;
+    const docxFileName = originalFileName.replace(/\.pdf$/i, '.docx');
     const docxPath = `converted/${docxFileName}`;
 
     console.log('Salvando DOCX convertido no storage:', docxPath);
 
-    const { data: uploadData, error: uploadError } = await supabaseClient
+    const { error: uploadError } = await supabaseClient
       .storage
-      .from('submissions')
+      .from(bucketId)
       .upload(docxPath, docxBlob, {
         contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        upsert: true
+        upsert: true,
       });
 
     if (uploadError) {
+      console.error('Erro ao salvar DOCX convertido:', uploadError);
       throw new Error('Erro ao salvar DOCX convertido: ' + uploadError.message);
     }
 
@@ -212,8 +237,8 @@ Deno.serve(async (req) => {
     const { error: updateError } = await supabaseClient
       .from('submissions')
       .update({
-        file_path_docx: `submissions/${docxPath}`,
-        docx_converted_at: new Date().toISOString()
+        file_path_docx: docxPath,
+        docx_converted_at: new Date().toISOString(),
       })
       .eq('id', submissionId);
 
@@ -224,10 +249,13 @@ Deno.serve(async (req) => {
     // Gerar URL assinada para o DOCX
     const { data: signedUrlData, error: signedUrlError } = await supabaseClient
       .storage
-      .from('submissions')
+      .from(bucketId)
       .createSignedUrl(docxPath, 3600);
 
-    if (signedUrlError) throw signedUrlError;
+    if (signedUrlError || !signedUrlData?.signedUrl) {
+      console.error('Erro ao gerar URL assinada para DOCX convertido:', signedUrlError);
+      throw new Error('Falha ao gerar URL assinada para DOCX convertido');
+    }
 
     console.log('Conversão completa, retornando URL do DOCX');
 
@@ -235,14 +263,13 @@ Deno.serve(async (req) => {
       JSON.stringify({ url: signedUrlData.signedUrl, type: 'docx', converted: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro na função:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
+      JSON.stringify({ error: error?.message ?? String(error) }),
+      {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   }
