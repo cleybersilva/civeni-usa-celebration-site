@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -68,6 +68,14 @@ export const SubmissionsManager = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Extrair áreas temáticas únicas das submissões
+  const uniqueAreas = useMemo(() => {
+    const areas = submissions
+      .map(s => s.area_tematica)
+      .filter((area): area is string => Boolean(area));
+    return Array.from(new Set(areas)).sort();
+  }, [submissions]);
 
   // Calcular paginação
   const totalPages = Math.ceil(submissions.length / itemsPerPage);
@@ -181,6 +189,25 @@ export const SubmissionsManager = () => {
                 <SelectItem value="all">Todos os tipos</SelectItem>
                 <SelectItem value="artigo">Artigo</SelectItem>
                 <SelectItem value="consorcio">Consórcio</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filters.area_tematica || 'all'}
+              onValueChange={(value) =>
+                handleFiltersChange({ ...filters, area_tematica: value === 'all' ? undefined : value })
+              }
+            >
+              <SelectTrigger className="w-full md:w-[200px]">
+                <SelectValue placeholder="Área" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as áreas</SelectItem>
+                {uniqueAreas.map((area) => (
+                  <SelectItem key={area} value={area}>
+                    {area}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
