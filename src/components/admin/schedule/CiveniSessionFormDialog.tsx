@@ -113,8 +113,26 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
         is_parallel: editingSession.is_parallel || false,
         is_featured: editingSession.is_featured || false,
       });
+    } else if (isOpen && days.length > 0) {
+      // Reset to default values when opening for new session
+      form.reset({
+        day_id: days[0]?.id || '',
+        session_type: 'palestra',
+        title: '',
+        description: '',
+        start_at: '',
+        end_at: '',
+        room: '',
+        modality: type === 'presencial' ? 'presencial' : 'online',
+        livestream_url: '',
+        materials_url: '',
+        is_parallel: false,
+        is_featured: false,
+        order_in_day: 0,
+        is_published: false,
+      });
     }
-  }, [editingSession, form]);
+  }, [editingSession, isOpen, days, type, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

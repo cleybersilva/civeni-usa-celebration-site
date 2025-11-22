@@ -84,8 +84,23 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
   React.useEffect(() => {
     if (editingDay) {
       form.reset(editingDay);
+    } else if (isOpen) {
+      // Reset to default values when opening for new day
+      form.reset({
+        date: '',
+        weekday_label: '',
+        headline: '',
+        theme: '',
+        location: type === 'presencial' ? 'Fortaleza/CE' : '',
+        modality: type === 'presencial' ? 'presencial' : 'online',
+        sort_order: 0,
+        is_published: false,
+        seo_title: '',
+        seo_description: '',
+        slug: '',
+      });
     }
-  }, [editingDay, form]);
+  }, [editingDay, isOpen, type, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
