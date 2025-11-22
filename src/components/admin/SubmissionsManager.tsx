@@ -51,6 +51,7 @@ import { useSubmissions } from '@/hooks/useSubmissions';
 import { SubmissionDetailsDialog } from './SubmissionDetailsDialog';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/integrations/supabase/client';
 
 export const SubmissionsManager = () => {
   const {
@@ -106,6 +107,38 @@ export const SubmissionsManager = () => {
     } catch (error: any) {
       console.error('Erro em handleDownload:', error);
       toast.error('Erro ao baixar arquivo: ' + error.message);
+    }
+  };
+
+  const handlePrintDocx = async (submissionId: string) => {
+    console.log('handlePrintDocx - Submission ID:', submissionId);
+    try {
+      toast.loading('Preparando documento para impressão...', { id: 'print-loading' });
+      
+      const { data, error } = await supabase.functions.invoke('download-submissao-docx', {
+        body: { submissionId }
+      });
+
+      toast.dismiss('print-loading');
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        console.log('DOCX pronto, iniciando download:', data.url);
+        window.location.href = data.url;
+        
+        if (data.converted) {
+          toast.success('PDF convertido para DOCX com sucesso!');
+        } else {
+          toast.success('Download do DOCX iniciado');
+        }
+      } else {
+        toast.error('Não foi possível gerar o documento');
+      }
+    } catch (error: any) {
+      console.error('Erro em handlePrintDocx:', error);
+      toast.dismiss('print-loading');
+      toast.error('Erro ao preparar documento: ' + error.message);
     }
   };
 
@@ -334,13 +367,10 @@ export const SubmissionsManager = () => {
                           )}
                           
                           <DropdownMenuItem
-                            onClick={() => {
-                              const filename = submission.arquivo_path.split('/').pop();
-                              handleDownload(submission.id, filename || 'arquivo');
-                            }}
+                            onClick={() => handlePrintDocx(submission.id)}
                           >
                             <Printer className="h-4 w-4 mr-2" />
-                            Imprimir
+                            Imprimir (DOCX)
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
