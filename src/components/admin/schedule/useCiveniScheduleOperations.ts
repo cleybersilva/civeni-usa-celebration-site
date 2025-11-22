@@ -23,7 +23,7 @@ const getEventSlug = (type: EventType) => {
 export const useCiveniScheduleOperations = () => {
   const queryClient = useQueryClient();
 
-  // Fetch days
+  // Fetch days (admin sees all, published or not)
   const useDays = (type: EventType) => {
     return useQuery({
       queryKey: ['civeni-program-days', type],
@@ -32,7 +32,7 @@ export const useCiveniScheduleOperations = () => {
           .from('civeni_program_days')
           .select('*')
           .eq('event_slug', getEventSlug(type))
-          .order('sort_order');
+          .order('sort_order', { ascending: true });
         
         if (error) throw error;
         return data || [];
