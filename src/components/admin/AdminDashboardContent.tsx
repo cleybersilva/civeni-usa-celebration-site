@@ -8,7 +8,7 @@ import DashboardOverview from '@/components/admin/AdminDashboard';
 import BannerManager from '@/components/admin/BannerManager';
 import EventConfigManager from '@/components/admin/EventConfigManager';
 import CopyrightManager from '@/components/admin/CopyrightManager';
-import ScheduleManager from '@/components/admin/ScheduleManager';
+import CiveniScheduleManager from '@/components/admin/CiveniScheduleManager';
 import RegistrationManager from '@/components/admin/RegistrationManager';
 import VenueConfigManager from '@/components/admin/VenueConfigManager';
 import OnlineConfigManager from '@/components/admin/OnlineConfigManager';
@@ -128,10 +128,10 @@ const AdminDashboardContent = () => {
         ) : null;
       
       case 'programacao':
-        console.log('Rendering ScheduleManager for programacao tab');
+        console.log('Rendering CiveniScheduleManager for programacao tab');
         return (hasPermission('cronograma') || isAdminRoot()) ? (
           <PermissionGuard resource="cronograma">
-            <ScheduleManager />
+            <CiveniScheduleManager />
           </PermissionGuard>
         ) : null;
       
