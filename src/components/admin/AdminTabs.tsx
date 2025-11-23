@@ -43,6 +43,7 @@ const AdminTabs = () => {
   const isAdminRoot = () => user.user_type === 'admin_root';
   const canViewFinanceiro = user.user_type === 'admin_root' || user.user_type === 'admin';
   const canViewUsuarios = user.user_type === 'admin_root' || user.is_admin_root;
+  const canViewCertificados = hasPermission('certificados') || user.user_type === 'admin_root' || user.user_type === 'admin';
 
   return (
     <Tabs defaultValue="eventos" className="w-full">
@@ -96,7 +97,7 @@ const AdminTabs = () => {
         {hasPermission('cronograma') && (
           <TabsTrigger value="salas-apresentacao">Salas de Apresentação</TabsTrigger>
         )}
-        {(hasPermission('certificados') || isAdminRoot() || user.user_type === 'admin') && (
+        {canViewCertificados && (
           <TabsTrigger value="certificados">Certificados</TabsTrigger>
         )}
       </TabsList>
@@ -201,7 +202,7 @@ const AdminTabs = () => {
         </TabsContent>
       )}
 
-      {(hasPermission('certificados') || isAdminRoot() || user.user_type === 'admin') && (
+      {canViewCertificados && (
         <TabsContent value="certificados">
           <CertificateManager />
         </TabsContent>
