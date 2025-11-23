@@ -39,29 +39,20 @@ export const useAdminEvents = () => {
   const { toast } = useToast();
   const { user, sessionToken } = useAdminAuth();
 
-  console.log('=== useAdminEvents: Hook initialized ===');
-
   const fetchEvents = async () => {
-    console.log('=== fetchEvents: Starting ===');
-    
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-    
     try {
       setLoading(true);
       setError(null);
       
       // Set admin context
       if (user && sessionToken) {
-        console.log('=== Setting admin context ===');
         await supabase.rpc('set_current_user_email_secure', {
           user_email: user.email,
           session_token: sessionToken
         });
       }
       
-      // Fetch ALL events with translations and speakers - same structure as useEvents
-      console.log('=== Fetching events with translations ===');
+      // Fetch ALL events with translations and speakers
       const { data, error: fetchError } = await supabase
         .from('events')
         .select(`
@@ -103,11 +94,8 @@ export const useAdminEvents = () => {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('=== Error fetching events ===', fetchError);
         throw fetchError;
       }
-
-      console.log('=== Events fetched successfully ===', data?.length || 0, 'events');
 
       // Transform data - flatten translations for PT-BR
       const transformedEvents = data?.map((event: any) => {
@@ -128,15 +116,10 @@ export const useAdminEvents = () => {
         };
       }) || [];
 
-      console.log('=== Transformed events ===', transformedEvents.length, 'events ready');
       setEvents(transformedEvents);
       
     } catch (error: any) {
-      console.error('=== ERRO AO CARREGAR EVENTOS ===', error);
-      
-      const errorMessage = error.name === 'AbortError' 
-        ? 'Tempo limite excedido ao carregar eventos'
-        : error.message || 'Erro ao carregar eventos';
+      const errorMessage = error.message || 'Erro ao carregar eventos';
       
       setError(new Error(errorMessage));
       setEvents([]);
@@ -147,9 +130,7 @@ export const useAdminEvents = () => {
         variant: 'destructive'
       });
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
-      console.log('=== fetchEvents: Completed ===');
     }
   };
 
@@ -164,8 +145,6 @@ export const useAdminEvents = () => {
     }
 
     try {
-      console.log('=== Creating event ===', eventData);
-      
       // Use RPC function to create event
       const { data, error } = await supabase.rpc('admin_upsert_event', {
         event_data: eventData,
@@ -174,8 +153,6 @@ export const useAdminEvents = () => {
       });
 
       if (error) throw error;
-
-      console.log('=== Event created ===', data);
 
       // Get event ID
       const eventId = typeof data === 'object' && data && 'id' in data ? (data as any).id : null;
@@ -205,7 +182,6 @@ export const useAdminEvents = () => {
       await fetchEvents();
       return true;
     } catch (error: any) {
-      console.error('=== Error creating event ===', error);
       toast({
         title: 'Erro ao criar evento',
         description: error.message,
@@ -226,8 +202,6 @@ export const useAdminEvents = () => {
     }
 
     try {
-      console.log('=== Updating event ===', eventId, eventData);
-      
       const { data, error } = await supabase.rpc('admin_upsert_event', {
         event_data: { ...eventData, id: eventId },
         user_email: user.email,
@@ -261,7 +235,6 @@ export const useAdminEvents = () => {
       await fetchEvents();
       return true;
     } catch (error: any) {
-      console.error('=== Error updating event ===', error);
       toast({
         title: 'Erro ao atualizar evento',
         description: error.message,
@@ -282,8 +255,6 @@ export const useAdminEvents = () => {
     }
 
     try {
-      console.log('=== Deleting event ===', eventId);
-      
       const { data, error } = await supabase.rpc('admin_delete_event', {
         event_id: eventId,
         user_email: user.email,
@@ -300,7 +271,6 @@ export const useAdminEvents = () => {
       await fetchEvents();
       return true;
     } catch (error: any) {
-      console.error('=== Error deleting event ===', error);
       toast({
         title: 'Erro ao deletar evento',
         description: error.message,
@@ -312,7 +282,6 @@ export const useAdminEvents = () => {
 
   useEffect(() => {
     if (user) {
-      console.log('=== useAdminEvents: Fetching on user change ===');
       fetchEvents();
     }
   }, [user]);
