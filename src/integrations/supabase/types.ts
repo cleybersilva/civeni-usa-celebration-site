@@ -3998,57 +3998,78 @@ export type Database = {
       video_submissions: {
         Row: {
           avaliador_id: string | null
+          category: string | null
           created_at: string
           curso: string | null
           email: string
+          event_edition: string | null
           id: string
+          is_deleted: boolean | null
+          modality: string | null
           nome: string
           observacoes: string | null
           parecer: string | null
           status: string
+          submission_origin: string | null
           submitted_ip: unknown
           tipo_participante: string
           turma: string | null
           updated_at: string
           user_agent: string | null
+          video_platform: string | null
           video_url_normalized: string
           video_url_original: string
+          work_title: string | null
         }
         Insert: {
           avaliador_id?: string | null
+          category?: string | null
           created_at?: string
           curso?: string | null
           email: string
+          event_edition?: string | null
           id?: string
+          is_deleted?: boolean | null
+          modality?: string | null
           nome: string
           observacoes?: string | null
           parecer?: string | null
           status?: string
+          submission_origin?: string | null
           submitted_ip?: unknown
           tipo_participante: string
           turma?: string | null
           updated_at?: string
           user_agent?: string | null
+          video_platform?: string | null
           video_url_normalized: string
           video_url_original: string
+          work_title?: string | null
         }
         Update: {
           avaliador_id?: string | null
+          category?: string | null
           created_at?: string
           curso?: string | null
           email?: string
+          event_edition?: string | null
           id?: string
+          is_deleted?: boolean | null
+          modality?: string | null
           nome?: string
           observacoes?: string | null
           parecer?: string | null
           status?: string
+          submission_origin?: string | null
           submitted_ip?: unknown
           tipo_participante?: string
           turma?: string | null
           updated_at?: string
           user_agent?: string | null
+          video_platform?: string | null
           video_url_normalized?: string
           video_url_original?: string
+          work_title?: string | null
         }
         Relationships: []
       }
