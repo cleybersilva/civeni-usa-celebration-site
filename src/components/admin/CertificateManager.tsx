@@ -201,26 +201,51 @@ const CertificateManager = () => {
       return;
     }
 
+    // Validação: required_correct deve estar entre 1 e 3
+    const minKeywords = Number(config.required_correct ?? 2);
+    if (minKeywords < 1 || minKeywords > 3) {
+      toast({
+        variant: "destructive",
+        title: "Valor inválido",
+        description: "O mínimo de acertos deve ser entre 1 e 3, pois existem 3 palavras-chave."
+      });
+      return;
+    }
+
+    // Filtrar e limpar palavras-chave
+    const cleanedKeywords = (config.keywords || ['', '', ''])
+      .map(k => k?.trim() || '')
+      .filter(k => k.length > 0);
+
+    if (cleanedKeywords.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Palavras-chave obrigatórias",
+        description: "Você deve informar pelo menos uma palavra-chave."
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const configData = {
         event_id: selectedEvent,
-        is_enabled: config.is_enabled ?? true,
-        required_correct: config.required_correct ?? 2,
-        keywords: config.keywords?.filter(k => k && k.trim()) || [],
-        issuer_name: config.issuer_name || '',
-        issuer_role: config.issuer_role || '',
+        is_enabled: !!config.is_enabled, // Garantir boolean
+        required_correct: minKeywords, // Já validado acima
+        keywords: cleanedKeywords,
+        issuer_name: (config.issuer_name || '').trim(),
+        issuer_role: (config.issuer_role || '').trim(),
         issuer_signature_url: config.issuer_signature_url || null,
-        hours: config.hours || '',
-        city: config.city || '',
-        country: config.country || '',
+        hours: (config.hours || '').trim(),
+        city: (config.city || '').trim(),
+        country: (config.country || '').trim(),
         timezone: config.timezone || 'America/Sao_Paulo',
         template_id: config.template_id || null,
         admin_email: user.email,
         session_token: sessionToken
       };
 
-      console.log('[CertificateManager] Salvando config via edge function');
+      console.log('[CertificateManager] Salvando config via edge function:', configData);
 
       const { data, error } = await supabase.functions.invoke('save-certificate-config', {
         body: configData
@@ -228,14 +253,14 @@ const CertificateManager = () => {
 
       if (error) {
         console.error('[CertificateManager] Erro ao salvar:', error);
-        throw error;
+        throw new Error(error.message || 'Erro ao comunicar com o servidor');
       }
 
-      if (!data.success) {
-        throw new Error(data.message || 'Erro ao salvar configurações');
+      if (!data?.success) {
+        throw new Error(data?.message || 'Erro ao salvar configurações');
       }
 
-      console.log('[CertificateManager] Config salva com sucesso');
+      console.log('[CertificateManager] Config salva com sucesso:', data);
 
       toast({
         title: "Sucesso",
@@ -515,15 +540,27 @@ const CertificateManager = () => {
                       value={config.required_correct ?? 2}
                       onChange={(e) => {
                         const value = parseInt(e.target.value, 10);
-                        setConfig(prev => ({
-                          ...prev,
-                          required_correct: isNaN(value) ? (prev.required_correct ?? 2) : value
-                        }));
+                        if (value >= 1 && value <= 3) {
+                          setConfig(prev => ({
+                            ...prev,
+                            required_correct: value
+                          }));
+                        }
                       }}
+                      className={
+                        config.required_correct && (config.required_correct < 1 || config.required_correct > 3)
+                          ? 'border-destructive'
+                          : ''
+                      }
                     />
                     <p className="text-xs text-muted-foreground">
                       Mínimo de acertos para emitir o certificado (de 3 palavras-chave)
                     </p>
+                    {config.required_correct && (config.required_correct < 1 || config.required_correct > 3) && (
+                      <p className="text-xs text-destructive">
+                        O valor deve estar entre 1 e 3
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label>Carga horária</Label>
