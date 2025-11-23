@@ -220,7 +220,7 @@ const VideoSubmissionsManager = () => {
   };
 
   const handleArchive = async (id: string) => {
-    if (!confirm('Tem certeza que deseja arquivar esta submissão?')) return;
+    if (!confirm('Tem certeza que deseja excluir esta submissão? Ela será arquivada e não aparecerá na lista principal.')) return;
 
     const { error } = await supabase
       .from('video_submissions')
@@ -228,10 +228,10 @@ const VideoSubmissionsManager = () => {
       .eq('id', id);
 
     if (error) {
-      toast.error('Erro ao arquivar submissão');
+      toast.error('Erro ao excluir submissão');
       console.error(error);
     } else {
-      toast.success('Submissão arquivada com sucesso');
+      toast.success('Submissão excluída com sucesso');
       fetchSubmissions();
     }
   };
@@ -286,7 +286,7 @@ const VideoSubmissionsManager = () => {
           <h2 className="text-2xl font-bold mb-2">Gerenciar Envio de Vídeos</h2>
           <p className="text-muted-foreground">
             Total: {filteredSubmissions.length} submissões
-            {showArchived && ' (incluindo arquivadas)'}
+            {showArchived && ' (incluindo excluídas)'}
           </p>
         </div>
         <Button onClick={handleCreate}>
@@ -346,8 +346,8 @@ const VideoSubmissionsManager = () => {
           variant={showArchived ? "default" : "outline"}
           onClick={() => setShowArchived(!showArchived)}
         >
-          <Archive className="mr-2 h-4 w-4" />
-          {showArchived ? 'Ocultar' : 'Mostrar'} Arquivadas
+          <Trash2 className="mr-2 h-4 w-4" />
+          {showArchived ? 'Ocultar' : 'Mostrar'} Excluídas
         </Button>
       </div>
 
@@ -412,10 +412,11 @@ const VideoSubmissionsManager = () => {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-destructive"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           onClick={() => handleArchive(sub.id)}
+                          title="Excluir"
                         >
-                          <Archive className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
