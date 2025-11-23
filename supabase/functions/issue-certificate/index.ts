@@ -102,9 +102,14 @@ const handler = async (req: Request): Promise<Response> => {
     // Check if user is registered for the event
     const { data: registration, error: regError } = await supabase
       .from('event_registrations')
-      .select('id, full_name, payment_status')
-      .eq('event_id', eventId)
+      .select(`
+        id, 
+        full_name, 
+        payment_status,
+        event_category!inner(event_id)
+      `)
       .eq('email', normalizedEmail)
+      .eq('event_category.event_id', eventId)
       .single();
 
     if (regError || !registration) {

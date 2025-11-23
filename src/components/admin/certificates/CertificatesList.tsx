@@ -22,12 +22,15 @@ import { Award, FileText, Download, Search } from 'lucide-react';
 
 interface IssuedCertificate {
   id: string;
-  user_email: string;
-  hash: string;
-  status: string;
-  emitido_at: string;
-  arquivo_url?: string;
   event_id: string;
+  registration_id: string;
+  email: string;
+  full_name: string;
+  code: string;
+  issued_at: string;
+  pdf_url: string;
+  keywords_matched: number;
+  keywords_provided: string[];
   created_at: string;
 }
 
@@ -41,12 +44,11 @@ const CertificatesList: React.FC<CertificatesListProps> = ({
   onToggleStatus
 }) => {
   const [searchEmail, setSearchEmail] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const filteredCertificates = certificates.filter(cert => {
-    const matchesEmail = cert.user_email.toLowerCase().includes(searchEmail.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || cert.status === statusFilter;
-    return matchesEmail && matchesStatus;
+    const matchesEmail = cert.email.toLowerCase().includes(searchEmail.toLowerCase());
+    // Status filter removed since issued_certificates doesn't have status field
+    return matchesEmail;
   });
 
   return (
@@ -68,22 +70,12 @@ const CertificatesList: React.FC<CertificatesListProps> = ({
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por e-mail..."
+              placeholder="Buscar por e-mail ou nome..."
               value={searchEmail}
               onChange={(e) => setSearchEmail(e.target.value)}
               className="pl-9"
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="issued">Válidos</SelectItem>
-              <SelectItem value="revoked">Revogados</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Tabela */}
@@ -102,26 +94,35 @@ const CertificatesList: React.FC<CertificatesListProps> = ({
               <TableHeader>
                 <TableRow>
                   <TableHead>E-mail</TableHead>
+                  <TableHead>Nome</TableHead>
                   <TableHead>Código</TableHead>
+                  <TableHead>Palavras Corretas</TableHead>
                   <TableHead>Emissão</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredCertificates.map((cert) => (
                   <TableRow key={cert.id}>
-                    <TableCell className="font-medium">
-                      {cert.user_email}
+                    <TableCell className="font-medium text-sm">
+                      {cert.email}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {cert.full_name}
                     </TableCell>
                     <TableCell>
                       <code className="text-xs bg-muted px-2 py-1 rounded">
-                        {cert.hash.substring(0, 8)}...
+                        {cert.code}
                       </code>
                     </TableCell>
+                    <TableCell className="text-sm">
+                      <Badge variant="secondary">
+                        {cert.keywords_matched}/3
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {cert.emitido_at
-                        ? new Date(cert.emitido_at).toLocaleDateString('pt-BR', {
+                      {cert.issued_at
+                        ? new Date(cert.issued_at).toLocaleDateString('pt-BR', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
@@ -130,32 +131,18 @@ const CertificatesList: React.FC<CertificatesListProps> = ({
                           })
                         : 'N/A'}
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={cert.status === 'issued' ? 'default' : 'destructive'}
-                      >
-                        {cert.status === 'issued' ? 'Válido' : 'Revogado'}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        {cert.arquivo_url && (
+                        {cert.pdf_url && (
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => window.open(cert.arquivo_url, '_blank')}
+                            onClick={() => window.open(cert.pdf_url, '_blank')}
                           >
                             <Download className="h-4 w-4 mr-1" />
                             PDF
                           </Button>
                         )}
-                        <Button
-                          size="sm"
-                          variant={cert.status === 'issued' ? 'destructive' : 'default'}
-                          onClick={() => onToggleStatus(cert.id, cert.status)}
-                        >
-                          {cert.status === 'issued' ? 'Revogar' : 'Revalidar'}
-                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
