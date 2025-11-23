@@ -28,17 +28,9 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventsManager = () => {
-  console.log('=== EventsManager: Component rendering ===');
   const { t } = useTranslation();
   
-  console.log('=== EventsManager: Calling useAdminEvents hook ===');
   const { events, loading, error, createEvent, updateEvent, deleteEvent, refetch } = useAdminEvents();
-  console.log('=== EventsManager: Hook returned ===', { 
-    eventsCount: events?.length || 0, 
-    loading,
-    error,
-    eventsData: events 
-  });
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -46,24 +38,23 @@ const EventsManager = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
 
-  // Log whenever events or loading changes
-  React.useEffect(() => {
-    console.log('=== EventsManager: State changed ===', {
-      eventsCount: events?.length || 0,
-      loading,
-      hasEvents: !!events,
-      eventsIsArray: Array.isArray(events)
-    });
-  }, [events, loading]);
-
   const getEventStatus = (event: any) => {
-    const now = new Date();
-    const startDate = new Date(event.inicio_at);
-    const endDate = event.fim_at ? new Date(event.fim_at) : startDate;
+    try {
+      const now = new Date();
+      const startDate = new Date(event.inicio_at);
+      const endDate = event.fim_at ? new Date(event.fim_at) : startDate;
 
-    if (now < startDate) return 'upcoming';
-    if (now >= startDate && now <= endDate) return 'live';
-    return 'past';
+      // Validate dates
+      if (isNaN(startDate.getTime()) || (event.fim_at && isNaN(endDate.getTime()))) {
+        return 'unknown';
+      }
+
+      if (now < startDate) return 'upcoming';
+      if (now >= startDate && now <= endDate) return 'live';
+      return 'past';
+    } catch (err) {
+      return 'unknown';
+    }
   };
 
   let filteredEvents: any[] = [];
@@ -89,7 +80,6 @@ const EventsManager = () => {
       return matchesSearch && matchesStatus && matchesModalidade;
     }) || [];
   } catch (err) {
-    console.error('=== EventsManager: Error filtering events ===', err, { events });
     filteredEvents = events || [];
   }
 
@@ -139,14 +129,22 @@ const EventsManager = () => {
 
   const formatEventDate = (dateString: string) => {
     try {
+      if (!dateString) return '';
+      
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        return dateString || '';
+        return 'Data inválida';
       }
+      
+      // Check if year is unreasonable (before 1900 or after 2200)
+      const year = date.getFullYear();
+      if (year < 1900 || year > 2200) {
+        return 'Data inválida';
+      }
+      
       return format(date, "dd/MM/yyyy HH:mm", { locale: ptBR });
     } catch (err) {
-      console.error('=== EventsManager: Error formatting date ===', err, { dateString });
-      return dateString || '';
+      return 'Data inválida';
     }
   };
 
@@ -162,6 +160,8 @@ const EventsManager = () => {
       return <Badge variant="destructive">Ao Vivo</Badge>;
     } else if (eventStatus === 'past') {
       return <Badge variant="outline">Encerrado</Badge>;
+    } else if (eventStatus === 'unknown') {
+      return <Badge variant="secondary">Data Inválida</Badge>;
     } else {
       return <Badge variant="default">Publicado</Badge>;
     }
