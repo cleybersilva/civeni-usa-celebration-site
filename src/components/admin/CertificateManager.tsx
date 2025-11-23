@@ -62,11 +62,14 @@ const CertificateManager = () => {
   });
   const [issuedCertificates, setIssuedCertificates] = useState<IssuedCertificate[]>([]);
   const [loading, setLoading] = useState(false);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [tab, setTab] = useState<'config' | 'certificates'>('config');
 
   useEffect(() => {
-    loadEvents();
-  }, []);
+    if (user) {
+      loadEvents();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (selectedEvent) {
@@ -76,17 +79,34 @@ const CertificateManager = () => {
   }, [selectedEvent]);
 
   const loadEvents = async () => {
-    const { data } = await supabase
-      .from('events')
-      .select('id, slug')
-      .eq('status_publicacao', 'published')
-      .order('created_at', { ascending: false });
-    
-    if (data) {
-      setEvents(data);
-      if (data.length > 0 && !selectedEvent) {
-        setSelectedEvent(data[0].id);
+    try {
+      setEventsLoading(true);
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, slug')
+        .eq('status_publicacao', 'published')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Erro ao carregar eventos:', error);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Erro ao carregar eventos"
+        });
+        return;
       }
+      
+      if (data) {
+        setEvents(data);
+        if (data.length > 0 && !selectedEvent) {
+          setSelectedEvent(data[0].id);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar eventos:', error);
+    } finally {
+      setEventsLoading(false);
     }
   };
 
@@ -281,7 +301,21 @@ const CertificateManager = () => {
   };
 
   if (!user) {
-    return <div>Acesso negado</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (eventsLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -329,18 +363,27 @@ const CertificateManager = () => {
           <CardTitle>Selecionar Evento</CardTitle>
         </CardHeader>
         <CardContent>
-          <select
-            value={selectedEvent}
-            onChange={(e) => setSelectedEvent(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
-            <option value="">Selecione um evento...</option>
-            {events.map(event => (
-              <option key={event.id} value={event.id}>
-                {event.slug}
-              </option>
-            ))}
-          </select>
+          {events.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-muted-foreground">
+                Nenhum evento publicado encontrado. Publique um evento primeiro.
+              </p>
+            </div>
+          ) : (
+            <select
+              value={selectedEvent}
+              onChange={(e) => setSelectedEvent(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="">Selecione um evento...</option>
+              {events.map(event => (
+                <option key={event.id} value={event.id}>
+                  {event.slug}
+                </option>
+              ))}
+            </select>
+          )}
         </CardContent>
       </Card>
 
