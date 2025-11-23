@@ -48,7 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!eventId || !email || !fullName || !keywords || keywords.length !== 3) {
       return new Response(
         JSON.stringify({ success: false, message: 'Dados inválidos. É necessário fornecer 3 palavras-chave.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (normalizedFullName.length < 2) {
       return new Response(
         JSON.stringify({ success: false, message: 'Nome deve ter pelo menos 2 caracteres' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -76,7 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (attempts && attempts.length >= 5) {
       return new Response(
         JSON.stringify({ success: false, message: 'Muitas tentativas. Tente novamente em 1 hora.' }),
-        { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -95,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (eventError || !eventCert) {
       return new Response(
         JSON.stringify({ success: false, message: 'Evento não encontrado ou certificados não habilitados' }),
-        { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -122,7 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       return new Response(
         JSON.stringify({ success: false, message: 'Email não encontrado nas inscrições deste evento' }),
-        { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (registration.payment_status && registration.payment_status !== 'completed') {
       return new Response(
         JSON.stringify({ success: false, message: 'Pagamento não confirmado' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -157,7 +157,7 @@ const handler = async (req: Request): Promise<Response> => {
           message: `Você acertou ${matchedCount}/3 palavras-chave. Mínimo necessário: ${eventCert.required_correct}/3`,
           matched: matchedCount 
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 

@@ -138,9 +138,10 @@ const CertificadoEmissao = () => {
       }
 
     } catch (error: any) {
+      console.error('Erro ao emitir certificado:', error);
       setResult({
         success: false,
-        message: error.message || "Erro ao processar solicitação"
+        message: error?.message || 'Erro ao processar solicitação. Tente novamente.'
       });
     } finally {
       setLoading(false);
