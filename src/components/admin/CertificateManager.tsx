@@ -119,15 +119,23 @@ const CertificateManager = () => {
   const loadCertificateConfig = async () => {
     if (!selectedEvent) return;
 
-    const { data } = await supabase
+    console.log('[CertificateManager] Carregando config para evento:', selectedEvent);
+
+    const { data, error } = await supabase
       .from('event_certificates')
       .select('*')
       .eq('event_id', selectedEvent)
-      .single();
+      .maybeSingle();
+
+    if (error) {
+      console.error('[CertificateManager] Erro ao carregar config:', error);
+    }
 
     if (data) {
+      console.log('[CertificateManager] Config carregada:', data);
       setConfig(data);
     } else {
+      console.log('[CertificateManager] Nenhuma config encontrada, usando padrão');
       // Reset to default if no config exists
       setConfig({
         is_enabled: true,
