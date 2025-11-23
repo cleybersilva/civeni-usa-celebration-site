@@ -19,12 +19,26 @@ interface LocationState {
 const CertificateSuccessPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as LocationState;
+  const state = location.state as LocationState | null;
 
-  // Se não há dados de estado, redirecionar para emissão
+  // Se não há dados de estado válidos, exibe mensagem amigável em vez de tela em branco
   if (!state || !state.success) {
-    navigate('/certificado-emissao');
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red flex items-center justify-center">
+        <Card className="w-full max-w-md bg-white shadow-2xl p-8 text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">Nenhum certificado encontrado</h1>
+          <p className="text-sm text-gray-600">
+            Para acessar esta página, primeiro valide sua participação na tela de emissão de certificados.
+          </p>
+          <Button
+            onClick={() => navigate('/certificado-emissao')}
+            className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white font-semibold mt-2"
+          >
+            Ir para emissão de certificado
+          </Button>
+        </Card>
+      </div>
+    );
   }
 
   const handleDownloadPDF = () => {
