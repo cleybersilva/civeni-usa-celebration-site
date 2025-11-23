@@ -4539,6 +4539,10 @@ export type Database = {
         Args: { event_data: Json; session_token: string; user_email: string }
         Returns: Json
       }
+      admin_upsert_event_certificate: {
+        Args: { p_config: Json; p_session_token: string; p_user_email: string }
+        Returns: Json
+      }
       admin_upsert_presentation_assignment: {
         Args: {
           assignment_data: Json

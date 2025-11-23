@@ -186,46 +186,19 @@ const CertificateManager = () => {
 
       console.log('[CertificateManager] Salvando config:', configData);
 
-      // Check if config exists
-      const { data: existing, error: selectError } = await supabase
-        .from('event_certificates')
-        .select('event_id')
-        .eq('event_id', selectedEvent)
-        .maybeSingle();
+      // Use função RPC segura para upsert
+      const { data, error } = await supabase.rpc('admin_upsert_event_certificate', {
+        p_config: configData,
+        p_user_email: user.email,
+        p_session_token: sessionToken
+      });
 
-      if (selectError) {
-        console.error('[CertificateManager] Erro ao verificar config existente:', selectError);
-        throw selectError;
+      if (error) {
+        console.error('[CertificateManager] Erro ao salvar:', error);
+        throw error;
       }
 
-      console.log('[CertificateManager] Config existente:', existing);
-
-      if (existing) {
-        // Update
-        console.log('[CertificateManager] Atualizando config existente');
-        const { error } = await supabase
-          .from('event_certificates')
-          .update(configData)
-          .eq('event_id', selectedEvent);
-
-        if (error) {
-          console.error('[CertificateManager] Erro ao atualizar:', error);
-          throw error;
-        }
-      } else {
-        // Insert
-        console.log('[CertificateManager] Inserindo nova config');
-        const { error } = await supabase
-          .from('event_certificates')
-          .insert(configData);
-
-        if (error) {
-          console.error('[CertificateManager] Erro ao inserir:', error);
-          throw error;
-        }
-      }
-
-      console.log('[CertificateManager] Config salva com sucesso');
+      console.log('[CertificateManager] Config salva com sucesso:', data);
 
       toast({
         title: "Sucesso",
