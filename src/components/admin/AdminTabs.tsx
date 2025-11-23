@@ -102,111 +102,197 @@ const AdminTabs = () => {
         )}
       </TabsList>
 
-      {canViewFinanceiro && (
-        <TabsContent value="financeiro">
+      {/* CERTIFICADOS - SEMPRE RENDERIZADO */}
+      <TabsContent value="certificados">
+        {canViewCertificados ? (
+          <CertificateManager />
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
+
+      {/* FINANCEIRO */}
+      <TabsContent value="financeiro">
+        {canViewFinanceiro ? (
           <FinancialDashboard />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('banner') && (
-        <TabsContent value="banner">
+      {/* BANNER */}
+      <TabsContent value="banner">
+        {hasPermission('banner') ? (
           <BannerManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('contador') && (
-        <TabsContent value="contador">
+      {/* CONTADOR */}
+      <TabsContent value="contador">
+        {hasPermission('contador') ? (
           <EventConfigManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('cronograma') && (
-        <TabsContent value="cronograma">
+      {/* CRONOGRAMA */}
+      <TabsContent value="cronograma">
+        {hasPermission('cronograma') ? (
           <ScheduleManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
+      {/* EVENTOS */}
       <TabsContent value="eventos">
         <EventsManager />
       </TabsContent>
 
-      {hasPermission('inscricoes') && (
-        <TabsContent value="inscricoes">
+      {/* INSCRIÇÕES */}
+      <TabsContent value="inscricoes">
+        {hasPermission('inscricoes') ? (
           <RegistrationManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('local') && (
-        <TabsContent value="local">
+      {/* LOCAL */}
+      <TabsContent value="local">
+        {hasPermission('local') ? (
           <VenueConfigManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('online') && (
-        <TabsContent value="online">
+      {/* ONLINE */}
+      <TabsContent value="online">
+        {hasPermission('online') ? (
           <OnlineConfigManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('palestrantes') && (
-        <TabsContent value="palestrantes">
+      {/* PALESTRANTES */}
+      <TabsContent value="palestrantes">
+        {hasPermission('palestrantes') ? (
           <SpeakersManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('parceiros') && (
-        <TabsContent value="parceiros">
+      {/* PARCEIROS */}
+      <TabsContent value="parceiros">
+        {hasPermission('parceiros') ? (
           <PartnersManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('textos') && (
-        <TabsContent value="textos">
+      {/* TEXTOS */}
+      <TabsContent value="textos">
+        {hasPermission('textos') ? (
           <SiteTextsManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('submissoes') && (
-        <TabsContent value="submissoes">
+      {/* SUBMISSÕES */}
+      <TabsContent value="submissoes">
+        {hasPermission('submissoes') ? (
           <SubmissionsManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('submissoes') && (
-        <TabsContent value="envio-videos">
+      {/* ENVIO DE VÍDEOS */}
+      <TabsContent value="envio-videos">
+        {hasPermission('submissoes') ? (
           <VideoSubmissionsManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('trabalhos') && (
-        <TabsContent value="trabalhos">
+      {/* TRABALHOS */}
+      <TabsContent value="trabalhos">
+        {hasPermission('trabalhos') ? (
           <WorkSubmissionsManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {canViewUsuarios && (
-        <TabsContent value="usuarios">
+      {/* USUÁRIOS */}
+      <TabsContent value="usuarios">
+        {canViewUsuarios ? (
           <UsersManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('videos') && (
-        <TabsContent value="videos">
+      {/* VÍDEOS */}
+      <TabsContent value="videos">
+        {hasPermission('videos') ? (
           <VideosManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
 
-      {hasPermission('cronograma') && (
-        <TabsContent value="salas-apresentacao">
+      {/* SALAS DE APRESENTAÇÃO */}
+      <TabsContent value="salas-apresentacao">
+        {hasPermission('cronograma') ? (
           <PresentationRoomsManager />
-        </TabsContent>
-      )}
-
-      {canViewCertificados && (
-        <TabsContent value="certificados">
-          <CertificateManager />
-        </TabsContent>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
     </Tabs>
   );
 };
