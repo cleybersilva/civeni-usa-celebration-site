@@ -161,6 +161,13 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Get event details for certificate (antes de verificar se já existe)
+    const { data: event } = await supabase
+      .from('events')
+      .select('slug')
+      .eq('id', eventId)
+      .single();
+
     // Check if certificate already exists
     const { data: existingCert } = await supabase
       .from('issued_certificates')
@@ -179,7 +186,7 @@ const handler = async (req: Request): Promise<Response> => {
           matched: matchedCount,
           fullName: normalizedFullName,
           email: normalizedEmail,
-          eventName: event?.slug || 'Evento'
+          eventName: event?.slug || 'CIVENI 2025'
         }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
@@ -188,13 +195,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate certificate
     const code = generateCode();
     const issueDate = new Date();
-    
-    // Get event details for certificate
-    const { data: event } = await supabase
-      .from('events')
-      .select('slug')
-      .eq('id', eventId)
-      .single();
 
     // For now, we'll create a simple PDF URL (in production, you'd generate actual PDF)
     const pdfUrl = `https://wdkeqxfglmritghmakma.supabase.co/storage/v1/object/public/certificates/${eventId}/${code}.pdf`;
