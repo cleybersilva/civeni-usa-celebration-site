@@ -90,46 +90,11 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('event_id', eventId)
       .eq('is_enabled', true)
       .eq('events.status_publicacao', 'published')
-      .single();
+      .maybeSingle();
 
     if (eventError || !eventCert) {
       return new Response(
         JSON.stringify({ success: false, message: 'Evento não encontrado ou certificados não habilitados' }),
-        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-    }
-
-    // Check if user is registered for the event
-    const { data: registration, error: regError } = await supabase
-      .from('event_registrations')
-      .select(`
-        id, 
-        full_name, 
-        payment_status,
-        event_category!inner(event_id)
-      `)
-      .eq('email', normalizedEmail)
-      .eq('event_category.event_id', eventId)
-      .single();
-
-    if (regError || !registration) {
-      await supabase.from('certificate_attempts').insert({
-        event_id: eventId,
-        email: normalizedEmail,
-        ip: clientIP,
-        matched: 0
-      });
-
-      return new Response(
-        JSON.stringify({ success: false, message: 'Email não encontrado nas inscrições deste evento' }),
-        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-    }
-
-    // Check if payment is confirmed (if required)
-    if (registration.payment_status && registration.payment_status !== 'completed') {
-      return new Response(
-        JSON.stringify({ success: false, message: 'Pagamento não confirmado' }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -204,7 +169,7 @@ const handler = async (req: Request): Promise<Response> => {
       .from('issued_certificates')
       .insert({
         event_id: eventId,
-        registration_id: registration.id,
+        registration_id: null,
         email: normalizedEmail,
         full_name: normalizedFullName,
         code: code,
