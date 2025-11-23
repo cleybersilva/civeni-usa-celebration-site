@@ -10,43 +10,38 @@ import {
   Save, 
   Settings, 
   Award,
-  FileText
+  FileText,
+  Download,
+  Upload
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface CertificateConfig {
-  id: string;
   event_id: string;
   is_enabled: boolean;
   required_correct: number;
   keywords: string[];
   issuer_name: string;
   issuer_role: string;
+  issuer_signature_url?: string;
   hours: string;
   city: string;
   country: string;
-  certificate_template_url?: string;
-  background_image_url?: string;
-  logo_url?: string;
-  signature_image_url?: string;
+  timezone?: string;
+  template_id?: string;
 }
 
 interface IssuedCertificate {
   id: string;
-  email: string;
-  full_name: string;
-  code: string;
-  keywords_matched: number;
-  issued_at: string;
-  is_valid?: boolean | null;
+  user_email: string;
+  hash: string;
+  status: string;
+  emitido_at: string;
+  arquivo_url?: string;
   event_id: string;
-  registration_id?: string;
-  pdf_url?: string;
-  keywords_provided?: string[];
   created_at: string;
-  verified_at?: string | null;
 }
 
 const CertificateManager = () => {
@@ -57,8 +52,8 @@ const CertificateManager = () => {
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [config, setConfig] = useState<Partial<CertificateConfig>>({
     is_enabled: true,
-    required_correct: 4,
-    keywords: ['', '', '', '', ''],
+    required_correct: 2,
+    keywords: ['', '', ''],
     issuer_name: 'Coordenador Acadêmico',
     issuer_role: 'Coordenador',
     hours: '40h',
@@ -110,8 +105,8 @@ const CertificateManager = () => {
       // Reset to default if no config exists
       setConfig({
         is_enabled: true,
-        required_correct: 4,
-        keywords: ['', '', '', '', ''],
+        required_correct: 2,
+        keywords: ['', '', ''],
         issuer_name: 'Coordenador Acadêmico',
         issuer_role: 'Coordenador',
         hours: '40h',
@@ -125,17 +120,13 @@ const CertificateManager = () => {
     if (!selectedEvent) return;
 
     const { data } = await supabase
-      .from('issued_certificates')
+      .from('event_cert_issuances')
       .select('*')
       .eq('event_id', selectedEvent)
-      .order('issued_at', { ascending: false });
+      .order('emitido_at', { ascending: false });
 
     if (data) {
-      setIssuedCertificates(data.map(cert => ({
-        ...cert,
-        is_valid: (cert as any).is_valid ?? true, // Default to true if null
-        verified_at: (cert as any).verified_at
-      } as IssuedCertificate)));
+      setIssuedCertificates(data as IssuedCertificate[]);
     }
   };
 
@@ -192,15 +183,16 @@ const CertificateManager = () => {
   };
 
   const updateKeyword = (index: number, value: string) => {
-    const newKeywords = [...(config.keywords || ['', '', '', '', ''])];
+    const newKeywords = [...(config.keywords || ['', '', ''])];
     newKeywords[index] = value;
     setConfig(prev => ({ ...prev, keywords: newKeywords }));
   };
 
-  const toggleCertificateValidity = async (certId: string, isValid: boolean) => {
+  const toggleCertificateStatus = async (certId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'issued' ? 'revoked' : 'issued';
     const { error } = await supabase
-      .from('issued_certificates')
-      .update({ is_valid: !isValid } as any)
+      .from('event_cert_issuances')
+      .update({ status: newStatus })
       .eq('id', certId);
 
     if (error) {
@@ -218,6 +210,76 @@ const CertificateManager = () => {
     }
   };
 
+  const handleExportConfig = () => {
+    if (!selectedEvent || !config) return;
+    
+    const exportData = {
+      config: {
+        title: `Certificado de Participação`,
+        keywords: config.keywords,
+        required_correct: config.required_correct,
+        issuer_name: config.issuer_name,
+        issuer_role: config.issuer_role,
+        hours: config.hours,
+        city: config.city,
+        country: config.country
+      },
+      template: {
+        name: "Modelo Padrão Civeni",
+        description: "Template padrão para certificados"
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `certificado-config-${selectedEvent}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Sucesso",
+      description: "Configuração exportada com sucesso!"
+    });
+  };
+
+  const handleImportConfig = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const importData = JSON.parse(text);
+        
+        if (importData.config) {
+          setConfig(prev => ({
+            ...prev,
+            ...importData.config
+          }));
+
+          toast({
+            title: "Sucesso",
+            description: "Configuração importada com sucesso! Lembre-se de salvar."
+          });
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Erro ao importar arquivo. Verifique o formato."
+        });
+      }
+    };
+    input.click();
+  };
+
   if (!user) {
     return <div>Acesso negado</div>;
   }
@@ -227,6 +289,23 @@ const CertificateManager = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Gerenciamento de Certificados</h2>
         <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleImportConfig}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportConfig}
+            disabled={!selectedEvent}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportar
+          </Button>
           <Button
             variant={tab === 'config' ? 'default' : 'outline'}
             onClick={() => setTab('config')}
@@ -293,10 +372,13 @@ const CertificateManager = () => {
                     <Input
                       type="number"
                       min={1}
-                      max={5}
-                      value={config.required_correct || 4}
+                      max={3}
+                      value={config.required_correct || 2}
                       onChange={(e) => setConfig(prev => ({ ...prev, required_correct: parseInt(e.target.value) }))}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Mínimo de acertos para emitir o certificado (de 3 palavras-chave)
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Carga horária</Label>
@@ -352,10 +434,10 @@ const CertificateManager = () => {
                 <div className="space-y-4">
                   <Label className="text-lg font-semibold">Palavras-chave do evento</Label>
                   <p className="text-sm text-muted-foreground">
-                    Configure as 5 palavras-chave que serão solicitadas durante a emissão do certificado.
+                    Configure as 3 palavras-chave que serão solicitadas durante a emissão do certificado.
                   </p>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    {(config.keywords || ['', '', '', '', '']).map((keyword, index) => (
+                  <div className="grid md:grid-cols-3 gap-3">
+                    {(config.keywords || ['', '', '']).map((keyword, index) => (
                       <div key={index} className="space-y-2">
                         <Label>Palavra-chave {index + 1}</Label>
                         <Input
@@ -408,24 +490,32 @@ const CertificateManager = () => {
                     {issuedCertificates.map(cert => (
                       <div key={cert.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
-                          <div className="font-medium">{cert.full_name}</div>
-                          <div className="text-sm text-muted-foreground">{cert.email}</div>
+                          <div className="font-medium">{cert.user_email}</div>
                           <div className="text-xs text-muted-foreground">
-                            Código: {cert.code} | 
-                            Acertos: {cert.keywords_matched}/5 | 
-                            Emitido: {new Date(cert.issued_at).toLocaleDateString('pt-BR')}
+                            Código: {cert.hash} | 
+                            Emitido: {cert.emitido_at ? new Date(cert.emitido_at).toLocaleDateString('pt-BR') : 'N/A'}
                           </div>
+                          {cert.arquivo_url && (
+                            <a 
+                              href={cert.arquivo_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-600 hover:underline"
+                            >
+                              Ver PDF
+                            </a>
+                          )}
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge variant={cert.is_valid ? 'default' : 'destructive'}>
-                            {cert.is_valid ? 'Válido' : 'Inválido'}
+                          <Badge variant={cert.status === 'issued' ? 'default' : 'destructive'}>
+                            {cert.status === 'issued' ? 'Válido' : 'Revogado'}
                           </Badge>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => toggleCertificateValidity(cert.id, cert.is_valid)}
+                            onClick={() => toggleCertificateStatus(cert.id, cert.status)}
                           >
-                            {cert.is_valid ? 'Invalidar' : 'Revalidar'}
+                            {cert.status === 'issued' ? 'Revogar' : 'Revalidar'}
                           </Button>
                         </div>
                       </div>

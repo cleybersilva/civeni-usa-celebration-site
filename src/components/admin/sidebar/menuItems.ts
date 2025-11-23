@@ -15,6 +15,7 @@ import {
   FileText,
   CalendarDays,
   Inbox,
+  Award,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -167,6 +168,13 @@ export const createMenuItems = (
       label: 'Salas de Apresentação',
       icon: Users,
       show: hasPermission('cronograma') || isAdminRoot(),
+      isPriority: false
+    },
+    {
+      id: 'certificados',
+      label: t('admin.menu.certificates', 'Certificados'),
+      icon: Award,
+      show: hasPermission('certificados') || isAdminRoot() || isAdmin,
       isPriority: false
     },
     {
