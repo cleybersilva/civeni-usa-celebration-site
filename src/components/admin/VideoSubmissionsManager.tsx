@@ -268,6 +268,11 @@ const VideoSubmissionsManager = () => {
     return matchStatus && matchTipo && matchOrigin && matchSearch;
   });
 
+  // Reset para página 1 quando filtros mudam
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, filterTipo, filterOrigin, searchTerm, showArchived]);
+
   // Paginação
   const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
