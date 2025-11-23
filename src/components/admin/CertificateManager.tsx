@@ -37,12 +37,15 @@ interface CertificateConfig {
 
 interface IssuedCertificate {
   id: string;
-  user_email: string;
-  hash: string;
-  status: string;
-  emitido_at: string;
-  arquivo_url?: string;
   event_id: string;
+  registration_id: string;
+  email: string;
+  full_name: string;
+  code: string;
+  issued_at: string;
+  pdf_url: string;
+  keywords_matched: number;
+  keywords_provided: string[];
   created_at: string;
 }
 
@@ -133,7 +136,15 @@ const CertificateManager = () => {
 
     if (data) {
       console.log('[CertificateManager] Config carregada:', data);
-      setConfig(data);
+      // Garante que keywords é array com 3 elementos
+      const keywordsArray = Array.isArray(data.keywords) ? data.keywords : [];
+      while (keywordsArray.length < 3) {
+        keywordsArray.push('');
+      }
+      setConfig({
+        ...data,
+        keywords: keywordsArray.slice(0, 3)
+      });
     } else {
       console.log('[CertificateManager] Nenhuma config encontrada, usando padrão');
       // Reset to default if no config exists
@@ -145,7 +156,8 @@ const CertificateManager = () => {
         issuer_role: 'Coordenador',
         hours: '40h',
         city: 'Fortaleza',
-        country: 'Brasil'
+        country: 'Brasil',
+        timezone: 'America/Sao_Paulo'
       });
     }
   };
@@ -153,11 +165,15 @@ const CertificateManager = () => {
   const loadIssuedCertificates = async () => {
     if (!selectedEvent) return;
 
-    const { data } = await supabase
-      .from('event_cert_issuances')
+    const { data, error } = await supabase
+      .from('issued_certificates')
       .select('*')
       .eq('event_id', selectedEvent)
-      .order('emitido_at', { ascending: false });
+      .order('issued_at', { ascending: false });
+
+    if (error) {
+      console.error('[CertificateManager] Erro ao carregar certificados emitidos:', error);
+    }
 
     if (data) {
       setIssuedCertificates(data as IssuedCertificate[]);
@@ -176,25 +192,7 @@ const CertificateManager = () => {
       return;
     }
 
-    // Recupera sessão preferencialmente do contexto, com fallback para localStorage
-    let sessionEmail = user?.email || '';
-    let sessionTokenValue: string | undefined = sessionToken;
-
-    if (!sessionEmail || !sessionTokenValue) {
-      try {
-        const raw = localStorage.getItem('adminSession');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          sessionEmail = sessionEmail || parsed?.user?.email || '';
-          sessionTokenValue = sessionTokenValue || parsed?.session_token || parsed?.sessionToken;
-        }
-      } catch (err) {
-        console.error('[CertificateManager] Erro ao ler adminSession do localStorage:', err);
-      }
-    }
-
-    if (!sessionEmail || !sessionTokenValue) {
-      console.error('[CertificateManager] Sessão administrativa inválida', { sessionEmail, sessionTokenValue });
+    if (!user) {
       toast({
         variant: "destructive",
         title: "Sessão inválida",
@@ -216,28 +214,30 @@ const CertificateManager = () => {
         hours: config.hours || '',
         city: config.city || '',
         country: config.country || '',
-        timezone: config.timezone || null,
-        template_id: config.template_id || null
+        timezone: config.timezone || 'America/Sao_Paulo',
+        template_id: config.template_id || null,
+        updated_at: new Date().toISOString()
       };
 
-      console.log('[CertificateManager] Salvando config via RPC:', { configData, sessionEmail, hasToken: !!sessionTokenValue });
+      console.log('[CertificateManager] Salvando config:', configData);
 
-      const { data, error } = await supabase.rpc('admin_upsert_event_certificate', {
-        p_config: configData,
-        p_user_email: sessionEmail,
-        p_session_token: sessionTokenValue
-      });
+      const { error } = await supabase
+        .from('event_certificates')
+        .upsert(configData, { 
+          onConflict: 'event_id',
+          ignoreDuplicates: false 
+        });
 
       if (error) {
-        console.error('[CertificateManager] Erro ao salvar (RPC):', error);
+        console.error('[CertificateManager] Erro ao salvar:', error);
         throw error;
       }
 
-      console.log('[CertificateManager] Config salva com sucesso (RPC):', data);
+      console.log('[CertificateManager] Config salva com sucesso');
 
       toast({
         title: "Sucesso",
-        description: "Configuração de certificados salva com sucesso!"
+        description: "Configurações salvas com sucesso!"
       });
 
       await loadCertificateConfig();
@@ -259,25 +259,12 @@ const CertificateManager = () => {
   };
 
   const toggleCertificateStatus = async (certId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'issued' ? 'revoked' : 'issued';
-    const { error } = await supabase
-      .from('event_cert_issuances')
-      .update({ status: newStatus })
-      .eq('id', certId);
-
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Erro ao atualizar certificado"
-      });
-    } else {
-      toast({
-        title: "Sucesso",
-        description: "Status do certificado atualizado"
-      });
-      loadIssuedCertificates();
-    }
+    // Not applicable for issued_certificates table - would need custom logic
+    toast({
+      variant: "destructive",
+      title: "Não disponível",
+      description: "Funcionalidade em desenvolvimento"
+    });
   };
 
   const handleExportConfig = () => {
