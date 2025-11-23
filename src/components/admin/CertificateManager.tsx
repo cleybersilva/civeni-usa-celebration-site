@@ -157,39 +157,75 @@ const CertificateManager = () => {
   };
 
   const handleSaveConfig = async () => {
-    if (!selectedEvent || !user || !sessionToken) return;
+    if (!selectedEvent || !user || !sessionToken) {
+      console.log('[CertificateManager] Validação falhou:', { selectedEvent, user: user?.email, sessionToken: !!sessionToken });
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Selecione um evento e verifique sua autenticação"
+      });
+      return;
+    }
 
     setLoading(true);
     try {
       const configData = {
         event_id: selectedEvent,
-        ...config,
-        keywords: config.keywords?.filter(k => k.trim()) || []
+        is_enabled: config.is_enabled ?? true,
+        required_correct: config.required_correct ?? 2,
+        keywords: config.keywords?.filter(k => k && k.trim()) || [],
+        issuer_name: config.issuer_name || '',
+        issuer_role: config.issuer_role || '',
+        issuer_signature_url: config.issuer_signature_url || null,
+        hours: config.hours || '',
+        city: config.city || '',
+        country: config.country || '',
+        timezone: config.timezone || null,
+        template_id: config.template_id || null
       };
 
+      console.log('[CertificateManager] Salvando config:', configData);
+
       // Check if config exists
-      const { data: existing } = await supabase
+      const { data: existing, error: selectError } = await supabase
         .from('event_certificates')
-        .select('id')
+        .select('event_id')
         .eq('event_id', selectedEvent)
-        .single();
+        .maybeSingle();
+
+      if (selectError) {
+        console.error('[CertificateManager] Erro ao verificar config existente:', selectError);
+        throw selectError;
+      }
+
+      console.log('[CertificateManager] Config existente:', existing);
 
       if (existing) {
         // Update
+        console.log('[CertificateManager] Atualizando config existente');
         const { error } = await supabase
           .from('event_certificates')
           .update(configData)
           .eq('event_id', selectedEvent);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[CertificateManager] Erro ao atualizar:', error);
+          throw error;
+        }
       } else {
         // Insert
+        console.log('[CertificateManager] Inserindo nova config');
         const { error } = await supabase
           .from('event_certificates')
           .insert(configData);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[CertificateManager] Erro ao inserir:', error);
+          throw error;
+        }
       }
+
+      console.log('[CertificateManager] Config salva com sucesso');
 
       toast({
         title: "Sucesso",
@@ -198,10 +234,11 @@ const CertificateManager = () => {
 
       loadCertificateConfig();
     } catch (error: any) {
+      console.error('[CertificateManager] Erro ao salvar config:', error);
       toast({
         variant: "destructive",
         title: "Erro",
-        description: error.message
+        description: error.message || "Erro ao salvar configuração"
       });
     } finally {
       setLoading(false);
