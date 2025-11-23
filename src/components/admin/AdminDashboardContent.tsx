@@ -35,6 +35,7 @@ import TransmissionScheduleManager from '@/components/admin/TransmissionSchedule
 import TransmissionFAQManager from '@/components/admin/TransmissionFAQManager';
 import { SubmissionsManager } from '@/components/admin/SubmissionsManager';
 import { PresentationRoomsManager } from '@/components/admin/PresentationRoomsManager';
+import CertificateManager from '@/components/admin/CertificateManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -236,6 +237,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('cronograma') || isAdminRoot()) ? (
           <PermissionGuard resource="cronograma">
             <PresentationRoomsManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'certificados':
+        return (hasPermission('certificados') || isAdmin) ? (
+          <PermissionGuard resource="certificados">
+            <CertificateManager />
           </PermissionGuard>
         ) : null;
       
