@@ -18,6 +18,7 @@ import WorkSubmissionsManager from './WorkSubmissionsManager';
 import { SubmissionsManager } from './SubmissionsManager';
 import VideoSubmissionsManager from './VideoSubmissionsManager';
 import { PresentationRoomsManager } from './PresentationRoomsManager';
+import CertificateManager from './CertificateManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -28,7 +29,7 @@ const AdminTabs = () => {
   const hasPermission = (resource: string) => {
     if (user.user_type === 'admin_root') return true;
     if (user.user_type === 'admin') {
-      return ['banner', 'contador', 'cronograma', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos', 'trabalhos', 'submissoes'].includes(resource);
+      return ['banner', 'contador', 'cronograma', 'eventos', 'inscricoes', 'cupons', 'local', 'online', 'palestrantes', 'parceiros', 'textos', 'videos', 'trabalhos', 'submissoes', 'certificados'].includes(resource);
     }
     if (user.user_type === 'design') {
       return ['banner', 'eventos', 'palestrantes', 'videos'].includes(resource);
@@ -94,6 +95,9 @@ const AdminTabs = () => {
         )}
         {hasPermission('cronograma') && (
           <TabsTrigger value="salas-apresentacao">Salas de Apresentação</TabsTrigger>
+        )}
+        {(hasPermission('certificados') || isAdminRoot() || user.user_type === 'admin') && (
+          <TabsTrigger value="certificados">Certificados</TabsTrigger>
         )}
       </TabsList>
 
@@ -194,6 +198,12 @@ const AdminTabs = () => {
       {hasPermission('cronograma') && (
         <TabsContent value="salas-apresentacao">
           <PresentationRoomsManager />
+        </TabsContent>
+      )}
+
+      {(hasPermission('certificados') || isAdminRoot() || user.user_type === 'admin') && (
+        <TabsContent value="certificados">
+          <CertificateManager />
         </TabsContent>
       )}
     </Tabs>

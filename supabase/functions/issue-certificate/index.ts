@@ -45,9 +45,9 @@ const handler = async (req: Request): Promise<Response> => {
     const { eventId, email, fullName, keywords }: CertificateRequest = await req.json();
 
     // Validate input
-    if (!eventId || !email || !fullName || !keywords || keywords.length !== 5) {
+    if (!eventId || !email || !fullName || !keywords || keywords.length !== 3) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Dados inválidos' }),
+        JSON.stringify({ success: false, message: 'Dados inválidos. É necessário fornecer 3 palavras-chave.' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -149,7 +149,7 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          message: `Você acertou ${matchedCount}/${eventCert.keywords.length} palavras-chave. Mínimo: ${eventCert.required_correct}/${eventCert.keywords.length}`,
+          message: `Você acertou ${matchedCount}/3 palavras-chave. Mínimo necessário: ${eventCert.required_correct}/3`,
           matched: matchedCount 
         }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -170,7 +170,11 @@ const handler = async (req: Request): Promise<Response> => {
           success: true, 
           message: `Certificado já emitido em ${new Date(existingCert.issued_at).toLocaleDateString('pt-BR')}`,
           pdfUrl: existingCert.pdf_url,
-          code: existingCert.code
+          code: existingCert.code,
+          matched: matchedCount,
+          fullName: normalizedFullName,
+          email: normalizedEmail,
+          eventName: event?.slug || 'Evento'
         }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
@@ -217,7 +221,11 @@ const handler = async (req: Request): Promise<Response> => {
         success: true, 
         message: 'Certificado emitido com sucesso!',
         pdfUrl: pdfUrl,
-        code: code
+        code: code,
+        matched: matchedCount,
+        fullName: normalizedFullName,
+        email: normalizedEmail,
+        eventName: event?.slug || 'Evento'
       }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
