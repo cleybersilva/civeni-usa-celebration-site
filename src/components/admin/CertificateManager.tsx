@@ -212,7 +212,7 @@ const CertificateManager = () => {
       return;
     }
 
-    // Filtrar e limpar palavras-chave
+    // Filtrar e limpar palavras-chave (UI trabalha com 3, mas o banco exige 5)
     const cleanedKeywords = (config.keywords || ['', '', ''])
       .map(k => k?.trim() || '')
       .filter(k => k.length > 0);
@@ -226,13 +226,20 @@ const CertificateManager = () => {
       return;
     }
 
+    // Banco tem constraint CHECK (array_length(keywords, 1) = 5)
+    // Então sempre enviamos exatamente 5 elementos, preenchendo com a última keyword informada
+    const keywordsForDb = [...cleanedKeywords];
+    while (keywordsForDb.length < 5) {
+      keywordsForDb.push(cleanedKeywords[cleanedKeywords.length - 1]);
+    }
+
     setLoading(true);
     try {
       const configData = {
         event_id: selectedEvent,
         is_enabled: !!config.is_enabled, // Garantir boolean
         required_correct: minKeywords, // Já validado acima
-        keywords: cleanedKeywords,
+        keywords: keywordsForDb,
         issuer_name: (config.issuer_name || '').trim(),
         issuer_role: (config.issuer_role || '').trim(),
         issuer_signature_url: config.issuer_signature_url || null,
