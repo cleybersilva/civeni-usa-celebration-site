@@ -69,14 +69,14 @@ export const createMenuItems = (
       id: 'civeni-programacao',
       label: 'CIVENI Presencial',
       icon: CalendarDays,
-      show: hasPermission('cronograma') || isAdminRoot(),
+      show: false,
       isPriority: false
     },
     {
       id: 'civeni-online-programacao',
       label: 'CIVENI Online',
       icon: Monitor,
-      show: hasPermission('cronograma') || isAdminRoot(),
+      show: false,
       isPriority: false
     },
     {
@@ -146,7 +146,7 @@ export const createMenuItems = (
       id: 'textos',
       label: t('admin.menu.texts', 'Textos'),
       icon: Type,
-      show: hasPermission('textos') || isAdminRoot(),
+      show: false,
       isPriority: false
     },
     {
