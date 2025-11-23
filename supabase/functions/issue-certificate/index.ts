@@ -221,6 +221,23 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Enviar e-mail automático com o certificado
+    try {
+      await supabase.functions.invoke('send-certificate-email', {
+        body: {
+          email: normalizedEmail,
+          fullName: normalizedFullName,
+          eventName: event?.slug || 'CIVENI 2025',
+          pdfUrl: pdfUrl,
+          code: code
+        }
+      });
+      console.log('Email de certificado enviado para:', normalizedEmail);
+    } catch (emailError) {
+      console.error('Erro ao enviar e-mail (não crítico):', emailError);
+      // Não falhar a requisição se o e-mail falhar
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -230,7 +247,7 @@ const handler = async (req: Request): Promise<Response> => {
         matched: matchedCount,
         fullName: normalizedFullName,
         email: normalizedEmail,
-        eventName: event?.slug || 'Evento'
+        eventName: event?.slug || 'CIVENI 2025'
       }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );

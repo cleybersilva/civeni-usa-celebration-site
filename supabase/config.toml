@@ -33,6 +33,9 @@ verify_jwt = false
 [functions.issue-certificate]
 verify_jwt = false
 
+[functions.send-certificate-email]
+verify_jwt = false
+
 [functions.verify-certificate]
 verify_jwt = false
 
