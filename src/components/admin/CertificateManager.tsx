@@ -48,6 +48,8 @@ const CertificateManager = () => {
   const { user, sessionToken } = useAdminAuth();
   const { toast } = useToast();
   
+  console.log('[CertificateManager] Componente montado, user:', user?.email);
+  
   const [events, setEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [config, setConfig] = useState<Partial<CertificateConfig>>({
