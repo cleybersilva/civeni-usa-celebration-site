@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { 
   Loader2, 
   Save, 
@@ -12,11 +11,14 @@ import {
   Award,
   FileText,
   Download,
-  Upload
+  Upload,
+  Plus
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import CertificatesList from './certificates/CertificatesList';
+import CertificateTemplateDialog from './certificates/CertificateTemplateDialog';
 
 interface CertificateConfig {
   event_id: string;
@@ -66,6 +68,8 @@ const CertificateManager = () => {
   const [loading, setLoading] = useState(false);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [tab, setTab] = useState<'config' | 'certificates'>('config');
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const [templateConfig, setTemplateConfig] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -302,6 +306,55 @@ const CertificateManager = () => {
     input.click();
   };
 
+  const handleSaveTemplate = async (layoutConfig: any) => {
+    if (!selectedEvent) return;
+
+    try {
+      // Salvar layout_config junto com outras configurações
+      const configData = {
+        event_id: selectedEvent,
+        ...config,
+        layout_config: layoutConfig,
+        keywords: config.keywords?.filter(k => k.trim()) || []
+      };
+
+      const { data: existing } = await supabase
+        .from('event_certificates')
+        .select('id')
+        .eq('event_id', selectedEvent)
+        .single();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('event_certificates')
+          .update(configData)
+          .eq('event_id', selectedEvent);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('event_certificates')
+          .insert(configData);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Sucesso",
+        description: "Modelo de certificado salvo com sucesso!"
+      });
+
+      loadCertificateConfig();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: error.message
+      });
+      throw error;
+    }
+  };
+
   if (!user) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -325,6 +378,14 @@ const CertificateManager = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Gerenciamento de Certificados</h2>
         <div className="flex items-center space-x-2">
+          <Button
+            onClick={() => setIsTemplateDialogOpen(true)}
+            disabled={!selectedEvent}
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white font-semibold"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Criar Certificado
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -512,66 +573,22 @@ const CertificateManager = () => {
           )}
 
           {tab === 'certificates' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Award className="h-5 w-5 mr-2" />
-                    Certificados Emitidos
-                  </div>
-                  <Badge variant="secondary">
-                    {issuedCertificates.length} certificados
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {issuedCertificates.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Nenhum certificado emitido ainda</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {issuedCertificates.map(cert => (
-                      <div key={cert.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="font-medium">{cert.user_email}</div>
-                          <div className="text-xs text-muted-foreground">
-                            Código: {cert.hash} | 
-                            Emitido: {cert.emitido_at ? new Date(cert.emitido_at).toLocaleDateString('pt-BR') : 'N/A'}
-                          </div>
-                          {cert.arquivo_url && (
-                            <a 
-                              href={cert.arquivo_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-xs text-blue-600 hover:underline"
-                            >
-                              Ver PDF
-                            </a>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={cert.status === 'issued' ? 'default' : 'destructive'}>
-                            {cert.status === 'issued' ? 'Válido' : 'Revogado'}
-                          </Badge>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleCertificateStatus(cert.id, cert.status)}
-                          >
-                            {cert.status === 'issued' ? 'Revogar' : 'Revalidar'}
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <CertificatesList
+              certificates={issuedCertificates}
+              onToggleStatus={toggleCertificateStatus}
+            />
           )}
         </>
       )}
+
+      {/* Dialog de Criação/Edição de Template */}
+      <CertificateTemplateDialog
+        isOpen={isTemplateDialogOpen}
+        onOpenChange={setIsTemplateDialogOpen}
+        onSave={handleSaveTemplate}
+        initialConfig={templateConfig}
+        eventId={selectedEvent}
+      />
     </div>
   );
 };
