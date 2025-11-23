@@ -164,13 +164,41 @@ const CertificateManager = () => {
     }
   };
 
-  const handleSaveConfig = async () => {
-    if (!selectedEvent || !user || !sessionToken) {
-      console.log('[CertificateManager] Validação falhou:', { selectedEvent, user: user?.email, sessionToken: !!sessionToken });
+  const handleSaveConfig = async (e?: React.FormEvent) => {
+    e?.preventDefault?.();
+
+    if (!selectedEvent) {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Selecione um evento e verifique sua autenticação"
+        description: "Selecione um evento antes de salvar as configurações."
+      });
+      return;
+    }
+
+    // Recupera sessão preferencialmente do contexto, com fallback para localStorage
+    let sessionEmail = user?.email || '';
+    let sessionTokenValue: string | undefined = sessionToken;
+
+    if (!sessionEmail || !sessionTokenValue) {
+      try {
+        const raw = localStorage.getItem('adminSession');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          sessionEmail = sessionEmail || parsed?.user?.email || '';
+          sessionTokenValue = sessionTokenValue || parsed?.session_token || parsed?.sessionToken;
+        }
+      } catch (err) {
+        console.error('[CertificateManager] Erro ao ler adminSession do localStorage:', err);
+      }
+    }
+
+    if (!sessionEmail || !sessionTokenValue) {
+      console.error('[CertificateManager] Sessão administrativa inválida', { sessionEmail, sessionTokenValue });
+      toast({
+        variant: "destructive",
+        title: "Sessão inválida",
+        description: "Sessão administrativa inválida. Faça login novamente."
       });
       return;
     }
@@ -192,40 +220,38 @@ const CertificateManager = () => {
         template_id: config.template_id || null
       };
 
-      console.log('[CertificateManager] Salvando config:', configData);
+      console.log('[CertificateManager] Salvando config via RPC:', { configData, sessionEmail, hasToken: !!sessionTokenValue });
 
-      // Use função RPC segura para upsert
       const { data, error } = await supabase.rpc('admin_upsert_event_certificate', {
         p_config: configData,
-        p_user_email: user.email,
-        p_session_token: sessionToken
+        p_user_email: sessionEmail,
+        p_session_token: sessionTokenValue
       });
 
       if (error) {
-        console.error('[CertificateManager] Erro ao salvar:', error);
+        console.error('[CertificateManager] Erro ao salvar (RPC):', error);
         throw error;
       }
 
-      console.log('[CertificateManager] Config salva com sucesso:', data);
+      console.log('[CertificateManager] Config salva com sucesso (RPC):', data);
 
       toast({
         title: "Sucesso",
         description: "Configuração de certificados salva com sucesso!"
       });
 
-      loadCertificateConfig();
+      await loadCertificateConfig();
     } catch (error: any) {
       console.error('[CertificateManager] Erro ao salvar config:', error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: error.message || "Erro ao salvar configuração"
+        title: "Erro ao salvar",
+        description: error?.message || 'Não foi possível salvar as configurações de certificados.'
       });
     } finally {
       setLoading(false);
     }
   };
-
   const updateKeyword = (index: number, value: string) => {
     const newKeywords = [...(config.keywords || ['', '', ''])];
     newKeywords[index] = value;
