@@ -66,23 +66,32 @@ const EventsManager = () => {
     return 'past';
   };
 
-  const filteredEvents = events?.filter((event: any) => {
-    const matchesSearch = event.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.slug?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const eventStatus = getEventStatus(event);
-    const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'draft' && event.status_publicacao === 'draft') ||
-                         (statusFilter === 'published' && event.status_publicacao === 'published') ||
-                         (statusFilter === 'archived' && event.status_publicacao === 'archived') ||
-                         (statusFilter === 'upcoming' && eventStatus === 'upcoming') ||
-                         (statusFilter === 'live' && eventStatus === 'live') ||
-                         (statusFilter === 'past' && eventStatus === 'past');
-    
-    const matchesModalidade = modalidadeFilter === 'all' || event.modalidade === modalidadeFilter;
-    
-    return matchesSearch && matchesStatus && matchesModalidade;
-  }) || [];
+  let filteredEvents: any[] = [];
+  try {
+    filteredEvents = events?.filter((event: any) => {
+      const title = typeof event.titulo === 'string' ? event.titulo : '';
+      const slug = typeof event.slug === 'string' ? event.slug : '';
+
+      const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           slug.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const eventStatus = getEventStatus(event);
+      const matchesStatus = statusFilter === 'all' || 
+                           (statusFilter === 'draft' && event.status_publicacao === 'draft') ||
+                           (statusFilter === 'published' && event.status_publicacao === 'published') ||
+                           (statusFilter === 'archived' && event.status_publicacao === 'archived') ||
+                           (statusFilter === 'upcoming' && eventStatus === 'upcoming') ||
+                           (statusFilter === 'live' && eventStatus === 'live') ||
+                           (statusFilter === 'past' && eventStatus === 'past');
+      
+      const matchesModalidade = modalidadeFilter === 'all' || event.modalidade === modalidadeFilter;
+      
+      return matchesSearch && matchesStatus && matchesModalidade;
+    }) || [];
+  } catch (err) {
+    console.error('=== EventsManager: Error filtering events ===', err, { events });
+    filteredEvents = events || [];
+  }
 
   const handleCreateEvent = async (eventData: any) => {
     const success = await createEvent(eventData);
@@ -129,7 +138,16 @@ const EventsManager = () => {
   };
 
   const formatEventDate = (dateString: string) => {
-    return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: ptBR });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return dateString || '';
+      }
+      return format(date, "dd/MM/yyyy HH:mm", { locale: ptBR });
+    } catch (err) {
+      console.error('=== EventsManager: Error formatting date ===', err, { dateString });
+      return dateString || '';
+    }
   };
 
   const getStatusBadge = (event: any) => {
