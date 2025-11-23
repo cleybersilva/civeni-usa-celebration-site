@@ -192,7 +192,7 @@ const CertificateManager = () => {
       return;
     }
 
-    if (!user) {
+    if (!user || !sessionToken) {
       toast({
         variant: "destructive",
         title: "Sessão inválida",
@@ -216,21 +216,23 @@ const CertificateManager = () => {
         country: config.country || '',
         timezone: config.timezone || 'America/Sao_Paulo',
         template_id: config.template_id || null,
-        updated_at: new Date().toISOString()
+        admin_email: user.email,
+        session_token: sessionToken
       };
 
-      console.log('[CertificateManager] Salvando config:', configData);
+      console.log('[CertificateManager] Salvando config via edge function');
 
-      const { error } = await supabase
-        .from('event_certificates')
-        .upsert(configData, { 
-          onConflict: 'event_id',
-          ignoreDuplicates: false 
-        });
+      const { data, error } = await supabase.functions.invoke('save-certificate-config', {
+        body: configData
+      });
 
       if (error) {
         console.error('[CertificateManager] Erro ao salvar:', error);
         throw error;
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || 'Erro ao salvar configurações');
       }
 
       console.log('[CertificateManager] Config salva com sucesso');
