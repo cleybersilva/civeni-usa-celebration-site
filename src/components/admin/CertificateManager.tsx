@@ -497,8 +497,14 @@ const CertificateManager = () => {
                       type="number"
                       min={1}
                       max={3}
-                      value={config.required_correct || 2}
-                      onChange={(e) => setConfig(prev => ({ ...prev, required_correct: parseInt(e.target.value) }))}
+                      value={config.required_correct ?? 2}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setConfig(prev => ({
+                          ...prev,
+                          required_correct: isNaN(value) ? (prev.required_correct ?? 2) : value
+                        }));
+                      }}
                     />
                     <p className="text-xs text-muted-foreground">
                       Mínimo de acertos para emitir o certificado (de 3 palavras-chave)
