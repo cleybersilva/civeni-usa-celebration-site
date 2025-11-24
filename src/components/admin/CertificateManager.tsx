@@ -387,6 +387,13 @@ const CertificateManager = () => {
     if (!selectedEvent) return;
 
     try {
+      console.log('[CertificateManager] handleSaveTemplate chamado com:', {
+        has_layoutConfig: !!layoutConfig,
+        layoutConfig_keys: layoutConfig ? Object.keys(layoutConfig) : [],
+        layoutConfig_json: JSON.stringify(layoutConfig),
+        language
+      });
+
       // Preparar keywords no formato exigido pelo banco (sempre 5 posições)
       const cleanedKeywords = (config.keywords || ['', '', ''])
         .map((k) => k.trim())
@@ -424,6 +431,13 @@ const CertificateManager = () => {
         language: language || config.language || 'pt-BR'
       };
 
+      console.log('[CertificateManager] configData preparado para salvar:', {
+        has_layout_config: !!configData.layout_config,
+        layout_config_type: typeof configData.layout_config,
+        layout_config_json: JSON.stringify(configData.layout_config),
+        event_id: configData.event_id
+      });
+
       const { data: existing } = await supabase
         .from('event_certificates')
         .select('id')
@@ -431,18 +445,28 @@ const CertificateManager = () => {
         .single();
 
       if (existing) {
+        console.log('[CertificateManager] Atualizando certificado existente...');
         const { error } = await supabase
           .from('event_certificates')
           .update(configData)
           .eq('event_id', selectedEvent);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[CertificateManager] Erro ao atualizar:', error);
+          throw error;
+        }
+        console.log('[CertificateManager] Certificado atualizado com sucesso!');
       } else {
+        console.log('[CertificateManager] Inserindo novo certificado...');
         const { error } = await supabase
           .from('event_certificates')
           .insert(configData);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[CertificateManager] Erro ao inserir:', error);
+          throw error;
+        }
+        console.log('[CertificateManager] Certificado inserido com sucesso!');
       }
 
       toast({
