@@ -257,7 +257,8 @@ const CertificateManager = () => {
         country: (config.country || '').trim(),
         timezone: config.timezone || 'America/Sao_Paulo',
         template_id: config.template_id || null,
-        layout_config: config.layout_config || null,
+        // NÃO enviar layout_config aqui para preservar o template salvo em "Criar Certificado"
+        // layout_config é gerenciado apenas pelo handleSaveTemplate
         language: config.language || 'pt-BR',
         admin_email: user.email,
         session_token: sessionToken
