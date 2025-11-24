@@ -386,13 +386,41 @@ const CertificateManager = () => {
     if (!selectedEvent) return;
 
     try {
-      // Salvar layout_config e language junto com outras configurações
+      // Preparar keywords no formato exigido pelo banco (sempre 5 posições)
+      const cleanedKeywords = (config.keywords || ['', '', ''])
+        .map((k) => k.trim())
+        .filter((k) => k.length > 0);
+
+      if (cleanedKeywords.length === 0) {
+        toast({
+          variant: "destructive",
+          title: "Palavras-chave obrigatórias",
+          description: "Defina ao menos uma palavra-chave nas configurações antes de salvar o modelo."
+        });
+        return;
+      }
+
+      const keywordsForDb = [...cleanedKeywords];
+      while (keywordsForDb.length < 5) {
+        keywordsForDb.push(cleanedKeywords[cleanedKeywords.length - 1]);
+      }
+
+      // Salvar layout_config, language e demais campos necessários para emissão
       const configData = {
         event_id: selectedEvent,
-        ...config,
+        is_enabled: !!config.is_enabled,
+        required_correct: config.required_correct ?? 2,
+        keywords: keywordsForDb,
+        issuer_name: (config.issuer_name || '').trim(),
+        issuer_role: (config.issuer_role || '').trim(),
+        issuer_signature_url: config.issuer_signature_url || null,
+        hours: (config.hours || '').trim(),
+        city: (config.city || '').trim(),
+        country: (config.country || '').trim(),
+        timezone: config.timezone || 'America/Sao_Paulo',
+        template_id: config.template_id || null,
         layout_config: layoutConfig,
-        language: language || config.language || 'pt-BR',
-        keywords: config.keywords?.filter(k => k.trim()) || []
+        language: language || config.language || 'pt-BR'
       };
 
       const { data: existing } = await supabase
@@ -431,7 +459,6 @@ const CertificateManager = () => {
       throw error;
     }
   };
-
   if (!user) {
     return (
       <div className="flex items-center justify-center h-64">
