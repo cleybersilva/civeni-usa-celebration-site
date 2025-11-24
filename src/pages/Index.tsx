@@ -1,5 +1,4 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import Header from '../components/Header';
 import HeroBanner from '../components/HeroBanner';
 import CountdownTimer from '../components/CountdownTimer';
@@ -9,18 +8,11 @@ import AboutSection from '../components/AboutSection';
 import SpeakersSection from '../components/SpeakersSection';
 import VideosSection from '../components/VideosSection';
 import CiveniII2024ImagesSection from '../components/CiveniII2024ImagesSection';
-
 import VenueSection from '../components/VenueSection';
 import PartnersSection from '../components/PartnersSection';
 import Footer from '../components/Footer';
 
 const Index = () => {
-  useEffect(() => {
-    // Force reload content on mount to ensure fresh data
-    console.log('Index page mounted - forcing content reload');
-    window.dispatchEvent(new CustomEvent('forceContentReload'));
-  }, []);
-
   return (
     <div className="min-h-screen bg-white font-poppins p-0 m-0">
       <Header />
@@ -32,7 +24,6 @@ const Index = () => {
       <SpeakersSection />
       <VideosSection />
       <CiveniII2024ImagesSection />
-      
       <VenueSection />
       <PartnersSection />
       <Footer />

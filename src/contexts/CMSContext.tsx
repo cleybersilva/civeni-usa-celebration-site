@@ -429,19 +429,19 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Detectar se estamos em contexto admin (URL contém /admin)
     const isAdminContext = window.location.pathname.includes('/admin');
     
-    // Force reload with timestamp to bypass cache
+    // Initial load only
+    loadContent(isAdminContext);
+    
+    // Listen for manual reload events (only for admin panel)
     const forceReload = () => {
-      console.log('Forcing content reload due to date update...');
-      loadContent(isAdminContext);
+      if (window.location.pathname.includes('/admin')) {
+        console.log('Admin panel: forcing content reload...');
+        loadContent(true);
+      }
     };
     
-    // Initial load
-    forceReload();
-    
-    // Listen for date updates
     window.addEventListener('forceContentReload', forceReload);
     
     return () => {
