@@ -450,9 +450,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const loadContent = async (adminMode = false) => {
+    setLoading(true);
     try {
       const timestamp = Date.now(); // Cache busting
-      console.log('Loading content with fresh data... timestamp:', timestamp);
+      console.log('🔄 Loading content with fresh data... timestamp:', timestamp);
+      
       // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
       let bannerQuery = supabase
         .from('banner_slides')
@@ -466,30 +468,32 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { data: bannerSlidesData, error: bannerError } = await bannerQuery;
 
       if (bannerError) {
-        console.error('Error loading banner slides:', bannerError);
+        console.error('❌ Error loading banner slides:', bannerError);
+      } else {
+        console.log('✅ Loaded', bannerSlidesData?.length || 0, 'banner slides');
       }
 
       // Converter dados do Supabase para o formato do contexto
-      const bannerSlides: BannerSlide[] = bannerSlidesData?.map(slide => {
+      const bannerSlides: BannerSlide[] = (bannerSlidesData?.map(slide => {
         // Converter caminhos de assets locais para URLs públicas
         let bgImage = slide.bg_image;
-        if (bgImage.startsWith('src/assets/')) {
+        if (bgImage && bgImage.startsWith('src/assets/')) {
           bgImage = bgImage.replace('src/assets/', '/assets/');
         }
         
         return {
           id: slide.id,
-          title: slide.title,
-          subtitle: slide.subtitle,
-          description: slide.description,
-          bgImage: bgImage,
-          buttonText: slide.button_text,
-          buttonLink: slide.button_link,
-          order: slide.order_index,
-          imageVersion: slide.image_version,
+          title: slide.title || '',
+          subtitle: slide.subtitle || '',
+          description: slide.description || '',
+          bgImage: bgImage || '',
+          buttonText: slide.button_text || '',
+          buttonLink: slide.button_link || '',
+          order: slide.order_index || 0,
+          imageVersion: slide.image_version || 1,
           updatedAt: slide.updated_at
         };
-      }) || defaultContent.bannerSlides;
+      }) || []).filter(slide => slide.id && slide.bgImage);
 
       // Carregar speakers do Supabase com cache busting
       console.log('🔎 CMSContext: Fetching speakers from DB... (adminMode:', adminMode, ')');
@@ -509,31 +513,30 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } else {
         console.log('✅ CMSContext: Raw speakers data from DB:', speakersData?.length || 0);
         if (speakersData && speakersData.length > 0) {
-          console.log('📋 First 5 speakers:', speakersData.slice(0, 5).map(s => s.name));
+          console.log('📋 First 3 speakers:', speakersData.slice(0, 3).map(s => s.name));
         }
       }
 
       // Converter dados do Supabase para o formato do contexto
-      const speakers: Speaker[] = speakersData?.map(speaker => ({
+      const speakers: Speaker[] = (speakersData?.map(speaker => ({
         id: speaker.id,
-        name: speaker.name,
-        title: speaker.title,
-        institution: speaker.institution,
+        name: speaker.name || '',
+        title: speaker.title || '',
+        institution: speaker.institution || '',
         image: speaker.image_url || '',
-        bio: speaker.bio,
-        order: speaker.order_index,
-        photoVersion: speaker.photo_version,
+        bio: speaker.bio || '',
+        order: speaker.order_index || 0,
+        photoVersion: speaker.photo_version || 1,
         updatedAt: speaker.updated_at,
         countryName: speaker.country_name || undefined,
         countryCode: speaker.country_code || undefined,
         showFlag: speaker.show_flag ?? true
-      })) || [];
+      })) || []).filter(speaker => speaker.id && speaker.name);
 
-      // CRÍTICO: Se não há speakers do DB, NÃO usar default!
       if (speakers.length === 0) {
         console.warn('⚠️ No speakers loaded from database!');
       } else {
-        console.log('✅ CMSContext: Formatted speakers:', speakers.length, speakers.slice(0, 3).map(s => s.name));
+        console.log('✅ CMSContext: Formatted speakers:', speakers.length);
       }
 
       // Carregar configurações do evento do Supabase
@@ -590,20 +593,22 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const { data: videos, error: videosError } = await videosQuery;
 
       if (videosError) {
-        console.error('Error loading videos:', videosError);
+        console.error('❌ Error loading videos:', videosError);
+      } else {
+        console.log('✅ Loaded', videos?.length || 0, 'videos');
       }
 
       // Converter dados do Supabase para o formato do contexto
-      const videosFormatted: Video[] = videos?.map(video => ({
+      const videosFormatted: Video[] = (videos?.map(video => ({
         id: video.id,
-        title: video.title,
+        title: video.title || '',
         description: video.description || '',
         videoType: video.video_type as 'youtube' | 'upload',
         youtubeUrl: video.youtube_url || undefined,
         uploadedVideoUrl: video.uploaded_video_url || undefined,
-        thumbnail: video.thumbnail,
-        order: video.order_index
-      })) || (adminMode ? [] : defaultContent.videos);
+        thumbnail: video.thumbnail || '',
+        order: video.order_index || 0
+      })) || []).filter(video => video.id && video.title);
 
       // Load counter settings
       const { data: counterData, error: counterError } = await supabase
@@ -639,22 +644,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
 
-      setContent(prev => ({ 
-        ...prev, 
-        bannerSlides, 
-        speakers,
-        eventConfig, 
+      setContent({
+        ...defaultContent,
+        bannerSlides: bannerSlides.length > 0 ? bannerSlides : defaultContent.bannerSlides,
+        speakers: speakers,
+        eventConfig,
         hybridActivities,
         videos: videosFormatted,
         counterSettings
-      }));
+      });
       
       console.log('✅ CMSContext - Content state updated!');
-      console.log('📊 Speakers in state:', speakers.length);
-      console.log('📋 First 3 speakers in state:', speakers.slice(0, 3).map(s => ({ name: s.name, id: s.id })));
+      console.log('📊 Content summary:', {
+        banners: bannerSlides.length,
+        speakers: speakers.length,
+        videos: videosFormatted.length
+      });
     } catch (error) {
       console.error('❌ CRITICAL ERROR loading content:', error);
-      console.error('Using defaultContent as fallback');
       setContent(defaultContent);
     } finally {
       setLoading(false);
