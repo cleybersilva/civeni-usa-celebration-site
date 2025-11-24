@@ -39,11 +39,19 @@ const BannerManager = () => {
 
   const [formData, setFormData] = useState({
     title: '',
+    titleEn: '',
+    titleEs: '',
     subtitle: '',
+    subtitleEn: '',
+    subtitleEs: '',
     description: '',
+    descriptionEn: '',
+    descriptionEs: '',
     bgImage: '',
     uploadedImage: '',
     buttonText: '',
+    buttonTextEn: '',
+    buttonTextEs: '',
     buttonLink: '',
     order: 1
   });
@@ -51,11 +59,19 @@ const BannerManager = () => {
   const resetForm = () => {
     setFormData({
       title: '',
+      titleEn: '',
+      titleEs: '',
       subtitle: '',
+      subtitleEn: '',
+      subtitleEs: '',
       description: '',
+      descriptionEn: '',
+      descriptionEs: '',
       bgImage: '',
       uploadedImage: '',
       buttonText: '',
+      buttonTextEn: '',
+      buttonTextEs: '',
       buttonLink: '',
       order: content.bannerSlides.length + 1
     });
@@ -126,11 +142,19 @@ const BannerManager = () => {
     setEditingSlide(slide);
     setFormData({
       title: slide.title,
+      titleEn: slide.titleEn || '',
+      titleEs: slide.titleEs || '',
       subtitle: slide.subtitle,
+      subtitleEn: slide.subtitleEn || '',
+      subtitleEs: slide.subtitleEs || '',
       description: slide.description,
+      descriptionEn: slide.descriptionEn || '',
+      descriptionEs: slide.descriptionEs || '',
       bgImage: slide.bgImage,
       uploadedImage: '', // Limpar upload quando editar
       buttonText: slide.buttonText,
+      buttonTextEn: slide.buttonTextEn || '',
+      buttonTextEs: slide.buttonTextEs || '',
       buttonLink: slide.buttonLink,
       order: slide.order
     });
@@ -179,31 +203,122 @@ const BannerManager = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Título</label>
-                    <Input
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      required
-                    />
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Seção Português */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-civeni-blue border-b pb-2">🇧🇷 Português</h3>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Título (PT)</label>
+                      <Input
+                        value={formData.title}
+                        onChange={(e) => setFormData({...formData, title: e.target.value})}
+                        required
+                        placeholder="Título em português"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Subtítulo (PT)</label>
+                      <Input
+                        value={formData.subtitle}
+                        onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
+                        required
+                        placeholder="Subtítulo em português"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Descrição (PT)</label>
+                      <Textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        rows={2}
+                        required
+                        placeholder="Descrição em português"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Texto do Botão (PT)</label>
+                      <Input
+                        value={formData.buttonText}
+                        onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
+                        placeholder="Ex: Inscreva-se agora"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Subtítulo</label>
-                    <Input
-                      value={formData.subtitle}
-                      onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
-                      required
-                    />
+
+                  {/* Seção Inglês */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-civeni-blue border-b pb-2">🇺🇸 English</h3>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Título (EN)</label>
+                      <Input
+                        value={formData.titleEn}
+                        onChange={(e) => setFormData({...formData, titleEn: e.target.value})}
+                        placeholder="Title in English"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Subtítulo (EN)</label>
+                      <Input
+                        value={formData.subtitleEn}
+                        onChange={(e) => setFormData({...formData, subtitleEn: e.target.value})}
+                        placeholder="Subtitle in English"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Descrição (EN)</label>
+                      <Textarea
+                        value={formData.descriptionEn}
+                        onChange={(e) => setFormData({...formData, descriptionEn: e.target.value})}
+                        rows={2}
+                        placeholder="Description in English"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Texto do Botão (EN)</label>
+                      <Input
+                        value={formData.buttonTextEn}
+                        onChange={(e) => setFormData({...formData, buttonTextEn: e.target.value})}
+                        placeholder="Ex: Register now"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Descrição</label>
-                    <Textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      rows={2}
-                      required
-                    />
+
+                  {/* Seção Espanhol */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-civeni-blue border-b pb-2">🇪🇸 Español</h3>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Título (ES)</label>
+                      <Input
+                        value={formData.titleEs}
+                        onChange={(e) => setFormData({...formData, titleEs: e.target.value})}
+                        placeholder="Título en español"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Subtítulo (ES)</label>
+                      <Input
+                        value={formData.subtitleEs}
+                        onChange={(e) => setFormData({...formData, subtitleEs: e.target.value})}
+                        placeholder="Subtítulo en español"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Descrição (ES)</label>
+                      <Textarea
+                        value={formData.descriptionEs}
+                        onChange={(e) => setFormData({...formData, descriptionEs: e.target.value})}
+                        rows={2}
+                        placeholder="Descripción en español"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Texto do Botão (ES)</label>
+                      <Input
+                        value={formData.buttonTextEs}
+                        onChange={(e) => setFormData({...formData, buttonTextEs: e.target.value})}
+                        placeholder="Ej: Inscríbete ahora"
+                      />
+                    </div>
                   </div>
                   <div>
                      <SimpleImageUpload
@@ -221,13 +336,15 @@ const BannerManager = () => {
                       placeholder="Cole aqui a URL da imagem ou faça upload acima"
                     />
                   </div>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  {/* Configurações Gerais */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <h3 className="text-lg font-semibold text-civeni-blue">⚙️ Configurações Gerais</h3>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Texto do Botão (Opcional)</label>
+                      <label className="block text-sm font-medium mb-2">Link do Botão</label>
                       <Input
-                        value={formData.buttonText}
-                        onChange={(e) => setFormData({...formData, buttonText: e.target.value})}
-                        placeholder="Texto do botão de ação"
+                        value={formData.buttonLink}
+                        onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
+                        placeholder="URL de destino do botão (ex: #inscricoes)"
                       />
                     </div>
                     <div>
@@ -239,14 +356,6 @@ const BannerManager = () => {
                         onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 1})}
                       />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Link do Botão (Opcional)</label>
-                    <Input
-                      value={formData.buttonLink}
-                      onChange={(e) => setFormData({...formData, buttonLink: e.target.value})}
-                      placeholder="URL de destino do botão"
-                    />
                   </div>
                   <div className="flex justify-end space-x-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
