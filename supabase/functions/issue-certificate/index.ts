@@ -148,6 +148,8 @@ const createCertificatePdf = async (
 
   // Se temos layout_config, usar ele
   if (layoutConfig && layoutConfig.header && layoutConfig.body && layoutConfig.footer) {
+    console.log("Using custom layout_config for PDF generation");
+    
     // Preparar dados para substituição de placeholders
     const dateStr = issueDate.toLocaleDateString(
       language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
@@ -367,6 +369,13 @@ const createCertificatePdf = async (
 
   } else {
     // Fallback: template genérico (caso não tenha layout_config)
+    console.warn("Using fallback template - layout_config missing or incomplete:", {
+      has_layoutConfig: !!layoutConfig,
+      has_header: !!layoutConfig?.header,
+      has_body: !!layoutConfig?.body,
+      has_footer: !!layoutConfig?.footer
+    });
+    
     const titleText =
       language === "en-US"
         ? "Certificate of Participation"
@@ -571,6 +580,7 @@ const handler = async (req: Request): Promise<Response> => {
       .maybeSingle();
 
     if (eventError || !eventCert) {
+      console.error("Error fetching event certificate config:", eventError);
       return new Response(
         JSON.stringify({
           success: false,
@@ -579,6 +589,12 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
       );
     }
+
+    console.log("Event certificate config found:", {
+      event_id: eventId,
+      has_layout_config: !!eventCert.layout_config,
+      language: eventCert.language
+    });
 
     // Mensagens por idioma
     const language = eventCert.language || "pt-BR";
@@ -651,12 +667,23 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Detalhes do evento para o certificado
+    // Buscar detalhes do evento com traduções
     const { data: event } = await supabase
       .from("events")
-      .select("slug")
+      .select("slug, id")
       .eq("id", eventId)
       .single();
+
+    // Buscar tradução do evento no idioma configurado
+    const { data: translation } = await supabase
+      .from("event_translations")
+      .select("titulo")
+      .eq("event_id", eventId)
+      .eq("idioma", language)
+      .maybeSingle();
+
+    const eventName = translation?.titulo || event?.slug || "CIVENI 2025";
+    console.log("Event name for certificate:", eventName);
 
     // Verificar se certificado já existe para este e-mail/evento
     const { data: existingCert } = await supabase
@@ -672,10 +699,18 @@ const handler = async (req: Request): Promise<Response> => {
     // Gerar PDF usando o layout_config do evento
     const layoutConfig = eventCert.layout_config as LayoutConfig | undefined;
     
+    console.log("Generating PDF with layout_config:", {
+      has_config: !!layoutConfig,
+      has_header: !!layoutConfig?.header,
+      has_body: !!layoutConfig?.body,
+      has_footer: !!layoutConfig?.footer,
+      eventName
+    });
+    
     const pdfBytes = await createCertificatePdf({
       fullName: normalizedFullName,
       eventSlug: event?.slug || "CIVENI 2025",
-      eventName: event?.slug || "CIVENI 2025",
+      eventName,
       language,
       issueDate,
       city: eventCert.city,
@@ -730,7 +765,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: {
           email: normalizedEmail,
           fullName: normalizedFullName,
-          eventName: event?.slug || "CIVENI 2025",
+          eventName,
           pdfUrl,
           code,
         },
@@ -758,7 +793,7 @@ const handler = async (req: Request): Promise<Response> => {
         matched: matchedCount,
         fullName: normalizedFullName,
         email: normalizedEmail,
-        eventName: event?.slug || "CIVENI 2025",
+        eventName,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
     );
