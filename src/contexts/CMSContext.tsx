@@ -12,6 +12,9 @@ export interface Speaker {
   order: number;
   photoVersion?: number;
   updatedAt?: string;
+  countryName?: string;
+  countryCode?: string;
+  showFlag?: boolean;
 }
 
 export interface BannerSlide {
@@ -520,7 +523,10 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         bio: speaker.bio,
         order: speaker.order_index,
         photoVersion: speaker.photo_version,
-        updatedAt: speaker.updated_at
+        updatedAt: speaker.updated_at,
+        countryName: speaker.country_name || undefined,
+        countryCode: speaker.country_code || undefined,
+        showFlag: speaker.show_flag ?? true
       })) || [];
 
       // CRÍTICO: Se não há speakers do DB, NÃO usar default!

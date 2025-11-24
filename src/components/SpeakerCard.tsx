@@ -3,6 +3,7 @@ import { Speaker } from '@/contexts/CMSContext';
 import { useFixedSpeakerImage } from '@/hooks/useFixedSpeakerImage';
 import { RefreshCw } from 'lucide-react';
 import React from 'react';
+import { getFlagEmoji } from '@/utils/countryFlags';
 
 interface SpeakerCardProps {
   speaker: Speaker;
@@ -73,9 +74,23 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
         <div className="p-5">
           <div className="space-y-2.5">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1 font-poppins leading-tight group-hover:text-civeni-blue transition-all duration-500 group-hover:translate-x-1">
-                {speaker.name}
-              </h3>
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h3 className="text-lg font-bold text-gray-900 font-poppins leading-tight group-hover:text-civeni-blue transition-all duration-500 group-hover:translate-x-1 flex-1">
+                  {speaker.name}
+                </h3>
+                {speaker.showFlag !== false && speaker.countryCode && (
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span className="text-2xl leading-none" title={speaker.countryName}>
+                      {getFlagEmoji(speaker.countryCode)}
+                    </span>
+                    {speaker.countryName && (
+                      <span className="text-xs font-medium text-gray-600 opacity-90">
+                        {speaker.countryName}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="h-0.5 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-2.5 group-hover:w-full transition-all duration-500"></div>
             </div>
             
