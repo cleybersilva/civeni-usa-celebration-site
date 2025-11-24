@@ -258,9 +258,9 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
             </DialogTitle>
             
             {/* Seletor de idioma */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-sm font-medium">Idioma do certificado deste evento</Label>
-              <div className="flex gap-2">
+            <div className="flex flex-col gap-3 items-center">
+              <Label className="text-sm font-medium text-center">Idioma do certificado deste evento</Label>
+              <div className="flex gap-2 justify-center">
                 <Button
                   type="button"
                   size="sm"
@@ -297,7 +297,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                 size="sm"
                 onClick={handleTranslate}
                 disabled={translating}
-                className="h-10 bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-sm"
+                className="h-10 w-full max-w-xs bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-sm"
               >
                 {translating ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -306,7 +306,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                 )}
                 Aplicar idioma ao modelo
               </Button>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground text-center max-w-sm">
                 Isso atualizará o texto do certificado para o idioma selecionado e será o idioma liberado para os participantes deste evento.
               </p>
             </div>
