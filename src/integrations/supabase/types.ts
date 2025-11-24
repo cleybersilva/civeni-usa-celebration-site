@@ -136,42 +136,66 @@ export type Database = {
           bg_image: string
           button_link: string
           button_text: string
+          button_text_en: string | null
+          button_text_es: string | null
           created_at: string
           description: string
+          description_en: string | null
+          description_es: string | null
           id: string
           image_version: number
           is_active: boolean
           order_index: number
           subtitle: string
+          subtitle_en: string | null
+          subtitle_es: string | null
           title: string
+          title_en: string | null
+          title_es: string | null
           updated_at: string
         }
         Insert: {
           bg_image: string
           button_link: string
           button_text: string
+          button_text_en?: string | null
+          button_text_es?: string | null
           created_at?: string
           description: string
+          description_en?: string | null
+          description_es?: string | null
           id?: string
           image_version?: number
           is_active?: boolean
           order_index?: number
           subtitle: string
+          subtitle_en?: string | null
+          subtitle_es?: string | null
           title: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
         }
         Update: {
           bg_image?: string
           button_link?: string
           button_text?: string
+          button_text_en?: string | null
+          button_text_es?: string | null
           created_at?: string
           description?: string
+          description_en?: string | null
+          description_es?: string | null
           id?: string
           image_version?: number
           is_active?: boolean
           order_index?: number
           subtitle?: string
+          subtitle_en?: string | null
+          subtitle_es?: string | null
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
         }
         Relationships: []
