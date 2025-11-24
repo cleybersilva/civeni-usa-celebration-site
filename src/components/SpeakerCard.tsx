@@ -11,6 +11,35 @@ interface SpeakerCardProps {
 const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
   const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
 
+  // Flag display logic: custom image > country flag > emojis in text
+  const flagElement = React.useMemo(() => {
+    if (speaker.flagImageUrl) {
+      return (
+        <img 
+          src={speaker.flagImageUrl} 
+          alt="Bandeira" 
+          className="inline-block w-5 h-5 ml-2 rounded-sm object-cover"
+        />
+      );
+    }
+    
+    if (speaker.countryCode) {
+      return (
+        <img 
+          src={`/flags/${speaker.countryCode}.svg`} 
+          alt={`Bandeira ${speaker.countryCode}`} 
+          className="inline-block w-5 h-5 ml-2 rounded-sm object-cover"
+          onError={(e) => {
+            // Hide flag if SVG not found
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      );
+    }
+    
+    return null;
+  }, [speaker.flagImageUrl, speaker.countryCode]);
+
   return (
     <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border border-gray-100/50 backdrop-blur-sm cursor-pointer">
       {/* Gradient overlay for visual depth */}
@@ -73,8 +102,9 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
         <div className="p-5">
           <div className="space-y-2.5">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1 font-poppins leading-tight group-hover:text-civeni-blue transition-all duration-500 group-hover:translate-x-1">
-                {speaker.name}
+              <h3 className="text-lg font-bold text-gray-900 mb-1 font-poppins leading-tight group-hover:text-civeni-blue transition-all duration-500 group-hover:translate-x-1 flex items-center">
+                <span>{speaker.name}</span>
+                {flagElement}
               </h3>
               <div className="h-0.5 w-10 bg-gradient-to-r from-civeni-red to-civeni-blue rounded-full mb-2.5 group-hover:w-full transition-all duration-500"></div>
             </div>
