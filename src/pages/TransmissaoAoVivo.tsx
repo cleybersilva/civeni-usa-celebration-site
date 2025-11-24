@@ -176,31 +176,31 @@ const TransmissaoAoVivo = () => {
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
-              <h1 className="text-4xl md:text-6xl font-bold font-poppins">
+            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 md:mb-6">
+              <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 animate-pulse" />
+              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold font-poppins">
                 {title || 'Transmissão ao vivo'}
               </h1>
-              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+              <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 animate-pulse" />
             </div>
             
             {subtitle && (
-              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              <p className="text-sm sm:text-base md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100">
                 {subtitle}
               </p>
             )}
             
             {description && (
-              <p className="text-lg mb-8 max-w-3xl mx-auto text-blue-100">
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100">
                 {description}
               </p>
             )}
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
               {primaryCTA && (
                 primaryCTA.external ? (
-                  <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer">
-                    <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+                  <a href={primaryCTA.href} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                       {primaryCTA.icon}
                       {primaryCTA.label}
                     </button>
@@ -210,7 +210,7 @@ const TransmissaoAoVivo = () => {
                     onClick={() => {
                       document.querySelector(primaryCTA.href)?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2"
+                    className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2"
                   >
                     {primaryCTA.icon}
                     {primaryCTA.label}
@@ -218,9 +218,9 @@ const TransmissaoAoVivo = () => {
                 )
               )}
               
-              <Link to="/inscricoes">
-                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+              <Link to="/inscricoes" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   Fazer Inscrição
                 </button>
               </Link>

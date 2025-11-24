@@ -90,17 +90,17 @@ const ScheduleInPerson = () => {
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
               {settings?.page_title || 'Programação Presencial'}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+            <p className="text-sm sm:text-base md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100">
               {settings?.page_subtitle || 'Confira toda a programação presencial do III CIVENI 2025'}
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/inscricoes">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/inscricoes" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   Fazer Inscrição
                 </button>
               </Link>
@@ -108,16 +108,16 @@ const ScheduleInPerson = () => {
               <button 
                 onClick={generatePDF}
                 disabled={isGeneratingPdf}
-                className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGeneratingPdf ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
                     Gerando PDF...
                   </>
                 ) : (
                   <>
-                    <Download className="w-5 h-5" />
+                    <Download className="w-4 h-4 sm:w-5 sm:h-5" />
                     Baixar Programação
                   </>
                 )}
