@@ -756,6 +756,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           image_url: finalImageUrl || '',
           order_index: speaker.order || (i + 1),
           is_active: true,
+          country_name: speaker.countryName || null,
+          country_code: speaker.countryCode || null,
+          show_flag: speaker.showFlag ?? true,
         };
 
         // Upsert via função segura
@@ -790,6 +793,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           image: speaker.image_url || '',
           bio: speaker.bio,
           order: speaker.order_index,
+          countryName: speaker.country_name || undefined,
+          countryCode: speaker.country_code || undefined,
+          showFlag: speaker.show_flag ?? true
         })) || [];
         
         setContent(prev => ({ ...prev, speakers: speakersFormatted }));
