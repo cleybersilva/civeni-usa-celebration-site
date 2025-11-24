@@ -52,6 +52,9 @@ const SpeakersManager = () => {
           image: speaker.image_url || '',
           bio: speaker.bio,
           order: speaker.order_index,
+          countryName: speaker.country_name || undefined,
+          countryCode: speaker.country_code || undefined,
+          showFlag: speaker.show_flag ?? true
         }));
 
         setLocalSpeakers(speakersFormatted);
@@ -69,7 +72,10 @@ const SpeakersManager = () => {
     title: '',
     institution: '',
     image: '',
-    bio: ''
+    bio: '',
+    countryName: '',
+    countryCode: '',
+    showFlag: true
   });
 
   const resetForm = () => {
@@ -78,7 +84,10 @@ const SpeakersManager = () => {
       title: '',
       institution: '',
       image: '',
-      bio: ''
+      bio: '',
+      countryName: '',
+      countryCode: '',
+      showFlag: true
     });
     setEditingSpeaker(null);
   };
@@ -124,7 +133,10 @@ const SpeakersManager = () => {
       title: speaker.title,
       institution: speaker.institution,
       image: speaker.image,
-      bio: speaker.bio
+      bio: speaker.bio,
+      countryName: speaker.countryName || '',
+      countryCode: speaker.countryCode || '',
+      showFlag: speaker.showFlag ?? true
     });
     setIsDialogOpen(true);
   };
