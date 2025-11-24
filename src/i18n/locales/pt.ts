@@ -159,6 +159,11 @@ export const ptTranslations = {
         daysRemaining: "dias restantes",
         timezone: "* Horário de Fortaleza (GMT-3)"
       },
+      'Professor(a)': 'Professor(a)',
+      'Palestrantes': 'Palestrantes',
+      'Sorteados': 'Sorteados',
+      'Participante Externo': 'Participante Externo',
+      batch: 'Lote',
       categories: {
         vccuStudentPresentation: "Aluno(a) VCCU - Apresentação",
         vccuStudentListener: "Aluno(a) VCCU - Ouvinte",
