@@ -9,8 +9,14 @@ interface TranslateRequest {
   texts: {
     header_title?: string;
     header_subtitle?: string;
+    body_certifyLabel?: string;
     body_mainText?: string;
     footer_locationDateText?: string;
+    badge_text?: string;
+    signature_1_label?: string;
+    signature_1_name?: string;
+    signature_2_label?: string;
+    signature_2_name?: string;
     [key: string]: string | undefined;
   };
   targetLanguage: 'pt-BR' | 'en-US' | 'es-ES';

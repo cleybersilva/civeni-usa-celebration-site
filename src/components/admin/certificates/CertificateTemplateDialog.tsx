@@ -48,6 +48,8 @@ const defaultConfig = {
     subtitleColor: '#4B5563'
   },
   body: {
+    certifyLabel: 'Certificamos que',
+    certifyLabelColor: '#6B7280',
     participantNamePlaceholder: '{{nome_participante}}',
     participantNameStyle: {
       fontSize: 32,
@@ -127,8 +129,14 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
       const textsToTranslate = {
         header_title: config.header.title,
         header_subtitle: config.header.subtitle,
+        body_certifyLabel: config.body.certifyLabel,
         body_mainText: config.body.mainText,
         footer_locationDateText: config.footer.locationDateText,
+        badge_text: config.badge.text,
+        signature_1_label: config.footer.signatures[0]?.label || '',
+        signature_1_name: config.footer.signatures[0]?.name || '',
+        signature_2_label: config.footer.signatures[1]?.label || '',
+        signature_2_name: config.footer.signatures[1]?.name || '',
       };
 
       const { data, error } = await supabase.functions.invoke('translate-certificate', {
@@ -146,22 +154,36 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
 
       // Atualizar config com textos traduzidos
       const translated = data.translatedTexts;
-      setConfig((prev: any) => ({
-        ...prev,
-        header: {
-          ...prev.header,
-          title: translated.header_title || prev.header.title,
-          subtitle: translated.header_subtitle || prev.header.subtitle
-        },
-        body: {
-          ...prev.body,
-          mainText: translated.body_mainText || prev.body.mainText
-        },
-        footer: {
-          ...prev.footer,
-          locationDateText: translated.footer_locationDateText || prev.footer.locationDateText
-        }
-      }));
+      setConfig((prev: any) => {
+        const newSignatures = [...prev.footer.signatures];
+        if (translated.signature_1_label) newSignatures[0].label = translated.signature_1_label;
+        if (translated.signature_1_name) newSignatures[0].name = translated.signature_1_name;
+        if (translated.signature_2_label && newSignatures[1]) newSignatures[1].label = translated.signature_2_label;
+        if (translated.signature_2_name && newSignatures[1]) newSignatures[1].name = translated.signature_2_name;
+
+        return {
+          ...prev,
+          header: {
+            ...prev.header,
+            title: translated.header_title || prev.header.title,
+            subtitle: translated.header_subtitle || prev.header.subtitle
+          },
+          body: {
+            ...prev.body,
+            certifyLabel: translated.body_certifyLabel || prev.body.certifyLabel,
+            mainText: translated.body_mainText || prev.body.mainText
+          },
+          footer: {
+            ...prev.footer,
+            locationDateText: translated.footer_locationDateText || prev.footer.locationDateText,
+            signatures: newSignatures
+          },
+          badge: {
+            ...prev.badge,
+            text: translated.badge_text || prev.badge.text
+          }
+        };
+      });
 
       toast({
         title: "Tradução concluída!",
@@ -316,6 +338,23 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                 </TabsContent>
 
                 <TabsContent value="body" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label>Texto "Certificamos que"</Label>
+                    <Input
+                      value={config.body.certifyLabel}
+                      onChange={(e) => updateConfig(['body', 'certifyLabel'], e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Cor do texto "Certificamos que"</Label>
+                    <Input
+                      type="color"
+                      value={config.body.certifyLabelColor}
+                      onChange={(e) => updateConfig(['body', 'certifyLabelColor'], e.target.value)}
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label>Texto principal</Label>
                     <Textarea
