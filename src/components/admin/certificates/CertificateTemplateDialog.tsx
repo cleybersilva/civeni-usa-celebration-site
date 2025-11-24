@@ -98,8 +98,8 @@ const getSampleDataByLanguage = (language: string) => {
         data_evento: 'December 11 to 13, 2025',
         carga_horaria: '20',
         data_emissao: 'December 13, 2025',
-        nome_reitor: 'Dr. John Silva',
-        nome_coordenador: 'Dr. Mary Santos'
+        nome_reitor: 'Dra. Maria Emilia Camargo',
+        nome_coordenador: 'Dra. Marcela Tarciana Martins'
       };
     case 'es-ES':
       return {
@@ -109,8 +109,8 @@ const getSampleDataByLanguage = (language: string) => {
         data_evento: '11 a 13 de diciembre de 2025',
         carga_horaria: '20',
         data_emissao: '13 de diciembre de 2025',
-        nome_reitor: 'Dr. João Silva',
-        nome_coordenador: 'Dra. María Santos'
+        nome_reitor: 'Dra. Maria Emilia Camargo',
+        nome_coordenador: 'Dra. Marcela Tarciana Martins'
       };
     default: // pt-BR
       return {
@@ -120,8 +120,8 @@ const getSampleDataByLanguage = (language: string) => {
         data_evento: '11 a 13 de dezembro de 2025',
         carga_horaria: '20',
         data_emissao: '13 de dezembro de 2025',
-        nome_reitor: 'Dr. João Silva',
-        nome_coordenador: 'Dra. Maria Santos'
+        nome_reitor: 'Dra. Maria Emilia Camargo',
+        nome_coordenador: 'Dra. Marcela Tarciana Martins'
       };
   }
 };
