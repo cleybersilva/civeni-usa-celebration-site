@@ -124,26 +124,26 @@ const EnvioVideos = () => {
           
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
-              <h1 className="text-4xl md:text-6xl font-bold font-poppins">
+              <Video className="w-10 h-10 md:w-14 md:h-14 animate-pulse" />
+              <h1 className="text-3xl md:text-5xl font-bold font-poppins">
                 Envio de Vídeos
               </h1>
-              <Video className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+              <Video className="w-10 h-10 md:w-14 md:h-14 animate-pulse" />
             </div>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+            <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-blue-100">
               Envie seu material em vídeo para análise pela banca avaliadora do III CIVENI 2025
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/area-tematica">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/area-tematica" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <BookOpen className="w-5 h-5" />
                   Ver Áreas Temáticas
                 </button>
               </Link>
               
-              <Link to="/inscricoes">
-                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
+              <Link to="/inscricoes" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-5 h-5" />
                   Fazer Inscrição
                 </button>
