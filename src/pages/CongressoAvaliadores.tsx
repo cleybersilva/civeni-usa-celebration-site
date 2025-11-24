@@ -133,11 +133,11 @@ const CongressoAvaliadores = () => {
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-12 md:py-16 lg:py-20">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="container mx-auto px-4 relative z-10">
             {/* Breadcrumbs */}
-            <nav className="mb-8 text-sm">
+            <nav className="mb-6 md:mb-8 text-xs md:text-sm">
               <ol className="flex items-center space-x-2">
                 <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
                 <li className="text-blue-200">›</li>
@@ -148,24 +148,24 @@ const CongressoAvaliadores = () => {
             </nav>
             
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
                 Avaliadores do III CIVENI 2025
               </h1>
-              <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
                 Conheça nossos renomados avaliadores acadêmicos que garantem a excelência e qualidade científica do Congresso Internacional Multidisciplinar
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/submissao-trabalhos">
-                  <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" />
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
+                <Link to="/submissao-trabalhos" className="w-full sm:w-auto">
+                  <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
+                    <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
                     Submeter Trabalho
                   </button>
                 </Link>
                 
-                <Link to="/inscricoes">
-                  <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                    <Users className="w-5 h-5" />
+                <Link to="/inscricoes" className="w-full sm:w-auto">
+                  <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
+                    <Users className="w-4 h-4 md:w-5 md:h-5" />
                     Fazer Inscrição
                   </button>
                 </Link>
@@ -175,14 +175,14 @@ const CongressoAvaliadores = () => {
         </section>
 
         {/* About Evaluation Section */}
-        <section className="py-16">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-civeni-blue mb-6 font-poppins">
+            <div className="max-w-4xl mx-auto text-center mb-12 md:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-civeni-blue mb-4 md:mb-6 font-poppins">
                 Excelência na Avaliação Científica
               </h2>
-              <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-2xl p-8 mb-8">
-                <p className="text-lg text-gray-700 leading-relaxed">
+              <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-xl md:rounded-2xl p-6 md:p-8 mb-6 md:mb-8">
+                <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
                   Nosso corpo de avaliadores é composto por <strong>doutores renomados</strong> de instituições nacionais e internacionais, 
                   garantindo que todos os trabalhos submetidos ao III CIVENI 2025 sejam avaliados com o mais alto rigor científico 
                   e acadêmico, seguindo os padrões internacionais de pesquisa.
@@ -225,13 +225,13 @@ const CongressoAvaliadores = () => {
         </section>
 
         {/* Evaluators Grid Section */}
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+        <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-gray-50 to-white">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl lg:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-civeni-blue mb-4 md:mb-6 font-poppins">
                 Nossos Avaliadores
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-2">
                 Conheça os doutores que compõem nosso renomado corpo de avaliadores acadêmicos
               </p>
             </div>
@@ -267,30 +267,30 @@ const CongressoAvaliadores = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-civeni-blue via-civeni-blue to-civeni-red relative overflow-hidden">
+        <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-r from-civeni-blue via-civeni-blue to-civeni-red relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="container mx-auto px-4 text-center relative z-10">
-            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 font-poppins">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6 font-poppins px-2">
               Submeta Seu Trabalho
             </h2>
-            <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-blue-100 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed px-2">
               Tenha seu trabalho avaliado por nosso renomado corpo de doutores e faça parte do maior congresso internacional multidisciplinar do mundo
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
-                <Link to="/submissao-trabalhos" className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
+              <Link to="/submissao-trabalhos" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full transition-all hover:scale-105 flex items-center justify-center gap-2">
+                  <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
                   Submeter Trabalho
-                </Link>
-              </Button>
+                </button>
+              </Link>
               
-              <Button asChild size="lg" className="bg-transparent text-white hover:bg-white hover:text-civeni-blue border-2 border-white px-8 py-4 text-lg font-semibold rounded-full transition-all hover:scale-105">
-                <Link to="/inscricoes" className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+              <Link to="/inscricoes" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-transparent text-white hover:bg-white hover:text-civeni-blue border-2 border-white px-6 py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full transition-all hover:scale-105 flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 md:w-5 md:h-5" />
                   Fazer Inscrição
-                </Link>
-              </Button>
+                </button>
+              </Link>
             </div>
           </div>
         </section>
