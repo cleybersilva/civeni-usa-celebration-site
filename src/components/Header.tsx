@@ -1,14 +1,17 @@
 
 import React, { useState } from 'react';
-import { Instagram, Facebook, Youtube, Settings, Linkedin } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Settings, Linkedin, Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { resolveAssetUrl } from '@/utils/assetUrl';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState<string | null>(null);
 
   const languages = [
     { code: 'en', flag: '🇺🇸', name: 'English' },
@@ -233,18 +236,112 @@ const Header = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link
-              to="/inscricoes"
-              className="bg-civeni-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition-colors font-poppins"
-            >
-              {t('header.registration')}
-            </Link>
-            <Link
-              to="/contato"
-              className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
-            >
-              {t('header.contact')}
-            </Link>
+            <div className="hidden lg:flex items-center space-x-4">
+              <Link
+                to="/inscricoes"
+                className="bg-civeni-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition-colors font-poppins"
+              >
+                {t('header.registration')}
+              </Link>
+              <Link
+                to="/contato"
+                className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
+              >
+                {t('header.contact')}
+              </Link>
+            </div>
+            
+            {/* Mobile Menu Button */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <button className="lg:hidden p-2 text-civeni-blue hover:text-civeni-red transition-colors">
+                  <Menu size={28} />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white overflow-y-auto">
+                <div className="flex flex-col space-y-6 mt-8">
+                  {/* Mobile Menu Items */}
+                  {menuItems.map((item) => (
+                    <div key={item.title} className="border-b border-gray-100 pb-4">
+                      {item.title === t('header.speakers') ? (
+                        <Link
+                          to="/palestrantes"
+                          className="text-civeni-blue font-semibold text-lg hover:text-civeni-red transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.title}
+                        </Link>
+                      ) : item.title === t('header.thematicAreas') ? (
+                        <Link
+                          to="/area-tematica"
+                          className="text-civeni-blue font-semibold text-lg hover:text-civeni-red transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.title}
+                        </Link>
+                      ) : item.title === t('header.events') ? (
+                        <Link
+                          to="/eventos"
+                          className="text-civeni-blue font-semibold text-lg hover:text-civeni-red transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.title}
+                        </Link>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === item.title ? null : item.title)}
+                            className="text-civeni-blue font-semibold text-lg hover:text-civeni-red transition-colors w-full text-left flex items-center justify-between"
+                          >
+                            <span>{item.title}</span>
+                            <svg
+                              className={`w-5 h-5 transition-transform ${mobileSubmenuOpen === item.title ? 'rotate-180' : ''}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          {item.items.length > 0 && mobileSubmenuOpen === item.title && (
+                            <div className="mt-3 ml-4 space-y-2">
+                              {item.items.map((subItem) => (
+                                <Link
+                                  key={subItem.name}
+                                  to={subItem.href}
+                                  className="block py-2 text-gray-700 hover:text-civeni-red transition-colors"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* Mobile Action Buttons */}
+                  <div className="space-y-4 pt-4">
+                    <Link
+                      to="/inscricoes"
+                      className="block w-full bg-civeni-green text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-colors text-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t('header.registration')}
+                    </Link>
+                    <Link
+                      to="/contato"
+                      className="block w-full bg-civeni-red text-white px-6 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors text-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t('header.contact')}
+                    </Link>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </nav>
