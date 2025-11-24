@@ -44,133 +44,445 @@ const generateCode = (): string => {
   return result;
 };
 
+// Helper para converter hex para RGB
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16) / 255;
+  const g = parseInt(clean.substring(2, 4), 16) / 255;
+  const b = parseInt(clean.substring(4, 6), 16) / 255;
+  return { r, g, b };
+}
+
+// Helper para substituir placeholders
+function replacePlaceholders(text: string, data: Record<string, string>): string {
+  let result = text;
+  for (const [key, value] of Object.entries(data)) {
+    result = result.replace(new RegExp(`{{${key}}}`, 'g'), value);
+  }
+  return result;
+}
+
+// Helper para quebrar texto em linhas
+function wrapText(text: string, maxWidth: number, font: any, fontSize: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const width = font.widthOfTextAtSize(testLine, fontSize);
+    
+    if (width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  
+  return lines;
+}
+
+interface LayoutConfig {
+  background?: {
+    type: 'solid' | 'gradient';
+    color?: string;
+    gradientFrom?: string;
+    gradientTo?: string;
+  };
+  border?: {
+    enabled: boolean;
+    thickness?: number;
+    gradient?: {
+      from: string;
+      to: string;
+    };
+  };
+  header?: {
+    title: string;
+    titleColor: string;
+    subtitle: string;
+    subtitleColor: string;
+  };
+  body?: {
+    certifyLabel: string;
+    certifyLabelColor: string;
+    participantNamePlaceholder: string;
+    participantNameStyle: {
+      fontSize: number;
+      color: string;
+    };
+    mainText: string;
+    mainTextColor: string;
+  };
+  footer?: {
+    locationDateText: string;
+    locationDateColor: string;
+    signatures?: Array<{
+      label: string;
+      name: string;
+    }>;
+  };
+  badge?: {
+    enabled: boolean;
+    text: string;
+    textColor: string;
+  };
+}
+
 const createCertificatePdf = async (
-  options: CertificatePdfOptions,
+  options: CertificatePdfOptions & { layoutConfig?: LayoutConfig; eventName?: string },
 ): Promise<Uint8Array> => {
-  const { fullName, eventSlug, language, issueDate, city, country, hours, code } = options;
+  const { fullName, eventSlug, language, issueDate, city, country, hours, code, layoutConfig, eventName } = options;
 
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage();
+  const page = pdfDoc.addPage([842, 595]); // A4 landscape
   const { width, height } = page.getSize();
 
   const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  const titleText =
-    language === "en-US"
-      ? "Certificate of Participation"
-      : language === "es-ES"
-      ? "Certificado de Participación"
-      : "Certificado de Participação";
+  // Se temos layout_config, usar ele
+  if (layoutConfig && layoutConfig.header && layoutConfig.body && layoutConfig.footer) {
+    // Preparar dados para substituição de placeholders
+    const dateStr = issueDate.toLocaleDateString(
+      language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
+    );
+    const locationParts: string[] = [];
+    if (city) locationParts.push(city);
+    if (country) locationParts.push(country);
+    const locationBase = locationParts.join(" - ");
+    
+    const placeholderData: Record<string, string> = {
+      nome_participante: fullName,
+      tipo_participacao: language === "en-US" ? "participant" : language === "es-ES" ? "participante" : "participante",
+      nome_evento: eventName || eventSlug,
+      data_evento: dateStr,
+      carga_horaria: hours || "",
+      data_emissao: dateStr,
+      codigo_verificacao: code,
+    };
 
-  page.drawText(titleText, {
-    x: 50,
-    y: height - 80,
-    size: 24,
-    font: titleFont,
-    color: rgb(0.1, 0.2, 0.5),
-  });
+    // Background (simples, pdf-lib não suporta gradientes nativamente)
+    if (layoutConfig.background?.color) {
+      const bgColor = hexToRgb(layoutConfig.background.color);
+      page.drawRectangle({
+        x: 0,
+        y: 0,
+        width: width,
+        height: height,
+        color: rgb(bgColor.r, bgColor.g, bgColor.b),
+      });
+    }
 
-  const nameLabelText =
-    language === "en-US"
-      ? "We hereby certify that"
-      : language === "es-ES"
-      ? "Certificamos que"
-      : "Certificamos que";
+    // Borda
+    if (layoutConfig.border?.enabled && layoutConfig.border.thickness) {
+      const borderColor = layoutConfig.border.gradient?.from 
+        ? hexToRgb(layoutConfig.border.gradient.from)
+        : { r: 0.2, g: 0.2, b: 0.5 };
+      
+      const thickness = layoutConfig.border.thickness;
+      const margin = 20;
+      
+      page.drawRectangle({
+        x: margin,
+        y: margin,
+        width: width - 2 * margin,
+        height: height - 2 * margin,
+        borderColor: rgb(borderColor.r, borderColor.g, borderColor.b),
+        borderWidth: thickness,
+      });
+    }
 
-  page.drawText(nameLabelText, {
-    x: 50,
-    y: height - 140,
-    size: 14,
-    font: textFont,
-    color: rgb(0.2, 0.2, 0.2),
-  });
+    let currentY = height - 80;
 
-  const nameSize = 32;
-  const nameWidth = titleFont.widthOfTextAtSize(fullName, nameSize);
-  page.drawText(fullName, {
-    x: (width - nameWidth) / 2,
-    y: height - 190,
-    size: nameSize,
-    font: titleFont,
-    color: rgb(0, 0, 0),
-  });
+    // Header - Title
+    const headerTitle = replacePlaceholders(layoutConfig.header.title, placeholderData);
+    const titleColor = hexToRgb(layoutConfig.header.titleColor);
+    const titleSize = 32;
+    const titleWidth = titleFont.widthOfTextAtSize(headerTitle, titleSize);
+    
+    page.drawText(headerTitle, {
+      x: (width - titleWidth) / 2,
+      y: currentY,
+      size: titleSize,
+      font: titleFont,
+      color: rgb(titleColor.r, titleColor.g, titleColor.b),
+    });
+    
+    currentY -= 40;
 
-  const eventLine =
-    language === "en-US"
-      ? `for participating in the event ${eventSlug}.`
-      : language === "es-ES"
-      ? `por participar del evento ${eventSlug}.`
-      : `por participar do evento ${eventSlug}.`;
+    // Header - Subtitle
+    if (layoutConfig.header.subtitle) {
+      const headerSubtitle = replacePlaceholders(layoutConfig.header.subtitle, placeholderData);
+      const subtitleColor = hexToRgb(layoutConfig.header.subtitleColor);
+      const subtitleSize = 16;
+      const subtitleWidth = textFont.widthOfTextAtSize(headerSubtitle, subtitleSize);
+      
+      page.drawText(headerSubtitle, {
+        x: (width - subtitleWidth) / 2,
+        y: currentY,
+        size: subtitleSize,
+        font: textFont,
+        color: rgb(subtitleColor.r, subtitleColor.g, subtitleColor.b),
+      });
+      
+      currentY -= 60;
+    } else {
+      currentY -= 40;
+    }
 
-  page.drawText(eventLine, {
-    x: 50,
-    y: height - 230,
-    size: 14,
-    font: textFont,
-    color: rgb(0.2, 0.2, 0.2),
-  });
+    // Body - Certify Label
+    const certifyLabel = replacePlaceholders(layoutConfig.body.certifyLabel, placeholderData);
+    const certifyLabelColor = hexToRgb(layoutConfig.body.certifyLabelColor);
+    const certifyLabelSize = 14;
+    const certifyLabelWidth = textFont.widthOfTextAtSize(certifyLabel, certifyLabelSize);
+    
+    page.drawText(certifyLabel, {
+      x: (width - certifyLabelWidth) / 2,
+      y: currentY,
+      size: certifyLabelSize,
+      font: textFont,
+      color: rgb(certifyLabelColor.r, certifyLabelColor.g, certifyLabelColor.b),
+    });
+    
+    currentY -= 30;
 
-  let y = height - 260;
-  if (hours) {
-    const hoursText =
+    // Body - Participant Name
+    const participantName = replacePlaceholders(layoutConfig.body.participantNamePlaceholder, placeholderData);
+    const nameColor = hexToRgb(layoutConfig.body.participantNameStyle.color);
+    const nameSize = layoutConfig.body.participantNameStyle.fontSize || 36;
+    const nameWidth = titleFont.widthOfTextAtSize(participantName, nameSize);
+    
+    page.drawText(participantName, {
+      x: (width - nameWidth) / 2,
+      y: currentY,
+      size: nameSize,
+      font: titleFont,
+      color: rgb(nameColor.r, nameColor.g, nameColor.b),
+    });
+    
+    currentY -= 50;
+
+    // Body - Main Text (quebrado em linhas)
+    const mainText = replacePlaceholders(layoutConfig.body.mainText, placeholderData);
+    const mainTextColor = hexToRgb(layoutConfig.body.mainTextColor);
+    const mainTextSize = 14;
+    const maxTextWidth = width - 120;
+    const textLines = wrapText(mainText, maxTextWidth, textFont, mainTextSize);
+    
+    for (const line of textLines) {
+      const lineWidth = textFont.widthOfTextAtSize(line, mainTextSize);
+      page.drawText(line, {
+        x: (width - lineWidth) / 2,
+        y: currentY,
+        size: mainTextSize,
+        font: textFont,
+        color: rgb(mainTextColor.r, mainTextColor.g, mainTextColor.b),
+      });
+      currentY -= 20;
+    }
+
+    // Footer - Location/Date
+    const footerLocation = replacePlaceholders(layoutConfig.footer.locationDateText, placeholderData);
+    const footerColor = hexToRgb(layoutConfig.footer.locationDateColor);
+    const footerSize = 12;
+    const footerWidth = textFont.widthOfTextAtSize(footerLocation, footerSize);
+    
+    page.drawText(footerLocation, {
+      x: (width - footerWidth) / 2,
+      y: 120,
+      size: footerSize,
+      font: textFont,
+      color: rgb(footerColor.r, footerColor.g, footerColor.b),
+    });
+
+    // Footer - Signatures
+    if (layoutConfig.footer.signatures && layoutConfig.footer.signatures.length > 0) {
+      const sigY = 80;
+      const sigSpacing = width / (layoutConfig.footer.signatures.length + 1);
+      
+      layoutConfig.footer.signatures.forEach((sig, index) => {
+        const sigX = sigSpacing * (index + 1);
+        const sigName = replacePlaceholders(sig.name, placeholderData);
+        const sigLabel = sig.label;
+        
+        // Nome do assinante
+        const nameWidth = textFont.widthOfTextAtSize(sigName, 10);
+        page.drawText(sigName, {
+          x: sigX - nameWidth / 2,
+          y: sigY,
+          size: 10,
+          font: titleFont,
+          color: rgb(0, 0, 0),
+        });
+        
+        // Label (cargo)
+        const labelWidth = textFont.widthOfTextAtSize(sigLabel, 8);
+        page.drawText(sigLabel, {
+          x: sigX - labelWidth / 2,
+          y: sigY - 15,
+          size: 8,
+          font: textFont,
+          color: rgb(0.3, 0.3, 0.3),
+        });
+        
+        // Linha de assinatura
+        page.drawLine({
+          start: { x: sigX - 60, y: sigY + 5 },
+          end: { x: sigX + 60, y: sigY + 5 },
+          thickness: 1,
+          color: rgb(0.5, 0.5, 0.5),
+        });
+      });
+    }
+
+    // Badge
+    if (layoutConfig.badge?.enabled && layoutConfig.badge.text) {
+      const badgeText = layoutConfig.badge.text;
+      const badgeColor = hexToRgb(layoutConfig.badge.textColor);
+      
+      page.drawText(badgeText, {
+        x: width - 150,
+        y: height - 50,
+        size: 10,
+        font: titleFont,
+        color: rgb(badgeColor.r, badgeColor.g, badgeColor.b),
+      });
+    }
+
+    // Código de verificação no rodapé
+    const codeLabel = language === "en-US" ? "Code:" : language === "es-ES" ? "Código:" : "Código:";
+    page.drawText(`${codeLabel} ${code}`, {
+      x: 40,
+      y: 30,
+      size: 8,
+      font: textFont,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+
+  } else {
+    // Fallback: template genérico (caso não tenha layout_config)
+    const titleText =
       language === "en-US"
-        ? `Workload: ${hours} hours`
+        ? "Certificate of Participation"
         : language === "es-ES"
-        ? `Carga horaria: ${hours} horas`
-        : `Carga horária: ${hours} horas`;
+        ? "Certificado de Participación"
+        : "Certificado de Participação";
 
-    page.drawText(hoursText, {
+    page.drawText(titleText, {
+      x: 50,
+      y: height - 80,
+      size: 24,
+      font: titleFont,
+      color: rgb(0.1, 0.2, 0.5),
+    });
+
+    const nameLabelText =
+      language === "en-US"
+        ? "We hereby certify that"
+        : language === "es-ES"
+        ? "Certificamos que"
+        : "Certificamos que";
+
+    page.drawText(nameLabelText, {
+      x: 50,
+      y: height - 140,
+      size: 14,
+      font: textFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    const nameSize = 32;
+    const nameWidth = titleFont.widthOfTextAtSize(fullName, nameSize);
+    page.drawText(fullName, {
+      x: (width - nameWidth) / 2,
+      y: height - 190,
+      size: nameSize,
+      font: titleFont,
+      color: rgb(0, 0, 0),
+    });
+
+    const eventLine =
+      language === "en-US"
+        ? `for participating in the event ${eventSlug}.`
+        : language === "es-ES"
+        ? `por participar del evento ${eventSlug}.`
+        : `por participar do evento ${eventSlug}.`;
+
+    page.drawText(eventLine, {
+      x: 50,
+      y: height - 230,
+      size: 14,
+      font: textFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    let y = height - 260;
+    if (hours) {
+      const hoursText =
+        language === "en-US"
+          ? `Workload: ${hours} hours`
+          : language === "es-ES"
+          ? `Carga horaria: ${hours} horas`
+          : `Carga horária: ${hours} horas`;
+
+      page.drawText(hoursText, {
+        x: 50,
+        y,
+        size: 12,
+        font: textFont,
+        color: rgb(0.3, 0.3, 0.3),
+      });
+      y -= 20;
+    }
+
+    const locationParts: string[] = [];
+    if (city) locationParts.push(city);
+    if (country) locationParts.push(country);
+    const locationBase = locationParts.join(" - ");
+
+    const dateStr = issueDate.toLocaleDateString(
+      language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
+    );
+
+    const locationLine = locationBase ? `${locationBase}, ${dateStr}` : dateStr;
+
+    page.drawText(locationLine, {
       x: 50,
       y,
       size: 12,
       font: textFont,
       color: rgb(0.3, 0.3, 0.3),
     });
-    y -= 20;
+
+    const codeLabel =
+      language === "en-US"
+        ? "Verification code:"
+        : language === "es-ES"
+        ? "Código de verificación:"
+        : "Código de verificação:";
+
+    page.drawText(codeLabel, {
+      x: 50,
+      y: 80,
+      size: 10,
+      font: textFont,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+
+    page.drawText(code, {
+      x: 50,
+      y: 65,
+      size: 14,
+      font: titleFont,
+      color: rgb(0.1, 0.2, 0.5),
+    });
   }
-
-  const locationParts: string[] = [];
-  if (city) locationParts.push(city);
-  if (country) locationParts.push(country);
-  const locationBase = locationParts.join(" - ");
-
-  const dateStr = issueDate.toLocaleDateString(
-    language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
-  );
-
-  const locationLine = locationBase ? `${locationBase}, ${dateStr}` : dateStr;
-
-  page.drawText(locationLine, {
-    x: 50,
-    y,
-    size: 12,
-    font: textFont,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-
-  const codeLabel =
-    language === "en-US"
-      ? "Verification code:"
-      : language === "es-ES"
-      ? "Código de verificación:"
-      : "Código de verificação:";
-
-  page.drawText(codeLabel, {
-    x: 50,
-    y: 80,
-    size: 10,
-    font: textFont,
-    color: rgb(0.4, 0.4, 0.4),
-  });
-
-  page.drawText(code, {
-    x: 50,
-    y: 65,
-    size: 14,
-    font: titleFont,
-    color: rgb(0.1, 0.2, 0.5),
-  });
 
   return await pdfDoc.save();
 };
@@ -245,7 +557,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Buscar configuração do evento e idioma
+    // Buscar configuração do evento, idioma e layout_config
     const { data: eventCert, error: eventError } = await supabase
       .from("event_certificates")
       .select(
@@ -357,16 +669,20 @@ const handler = async (req: Request): Promise<Response> => {
     const code = existingCert?.code || generateCode();
     const issueDate = existingCert?.issued_at ? new Date(existingCert.issued_at) : new Date();
 
-    // Gerar PDF e enviar para o Storage
+    // Gerar PDF usando o layout_config do evento
+    const layoutConfig = eventCert.layout_config as LayoutConfig | undefined;
+    
     const pdfBytes = await createCertificatePdf({
       fullName: normalizedFullName,
       eventSlug: event?.slug || "CIVENI 2025",
+      eventName: event?.slug || "CIVENI 2025",
       language,
       issueDate,
       city: eventCert.city,
       country: eventCert.country,
       hours: eventCert.hours,
       code,
+      layoutConfig,
     });
 
     const { pdfUrl } = await uploadCertificatePdf(supabase, pdfBytes, eventId, code);
