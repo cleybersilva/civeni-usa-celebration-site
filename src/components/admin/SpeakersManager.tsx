@@ -52,8 +52,6 @@ const SpeakersManager = () => {
           image: speaker.image_url || '',
           bio: speaker.bio,
           order: speaker.order_index,
-          countryCode: speaker.country_code,
-          flagImageUrl: speaker.flag_image_url
         }));
 
         setLocalSpeakers(speakersFormatted);
@@ -71,9 +69,7 @@ const SpeakersManager = () => {
     title: '',
     institution: '',
     image: '',
-    bio: '',
-    countryCode: undefined as string | undefined,
-    flagImageUrl: undefined as string | undefined
+    bio: ''
   });
 
   const resetForm = () => {
@@ -82,9 +78,7 @@ const SpeakersManager = () => {
       title: '',
       institution: '',
       image: '',
-      bio: '',
-      countryCode: undefined,
-      flagImageUrl: undefined
+      bio: ''
     });
     setEditingSpeaker(null);
   };
@@ -130,9 +124,7 @@ const SpeakersManager = () => {
       title: speaker.title,
       institution: speaker.institution,
       image: speaker.image,
-      bio: speaker.bio,
-      countryCode: speaker.countryCode,
-      flagImageUrl: speaker.flagImageUrl
+      bio: speaker.bio
     });
     setIsDialogOpen(true);
   };
@@ -195,9 +187,7 @@ const SpeakersManager = () => {
             institution: speaker.institution,
             image: speaker.image_url || '',
             bio: speaker.bio,
-            order: speaker.order_index,
-            countryCode: speaker.country_code,
-            flagImageUrl: speaker.flag_image_url
+            order: speaker.order_index
           }));
           
           // Forçar atualização do contexto

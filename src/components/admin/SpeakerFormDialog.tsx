@@ -15,8 +15,6 @@ interface SpeakerFormDialogProps {
     institution: string;
     image: string;
     bio: string;
-    countryCode?: string;
-    flagImageUrl?: string;
   };
   setFormData: (data: any) => void;
   onSubmit: (e: React.FormEvent) => void;

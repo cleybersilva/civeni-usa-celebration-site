@@ -12,8 +12,6 @@ export interface Speaker {
   order: number;
   photoVersion?: number;
   updatedAt?: string;
-  countryCode?: string;
-  flagImageUrl?: string;
 }
 
 export interface BannerSlide {
@@ -522,9 +520,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         bio: speaker.bio,
         order: speaker.order_index,
         photoVersion: speaker.photo_version,
-        updatedAt: speaker.updated_at,
-        countryCode: speaker.country_code,
-        flagImageUrl: speaker.flag_image_url
+        updatedAt: speaker.updated_at
       })) || [];
 
       // CRÍTICO: Se não há speakers do DB, NÃO usar default!
@@ -745,22 +741,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }
 
-        // Upload da flag image se for data URL
-        let finalFlagImageUrl = speaker.flagImageUrl || '';
-        if (finalFlagImageUrl && finalFlagImageUrl.startsWith('data:')) {
-          try {
-            const { blob, mime, extension } = dataUrlToBlob(finalFlagImageUrl);
-            const filePath = `speaker-flags/${Date.now()}_${i}.${extension}`;
-            const { error: uploadError } = await supabase.storage
-              .from('site-civeni')
-              .upload(filePath, blob, { upsert: true, contentType: mime });
-            if (uploadError) throw uploadError;
-            finalFlagImageUrl = supabase.storage.from('site-civeni').getPublicUrl(filePath).data.publicUrl;
-          } catch (e) {
-            console.error('Erro ao enviar flag image do speaker para o Storage:', e);
-          }
-        }
-
         const speakerPayload: any = {
           id: isTempId(speaker.id) ? null : speaker.id,
           name: speaker.name || '',
@@ -768,8 +748,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           institution: speaker.institution || '',
           bio: speaker.bio || '',
           image_url: finalImageUrl || '',
-          country_code: speaker.countryCode || null,
-          flag_image_url: finalFlagImageUrl || null,
           order_index: speaker.order || (i + 1),
           is_active: true,
         };
@@ -806,8 +784,6 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           image: speaker.image_url || '',
           bio: speaker.bio,
           order: speaker.order_index,
-          countryCode: speaker.country_code,
-          flagImageUrl: speaker.flag_image_url
         })) || [];
         
         setContent(prev => ({ ...prev, speakers: speakersFormatted }));
