@@ -22,31 +22,30 @@ const Inscricoes = () => {
             <ol className="flex items-center space-x-2">
               <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Inscrições</li>
+              <li>{t('registration.title')}</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
-              Inscrições
+              {t('registration.title')}
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Garante sua participação no III CIVENI 2025 - 
-              O maior Congresso Internacional Multidisciplinar do mundo em educação, inovação, justiça, humanidade, religiosidade e tecnologia
+              {t('registration.description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
               <Link to="/area-tematica" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <FileText className="w-4 h-4 md:w-5 md:h-5" />
-                  Áreas Temáticas
+                  {t('registration.thematicAreas')}
                 </button>
               </Link>
               
               <Link to="/programacao-presencial" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                  Ver Programação
+                  {t('registration.viewSchedule')}
                 </button>
               </Link>
             </div>

@@ -200,33 +200,32 @@ const ApresentacaoOral = () => {
             <ol className="flex items-center space-x-2">
               <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
               <li className="text-blue-200">›</li>
-              <li><Link to="/submissao-trabalhos" className="hover:text-blue-200 transition-colors">Trabalhos</Link></li>
+              <li><Link to="/submissao-trabalhos" className="hover:text-blue-200 transition-colors">{t('works.breadcrumb')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Apresentação Oral Lista/Template</li>
+              <li>{t('works.oral.title')}</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-5xl font-bold mb-6 font-poppins">
-              Apresentação Oral Lista/Template
+              {t('works.oral.title')}
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025 - 
-              Compartilhe suas pesquisas com especialistas de todo o mundo
+              {t('works.oral.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/submissao-trabalhos" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <FileText className="w-5 h-5" />
-                  Submeter Trabalho
+                  {t('works.submitWork')}
                 </button>
               </Link>
               
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-5 h-5" />
-                  Fazer Inscrição
+                  {t('works.makeRegistration')}
                 </button>
               </Link>
             </div>
@@ -240,10 +239,10 @@ const ApresentacaoOral = () => {
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-poppins flex items-center justify-center gap-3">
                 <Users className="w-8 h-8 text-civeni-blue" />
-                Apresentação Oral Lista/Template
+                {t('works.oral.pageTitle')}
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Conheça os requisitos, formatos e orientações para apresentar seu trabalho de forma oral no congresso
+                {t('works.oral.infoDescription')}
               </p>
             </div>
 

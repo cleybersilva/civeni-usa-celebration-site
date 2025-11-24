@@ -281,33 +281,32 @@ const SubmissaoTrabalhos = () => {
             <ol className="flex items-center space-x-2">
               <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
               <li className="text-blue-200">›</li>
-              <li><Link to="/area-tematica" className="hover:text-blue-200 transition-colors">Trabalhos</Link></li>
+              <li><Link to="/area-tematica" className="hover:text-blue-200 transition-colors">{t('works.breadcrumb')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Submissão</li>
+              <li>{t('works.submissionPage.title')}</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-5xl font-bold mb-6 font-poppins">
-              Submissão Artigos/Consórcio
+              {t('works.submissionPage.title')}
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Compartilhe suas pesquisas e experiências no III CIVENI 2025 - 
-              Contribua para o avanço do conhecimento multidisciplinar mundial
+              {t('works.submissionPage.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/area-tematica" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <BookOpen className="w-5 h-5" />
-                  Ver Áreas Temáticas
+                  {t('works.viewThematicAreas')}
                 </button>
               </Link>
               
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-5 h-5" />
-                  Fazer Inscrição
+                  {t('works.makeRegistration')}
                 </button>
               </Link>
             </div>
@@ -320,10 +319,10 @@ const SubmissaoTrabalhos = () => {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-poppins">
-                Submissão Artigos/Consórcio
+                {t('works.submissionPage.pageTitle')}
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Escolha o tipo de submissão e preencha todos os campos obrigatórios
+                {t('works.submissionPage.formDescription')}
               </p>
             </div>
 
