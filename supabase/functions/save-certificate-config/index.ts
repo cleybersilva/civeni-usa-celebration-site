@@ -91,6 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     // Prepare data for upsert
+    // Se layout_config não foi enviado no request, preservar o existente
     const dataToSave = {
       event_id: configData.event_id,
       is_enabled: configData.is_enabled ?? true,
@@ -104,7 +105,7 @@ const handler = async (req: Request): Promise<Response> => {
       country: configData.country || '',
       timezone: configData.timezone || 'America/Sao_Paulo',
       template_id: configData.template_id || null,
-      // Preserve existing layout_config and language if not provided in request
+      // Preservar layout_config existente se não foi enviado no request
       layout_config: configData.layout_config !== undefined ? configData.layout_config : (existingConfig?.layout_config || null),
       language: configData.language || existingConfig?.language || 'pt-BR',
       updated_at: new Date().toISOString()
