@@ -89,6 +89,13 @@ const CertificateManager = () => {
     }
   }, [selectedEvent]);
 
+  // Sincronizar templateConfig com layout_config quando config é carregado
+  useEffect(() => {
+    if (config.layout_config) {
+      setTemplateConfig(config.layout_config);
+    }
+  }, [config.layout_config]);
+
   const loadEvents = async () => {
     try {
       setEventsLoading(true);
@@ -250,6 +257,8 @@ const CertificateManager = () => {
         country: (config.country || '').trim(),
         timezone: config.timezone || 'America/Sao_Paulo',
         template_id: config.template_id || null,
+        layout_config: config.layout_config || null,
+        language: config.language || 'pt-BR',
         admin_email: user.email,
         session_token: sessionToken
       };

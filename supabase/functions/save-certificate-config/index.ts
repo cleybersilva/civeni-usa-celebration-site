@@ -19,6 +19,8 @@ interface ConfigRequest {
   country: string;
   timezone?: string;
   template_id?: string;
+  layout_config?: any;
+  language?: string;
   admin_email: string;
   session_token: string;
 }
@@ -81,6 +83,13 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Get existing config to preserve layout_config and language if not provided
+    const { data: existingConfig } = await supabase
+      .from('event_certificates')
+      .select('layout_config, language')
+      .eq('event_id', configData.event_id)
+      .single();
+
     // Prepare data for upsert
     const dataToSave = {
       event_id: configData.event_id,
@@ -95,6 +104,9 @@ const handler = async (req: Request): Promise<Response> => {
       country: configData.country || '',
       timezone: configData.timezone || 'America/Sao_Paulo',
       template_id: configData.template_id || null,
+      // Preserve existing layout_config and language if not provided in request
+      layout_config: configData.layout_config !== undefined ? configData.layout_config : (existingConfig?.layout_config || null),
+      language: configData.language || existingConfig?.language || 'pt-BR',
       updated_at: new Date().toISOString()
     };
 
