@@ -65,12 +65,12 @@ const defaultConfig = {
     locationDateColor: '#4B5563',
     signatures: [
       {
-        label: 'Reitor(a) – Veni Creator Christian University',
+        label: 'Dean of International Relations/VCCU',
         name: '{{nome_reitor}}',
         signatureImageUrl: ''
       },
       {
-        label: 'Coordenação Geral – III CIVENI 2025',
+        label: 'Dean of Academic Relations/VCCU',
         name: '{{nome_coordenador}}',
         signatureImageUrl: ''
       }
