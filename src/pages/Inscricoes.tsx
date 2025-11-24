@@ -35,17 +35,17 @@ const Inscricoes = () => {
               O maior Congresso Internacional Multidisciplinar do mundo em educação, inovação, justiça, humanidade, religiosidade e tecnologia
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/area-tematica">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
+              <Link to="/area-tematica" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
+                  <FileText className="w-4 h-4 md:w-5 md:h-5" />
                   Áreas Temáticas
                 </button>
               </Link>
               
-              <Link to="/programacao-presencial">
-                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
+              <Link to="/programacao-presencial" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
+                  <Calendar className="w-4 h-4 md:w-5 md:h-5" />
                   Ver Programação
                 </button>
               </Link>
