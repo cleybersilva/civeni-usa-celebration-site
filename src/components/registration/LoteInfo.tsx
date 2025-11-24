@@ -54,7 +54,7 @@ const LoteInfo = ({ lote }: LoteInfoProps) => {
             {formatPrice(lote.price_cents)}
           </div>
           <Badge variant="secondary" className="mt-1">
-            Valor atual da inscrição "Exclusivo para Discentes VCCU"
+            {t('registration.batchInfo.currentValue')}
           </Badge>
         </div>
 
@@ -62,7 +62,7 @@ const LoteInfo = ({ lote }: LoteInfoProps) => {
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />
           <span>
-            Válido de {formatDate(lote.dt_inicio)} a {formatDate(lote.dt_fim)}
+            {t('registration.batchInfo.validFrom')} {formatDate(lote.dt_inicio)} {t('registration.batchInfo.validTo')} {formatDate(lote.dt_fim)}
           </span>
         </div>
 
@@ -72,15 +72,15 @@ const LoteInfo = ({ lote }: LoteInfoProps) => {
             <Clock className="w-4 h-4 text-orange-500" />
             <span className="text-sm font-medium text-orange-600">
               {daysRemaining === 1 
-                ? 'Último dia!' 
-                : `${daysRemaining} dias restantes`
+                ? t('registration.batchInfo.lastDay')
+                : `${daysRemaining} ${t('registration.batchInfo.daysRemaining')}`
               }
             </span>
           </div>
         )}
 
         <div className="text-xs text-center text-muted-foreground">
-          * Horário de Fortaleza (GMT-3)
+          {t('registration.batchInfo.timezone')}
         </div>
       </CardContent>
     </Card>

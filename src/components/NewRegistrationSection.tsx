@@ -113,10 +113,10 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-civeni-blue mb-6 font-poppins">
             {registrationType === 'presencial' 
-              ? t('registration.presentialFormTitle', 'Formulário de Inscrição Presencial')
+              ? t('registration.presentialFormTitle')
               : registrationType === 'online'
-              ? t('registration.onlineFormTitle', 'Formulário de Inscrição Online')
-              : 'Inscrições III Civeni 2025'
+              ? t('registration.onlineFormTitle')
+              : t('registration.mainTitle')
             }
           </h2>
         </div>

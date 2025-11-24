@@ -95,6 +95,7 @@ export const ptTranslations = {
       title: "Inscrições",
       subtitle: "Garanta sua vaga no evento educacional mais importante do ano",
       newTitle: "Inscrições",
+      mainTitle: "Inscrições III Civeni 2025",
       formTitle: "Formulário de Inscrição",
       presentialFormTitle: "Formulário de Inscrição Presencial",
       onlineFormTitle: "Formulário de Inscrição Online",
@@ -147,6 +148,14 @@ export const ptTranslations = {
       },
       totalAmount: "Valor Total",
       proofRequired: "Comprovação obrigatória",
+      batchInfo: {
+        currentValue: "Valor atual da inscrição \"Exclusivo para Discentes VCCU\"",
+        validFrom: "Válido de",
+        validTo: "a",
+        lastDay: "Último dia!",
+        daysRemaining: "dias restantes",
+        timezone: "* Horário de Fortaleza (GMT-3)"
+      },
       categories: {
         vccuStudentPresentation: "Aluno(a) VCCU - Apresentação",
         vccuStudentListener: "Aluno(a) VCCU - Ouvinte",

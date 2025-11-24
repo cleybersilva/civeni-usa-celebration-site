@@ -92,6 +92,7 @@ export const enTranslations = {
       title: "Registration",
       subtitle: "Secure your spot at the most important educational event of the year",
       newTitle: "Registration",
+      mainTitle: "III Civeni 2025 Registration",
       formTitle: "Registration Form",
       presentialFormTitle: "In-Person Registration Form",
       onlineFormTitle: "Online Registration Form",
@@ -144,6 +145,14 @@ export const enTranslations = {
       },
       totalAmount: "Total Amount",
       proofRequired: "Proof Required",
+      batchInfo: {
+        currentValue: "Current registration value \"Exclusive for VCCU Students\"",
+        validFrom: "Valid from",
+        validTo: "to",
+        lastDay: "Last day!",
+        daysRemaining: "days remaining",
+        timezone: "* Fortaleza Time (GMT-3)"
+      },
       categories: {
         vccuStudentPresentation: "VCCU Student - Presentation",
         vccuStudentListener: "VCCU Student - Listener",
