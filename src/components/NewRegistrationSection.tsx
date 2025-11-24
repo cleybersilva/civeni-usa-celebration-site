@@ -46,11 +46,10 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
           <Card>
             <CardContent className="py-8">
               <h3 className="text-xl font-semibold text-orange-600 mb-2">
-                Inscrições Temporariamente Indisponíveis
+                {t('registration.registrationUnavailable')}
               </h3>
               <p className="text-muted-foreground">
-                Não há lotes de inscrição disponíveis no momento. 
-                Entre em contato conosco ou tente novamente mais tarde.
+                {t('registration.registrationUnavailableMessage')}
               </p>
             </CardContent>
           </Card>
@@ -128,7 +127,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
             {/* Botão Vagas Limitadas */}
             <div className="text-center mb-4">
               <div className="inline-block bg-orange-500 text-white px-6 py-2 rounded-full text-sm font-semibold animate-pulse cursor-default">
-                Vagas Limitadas
+                {t('registration.limitedSeats')}
               </div>
             </div>
             <div className="sticky top-8">
@@ -138,16 +137,16 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
             {/* Aviso de Atenção */}
             <div className="mt-6 text-center lg:text-left space-y-2">
               <p className="text-orange-600 font-medium" style={{ fontSize: '1rem' }}>
-                ⚠️ Atenção antes de prosseguir com sua inscrição
+                {t('registration.attentionWarning')}
               </p>
               <p className="text-gray-700" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                Antes de clicar em <strong>"Inscrever-se Agora"</strong>, verifique com atenção se o <strong>Nome Completo e o E-mail informados estão corretos.</strong>
+                {t('registration.attentionText1')}
               </p>
               <p className="text-gray-700" style={{ fontSize: '0.95rem', fontWeight: 500 }}>
-                Esses dados serão usados para gerar sua <strong>inscrição oficial</strong>, exibir a mensagem confirmação da inscrição e do pagamento e o link de acesso à programação do <strong>III Civeni 2025 no dia 10/12/2025 - 24h antes do início do evento.</strong>
+                {t('registration.attentionText2')}
               </p>
               <p className="text-red-600 font-semibold" style={{ fontSize: '0.95rem' }}>
-                Alterações após o envio podem causar atrasos ou inconsistências na validação da sua participação.
+                {t('registration.attentionText3')}
               </p>
             </div>
           </div>
@@ -194,14 +193,14 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 </div>
 
                 <div>
-                  <Label htmlFor="participantType">Tipo de Participante</Label>
+                  <Label htmlFor="participantType">{t('registration.participantType')}</Label>
                   <Select value={formData.participantType} onValueChange={(value) => setFormData({...formData, participantType: value, cursoId: '', turmaId: '', categoryId: ''})}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tipo de participante" />
+                      <SelectValue placeholder={t('registration.selectParticipantType')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="vccu_student">Aluno(a) VCCU</SelectItem>
-                      <SelectItem value="guest">Convidado(a)</SelectItem>
+                      <SelectItem value="guest">{t('registration.guest')}</SelectItem>
                       {participantTypes.filter(pt => pt.is_active && pt.type_name !== 'Aluno(a) VCCU').map((pt) => (
                         <SelectItem key={pt.id} value={pt.type_name}>
                           {pt.type_name}
@@ -229,7 +228,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                             <div className="ml-4 flex flex-col items-end">
                               <span className="font-semibold">
                                 {category.is_free 
-                                  ? 'GRATUITO' 
+                                  ? t('registration.freeLabel')
                                   : category.slug === 'participante-externo' 
                                     ? 'R$ 200,00'
                                     : category.slug === 'convidado'
@@ -244,12 +243,12 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                               )}
                               {category.slug === 'participante-externo' && (
                                 <span className="text-xs text-blue-600 font-medium">
-                                  Valor fixo
+                                  {t('registration.fixedValue')}
                                 </span>
                               )}
                               {category.slug === 'convidado' && (
                                 <span className="text-xs text-purple-600 font-medium">
-                                  Taxa convidado
+                                  {t('registration.guestFee')}
                                 </span>
                               )}
                             </div>
@@ -263,19 +262,19 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                 {selectedCategory && (
                   <div>
                     <Label htmlFor="couponCode">
-                      {selectedCategory.is_free ? 'Código do Cupom (obrigatório para categoria gratuita)' : t('registration.couponCode')}
+                      {selectedCategory.is_free ? t('registration.couponRequired') : t('registration.couponCode')}
                     </Label>
                     <Input
                       id="couponCode"
                       type="text"  
                       value={formData.couponCode}
                       onChange={(e) => setFormData({...formData, couponCode: e.target.value})}
-                      placeholder={selectedCategory.is_free ? 'Digite seu código de professor VCCU' : t('registration.couponPlaceholder')}
+                      placeholder={selectedCategory.is_free ? t('registration.couponProfessorPlaceholder') : t('registration.couponPlaceholder')}
                       required={selectedCategory.is_free}
                     />
                     {selectedCategory.is_free && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        Para categoria gratuita, o código do cupom é obrigatório para validar sua elegibilidade como professor VCCU.
+                        {t('registration.couponExplanation')}
                       </p>
                     )}
                   </div>
