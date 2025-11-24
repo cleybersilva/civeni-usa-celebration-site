@@ -1,193 +1,240 @@
 // Course name translations
 // Since the database only has Portuguese names, we provide translations here
-export const courseTranslations: Record<string, { en: string; es: string }> = {
+export const courseTranslations: Record<string, { en: string; es: string; tr: string }> = {
   'Doutorado em Ciências Jurídicas': {
     en: 'PhD in Legal Sciences',
-    es: 'Doctorado en Ciencias Jurídicas'
+    es: 'Doctorado en Ciencias Jurídicas',
+    tr: 'Hukuk Bilimleri Doktorası'
   },
   'Mestrado em Ciências Jurídicas': {
     en: 'Master in Legal Sciences',
-    es: 'Maestría en Ciencias Jurídicas'
+    es: 'Maestría en Ciencias Jurídicas',
+    tr: 'Hukuk Bilimleri Yüksek Lisansı'
   },
   'Direito': {
     en: 'Law',
-    es: 'Derecho'
+    es: 'Derecho',
+    tr: 'Hukuk'
   },
   'Administração': {
     en: 'Business Administration',
-    es: 'Administración'
+    es: 'Administración',
+    tr: 'İşletme'
   },
   'Ciências Contábeis': {
     en: 'Accounting',
-    es: 'Ciencias Contables'
+    es: 'Ciencias Contables',
+    tr: 'Muhasebe'
   },
   'Engenharia Civil': {
     en: 'Civil Engineering',
-    es: 'Ingeniería Civil'
+    es: 'Ingeniería Civil',
+    tr: 'İnşaat Mühendisliği'
   },
   'Arquitetura e Urbanismo': {
     en: 'Architecture and Urbanism',
-    es: 'Arquitectura y Urbanismo'
+    es: 'Arquitectura y Urbanismo',
+    tr: 'Mimarlık ve Şehircilik'
   },
   'Medicina': {
     en: 'Medicine',
-    es: 'Medicina'
+    es: 'Medicina',
+    tr: 'Tıp'
   },
   'Enfermagem': {
     en: 'Nursing',
-    es: 'Enfermería'
+    es: 'Enfermería',
+    tr: 'Hemşirelik'
   },
   'Farmácia': {
     en: 'Pharmacy',
-    es: 'Farmacia'
+    es: 'Farmacia',
+    tr: 'Eczacılık'
   },
   'Fisioterapia': {
     en: 'Physical Therapy',
-    es: 'Fisioterapia'
+    es: 'Fisioterapia',
+    tr: 'Fizyoterapi'
   },
   'Odontologia': {
     en: 'Dentistry',
-    es: 'Odontología'
+    es: 'Odontología',
+    tr: 'Diş Hekimliği'
   },
   'Psicologia': {
     en: 'Psychology',
-    es: 'Psicología'
+    es: 'Psicología',
+    tr: 'Psikoloji'
   },
   'Pedagogia': {
     en: 'Pedagogy',
-    es: 'Pedagogía'
+    es: 'Pedagogía',
+    tr: 'Pedagoji'
   },
   'Letras': {
     en: 'Letters',
-    es: 'Letras'
+    es: 'Letras',
+    tr: 'Edebiyat'
   },
   'História': {
     en: 'History',
-    es: 'Historia'
+    es: 'Historia',
+    tr: 'Tarih'
   },
   'Geografia': {
     en: 'Geography',
-    es: 'Geografía'
+    es: 'Geografía',
+    tr: 'Coğrafya'
   },
   'Matemática': {
     en: 'Mathematics',
-    es: 'Matemáticas'
+    es: 'Matemáticas',
+    tr: 'Matematik'
   },
   'Física': {
     en: 'Physics',
-    es: 'Física'
+    es: 'Física',
+    tr: 'Fizik'
   },
   'Química': {
     en: 'Chemistry',
-    es: 'Química'
+    es: 'Química',
+    tr: 'Kimya'
   },
   'Biologia': {
     en: 'Biology',
-    es: 'Biología'
+    es: 'Biología',
+    tr: 'Biyoloji'
   },
   'Educação Física': {
     en: 'Physical Education',
-    es: 'Educación Física'
+    es: 'Educación Física',
+    tr: 'Beden Eğitimi'
   },
   'Ciências da Computação': {
     en: 'Computer Science',
-    es: 'Ciencias de la Computación'
+    es: 'Ciencias de la Computación',
+    tr: 'Bilgisayar Bilimi'
   },
   'Sistemas de Informação': {
     en: 'Information Systems',
-    es: 'Sistemas de Información'
+    es: 'Sistemas de Información',
+    tr: 'Bilgi Sistemleri'
   },
   'Engenharia de Software': {
     en: 'Software Engineering',
-    es: 'Ingeniería de Software'
+    es: 'Ingeniería de Software',
+    tr: 'Yazılım Mühendisliği'
   },
   'Design': {
     en: 'Design',
-    es: 'Diseño'
+    es: 'Diseño',
+    tr: 'Tasarım'
   },
   'Publicidade e Propaganda': {
     en: 'Advertising and Marketing',
-    es: 'Publicidad y Propaganda'
+    es: 'Publicidad y Propaganda',
+    tr: 'Reklamcılık ve Pazarlama'
   },
   'Jornalismo': {
     en: 'Journalism',
-    es: 'Periodismo'
+    es: 'Periodismo',
+    tr: 'Gazetecilik'
   },
   'Relações Internacionais': {
     en: 'International Relations',
-    es: 'Relaciones Internacionales'
+    es: 'Relaciones Internacionales',
+    tr: 'Uluslararası İlişkiler'
   },
   'Economia': {
     en: 'Economics',
-    es: 'Economía'
+    es: 'Economía',
+    tr: 'Ekonomi'
   },
   'Ciências Sociais': {
     en: 'Social Sciences',
-    es: 'Ciencias Sociales'
+    es: 'Ciencias Sociales',
+    tr: 'Sosyal Bilimler'
   },
   'Filosofia': {
     en: 'Philosophy',
-    es: 'Filosofía'
+    es: 'Filosofía',
+    tr: 'Felsefe'
   },
   'Teologia': {
     en: 'Theology',
-    es: 'Teología'
+    es: 'Teología',
+    tr: 'İlahiyat'
   },
   'Serviço Social': {
     en: 'Social Work',
-    es: 'Trabajo Social'
+    es: 'Trabajo Social',
+    tr: 'Sosyal Hizmet'
   },
   'Nutrição': {
     en: 'Nutrition',
-    es: 'Nutrición'
+    es: 'Nutrición',
+    tr: 'Beslenme'
   },
   'Medicina Veterinária': {
     en: 'Veterinary Medicine',
-    es: 'Medicina Veterinaria'
+    es: 'Medicina Veterinaria',
+    tr: 'Veterinerlik'
   },
   'Zootecnia': {
     en: 'Animal Science',
-    es: 'Zootecnia'
+    es: 'Zootecnia',
+    tr: 'Zootekni'
   },
   'Agronomia': {
     en: 'Agronomy',
-    es: 'Agronomía'
+    es: 'Agronomía',
+    tr: 'Tarım Mühendisliği'
   },
   'Engenharia Elétrica': {
     en: 'Electrical Engineering',
-    es: 'Ingeniería Eléctrica'
+    es: 'Ingeniería Eléctrica',
+    tr: 'Elektrik Mühendisliği'
   },
   'Engenharia Mecânica': {
     en: 'Mechanical Engineering',
-    es: 'Ingeniería Mecánica'
+    es: 'Ingeniería Mecánica',
+    tr: 'Makine Mühendisliği'
   },
   'Engenharia de Produção': {
     en: 'Production Engineering',
-    es: 'Ingeniería de Producción'
+    es: 'Ingeniería de Producción',
+    tr: 'Endüstri Mühendisliği'
   },
   'Engenharia Química': {
     en: 'Chemical Engineering',
-    es: 'Ingeniería Química'
+    es: 'Ingeniería Química',
+    tr: 'Kimya Mühendisliği'
   },
   'Engenharia Ambiental': {
     en: 'Environmental Engineering',
-    es: 'Ingeniería Ambiental'
+    es: 'Ingeniería Ambiental',
+    tr: 'Çevre Mühendisliği'
   },
   'Biomedicina': {
     en: 'Biomedicine',
-    es: 'Biomedicina'
+    es: 'Biomedicina',
+    tr: 'Biyomedikal'
   },
   'Gastronomia': {
     en: 'Gastronomy',
-    es: 'Gastronomía'
+    es: 'Gastronomía',
+    tr: 'Gastronomi'
   },
   'Turismo': {
     en: 'Tourism',
-    es: 'Turismo'
+    es: 'Turismo',
+    tr: 'Turizm'
   },
   'Hotelaria': {
     en: 'Hospitality',
-    es: 'Hotelería'
+    es: 'Hotelería',
+    tr: 'Otelcilik'
   }
 };
 
@@ -197,13 +244,17 @@ export const getTranslatedCourseName = (courseName: string, language: string): s
     return courseName;
   }
   
-  // Return English or Spanish translation
+  // Return English, Spanish or Turkish translation
   if (language === 'en') {
     return courseTranslations[courseName].en;
   }
   
   if (language === 'es') {
     return courseTranslations[courseName].es;
+  }
+  
+  if (language === 'tr') {
+    return courseTranslations[courseName].tr;
   }
   
   // Fallback to original

@@ -14,11 +14,12 @@ const HeroBanner = () => {
     .sort((a, b) => a.order - b.order);
 
   // Função para obter texto traduzido
-  const getTranslatedText = (pt: string, en?: string, es?: string) => {
-    const currentLang = i18n.language.split('-')[0]; // Pega apenas 'en', 'es', 'pt'
+  const getTranslatedText = (pt: string, en?: string, es?: string, tr?: string) => {
+    const currentLang = i18n.language.split('-')[0]; // Pega apenas 'en', 'es', 'pt', 'tr'
     
     if (currentLang === 'en' && en) return en;
     if (currentLang === 'es' && es) return es;
+    if (currentLang === 'tr' && tr) return tr;
     return pt; // Padrão português
   };
 
@@ -76,13 +77,13 @@ const HeroBanner = () => {
           <div className="relative z-10 flex items-center justify-center h-full px-4">
             <div className="text-center text-white max-w-4xl w-full">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold font-poppins mb-4 md:mb-6 animate-fade-in leading-tight">
-                {getTranslatedText(slide.title, slide.titleEn, slide.titleEs)}
+                {getTranslatedText(slide.title, slide.titleEn, slide.titleEs, slide.titleTr)}
               </h1>
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 md:mb-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                {getTranslatedText(slide.subtitle, slide.subtitleEn, slide.subtitleEs)}
+                {getTranslatedText(slide.subtitle, slide.subtitleEn, slide.subtitleEs, slide.subtitleTr)}
               </p>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 md:mb-8 animate-fade-in px-2" style={{ animationDelay: '0.6s' }}>
-                {getTranslatedText(slide.description, slide.descriptionEn, slide.descriptionEs)}
+                {getTranslatedText(slide.description, slide.descriptionEn, slide.descriptionEs, slide.descriptionTr)}
               </p>
               <div className="flex justify-center w-full px-6 sm:px-4">
                 <a 
@@ -90,7 +91,7 @@ const HeroBanner = () => {
                   className="inline-block w-full max-w-[280px] sm:max-w-xs bg-civeni-red text-white px-4 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-xs sm:text-sm md:text-base lg:text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins text-center leading-tight"
                   style={{ animationDelay: '0.9s' }}
                 >
-                  {getTranslatedText(slide.buttonText, slide.buttonTextEn, slide.buttonTextEs)}
+                  {getTranslatedText(slide.buttonText, slide.buttonTextEn, slide.buttonTextEs, slide.buttonTextTr)}
                 </a>
               </div>
             </div>
