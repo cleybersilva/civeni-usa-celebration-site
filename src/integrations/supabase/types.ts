@@ -1346,6 +1346,8 @@ export type Database = {
           issuer_role: string | null
           issuer_signature_url: string | null
           keywords: string[]
+          language: string
+          layout_config: Json | null
           required_correct: number | null
           template_id: string | null
           timezone: string | null
@@ -1363,6 +1365,8 @@ export type Database = {
           issuer_role?: string | null
           issuer_signature_url?: string | null
           keywords: string[]
+          language?: string
+          layout_config?: Json | null
           required_correct?: number | null
           template_id?: string | null
           timezone?: string | null
@@ -1380,6 +1384,8 @@ export type Database = {
           issuer_role?: string | null
           issuer_signature_url?: string | null
           keywords?: string[]
+          language?: string
+          layout_config?: Json | null
           required_correct?: number | null
           template_id?: string | null
           timezone?: string | null

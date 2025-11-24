@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.download-submissao-docx]
 verify_jwt = false
+
+[functions.translate-certificate]
+verify_jwt = false

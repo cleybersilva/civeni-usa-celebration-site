@@ -47,7 +47,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Validate input
     if (!eventId || !email || !fullName || !keywords || keywords.length !== 3) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Dados inválidos. É necessário fornecer 3 palavras-chave.' }),
+        JSON.stringify({ success: false, message: msg.invalidData }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -58,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (normalizedFullName.length < 2) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Nome deve ter pelo menos 2 caracteres' }),
+        JSON.stringify({ success: false, message: msg.nameMin }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -75,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (attempts && attempts.length >= 5) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Muitas tentativas. Tente novamente em 1 hora.' }),
+        JSON.stringify({ success: false, message: msg.tooManyAttempts }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
@@ -99,6 +99,43 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Get language-specific messages
+    const language = eventCert.language || 'pt-BR';
+    const messages = {
+      'pt-BR': {
+        invalidData: 'Dados inválidos. É necessário fornecer 3 palavras-chave.',
+        nameMin: 'Nome deve ter pelo menos 2 caracteres',
+        tooManyAttempts: 'Muitas tentativas. Tente novamente em 1 hora.',
+        eventNotFound: 'Evento não encontrado ou certificados não habilitados',
+        keywordsMismatch: (matched: number, required: number) => 
+          `Você acertou ${matched}/3 palavras-chave. Mínimo necessário: ${required}/3`,
+        alreadyIssued: (date: string) => `Certificado já emitido em ${date}`,
+        success: 'Certificado emitido com sucesso!'
+      },
+      'en-US': {
+        invalidData: 'Invalid data. 3 keywords are required.',
+        nameMin: 'Name must be at least 2 characters',
+        tooManyAttempts: 'Too many attempts. Try again in 1 hour.',
+        eventNotFound: 'Event not found or certificates not enabled',
+        keywordsMismatch: (matched: number, required: number) => 
+          `You got ${matched}/3 keywords correct. Minimum required: ${required}/3`,
+        alreadyIssued: (date: string) => `Certificate already issued on ${date}`,
+        success: 'Certificate issued successfully!'
+      },
+      'es-ES': {
+        invalidData: 'Datos inválidos. Se requieren 3 palabras clave.',
+        nameMin: 'El nombre debe tener al menos 2 caracteres',
+        tooManyAttempts: 'Demasiados intentos. Inténtelo de nuevo en 1 hora.',
+        eventNotFound: 'Evento no encontrado o certificados no habilitados',
+        keywordsMismatch: (matched: number, required: number) => 
+          `Acertó ${matched}/3 palabras clave. Mínimo requerido: ${required}/3`,
+        alreadyIssued: (date: string) => `Certificado ya emitido el ${date}`,
+        success: '¡Certificado emitido con éxito!'
+      }
+    };
+
+    const msg = messages[language as keyof typeof messages] || messages['pt-BR'];
+
     // Check keywords
     const normalizedUserKeywords = keywords.map(normalizeText);
     const normalizedOfficialKeywords = eventCert.keywords.map(normalizeText);
@@ -119,7 +156,7 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          message: `Você acertou ${matchedCount}/3 palavras-chave. Mínimo necessário: ${eventCert.required_correct}/3`,
+          message: msg.keywordsMismatch(matchedCount, eventCert.required_correct),
           matched: matchedCount 
         }),
         { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -142,10 +179,14 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (existingCert) {
+      const issuedDate = new Date(existingCert.issued_at).toLocaleDateString(
+        language === 'en-US' ? 'en-US' : language === 'es-ES' ? 'es-ES' : 'pt-BR'
+      );
+      
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: `Certificado já emitido em ${new Date(existingCert.issued_at).toLocaleDateString('pt-BR')}`,
+          message: msg.alreadyIssued(issuedDate),
           pdfUrl: existingCert.pdf_url,
           code: existingCert.code,
           matched: matchedCount,
@@ -206,7 +247,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Certificado emitido com sucesso!',
+        message: msg.success,
         pdfUrl: pdfUrl,
         code: code,
         matched: matchedCount,
