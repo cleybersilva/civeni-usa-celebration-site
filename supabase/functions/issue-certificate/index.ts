@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
-import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -87,418 +86,157 @@ function wrapText(text: string, maxWidth: number, font: any, fontSize: number): 
   return lines;
 }
 
-interface LayoutConfig {
-  background?: {
-    type: 'solid' | 'gradient';
-    color?: string;
-    gradientFrom?: string;
-    gradientTo?: string;
-  };
-  border?: {
-    enabled: boolean;
-    thickness?: number;
-    gradient?: {
-      from: string;
-      to: string;
-    };
-  };
-  header?: {
-    title: string;
-    titleColor: string;
-    subtitle: string;
-    subtitleColor: string;
-  };
-  body?: {
-    certifyLabel: string;
-    certifyLabelColor: string;
-    participantNamePlaceholder: string;
-    participantNameStyle: {
-      fontSize: number;
-      color: string;
-    };
-    mainText: string;
-    mainTextColor: string;
-  };
-  footer?: {
-    locationDateText: string;
-    locationDateColor: string;
-    signatures?: Array<{
-      label: string;
-      name: string;
-    }>;
-  };
-  badge?: {
-    enabled: boolean;
-    text: string;
-    textColor: string;
-  };
-}
+// Função para buscar template HTML do evento
+async function getEventCertificateTemplate(supabaseClient: any, eventId: string) {
+  const { data: eventCert, error: certError } = await supabaseClient
+    .from("event_certificates")
+    .select("template_id, language")
+    .eq("event_id", eventId)
+    .single();
 
-const createCertificatePdf = async (
-  options: CertificatePdfOptions & { layoutConfig?: LayoutConfig; eventName?: string },
-): Promise<Uint8Array> => {
-  const { fullName, eventSlug, language, issueDate, city, country, hours, code, layoutConfig, eventName } = options;
-
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([842, 595]); // A4 landscape
-  const { width, height } = page.getSize();
-
-  const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  // Se temos layout_config, usar ele
-  if (layoutConfig && layoutConfig.header && layoutConfig.body && layoutConfig.footer) {
-    console.log("Using custom layout_config for PDF generation");
-    
-    // Preparar dados para substituição de placeholders
-    const dateStr = issueDate.toLocaleDateString(
-      language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
-    );
-    const locationParts: string[] = [];
-    if (city) locationParts.push(city);
-    if (country) locationParts.push(country);
-    const locationBase = locationParts.join(" - ");
-    
-    const placeholderData: Record<string, string> = {
-      nome_participante: fullName,
-      tipo_participacao: language === "en-US" ? "participant" : language === "es-ES" ? "participante" : "participante",
-      nome_evento: eventName || eventSlug,
-      data_evento: dateStr,
-      carga_horaria: hours || "",
-      data_emissao: dateStr,
-      codigo_verificacao: code,
-    };
-
-    // Background (simples, pdf-lib não suporta gradientes nativamente)
-    if (layoutConfig.background?.color) {
-      const bgColor = hexToRgb(layoutConfig.background.color);
-      page.drawRectangle({
-        x: 0,
-        y: 0,
-        width: width,
-        height: height,
-        color: rgb(bgColor.r, bgColor.g, bgColor.b),
-      });
-    }
-
-    // Borda
-    if (layoutConfig.border?.enabled && layoutConfig.border.thickness) {
-      const borderColor = layoutConfig.border.gradient?.from 
-        ? hexToRgb(layoutConfig.border.gradient.from)
-        : { r: 0.2, g: 0.2, b: 0.5 };
-      
-      const thickness = layoutConfig.border.thickness;
-      const margin = 20;
-      
-      page.drawRectangle({
-        x: margin,
-        y: margin,
-        width: width - 2 * margin,
-        height: height - 2 * margin,
-        borderColor: rgb(borderColor.r, borderColor.g, borderColor.b),
-        borderWidth: thickness,
-      });
-    }
-
-    let currentY = height - 80;
-
-    // Header - Title
-    const headerTitle = replacePlaceholders(layoutConfig.header.title, placeholderData);
-    const titleColor = hexToRgb(layoutConfig.header.titleColor);
-    const titleSize = 32;
-    const titleWidth = titleFont.widthOfTextAtSize(headerTitle, titleSize);
-    
-    page.drawText(headerTitle, {
-      x: (width - titleWidth) / 2,
-      y: currentY,
-      size: titleSize,
-      font: titleFont,
-      color: rgb(titleColor.r, titleColor.g, titleColor.b),
-    });
-    
-    currentY -= 40;
-
-    // Header - Subtitle
-    if (layoutConfig.header.subtitle) {
-      const headerSubtitle = replacePlaceholders(layoutConfig.header.subtitle, placeholderData);
-      const subtitleColor = hexToRgb(layoutConfig.header.subtitleColor);
-      const subtitleSize = 16;
-      const subtitleWidth = textFont.widthOfTextAtSize(headerSubtitle, subtitleSize);
-      
-      page.drawText(headerSubtitle, {
-        x: (width - subtitleWidth) / 2,
-        y: currentY,
-        size: subtitleSize,
-        font: textFont,
-        color: rgb(subtitleColor.r, subtitleColor.g, subtitleColor.b),
-      });
-      
-      currentY -= 60;
-    } else {
-      currentY -= 40;
-    }
-
-    // Body - Certify Label
-    const certifyLabel = replacePlaceholders(layoutConfig.body.certifyLabel, placeholderData);
-    const certifyLabelColor = hexToRgb(layoutConfig.body.certifyLabelColor);
-    const certifyLabelSize = 14;
-    const certifyLabelWidth = textFont.widthOfTextAtSize(certifyLabel, certifyLabelSize);
-    
-    page.drawText(certifyLabel, {
-      x: (width - certifyLabelWidth) / 2,
-      y: currentY,
-      size: certifyLabelSize,
-      font: textFont,
-      color: rgb(certifyLabelColor.r, certifyLabelColor.g, certifyLabelColor.b),
-    });
-    
-    currentY -= 30;
-
-    // Body - Participant Name
-    const participantName = replacePlaceholders(layoutConfig.body.participantNamePlaceholder, placeholderData);
-    const nameColor = hexToRgb(layoutConfig.body.participantNameStyle.color);
-    const nameSize = layoutConfig.body.participantNameStyle.fontSize || 36;
-    const nameWidth = titleFont.widthOfTextAtSize(participantName, nameSize);
-    
-    page.drawText(participantName, {
-      x: (width - nameWidth) / 2,
-      y: currentY,
-      size: nameSize,
-      font: titleFont,
-      color: rgb(nameColor.r, nameColor.g, nameColor.b),
-    });
-    
-    currentY -= 50;
-
-    // Body - Main Text (quebrado em linhas)
-    const mainText = replacePlaceholders(layoutConfig.body.mainText, placeholderData);
-    const mainTextColor = hexToRgb(layoutConfig.body.mainTextColor);
-    const mainTextSize = 14;
-    const maxTextWidth = width - 120;
-    const textLines = wrapText(mainText, maxTextWidth, textFont, mainTextSize);
-    
-    for (const line of textLines) {
-      const lineWidth = textFont.widthOfTextAtSize(line, mainTextSize);
-      page.drawText(line, {
-        x: (width - lineWidth) / 2,
-        y: currentY,
-        size: mainTextSize,
-        font: textFont,
-        color: rgb(mainTextColor.r, mainTextColor.g, mainTextColor.b),
-      });
-      currentY -= 20;
-    }
-
-    // Footer - Location/Date
-    const footerLocation = replacePlaceholders(layoutConfig.footer.locationDateText, placeholderData);
-    const footerColor = hexToRgb(layoutConfig.footer.locationDateColor);
-    const footerSize = 12;
-    const footerWidth = textFont.widthOfTextAtSize(footerLocation, footerSize);
-    
-    page.drawText(footerLocation, {
-      x: (width - footerWidth) / 2,
-      y: 120,
-      size: footerSize,
-      font: textFont,
-      color: rgb(footerColor.r, footerColor.g, footerColor.b),
-    });
-
-    // Footer - Signatures
-    if (layoutConfig.footer.signatures && layoutConfig.footer.signatures.length > 0) {
-      const sigY = 80;
-      const sigSpacing = width / (layoutConfig.footer.signatures.length + 1);
-      
-      layoutConfig.footer.signatures.forEach((sig, index) => {
-        const sigX = sigSpacing * (index + 1);
-        const sigName = replacePlaceholders(sig.name, placeholderData);
-        const sigLabel = sig.label;
-        
-        // Nome do assinante
-        const nameWidth = textFont.widthOfTextAtSize(sigName, 10);
-        page.drawText(sigName, {
-          x: sigX - nameWidth / 2,
-          y: sigY,
-          size: 10,
-          font: titleFont,
-          color: rgb(0, 0, 0),
-        });
-        
-        // Label (cargo)
-        const labelWidth = textFont.widthOfTextAtSize(sigLabel, 8);
-        page.drawText(sigLabel, {
-          x: sigX - labelWidth / 2,
-          y: sigY - 15,
-          size: 8,
-          font: textFont,
-          color: rgb(0.3, 0.3, 0.3),
-        });
-        
-        // Linha de assinatura
-        page.drawLine({
-          start: { x: sigX - 60, y: sigY + 5 },
-          end: { x: sigX + 60, y: sigY + 5 },
-          thickness: 1,
-          color: rgb(0.5, 0.5, 0.5),
-        });
-      });
-    }
-
-    // Badge
-    if (layoutConfig.badge?.enabled && layoutConfig.badge.text) {
-      const badgeText = layoutConfig.badge.text;
-      const badgeColor = hexToRgb(layoutConfig.badge.textColor);
-      
-      page.drawText(badgeText, {
-        x: width - 150,
-        y: height - 50,
-        size: 10,
-        font: titleFont,
-        color: rgb(badgeColor.r, badgeColor.g, badgeColor.b),
-      });
-    }
-
-    // Código de verificação no rodapé
-    const codeLabel = language === "en-US" ? "Code:" : language === "es-ES" ? "Código:" : "Código:";
-    page.drawText(`${codeLabel} ${code}`, {
-      x: 40,
-      y: 30,
-      size: 8,
-      font: textFont,
-      color: rgb(0.4, 0.4, 0.4),
-    });
-
-  } else {
-    // Fallback: template genérico (caso não tenha layout_config)
-    console.error("FALLBACK TEMPLATE BEING USED - layout_config missing or incomplete:", {
-      has_layoutConfig: !!layoutConfig,
-      has_header: !!layoutConfig?.header,
-      has_body: !!layoutConfig?.body,
-      has_footer: !!layoutConfig?.footer,
-      layoutConfig_json: JSON.stringify(layoutConfig),
-      header_title: layoutConfig?.header?.title,
-      body_certifyLabel: layoutConfig?.body?.certifyLabel,
-      footer_locationDateText: layoutConfig?.footer?.locationDateText
-    });
-    console.error("THIS SHOULD NOT HAPPEN! Check event_certificates.layout_config in database!");
-    
-    const titleText =
-      language === "en-US"
-        ? "Certificate of Participation"
-        : language === "es-ES"
-        ? "Certificado de Participación"
-        : "Certificado de Participação";
-
-    page.drawText(titleText, {
-      x: 50,
-      y: height - 80,
-      size: 24,
-      font: titleFont,
-      color: rgb(0.1, 0.2, 0.5),
-    });
-
-    const nameLabelText =
-      language === "en-US"
-        ? "We hereby certify that"
-        : language === "es-ES"
-        ? "Certificamos que"
-        : "Certificamos que";
-
-    page.drawText(nameLabelText, {
-      x: 50,
-      y: height - 140,
-      size: 14,
-      font: textFont,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    const nameSize = 32;
-    const nameWidth = titleFont.widthOfTextAtSize(fullName, nameSize);
-    page.drawText(fullName, {
-      x: (width - nameWidth) / 2,
-      y: height - 190,
-      size: nameSize,
-      font: titleFont,
-      color: rgb(0, 0, 0),
-    });
-
-    const eventLine =
-      language === "en-US"
-        ? `for participating in the event ${eventSlug}.`
-        : language === "es-ES"
-        ? `por participar del evento ${eventSlug}.`
-        : `por participar do evento ${eventSlug}.`;
-
-    page.drawText(eventLine, {
-      x: 50,
-      y: height - 230,
-      size: 14,
-      font: textFont,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    let y = height - 260;
-    if (hours) {
-      const hoursText =
-        language === "en-US"
-          ? `Workload: ${hours} hours`
-          : language === "es-ES"
-          ? `Carga horaria: ${hours} horas`
-          : `Carga horária: ${hours} horas`;
-
-      page.drawText(hoursText, {
-        x: 50,
-        y,
-        size: 12,
-        font: textFont,
-        color: rgb(0.3, 0.3, 0.3),
-      });
-      y -= 20;
-    }
-
-    const locationParts: string[] = [];
-    if (city) locationParts.push(city);
-    if (country) locationParts.push(country);
-    const locationBase = locationParts.join(" - ");
-
-    const dateStr = issueDate.toLocaleDateString(
-      language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
-    );
-
-    const locationLine = locationBase ? `${locationBase}, ${dateStr}` : dateStr;
-
-    page.drawText(locationLine, {
-      x: 50,
-      y,
-      size: 12,
-      font: textFont,
-      color: rgb(0.3, 0.3, 0.3),
-    });
-
-    const codeLabel =
-      language === "en-US"
-        ? "Verification code:"
-        : language === "es-ES"
-        ? "Código de verificación:"
-        : "Código de verificação:";
-
-    page.drawText(codeLabel, {
-      x: 50,
-      y: 80,
-      size: 10,
-      font: textFont,
-      color: rgb(0.4, 0.4, 0.4),
-    });
-
-    page.drawText(code, {
-      x: 50,
-      y: 65,
-      size: 14,
-      font: titleFont,
-      color: rgb(0.1, 0.2, 0.5),
-    });
+  if (certError || !eventCert || !eventCert.template_id) {
+    console.error("Event certificate config not found or no template_id:", certError);
+    return null;
   }
 
-  return await pdfDoc.save();
+  const { data: template, error: templateError } = await supabaseClient
+    .from("certificate_templates")
+    .select("body_html, base_colors, logo_url, background_url")
+    .eq("id", eventCert.template_id)
+    .single();
+
+  if (templateError || !template) {
+    console.error("Template not found:", templateError);
+    return null;
+  }
+
+  return { template, language: eventCert.language };
+}
+
+// Converter HTML para PDF usando serviço externo (HTMLtoPDF API)
+async function htmlToPdf(html: string): Promise<Uint8Array> {
+  const HTMLTOPDF_API_KEY = Deno.env.get("HTMLTOPDF_API_KEY");
+  
+  if (!HTMLTOPDF_API_KEY) {
+    console.error("HTMLTOPDF_API_KEY not configured, PDF generation will fail");
+    throw new Error("HTMLTOPDF_API_KEY não configurada");
+  }
+
+  const response = await fetch("https://api.html2pdf.app/v1/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-KEY": HTMLTOPDF_API_KEY,
+    },
+    body: JSON.stringify({
+      html,
+      format: "A4",
+      landscape: true,
+      printBackground: true,
+      margin: { top: "0mm", right: "0mm", bottom: "0mm", left: "0mm" },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("HTML to PDF conversion failed:", errorText);
+    throw new Error(`Falha ao converter HTML para PDF: ${response.status}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
+}
+
+// Criar PDF do certificado usando template HTML
+const createCertificatePdf = async (
+  supabaseClient: any,
+  options: CertificatePdfOptions & { eventName?: string },
+): Promise<Uint8Array> => {
+  const { fullName, eventSlug, language, issueDate, city, country, hours, code, eventName } = options;
+
+  console.log("Fetching certificate template for event:", eventSlug);
+
+  const templateData = await getEventCertificateTemplate(supabaseClient, eventSlug);
+
+  if (!templateData || !templateData.template) {
+    console.error("No template found, using fallback");
+    throw new Error("Template de certificado não encontrado para este evento");
+  }
+
+  const { template } = templateData;
+
+  // Preparar dados para substituição de placeholders
+  const dateStr = issueDate.toLocaleDateString(
+    language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
+  );
+
+  const locationParts: string[] = [];
+  if (city) locationParts.push(city);
+  if (country) locationParts.push(country);
+  const locationDate = locationParts.length > 0 
+    ? `${locationParts.join(" - ")}, ${dateStr}`
+    : dateStr;
+
+  // Substituir todos os placeholders no body_html
+  let bodyHtml = template.body_html
+    .replace(/\{\{PARTICIPANT_NAME\}\}/g, fullName)
+    .replace(/\{\{EVENT_NAME\}\}/g, eventName || eventSlug)
+    .replace(/\{\{WORKLOAD_HOURS\}\}/g, hours || "20")
+    .replace(/\{\{CITY\}\}/g, city || "")
+    .replace(/\{\{COUNTRY\}\}/g, country || "")
+    .replace(/\{\{EVENT_DATE\}\}/g, locationDate)
+    .replace(/\{\{VERIFICATION_CODE\}\}/g, code);
+
+  // Extrair cores do base_colors
+  const colors = template.base_colors || {};
+
+  // Montar HTML completo com CSS embutido
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 297mm;
+      height: 210mm;
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      background-color: ${colors.background || '#ffffff'};
+      ${template.background_url ? `background-image: url('${template.background_url}'); background-size: cover; background-position: center;` : ''}
+      position: relative;
+    }
+    ${bodyHtml.includes('<style>') ? '' : `
+    .title { text-align: center; color: ${colors.primary || '#1e40af'}; font-size: 32pt; font-weight: bold; margin-bottom: 10mm; text-transform: uppercase; }
+    .subtitle { text-align: center; color: ${colors.secondary || '#ef4444'}; font-size: 14pt; margin-bottom: 15mm; }
+    .certify-text { text-align: center; color: ${colors.secondary || '#ef4444'}; font-size: 12pt; margin-bottom: 5mm; }
+    .participant-name { text-align: center; font-size: 28pt; font-weight: bold; color: #000; margin: 10mm 0; }
+    .main-text { text-align: center; font-size: 12pt; color: #000; line-height: 1.6; max-width: 80%; margin: 0 auto 15mm; }
+    .location-date { text-align: center; font-size: 11pt; color: #000; margin-bottom: 10mm; }
+    .signatures { display: flex; justify-content: space-around; margin-top: 15mm; }
+    .signature { text-align: center; }
+    .signature-line { border-top: 1px solid #000; margin-bottom: 3mm; padding-top: 2mm; width: 150px; margin: 0 auto; }
+    .signature-name { font-weight: bold; font-size: 10pt; }
+    .signature-title { font-size: 9pt; color: #666; }
+    .verification-code { position: absolute; bottom: 5mm; left: 10mm; font-size: 8pt; color: #666; }
+    .badge { position: absolute; bottom: 5mm; right: 10mm; padding: 3mm 6mm; background: ${colors.primary || '#1e40af'}; color: white; border-radius: 5mm; font-size: 9pt; font-weight: bold; }
+    .border { position: absolute; top: 10mm; left: 10mm; right: 10mm; bottom: 10mm; border: 3px solid ${colors.primary || '#1e40af'}; pointer-events: none; }
+    `}
+  </style>
+</head>
+<body>
+  <div class="border"></div>
+  ${template.logo_url ? `<div class="logo" style="text-align: center; padding-top: 15mm;"><img src="${template.logo_url}" style="height: 15mm; width: auto;" /></div>` : ''}
+  ${bodyHtml}
+</body>
+</html>
+  `;
+
+  console.log("Converting HTML to PDF...");
+  
+  return await htmlToPdf(html);
 };
 
 const uploadCertificatePdf = async (
@@ -701,38 +439,12 @@ const handler = async (req: Request): Promise<Response> => {
     const code = existingCert?.code || generateCode();
     const issueDate = existingCert?.issued_at ? new Date(existingCert.issued_at) : new Date();
 
-    // Gerar PDF usando o layout_config do evento
-    const layoutConfig = eventCert.layout_config as LayoutConfig | undefined;
+    // Gerar PDF usando o template HTML completo do evento
+    console.log("Generating PDF for event:", eventId);
     
-    console.log("DEBUG - layout_config from database:", {
-      has_config: !!layoutConfig,
-      config_keys: layoutConfig ? Object.keys(layoutConfig) : [],
-      has_header: !!layoutConfig?.header,
-      has_body: !!layoutConfig?.body,
-      has_footer: !!layoutConfig?.footer,
-      header_keys: layoutConfig?.header ? Object.keys(layoutConfig.header) : [],
-      body_keys: layoutConfig?.body ? Object.keys(layoutConfig.body) : [],
-      footer_keys: layoutConfig?.footer ? Object.keys(layoutConfig.footer) : [],
-      eventName,
-      raw_layout_config: JSON.stringify(layoutConfig)
-    });
-    
-    // Se layout_config estiver incompleto ou null, logar erro detalhado
-    if (!layoutConfig || !layoutConfig.header || !layoutConfig.body || !layoutConfig.footer) {
-      console.error("CRITICAL: layout_config is incomplete or missing!", {
-        event_id: eventId,
-        has_layout_config: !!eventCert.layout_config,
-        layout_config_type: typeof eventCert.layout_config,
-        missing_header: !layoutConfig?.header,
-        missing_body: !layoutConfig?.body,
-        missing_footer: !layoutConfig?.footer,
-        full_config: JSON.stringify(eventCert.layout_config)
-      });
-    }
-    
-    const pdfBytes = await createCertificatePdf({
+    const pdfBytes = await createCertificatePdf(supabase, {
       fullName: normalizedFullName,
-      eventSlug: event?.slug || "CIVENI 2025",
+      eventSlug: eventId,
       eventName,
       language,
       issueDate,
@@ -740,7 +452,6 @@ const handler = async (req: Request): Promise<Response> => {
       country: eventCert.country,
       hours: eventCert.hours,
       code,
-      layoutConfig,
     });
 
     const { pdfUrl } = await uploadCertificatePdf(supabase, pdfBytes, eventId, code);
