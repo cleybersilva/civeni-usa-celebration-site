@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCursos, useTurmas } from '@/hooks/useCursos';
@@ -11,16 +12,17 @@ interface VCCUFieldsProps {
 }
 
 const VCCUFields = ({ formData, setFormData }: VCCUFieldsProps) => {
+  const { t } = useTranslation();
   const { cursos } = useCursos();
   const { turmas } = useTurmas(formData.cursoId);
 
   return (
     <>
       <div>
-        <Label htmlFor="curso">Curso *</Label>
+        <Label htmlFor="curso">{t('registration.course')} *</Label>
         <Select value={formData.cursoId} onValueChange={(value) => setFormData({...formData, cursoId: value, turmaId: ''})}>
           <SelectTrigger>
-            <SelectValue placeholder="Selecione seu curso" />
+            <SelectValue placeholder={t('registration.selectCourse')} />
           </SelectTrigger>
           <SelectContent>
             {cursos.map((curso) => (
@@ -30,18 +32,18 @@ const VCCUFields = ({ formData, setFormData }: VCCUFieldsProps) => {
             ))}
           </SelectContent>
         </Select>
-        <p className="text-sm text-gray-500 mt-1">Campo obrigatório para alunos da VCCU</p>
+        <p className="text-sm text-gray-500 mt-1">{t('registration.requiredForVccuStudents')}</p>
       </div>
 
       <div>
-        <Label htmlFor="turma">Turma *</Label>
+        <Label htmlFor="turma">{t('registration.class')} *</Label>
         <Select 
           value={formData.turmaId} 
           onValueChange={(value) => setFormData({...formData, turmaId: value})}
           disabled={!formData.cursoId}
         >
           <SelectTrigger>
-            <SelectValue placeholder={formData.cursoId ? "Selecione sua turma" : "Primeiro selecione um curso"} />
+            <SelectValue placeholder={formData.cursoId ? t('registration.selectClass') : t('registration.selectCourseFirst')} />
           </SelectTrigger>
           <SelectContent>
             {turmas.map((turma) => (
@@ -51,7 +53,7 @@ const VCCUFields = ({ formData, setFormData }: VCCUFieldsProps) => {
             ))}
           </SelectContent>
         </Select>
-        <p className="text-sm text-gray-500 mt-1">Campo obrigatório para alunos da VCCU</p>
+        <p className="text-sm text-gray-500 mt-1">{t('registration.requiredForVccuStudents')}</p>
       </div>
     </>
   );

@@ -199,7 +199,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       <SelectValue placeholder={t('registration.selectParticipantType')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="vccu_student">Aluno(a) VCCU</SelectItem>
+                      <SelectItem value="vccu_student">{t('registration.vccuStudent')}</SelectItem>
                       <SelectItem value="guest">{t('registration.guest')}</SelectItem>
                       {participantTypes.filter(pt => pt.is_active && pt.type_name !== 'Aluno(a) VCCU').map((pt) => (
                         <SelectItem key={pt.id} value={pt.type_name}>
