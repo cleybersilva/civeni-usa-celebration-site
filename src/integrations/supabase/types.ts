@@ -696,7 +696,9 @@ export type Database = {
       cms_speakers: {
         Row: {
           bio: string
+          country_code: string | null
           created_at: string
+          flag_image_url: string | null
           id: string
           image_url: string | null
           institution: string
@@ -710,7 +712,9 @@ export type Database = {
         }
         Insert: {
           bio: string
+          country_code?: string | null
           created_at?: string
+          flag_image_url?: string | null
           id?: string
           image_url?: string | null
           institution: string
@@ -724,7 +728,9 @@ export type Database = {
         }
         Update: {
           bio?: string
+          country_code?: string | null
           created_at?: string
+          flag_image_url?: string | null
           id?: string
           image_url?: string | null
           institution?: string
