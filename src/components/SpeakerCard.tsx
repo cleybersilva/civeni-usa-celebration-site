@@ -80,9 +80,14 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
                 </h3>
                 {speaker.showFlag !== false && speaker.countryCode && (
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className="text-3xl leading-none" title={speaker.countryName || speaker.countryCode}>
+                    <span className="text-xl md:text-2xl leading-none" title={speaker.countryName || speaker.countryCode}>
                       {getFlagEmoji(speaker.countryCode)}
                     </span>
+                    {speaker.countryName && (
+                      <span className="text-xs md:text-sm font-medium text-gray-700">
+                        {speaker.countryName}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
