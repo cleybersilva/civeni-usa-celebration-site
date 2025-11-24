@@ -15,7 +15,7 @@ const HeroBanner = () => {
 
   // Função para obter texto traduzido
   const getTranslatedText = (pt: string, en?: string, es?: string) => {
-    const currentLang = i18n.language;
+    const currentLang = i18n.language.split('-')[0]; // Pega apenas 'en', 'es', 'pt'
     if (currentLang === 'en' && en) return en;
     if (currentLang === 'es' && es) return es;
     return pt; // Padrão português
