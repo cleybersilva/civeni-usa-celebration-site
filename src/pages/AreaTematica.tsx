@@ -42,11 +42,11 @@ const AreaTematica = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-12 md:py-16 lg:py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
-          <nav className="mb-8 text-sm">
+          <nav className="mb-6 md:mb-8 text-xs md:text-sm">
             <ol className="flex items-center space-x-2">
               <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
               <li className="text-blue-200">›</li>
@@ -55,25 +55,25 @@ const AreaTematica = () => {
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 font-poppins">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
               Áreas Temáticas
             </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
               Explore as principais áreas de conhecimento que serão abordadas no III CIVENI 2025 - 
               Um congresso multidisciplinar que conecta educação, inovação, justiça, humanidade, religiosidade e tecnologia
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/submissao-trabalhos">
-                <button className="bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
+              <Link to="/submissao-trabalhos" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
+                  <FileText className="w-4 h-4 md:w-5 md:h-5" />
                   Submeter Trabalho
                 </button>
               </Link>
               
-              <Link to="/inscricoes">
-                <button className="border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+              <Link to="/inscricoes" className="w-full sm:w-auto">
+                <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 md:w-5 md:h-5" />
                   Fazer Inscrição
                 </button>
               </Link>
@@ -82,13 +82,13 @@ const AreaTematica = () => {
         </div>
       </section>
 
-      <main className="py-20">
+      <main className="py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-poppins">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6 font-poppins">
               Conheça Nossas Áreas de Conhecimento
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2">
               Cada área temática representa um pilar fundamental do conhecimento multidisciplinar que caracteriza o CIVENI
             </p>
           </div>
@@ -125,21 +125,21 @@ const AreaTematica = () => {
             })}
           </div>
           
-          <div className="mt-16 text-center">
-            <div className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white rounded-2xl p-8 max-w-4xl mx-auto shadow-xl">
-              <h3 className="text-3xl font-bold mb-4 font-poppins">
+          <div className="mt-12 md:mt-16 text-center">
+            <div className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white rounded-xl md:rounded-2xl p-6 md:p-8 max-w-4xl mx-auto shadow-xl">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 md:mb-4 font-poppins">
                 Submissão de Trabalhos
               </h3>
-              <p className="text-lg opacity-90 mb-6">
+              <p className="text-sm sm:text-base md:text-lg opacity-90 mb-4 md:mb-6 px-2">
                 Apresente suas pesquisas e experiências em uma dessas áreas temáticas e contribua para o avanço do conhecimento multidisciplinar
               </p>
               <Link 
                 to="/submissao-trabalhos"
-                className="inline-flex items-center gap-2 bg-white text-civeni-blue px-8 py-3 rounded-full font-semibold hover:bg-white/90 transition-colors font-poppins"
+                className="inline-flex items-center gap-2 bg-white text-civeni-blue px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold hover:bg-white/90 transition-colors font-poppins"
               >
-                <FileText className="w-5 h-5" />
+                <FileText className="w-4 h-4 md:w-5 md:h-5" />
                 Saiba Mais sobre Submissões
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
               </Link>
             </div>
           </div>
