@@ -27,6 +27,8 @@ interface CertificateLayoutConfig {
     subtitleColor: string;
   };
   body: {
+    certifyLabel: string;
+    certifyLabelColor: string;
     participantNamePlaceholder: string;
     participantNameStyle: {
       fontSize: number;
@@ -163,7 +165,12 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({
           style={{ textAlign: layoutConfig.body.alignment }}
         >
           <div className="space-y-2">
-            <p className="text-sm text-gray-600">Certificamos que</p>
+            <p 
+              className="text-sm"
+              style={{ color: layoutConfig.body.certifyLabelColor }}
+            >
+              {layoutConfig.body.certifyLabel}
+            </p>
             <h2 
               className="font-bold"
               style={{
