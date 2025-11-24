@@ -156,6 +156,11 @@ export const esTranslations = {
         daysRemaining: "días restantes",
         timezone: "* Horario de Fortaleza (GMT-3)"
       },
+      'Professor(a)': 'Profesor(a)',
+      'Palestrantes': 'Conferencistas',
+      'Sorteados': 'Ganadores de Beca',
+      'Participante Externo': 'Participante Externo',
+      batch: 'Lote',
       categories: {
         vccuStudentPresentation: "Estudiante VCCU - Presentación",
         vccuStudentListener: "Estudiante VCCU - Oyente",

@@ -203,7 +203,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       <SelectItem value="guest">{t('registration.guest')}</SelectItem>
                       {participantTypes.filter(pt => pt.is_active && pt.type_name !== 'Aluno(a) VCCU').map((pt) => (
                         <SelectItem key={pt.id} value={pt.type_name}>
-                          {pt.type_name}
+                          {t(`registration.${pt.type_name}`) || pt.type_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -238,7 +238,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                               </span>
                               {loteVigente && !category.is_free && category.slug !== 'participante-externo' && category.slug !== 'convidado' && (
                                 <span className="text-xs text-green-600 font-medium">
-                                  {loteVigente.nome}
+                                  {t('registration.batch')} {loteVigente.nome}
                                 </span>
                               )}
                               {category.slug === 'participante-externo' && (
