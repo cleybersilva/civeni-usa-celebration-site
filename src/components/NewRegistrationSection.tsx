@@ -25,6 +25,13 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
   const { participantTypes } = useParticipantTypes();
   const { formData, setFormData, loading, error, handleSubmit } = useRegistrationForm(registrationType);
 
+  // Helper function to get translated category title
+  const getCategoryTitle = (category: any) => {
+    if (i18n.language === 'en' && category.title_en) return category.title_en;
+    if (i18n.language === 'es' && category.title_es) return category.title_es;
+    return category.title_pt;
+  };
+
   if (loteLoading) {
     return (
       <section id="registration" className="py-20 bg-gray-50">
@@ -224,7 +231,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       {filteredCategories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           <div className="flex justify-between w-full">
-                            <span>{category.title_pt}</span>
+                            <span>{getCategoryTitle(category)}</span>
                             <div className="ml-4 flex flex-col items-end">
                               <span className="font-semibold">
                                 {category.is_free 
