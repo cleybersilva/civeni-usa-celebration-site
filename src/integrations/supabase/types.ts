@@ -138,10 +138,12 @@ export type Database = {
           button_text: string
           button_text_en: string | null
           button_text_es: string | null
+          button_text_tr: string | null
           created_at: string
           description: string
           description_en: string | null
           description_es: string | null
+          description_tr: string | null
           id: string
           image_version: number
           is_active: boolean
@@ -149,9 +151,11 @@ export type Database = {
           subtitle: string
           subtitle_en: string | null
           subtitle_es: string | null
+          subtitle_tr: string | null
           title: string
           title_en: string | null
           title_es: string | null
+          title_tr: string | null
           updated_at: string
         }
         Insert: {
@@ -160,10 +164,12 @@ export type Database = {
           button_text: string
           button_text_en?: string | null
           button_text_es?: string | null
+          button_text_tr?: string | null
           created_at?: string
           description: string
           description_en?: string | null
           description_es?: string | null
+          description_tr?: string | null
           id?: string
           image_version?: number
           is_active?: boolean
@@ -171,9 +177,11 @@ export type Database = {
           subtitle: string
           subtitle_en?: string | null
           subtitle_es?: string | null
+          subtitle_tr?: string | null
           title: string
           title_en?: string | null
           title_es?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Update: {
@@ -182,10 +190,12 @@ export type Database = {
           button_text?: string
           button_text_en?: string | null
           button_text_es?: string | null
+          button_text_tr?: string | null
           created_at?: string
           description?: string
           description_en?: string | null
           description_es?: string | null
+          description_tr?: string | null
           id?: string
           image_version?: number
           is_active?: boolean
@@ -193,9 +203,11 @@ export type Database = {
           subtitle?: string
           subtitle_en?: string | null
           subtitle_es?: string | null
+          subtitle_tr?: string | null
           title?: string
           title_en?: string | null
           title_es?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Relationships: []
