@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Instagram, Facebook, Youtube, Settings, Linkedin, Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { resolveAssetUrl } from '@/utils/assetUrl';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import FlagEmoji from '@/components/FlagEmoji';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
@@ -123,7 +123,7 @@ const Header = () => {
                 onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
                 className="flex items-center space-x-1 md:space-x-2 text-white hover:text-civeni-red transition-colors bg-white bg-opacity-10 px-2 py-1 md:px-3 rounded-md hover:bg-opacity-20"
               >
-                <span className="text-base md:text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
+                <FlagEmoji countryCode={selectedLanguage} size="md" />
                 <span className="text-xs md:text-sm font-medium hidden sm:inline">{languages.find(l => l.code === selectedLanguage)?.name}</span>
                 <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -140,7 +140,7 @@ const Header = () => {
                         selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
                       }`}
                     >
-                      <span className="text-lg">{lang.flag}</span>
+                      <FlagEmoji countryCode={lang.code} size="md" />
                       <span className="text-sm">{lang.name}</span>
                     </button>
                   ))}
