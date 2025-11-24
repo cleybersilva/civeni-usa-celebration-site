@@ -20,10 +20,18 @@ export interface Speaker {
 export interface BannerSlide {
   id: string;
   title: string;
+  titleEn?: string;
+  titleEs?: string;
   subtitle: string;
+  subtitleEn?: string;
+  subtitleEs?: string;
   description: string;
+  descriptionEn?: string;
+  descriptionEs?: string;
   bgImage: string;
   buttonText: string;
+  buttonTextEn?: string;
+  buttonTextEs?: string;
   buttonLink: string;
   order: number;
   imageVersion?: number;
@@ -484,10 +492,18 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return {
           id: slide.id,
           title: slide.title || '',
+          titleEn: slide.title_en || undefined,
+          titleEs: slide.title_es || undefined,
           subtitle: slide.subtitle || '',
+          subtitleEn: slide.subtitle_en || undefined,
+          subtitleEs: slide.subtitle_es || undefined,
           description: slide.description || '',
+          descriptionEn: slide.description_en || undefined,
+          descriptionEs: slide.description_es || undefined,
           bgImage: bgImage || '',
           buttonText: slide.button_text || '',
+          buttonTextEn: slide.button_text_en || undefined,
+          buttonTextEs: slide.button_text_es || undefined,
           buttonLink: slide.button_link || '',
           order: slide.order_index || 0,
           imageVersion: slide.image_version || 1,
