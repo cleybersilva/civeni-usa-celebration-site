@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCursos, useTurmas } from '@/hooks/useCursos';
 import { RegistrationFormData } from '@/types/registration';
+import { getTranslatedCourseName } from '@/utils/courseTranslations';
 
 interface VCCUFieldsProps {
   formData: RegistrationFormData;
@@ -12,7 +13,7 @@ interface VCCUFieldsProps {
 }
 
 const VCCUFields = ({ formData, setFormData }: VCCUFieldsProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { cursos } = useCursos();
   const { turmas } = useTurmas(formData.cursoId);
 
@@ -24,10 +25,10 @@ const VCCUFields = ({ formData, setFormData }: VCCUFieldsProps) => {
           <SelectTrigger>
             <SelectValue placeholder={t('registration.selectCourse')} />
           </SelectTrigger>
-          <SelectContent>
+                     <SelectContent>
             {cursos.map((curso) => (
               <SelectItem key={curso.id} value={curso.id}>
-                {curso.nome_curso}
+                {getTranslatedCourseName(curso.nome_curso, i18n.language)}
               </SelectItem>
             ))}
           </SelectContent>
