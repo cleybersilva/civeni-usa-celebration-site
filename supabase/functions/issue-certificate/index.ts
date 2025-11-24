@@ -369,12 +369,17 @@ const createCertificatePdf = async (
 
   } else {
     // Fallback: template genérico (caso não tenha layout_config)
-    console.warn("Using fallback template - layout_config missing or incomplete:", {
+    console.error("FALLBACK TEMPLATE BEING USED - layout_config missing or incomplete:", {
       has_layoutConfig: !!layoutConfig,
       has_header: !!layoutConfig?.header,
       has_body: !!layoutConfig?.body,
-      has_footer: !!layoutConfig?.footer
+      has_footer: !!layoutConfig?.footer,
+      layoutConfig_json: JSON.stringify(layoutConfig),
+      header_title: layoutConfig?.header?.title,
+      body_certifyLabel: layoutConfig?.body?.certifyLabel,
+      footer_locationDateText: layoutConfig?.footer?.locationDateText
     });
+    console.error("THIS SHOULD NOT HAPPEN! Check event_certificates.layout_config in database!");
     
     const titleText =
       language === "en-US"
@@ -699,13 +704,31 @@ const handler = async (req: Request): Promise<Response> => {
     // Gerar PDF usando o layout_config do evento
     const layoutConfig = eventCert.layout_config as LayoutConfig | undefined;
     
-    console.log("Generating PDF with layout_config:", {
+    console.log("DEBUG - layout_config from database:", {
       has_config: !!layoutConfig,
+      config_keys: layoutConfig ? Object.keys(layoutConfig) : [],
       has_header: !!layoutConfig?.header,
       has_body: !!layoutConfig?.body,
       has_footer: !!layoutConfig?.footer,
-      eventName
+      header_keys: layoutConfig?.header ? Object.keys(layoutConfig.header) : [],
+      body_keys: layoutConfig?.body ? Object.keys(layoutConfig.body) : [],
+      footer_keys: layoutConfig?.footer ? Object.keys(layoutConfig.footer) : [],
+      eventName,
+      raw_layout_config: JSON.stringify(layoutConfig)
     });
+    
+    // Se layout_config estiver incompleto ou null, logar erro detalhado
+    if (!layoutConfig || !layoutConfig.header || !layoutConfig.body || !layoutConfig.footer) {
+      console.error("CRITICAL: layout_config is incomplete or missing!", {
+        event_id: eventId,
+        has_layout_config: !!eventCert.layout_config,
+        layout_config_type: typeof eventCert.layout_config,
+        missing_header: !layoutConfig?.header,
+        missing_body: !layoutConfig?.body,
+        missing_footer: !layoutConfig?.footer,
+        full_config: JSON.stringify(eventCert.layout_config)
+      });
+    }
     
     const pdfBytes = await createCertificatePdf({
       fullName: normalizedFullName,
