@@ -33,6 +33,8 @@ interface CertificateConfig {
   country: string;
   timezone?: string;
   template_id?: string;
+  language?: string;
+  layout_config?: any;
 }
 
 interface IssuedCertificate {
@@ -371,15 +373,16 @@ const CertificateManager = () => {
     input.click();
   };
 
-  const handleSaveTemplate = async (layoutConfig: any) => {
+  const handleSaveTemplate = async (layoutConfig: any, language?: string) => {
     if (!selectedEvent) return;
 
     try {
-      // Salvar layout_config junto com outras configurações
+      // Salvar layout_config e language junto com outras configurações
       const configData = {
         event_id: selectedEvent,
         ...config,
         layout_config: layoutConfig,
+        language: language || config.language || 'pt-BR',
         keywords: config.keywords?.filter(k => k.trim()) || []
       };
 
@@ -671,6 +674,7 @@ const CertificateManager = () => {
         onSave={handleSaveTemplate}
         initialConfig={templateConfig}
         eventId={selectedEvent}
+        currentLanguage={config.language || 'pt-BR'}
       />
     </div>
   );

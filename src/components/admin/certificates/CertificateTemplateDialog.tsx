@@ -12,15 +12,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Languages } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import CertificatePreview from './CertificatePreview';
 
 interface CertificateTemplateDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (config: any) => Promise<void>;
+  onSave: (config: any, language?: string) => Promise<void>;
   initialConfig?: any;
   eventId: string;
+  currentLanguage?: string;
 }
 
 const defaultConfig = {
@@ -99,18 +102,80 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
   onOpenChange,
   onSave,
   initialConfig,
-  eventId
+  eventId,
+  currentLanguage = 'pt-BR'
 }) => {
+  const { toast } = useToast();
   const [config, setConfig] = useState(initialConfig || defaultConfig);
   const [loading, setLoading] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<'pt-BR' | 'en-US' | 'es-ES'>(currentLanguage as any);
 
   const handleSave = async () => {
     setLoading(true);
     try {
-      await onSave(config);
+      await onSave(config, selectedLanguage);
       onOpenChange(false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      const textsToTranslate = {
+        header_title: config.header.title,
+        header_subtitle: config.header.subtitle,
+        body_mainText: config.body.mainText,
+        footer_locationDateText: config.footer.locationDateText,
+      };
+
+      const { data, error } = await supabase.functions.invoke('translate-certificate', {
+        body: {
+          texts: textsToTranslate,
+          targetLanguage: selectedLanguage
+        }
+      });
+
+      if (error) throw error;
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao traduzir');
+      }
+
+      // Atualizar config com textos traduzidos
+      const translated = data.translatedTexts;
+      setConfig((prev: any) => ({
+        ...prev,
+        header: {
+          ...prev.header,
+          title: translated.header_title || prev.header.title,
+          subtitle: translated.header_subtitle || prev.header.subtitle
+        },
+        body: {
+          ...prev.body,
+          mainText: translated.body_mainText || prev.body.mainText
+        },
+        footer: {
+          ...prev.footer,
+          locationDateText: translated.footer_locationDateText || prev.footer.locationDateText
+        }
+      }));
+
+      toast({
+        title: "Tradução concluída!",
+        description: `Certificado traduzido para ${selectedLanguage === 'en-US' ? 'Inglês' : selectedLanguage === 'es-ES' ? 'Espanhol' : 'Português'}`,
+      });
+    } catch (error: any) {
+      console.error('Erro ao traduzir:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro na tradução",
+        description: error.message || "Não foi possível traduzir o certificado"
+      });
+    } finally {
+      setTranslating(false);
     }
   };
 
@@ -133,9 +198,65 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
         <DialogHeader className="px-6 pt-6">
-          <DialogTitle className="text-2xl">
-            Configurar Modelo de Certificado
-          </DialogTitle>
+          <div className="flex items-start justify-between">
+            <DialogTitle className="text-2xl">
+              Configurar Modelo de Certificado
+            </DialogTitle>
+            
+            {/* Seletor de idioma */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm font-medium">Idioma do certificado deste evento</Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={selectedLanguage === 'pt-BR' ? 'default' : 'outline'}
+                  onClick={() => setSelectedLanguage('pt-BR')}
+                  className="w-20"
+                  title="Certificado será liberado em Português para este evento"
+                >
+                  🇧🇷 PT-BR
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={selectedLanguage === 'en-US' ? 'default' : 'outline'}
+                  onClick={() => setSelectedLanguage('en-US')}
+                  className="w-20"
+                  title="Certificate will be issued in English for this event"
+                >
+                  🇺🇸 EN
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={selectedLanguage === 'es-ES' ? 'default' : 'outline'}
+                  onClick={() => setSelectedLanguage('es-ES')}
+                  className="w-20"
+                  title="El certificado será emitido en Español para este evento"
+                >
+                  🇪🇸 ES
+                </Button>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleTranslate}
+                disabled={translating}
+                className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90"
+              >
+                {translating ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Languages className="h-4 w-4 mr-2" />
+                )}
+                Aplicar idioma ao modelo
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Isso atualizará o texto do certificado para o idioma selecionado e será o idioma liberado para os participantes deste evento.
+              </p>
+            </div>
+          </div>
         </DialogHeader>
 
         <div className="grid lg:grid-cols-2 gap-6 px-6 pb-6">
