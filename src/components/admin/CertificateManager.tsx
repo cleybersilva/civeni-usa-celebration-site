@@ -438,35 +438,39 @@ const CertificateManager = () => {
         event_id: configData.event_id
       });
 
-      const { data: existing } = await supabase
-        .from('event_certificates')
-        .select('id')
-        .eq('event_id', selectedEvent)
-        .single();
+      if (!user || !sessionToken) {
+        toast({
+          variant: "destructive",
+          title: "Sessão inválida",
+          description: "Sessão administrativa inválida. Faça login novamente."
+        });
+        return;
+      }
 
-      if (existing) {
-        console.log('[CertificateManager] Atualizando certificado existente...');
-        const { error } = await supabase
-          .from('event_certificates')
-          .update(configData)
-          .eq('event_id', selectedEvent);
+      const payload = {
+        ...configData,
+        admin_email: user.email,
+        session_token: sessionToken
+      };
 
-        if (error) {
-          console.error('[CertificateManager] Erro ao atualizar:', error);
-          throw error;
-        }
-        console.log('[CertificateManager] Certificado atualizado com sucesso!');
-      } else {
-        console.log('[CertificateManager] Inserindo novo certificado...');
-        const { error } = await supabase
-          .from('event_certificates')
-          .insert(configData);
+      console.log('[CertificateManager] Enviando layout_config via edge function:', {
+        event_id: payload.event_id,
+        has_layout_config: !!payload.layout_config,
+        layout_config_type: typeof payload.layout_config
+      });
 
-        if (error) {
-          console.error('[CertificateManager] Erro ao inserir:', error);
-          throw error;
-        }
-        console.log('[CertificateManager] Certificado inserido com sucesso!');
+      const { data, error } = await supabase.functions.invoke('save-certificate-config', {
+        body: payload
+      });
+
+      if (error) {
+        console.error('[CertificateManager] Erro ao salvar template via edge function:', error);
+        throw new Error(error.message || 'Erro ao comunicar com o servidor');
+      }
+
+      if (!data?.success) {
+        console.error('[CertificateManager] Resposta de erro ao salvar template:', data);
+        throw new Error(data?.message || 'Erro ao salvar modelo de certificado');
       }
 
       toast({
