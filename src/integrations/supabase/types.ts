@@ -697,6 +697,7 @@ export type Database = {
         Row: {
           bio: string
           country_code: string | null
+          country_name: string | null
           created_at: string
           flag_image_url: string | null
           id: string
@@ -707,12 +708,14 @@ export type Database = {
           name: string
           order_index: number
           photo_version: number
+          show_flag: boolean | null
           title: string
           updated_at: string
         }
         Insert: {
           bio: string
           country_code?: string | null
+          country_name?: string | null
           created_at?: string
           flag_image_url?: string | null
           id?: string
@@ -723,12 +726,14 @@ export type Database = {
           name: string
           order_index?: number
           photo_version?: number
+          show_flag?: boolean | null
           title: string
           updated_at?: string
         }
         Update: {
           bio?: string
           country_code?: string | null
+          country_name?: string | null
           created_at?: string
           flag_image_url?: string | null
           id?: string
@@ -739,6 +744,7 @@ export type Database = {
           name?: string
           order_index?: number
           photo_version?: number
+          show_flag?: boolean | null
           title?: string
           updated_at?: string
         }
