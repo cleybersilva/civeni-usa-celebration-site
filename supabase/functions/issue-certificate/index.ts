@@ -87,49 +87,6 @@ function wrapText(text: string, maxWidth: number, font: any, fontSize: number): 
   return lines;
 }
 
-// Helper para substituir placeholders no layout_config
-function replacePlaceholders(text: string, data: Record<string, string>): string {
-  let result = text;
-  for (const [key, value] of Object.entries(data)) {
-    result = result.replace(new RegExp(`{{${key}}}`, 'g'), value);
-  }
-  return result;
-}
-
-// Helper para converter hex para RGB
-function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  const clean = hex.replace('#', '');
-  const r = parseInt(clean.substring(0, 2), 16) / 255;
-  const g = parseInt(clean.substring(2, 4), 16) / 255;
-  const b = parseInt(clean.substring(4, 6), 16) / 255;
-  return { r, g, b };
-}
-
-// Helper para quebrar texto em linhas
-function wrapText(text: string, maxWidth: number, font: any, fontSize: number): string[] {
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let currentLine = '';
-
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const width = font.widthOfTextAtSize(testLine, fontSize);
-    
-    if (width > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  }
-  
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-  
-  return lines;
-}
-
 interface LayoutConfig {
   background?: {
     type: 'solid' | 'gradient';
@@ -712,8 +669,8 @@ const handler = async (req: Request): Promise<Response> => {
     if (saveError) {
       console.error("Error saving certificate:", saveError);
       return new Response(
-        JSON.stringify({ success: false, message: "Erro interno do servidor" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } },
+        JSON.stringify({ success: false, message: "Erro ao salvar certificado" }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
       );
     }
 
