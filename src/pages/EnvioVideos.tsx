@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 
 const EnvioVideos = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cursoId, setCursoId] = useState<string>('');
@@ -116,9 +118,9 @@ const EnvioVideos = () => {
             <ol className="flex items-center space-x-2">
               <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
               <li className="text-blue-200">›</li>
-              <li><Link to="/area-tematica" className="hover:text-blue-200 transition-colors">Trabalhos</Link></li>
+              <li><Link to="/area-tematica" className="hover:text-blue-200 transition-colors">{t('works.breadcrumb')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Envio de Vídeos</li>
+              <li>{t('works.videos.title')}</li>
             </ol>
           </nav>
           
@@ -126,26 +128,26 @@ const EnvioVideos = () => {
             <div className="flex items-center justify-center gap-4 mb-6">
               <Video className="w-10 h-10 md:w-14 md:h-14 animate-pulse" />
               <h1 className="text-3xl md:text-5xl font-bold font-poppins">
-                Envio de Vídeos
+                {t('works.videos.title')}
               </h1>
               <Video className="w-10 h-10 md:w-14 md:h-14 animate-pulse" />
             </div>
             <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Envie seu material em vídeo para análise pela banca avaliadora do III CIVENI 2025
+              {t('works.videos.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/area-tematica" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <BookOpen className="w-5 h-5" />
-                  Ver Áreas Temáticas
+                  {t('works.viewThematicAreas')}
                 </button>
               </Link>
               
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-8 py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-5 h-5" />
-                  Fazer Inscrição
+                  {t('works.makeRegistration')}
                 </button>
               </Link>
             </div>

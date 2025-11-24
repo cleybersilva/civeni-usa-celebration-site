@@ -98,7 +98,9 @@ export const ptTranslations = {
       formTitle: "Formulário de Inscrição",
       presentialFormTitle: "Formulário de Inscrição Presencial",
       onlineFormTitle: "Formulário de Inscrição Online",
-      description: "Garanta sua vaga no evento educacional mais importante do ano",
+      description: "Garanta sua participação no III CIVENI 2025 - O maior Congresso Internacional Multidisciplinar do mundo em educação, inovação, justiça, humanidade, religiosidade e tecnologia",
+      thematicAreas: "Áreas Temáticas",
+      viewSchedule: "Ver Programação",
       urgent: "Vagas Limitadas",
       mostPopular: "Mais Popular",
       registerButton: "Inscrever-se Agora",
@@ -202,23 +204,40 @@ export const ptTranslations = {
         content: "Implementamos medidas de segurança técnicas e organizacionais para proteger suas informações contra acesso não autorizado, alteração, divulgação ou destruição."
   },
   works: {
+    breadcrumb: "Trabalhos",
+    submitWork: "Submeter Trabalho",
+    makeRegistration: "Fazer Inscrição",
+    viewThematicAreas: "Ver Áreas Temáticas",
     oral: {
       title: 'Apresentação Oral Lista/Template',
-      subtitle: 'Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025',
+      subtitle: 'Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025 - Compartilhe suas pesquisas com especialistas de todo o mundo',
+      pageTitle: 'Apresentação Oral Lista/Template',
+      infoTitle: 'Informações sobre Apresentação Oral Lista/Template',
+      infoDescription: 'Conheça os requisitos, formatos e orientações para apresentar seu trabalho de forma oral no congresso',
       noContent: 'Conteúdo em breve',
       noContentDescription: 'As informações sobre apresentação oral serão publicadas em breve.',
     },
     poster: {
       title: 'Sessões de Pôster',
-      subtitle: 'Modalidade de apresentação em pôster para o III CIVENI 2025',
+      subtitle: 'Modalidade de apresentação em pôster para o III CIVENI 2025 - Apresente visualmente suas descobertas e pesquisas inovadoras',
+      infoTitle: 'Informações sobre Sessões de Pôster',
+      infoDescription: 'Saiba como preparar e apresentar seu pôster científico seguindo as diretrizes do congresso',
       noContent: 'Conteúdo em breve',
       noContentDescription: 'As informações sobre sessões de pôster serão publicadas em breve.',
     },
-    manuscripts: {
+    videos: {
       title: 'Envio de Vídeos',
-      subtitle: 'Modalidade de envio de vídeos para o III CIVENI 2025',
-      noContent: 'Conteúdo em breve',
-      noContentDescription: 'As informações sobre envio de vídeos serão publicadas em breve.',
+      subtitle: 'Envie seu material em vídeo para análise pela banca avaliadora do III CIVENI 2025',
+    },
+    submissionPage: {
+      title: 'Submissão Artigos/Consórcio',
+      subtitle: 'Compartilhe suas pesquisas e experiências no III CIVENI 2025 - Contribua para o avanço do conhecimento multidisciplinar mundial',
+      pageTitle: 'Submissão Artigos/Consórcio',
+      formDescription: 'Escolha o tipo de submissão e preencha todos os campos obrigatórios',
+    },
+    templates: {
+      title: 'Templates Artigos/Slides',
+      subtitle: 'Modelos padronizados para artigos acadêmicos e apresentações do III CIVENI 2025 - Facilite a formatação dos seus trabalhos e apresentações',
     },
   },
       userRights: {
