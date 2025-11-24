@@ -20,24 +20,24 @@ const Footer = () => {
 
   return (
     <footer className="bg-civeni-blue text-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="grid md:grid-cols-4 gap-6 md:gap-8">
           <div className="md:col-span-2 text-left">
-            <div className="text-3xl font-bold mb-4 font-poppins">
+            <div className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 font-poppins">
               III CIVENI <span className="text-civeni-red">2025</span>
             </div>
-            <p className="text-lg opacity-90 mb-6 leading-relaxed">
+            <p className="text-base md:text-lg opacity-90 mb-4 md:mb-6 leading-relaxed">
               {t('footer.eventTitle')}<br/>
               {t('footer.eventDates')}
             </p>
-            <div className="flex items-center space-x-4 mb-4">
+            <div className="flex items-center space-x-3 md:space-x-4 mb-3 md:mb-4">
               <a 
                 href="https://www.instagram.com/veniuniversity/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
               >
-                <Instagram size={24} />
+                <Instagram size={20} className="md:w-6 md:h-6" />
               </a>
               <a 
                 href="https://www.facebook.com/veniuniversity/" 
@@ -45,7 +45,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
               >
-                <Facebook size={24} />
+                <Facebook size={20} className="md:w-6 md:h-6" />
               </a>
               <a 
                 href="https://www.youtube.com/@veniuniversity/" 
@@ -53,7 +53,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
               >
-                <Youtube size={24} />
+                <Youtube size={20} className="md:w-6 md:h-6" />
               </a>
               <a 
                 href="https://www.linkedin.com/company/veniuniversity/" 
@@ -61,36 +61,36 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-white hover:text-civeni-red transition-colors transform hover:scale-110"
               >
-                <Linkedin size={24} />
+                <Linkedin size={20} className="md:w-6 md:h-6" />
               </a>
             </div>
-            <div className="mt-4">
+            <div className="mt-3 md:mt-4">
               <Link 
                 to="/admin" 
-                className="inline-flex items-center space-x-2 bg-civeni-red text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors transform hover:scale-105"
+                className="inline-flex items-center space-x-1.5 md:space-x-2 bg-civeni-red text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-red-700 transition-colors transform hover:scale-105"
               >
-                <Lock size={16} />
-                <span className="text-sm font-medium">{t('header.adminArea')}</span>
+                <Lock size={14} className="md:w-4 md:h-4" />
+                <span className="text-xs md:text-sm font-medium">{t('header.adminArea')}</span>
               </Link>
             </div>
           </div>
           
           <div className="text-left">
-            <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.quickLinks')}</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 font-poppins">{t('footer.quickLinks')}</h3>
+            <ul className="space-y-2 md:space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   {link.href.startsWith('/') ? (
                     <Link
                       to={link.href}
-                      className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
+                      className="text-sm md:text-base opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
                     >
                       {link.name}
                     </Link>
                   ) : (
                     <a
                       href={link.href}
-                      className="opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
+                      className="text-sm md:text-base opacity-90 hover:opacity-100 hover:text-civeni-red transition-all duration-300"
                     >
                       {link.name}
                     </a>
@@ -101,8 +101,8 @@ const Footer = () => {
           </div>
           
           <div className="text-left">
-            <h3 className="text-xl font-bold mb-6 font-poppins">{t('footer.contactInfo')}</h3>
-            <div className="space-y-3 opacity-90">
+            <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 font-poppins">{t('footer.contactInfo')}</h3>
+            <div className="space-y-2 md:space-y-3 opacity-90 text-sm md:text-base">
               <p>📧 contact@civeni.com</p>
               <p>📞 {content.siteTexts.contactPhone}</p>
               <p>📍 Celebration, FL 34747</p>
@@ -118,15 +118,15 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="border-t border-white border-opacity-20 mt-12 pt-8 text-center">
-          <div className="grid md:grid-cols-3 gap-4 items-center text-center">
-            <div className="text-sm opacity-75">
+        <div className="border-t border-white border-opacity-20 mt-8 md:mt-12 pt-6 md:pt-8 text-center">
+          <div className="grid md:grid-cols-3 gap-3 md:gap-4 items-center text-center">
+            <div className="text-xs md:text-sm opacity-75">
               {content.siteTexts.footerCopyright || t('footer.copyright')}
             </div>
-            <div className="text-sm opacity-75">
+            <div className="text-xs md:text-sm opacity-75">
               {t('footer.poweredBy')}
             </div>
-            <div className="text-sm opacity-75">
+            <div className="text-xs md:text-sm opacity-75">
               <Link 
                 to="/politicas-de-privacidade" 
                 className="hover:text-civeni-red transition-colors underline"
