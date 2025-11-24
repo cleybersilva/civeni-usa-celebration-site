@@ -13,6 +13,26 @@ const HeroBanner = () => {
     .filter(slide => slide.id && slide.id !== 'new') // Filtrar slides válidos
     .sort((a, b) => a.order - b.order);
 
+  // Debug: Verificar dados de tradução
+  useEffect(() => {
+    if (slides.length > 0) {
+      console.log('🌍 Banner translations debug:', {
+        currentLang: i18n.language,
+        slide0: {
+          title: slides[0].title,
+          titleEn: slides[0].titleEn,
+          titleEs: slides[0].titleEs,
+          subtitle: slides[0].subtitle,
+          subtitleEn: slides[0].subtitleEn,
+          subtitleEs: slides[0].subtitleEs,
+          buttonText: slides[0].buttonText,
+          buttonTextEn: slides[0].buttonTextEn,
+          buttonTextEs: slides[0].buttonTextEs
+        }
+      });
+    }
+  }, [slides, i18n.language]);
+
   // Função para obter texto traduzido
   const getTranslatedText = (pt: string, en?: string, es?: string) => {
     const currentLang = i18n.language.split('-')[0]; // Pega apenas 'en', 'es', 'pt'
