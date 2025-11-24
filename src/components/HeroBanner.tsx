@@ -64,24 +64,26 @@ const HeroBanner = () => {
           />
           <div className="absolute inset-0 bg-black bg-opacity-50" />
           
-          <div className="relative z-10 flex items-center justify-center h-full">
-            <div className="text-center text-white max-w-4xl px-4">
+          <div className="relative z-10 flex items-center justify-center h-full px-4">
+            <div className="text-center text-white max-w-4xl w-full">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold font-poppins mb-4 md:mb-6 animate-fade-in leading-tight">
                 {slide.title}
               </h1>
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 md:mb-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 {slide.subtitle}
               </p>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 md:mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 md:mb-8 animate-fade-in px-2" style={{ animationDelay: '0.6s' }}>
                 {slide.description}
               </p>
-              <a 
-                href={slide.buttonLink}
-                className="inline-block bg-civeni-red text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-base md:text-lg lg:text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins"
-                style={{ animationDelay: '0.9s' }}
-              >
-                {slide.buttonText}
-              </a>
+              <div className="flex justify-center px-4">
+                <a 
+                  href={slide.buttonLink}
+                  className="inline-block w-full max-w-xs bg-civeni-red text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-sm sm:text-base md:text-lg lg:text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins text-center"
+                  style={{ animationDelay: '0.9s' }}
+                >
+                  {slide.buttonText}
+                </a>
+              </div>
             </div>
           </div>
         </div>
