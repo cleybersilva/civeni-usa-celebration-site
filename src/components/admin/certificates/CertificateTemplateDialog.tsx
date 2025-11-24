@@ -88,15 +88,42 @@ const defaultConfig = {
   }
 };
 
-const sampleData = {
-  nome_participante: 'Nome do Participante',
-  tipo_participacao: 'Participante',
-  nome_evento: 'III CIVENI 2025 – Celebration/Florida/EUA',
-  data_evento: '11 a 13 de dezembro de 2025',
-  carga_horaria: '20',
-  data_emissao: '13 de dezembro de 2025',
-  nome_reitor: 'Dr. João Silva',
-  nome_coordenador: 'Dra. Maria Santos'
+const getSampleDataByLanguage = (language: string) => {
+  switch (language) {
+    case 'en-US':
+      return {
+        nome_participante: 'Participant Name',
+        tipo_participacao: 'Participant',
+        nome_evento: 'III CIVENI 2025 – Celebration/Florida/USA',
+        data_evento: 'December 11 to 13, 2025',
+        carga_horaria: '20',
+        data_emissao: 'December 13, 2025',
+        nome_reitor: 'Dr. John Silva',
+        nome_coordenador: 'Dr. Mary Santos'
+      };
+    case 'es-ES':
+      return {
+        nome_participante: 'Nombre del Participante',
+        tipo_participacao: 'Participante',
+        nome_evento: 'III CIVENI 2025 – Celebration/Florida/EUA',
+        data_evento: '11 a 13 de diciembre de 2025',
+        carga_horaria: '20',
+        data_emissao: '13 de diciembre de 2025',
+        nome_reitor: 'Dr. João Silva',
+        nome_coordenador: 'Dra. María Santos'
+      };
+    default: // pt-BR
+      return {
+        nome_participante: 'Nome do Participante',
+        tipo_participacao: 'Participante',
+        nome_evento: 'III CIVENI 2025 – Celebration/Florida/EUA',
+        data_evento: '11 a 13 de dezembro de 2025',
+        carga_horaria: '20',
+        data_emissao: '13 de dezembro de 2025',
+        nome_reitor: 'Dr. João Silva',
+        nome_coordenador: 'Dra. Maria Santos'
+      };
+  }
 };
 
 const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
@@ -112,6 +139,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<'pt-BR' | 'en-US' | 'es-ES'>(currentLanguage as any);
+  const [sampleData, setSampleData] = useState(getSampleDataByLanguage(currentLanguage));
 
   const handleSave = async () => {
     setLoading(true);
@@ -125,6 +153,10 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
 
   const handleTranslate = async () => {
     setTranslating(true);
+    
+    // Update sample data immediately based on selected language
+    setSampleData(getSampleDataByLanguage(selectedLanguage));
+    
     try {
       const textsToTranslate = {
         header_title: config.header.title,
@@ -265,7 +297,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                 size="sm"
                 onClick={handleTranslate}
                 disabled={translating}
-                className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90"
+                className="h-10 bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-sm"
               >
                 {translating ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
