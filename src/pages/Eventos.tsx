@@ -61,9 +61,9 @@ const Eventos = () => {
       past: 'secondary'
     };
     const labels = {
-      upcoming: 'Próximo',
-      live: 'Ao Vivo',
-      past: 'Encerrado'
+      upcoming: t('eventsPage.statusUpcoming'),
+      live: t('eventsPage.statusLive'),
+      past: t('eventsPage.statusFinished')
     };
     
     return (
@@ -102,40 +102,39 @@ const Eventos = () => {
           {/* Breadcrumbs */}
           <nav className="mb-6 md:mb-8 text-xs md:text-sm">
             <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">{t('eventsPage.breadcrumbHome')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Eventos</li>
+              <li>{t('eventsPage.pageTitle')}</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
-              Eventos
+              {t('eventsPage.pageTitle')}
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
-              Congresso Internacional Multidisciplinar - Acompanhe todos os eventos, palestras e atividades do III CIVENI 2025 -
-              Uma experiência única de aprendizado e networking mundial
+              {t('eventsPage.description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 md:w-5 md:h-5" />
-                  Fazer Inscrição
+                  {t('eventsPage.registerButton')}
                 </button>
               </Link>
               
               <Link to="/programacao-presencial" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                  Ver Programação
+                  {t('eventsPage.viewSchedule')}
                 </button>
               </Link>
               
               <Link to="/certificado-emissao" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Award className="w-4 h-4 md:w-5 md:h-5" />
-                  Emitir Certificado
+                  {t('eventsPage.issueCertificate')}
                 </button>
               </Link>
             </div>
@@ -151,7 +150,7 @@ const Eventos = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Buscar eventos..."
+                  placeholder={t('eventsPage.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -161,31 +160,31 @@ const Eventos = () => {
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('eventsPage.statusFilter')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Status</SelectItem>
-                <SelectItem value="upcoming">Próximos</SelectItem>
-                <SelectItem value="live">Em Andamento</SelectItem>
-                <SelectItem value="past">Encerrados</SelectItem>
+                <SelectItem value="all">{t('eventsPage.allStatuses')}</SelectItem>
+                <SelectItem value="upcoming">{t('eventsPage.upcoming')}</SelectItem>
+                <SelectItem value="live">{t('eventsPage.inProgress')}</SelectItem>
+                <SelectItem value="past">{t('eventsPage.finished')}</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={modalidadeFilter} onValueChange={setModalidadeFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Modalidade" />
+                <SelectValue placeholder={t('eventsPage.modalityFilter')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas Modalidades</SelectItem>
-                <SelectItem value="online">Online</SelectItem>
-                <SelectItem value="presencial">Presencial</SelectItem>
-                <SelectItem value="hibrido">Híbrido</SelectItem>
+                <SelectItem value="all">{t('eventsPage.allModalities')}</SelectItem>
+                <SelectItem value="online">{t('eventsPage.online')}</SelectItem>
+                <SelectItem value="presencial">{t('eventsPage.inPerson')}</SelectItem>
+                <SelectItem value="hibrido">{t('eventsPage.hybrid')}</SelectItem>
               </SelectContent>
             </Select>
 
             <Button variant="outline" size="sm">
               <Filter className="h-4 w-4 mr-2" />
-              Filtros
+              {t('eventsPage.filters')}
             </Button>
           </div>
         </div>
@@ -197,11 +196,11 @@ const Eventos = () => {
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="upcoming" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Próximos Eventos
+              {t('eventsPage.upcomingEvents')}
             </TabsTrigger>
             <TabsTrigger value="past" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Eventos Passados
+              {t('eventsPage.pastEvents')}
             </TabsTrigger>
           </TabsList>
 
@@ -211,7 +210,7 @@ const Eventos = () => {
               <section className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <Users className="h-6 w-6 text-civeni-blue" />
-                  Eventos em Destaque
+                  {t('eventsPage.featuredEvents')}
                 </h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {events?.filter((event: any) => event.featured && getEventStatus(event) !== 'past').map((event: any) => (
@@ -252,7 +251,7 @@ const Eventos = () => {
                         <div className="flex gap-2 pt-3">
                           <Link to={`/eventos/${event.slug}`} className="flex-1">
                             <Button className="w-full">
-                              Ver Detalhes
+                              {t('eventsPage.viewDetails')}
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
                           </Link>
@@ -267,7 +266,7 @@ const Eventos = () => {
             {/* All Upcoming Events */}
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Todos os Eventos
+                {t('eventsPage.allEvents')}
               </h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {filteredEvents.map((event: any) => (
@@ -308,7 +307,7 @@ const Eventos = () => {
                       <div className="flex gap-2 pt-3">
                         <Link to={`/eventos/${event.slug}`} className="flex-1">
                           <Button variant="outline" className="w-full">
-                            Ver Detalhes
+                            {t('eventsPage.viewDetails')}
                             <ExternalLink className="h-4 w-4 ml-2" />
                           </Button>
                         </Link>
@@ -323,8 +322,8 @@ const Eventos = () => {
                   <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-xl text-gray-600">
                     {events && events.length > 0 
-                      ? "Nenhum evento encontrado com os filtros selecionados."
-                      : "Nenhum evento disponível no momento."
+                      ? t('eventsPage.noEventsFound')
+                      : t('eventsPage.noEventsAvailable')
                     }
                   </p>
                   {/* Debug info */}
@@ -341,7 +340,7 @@ const Eventos = () => {
           <TabsContent value="past" className="space-y-8">
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Eventos Realizados
+                {t('eventsPage.pastEventsTitle')}
               </h2>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {filteredEvents.map((event: any) => (
@@ -382,14 +381,14 @@ const Eventos = () => {
                        <div className="flex gap-2 pt-3">
                          <Link to={`/eventos/${event.slug}`} className="flex-1">
                            <Button variant="outline" size="sm" className="w-full">
-                             Ver Detalhes
+                             {t('eventsPage.viewDetails')}
                            </Button>
                          </Link>
                          
                          {event.youtube_url && (
                            <Button variant="default" size="sm" asChild>
                              <a href={event.youtube_url} target="_blank" rel="noopener noreferrer">
-                               Gravação
+                               {t('eventsPage.recording')}
                              </a>
                            </Button>
                          )}
@@ -403,7 +402,7 @@ const Eventos = () => {
                 <div className="text-center py-16">
                   <Clock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-xl text-gray-600">
-                    Nenhum evento passado encontrado.
+                    {t('eventsPage.noPastEvents')}
                   </p>
                 </div>
               )}
