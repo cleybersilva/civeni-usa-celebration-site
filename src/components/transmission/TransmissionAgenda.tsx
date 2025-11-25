@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Calendar, Clock, MapPin, Video, ExternalLink, Users } from 'lucide-react';
 import { format, isAfter, isBefore, addHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 interface Schedule {
   id: string;
@@ -22,6 +23,8 @@ interface Schedule {
 }
 
 const TransmissionAgenda = () => {
+  const { t } = useTranslation();
+
   const { data: schedules, isLoading } = useQuery({
     queryKey: ['transmission-agenda'],
     queryFn: async () => {

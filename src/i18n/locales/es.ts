@@ -592,7 +592,9 @@ export const esTranslations = {
         noRooms: "No hay salas disponibles",
         watchLive: "Ver en Vivo",
         joinRoom: "Entrar a la Sala",
+        watchReplay: "Ver repetición",
         waitingToStart: "Esperando Inicio",
+        startsIn: "Comienza en {{hours}}h {{minutes}}min",
         capacity: "Capacidad",
         moderators: "Moderadores",
         staffOnly: "Solo Personal",
@@ -637,7 +639,8 @@ export const esTranslations = {
           support: { 
             title: "Necesito soporte técnico. ¿Qué hago?", 
             answer: "Contacta con nuestro equipo de soporte a través del email suporte@civeni.org o por WhatsApp disponible en la página de contacto." 
-          }
+          },
+          ctaTitle: "¿Aún tienes dudas?"
         }
       }
     }
