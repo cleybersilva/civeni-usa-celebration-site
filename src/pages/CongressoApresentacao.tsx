@@ -212,18 +212,12 @@ const CongressoApresentacao = () => {
                           <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-civeni-blue to-civeni-red rounded-xl flex items-center justify-center">
                             <Globe className="w-5 h-5 md:w-6 md:h-6 text-white" />
                           </div>
-                          <div className="flex-1">
-                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{t('presentationPage.globalContextTitle')}</h4>
-                            <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextCrises'))[0]}
-                              <span className="font-semibold text-civeni-blue">{t('presentationPage.globalContextCrises')}</span>
-                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextCrises'))[1].split(t('presentationPage.globalContextInequalities'))[0]}
-                              <span className="font-semibold text-civeni-red">{t('presentationPage.globalContextInequalities')}</span>
-                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextInequalities'))[1].split(t('presentationPage.globalContextTech'))[0]}
-                              <span className="font-semibold text-purple-600">{t('presentationPage.globalContextTech')}</span>
-                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextTech'))[1]}
-                            </p>
-                          </div>
+                           <div className="flex-1">
+                             <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{t('presentationPage.globalContextTitle')}</h4>
+                             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
+                               {t('presentationPage.globalContextText')}
+                             </p>
+                           </div>
                         </div>
                       </div>
                     </div>
@@ -238,15 +232,9 @@ const CongressoApresentacao = () => {
                           </div>
                           <div className="flex-1">
                             <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{t('presentationPage.knowledgeArticulationTitle')}</h4>
-                            <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationDiverse'))[0]}
-                              <span className="px-2 md:px-3 py-1 bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-full font-semibold text-sm md:text-base">{t('presentationPage.knowledgeArticulationDiverse')}</span>
-                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationDiverse'))[1].split(t('presentationPage.knowledgeArticulationJustice'))[0]}
-                              <span className="font-semibold text-civeni-blue">{t('presentationPage.knowledgeArticulationJustice')}</span>
-                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationJustice'))[1].split(t('presentationPage.knowledgeArticulationDignity'))[0]}
-                              <span className="font-semibold text-civeni-red">{t('presentationPage.knowledgeArticulationDignity')}</span>
-                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationDignity'))[1]}
-                            </p>
+                             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
+                               {t('presentationPage.knowledgeArticulationText')}
+                             </p>
                           </div>
                         </div>
                       </div>
@@ -262,24 +250,14 @@ const CongressoApresentacao = () => {
                           </div>
                           <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">{t('presentationPage.innovationVisionTitle')}</h4>
                           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl md:rounded-2xl p-5 md:p-8">
-                            <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-left">
-                              {t('presentationPage.innovationVisionIntro').split(t('presentationPage.innovationVisionNotTechnical'))[0]}
-                              <span className="font-bold text-civeni-blue">{t('presentationPage.innovationVisionNotTechnical')}</span>
-                              {t('presentationPage.innovationVisionIntro').split(t('presentationPage.innovationVisionNotTechnical'))[1].split(t('presentationPage.innovationVisionCommitted'))[0]}
-                              <span className="font-semibold text-civeni-red">{t('presentationPage.innovationVisionCommitted')}</span>
-                              {t('presentationPage.innovationVisionIntro').split(t('presentationPage.innovationVisionCommitted'))[1]}
-                            </p>
-                            <div className="mt-4 md:mt-6 p-4 md:p-6 bg-white rounded-lg md:rounded-xl border-l-4 border-civeni-blue">
-                              <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionInnovation'))[0]}
-                                <span className="font-semibold text-purple-600">{t('presentationPage.innovationVisionInnovation')}</span>
-                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionInnovation'))[1].split(t('presentationPage.innovationVisionJustice'))[0]}
-                                <span className="font-semibold text-civeni-blue">{t('presentationPage.innovationVisionJustice')}</span>
-                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionJustice'))[1].split(t('presentationPage.innovationVisionHumanity'))[0]}
-                                <span className="font-semibold text-civeni-red">{t('presentationPage.innovationVisionHumanity')}</span>
-                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionHumanity'))[1]}
-                              </p>
-                            </div>
+                             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-left">
+                               {t('presentationPage.innovationVisionIntro')}
+                             </p>
+                             <div className="mt-4 md:mt-6 p-4 md:p-6 bg-white rounded-lg md:rounded-xl border-l-4 border-civeni-blue">
+                               <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
+                                 {t('presentationPage.innovationVisionBridge')}
+                               </p>
+                             </div>
                           </div>
                         </div>
                       </div>
@@ -296,11 +274,9 @@ const CongressoApresentacao = () => {
                             </div>
                             <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">{t('presentationPage.mainObjectiveTitle')}</h4>
                           </div>
-                          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                            {t('presentationPage.mainObjectiveText').split(t('presentationPage.mainObjectiveIntegration'))[0]}
-                            <span className="font-semibold text-civeni-blue">{t('presentationPage.mainObjectiveIntegration')}</span>
-                            {t('presentationPage.mainObjectiveText').split(t('presentationPage.mainObjectiveIntegration'))[1]}
-                          </p>
+                           <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                             {t('presentationPage.mainObjectiveText')}
+                           </p>
                         </div>
                       </div>
                       
@@ -313,11 +289,9 @@ const CongressoApresentacao = () => {
                             </div>
                             <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">{t('presentationPage.expectedImpactTitle')}</h4>
                           </div>
-                          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                            {t('presentationPage.expectedImpactText').split(t('presentationPage.expectedImpactNetwork'))[0]}
-                            <span className="font-semibold text-civeni-red">{t('presentationPage.expectedImpactNetwork')}</span>
-                            {t('presentationPage.expectedImpactText').split(t('presentationPage.expectedImpactNetwork'))[1]}
-                          </p>
+                           <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                             {t('presentationPage.expectedImpactText')}
+                           </p>
                         </div>
                       </div>
                     </div>
