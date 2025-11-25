@@ -646,8 +646,9 @@ export const enTranslations = {
           },
           ctaTitle: "Still have questions?"
         },
-        noVideoTitle: "No video available",
-        noVideoDescription: "The broadcast has not started yet or there is no replay available.",
+        noVideoTitle: "Video not available",
+        noVideoDescription: "The broadcast has not started yet.",
+        noReplayAvailable: "No replay available at the moment.",
         visitChannel: "Visit the channel",
         noRoomsAvailable: "No rooms available at the moment",
         noRoomsDescription: "Presentation rooms will be published soon. Stay tuned to the schedule.",

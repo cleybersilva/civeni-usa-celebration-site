@@ -627,8 +627,9 @@ export const trTranslations = {
           },
           ctaTitle: "Hâlâ sorularınız mı var?"
         },
-        noVideoTitle: "Kullanılabilir video yok",
-        noVideoDescription: "Yayın henüz başlamadı veya tekrar mevcut değil.",
+        noVideoTitle: "Video mevcut değil",
+        noVideoDescription: "Yayın henüz başlamadı.",
+        noReplayAvailable: "Şu anda tekrar mevcut değil.",
         visitChannel: "Kanalı ziyaret edin",
         noRoomsAvailable: "Şu anda uygun oda yok",
         noRoomsDescription: "Sunum odaları yakında yayınlanacaktır. Programa dikkat edin.",

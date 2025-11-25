@@ -650,8 +650,9 @@ export const ptTranslations = {
         },
         ctaTitle: "Ainda tem dúvidas?" 
       },
-      noVideoTitle: "Nenhum vídeo disponível",
-      noVideoDescription: "A transmissão ainda não começou ou não há replay disponível.",
+      noVideoTitle: "Vídeo não disponível",
+      noVideoDescription: "A transmissão ainda não começou.",
+      noReplayAvailable: "Não há replay disponível no momento.",
       visitChannel: "Visite o canal",
       noRoomsAvailable: "Nenhuma sala disponível no momento",
       noRoomsDescription: "As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.",
