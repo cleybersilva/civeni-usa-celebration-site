@@ -606,8 +606,10 @@ export const enTranslations = {
         roomWorks: "Works in this room",
         noWorkTitle: "Title not available",
         faqTitle: "Frequently Asked Questions",
+        faqCtaTitle: "Still have questions?",
+        faqCtaDescription: "Our team is ready to help. Contact us for more information.",
         badges: { 
-          live: "LIVE", 
+          live: "LIVE",
           scheduled: "SCHEDULED", 
           ended: "ENDED" 
         },

@@ -587,7 +587,9 @@ export const trTranslations = {
         roomWorks: "Bu odadaki çalışmalar",
         noWorkTitle: "Başlık mevcut değil",
         faqTitle: "Sık Sorulan Sorular",
-        badges: { 
+        faqCtaTitle: "Hala sorularınız mı var?",
+        faqCtaDescription: "Ekibimiz yardıma hazır. Daha fazla bilgi için bizimle iletişime geçin.",
+        badges: {
           live: "CANLI", 
           scheduled: "PLANLI", 
           ended: "BİTTİ" 
