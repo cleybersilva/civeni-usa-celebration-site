@@ -316,76 +316,86 @@ const TransmissaoDetalhes = () => {
           <div className="space-y-6">
             {/* Event Info */}
             <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">Informações</h3>
-              <div className="space-y-4">
+              <h3 className="font-semibold text-lg mb-6 text-center">
+                {t('transmission.info', 'Informações')}
+              </h3>
+              <div className="space-y-6">
                 {startAt && (
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 mt-0.5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Data</p>
-                      <p className="text-sm text-muted-foreground">
-                        {startAt.toLocaleDateString(locale, { 
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
+                  <div className="text-center">
+                    <div className="flex justify-center mb-2">
+                      <Calendar className="w-5 h-5 text-muted-foreground" />
                     </div>
+                    <p className="font-semibold text-base mb-1">
+                      {t('transmission.date', 'Data')}
+                    </p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {startAt.toLocaleDateString(locale, { 
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
                   </div>
                 )}
                 {startAt && (
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 mt-0.5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Horário</p>
-                      <p className="text-sm text-muted-foreground">
-                        {startAt.toLocaleTimeString(locale, { timeStyle: 'short' })}
-                        {endAt && ` - ${endAt.toLocaleTimeString(locale, { timeStyle: 'short' })}`}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {timezoneText}
-                      </p>
+                  <div className="text-center">
+                    <div className="flex justify-center mb-2">
+                      <Clock className="w-5 h-5 text-muted-foreground" />
                     </div>
+                    <p className="font-semibold text-base mb-1">
+                      {t('transmission.time', 'Horário')}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {startAt.toLocaleTimeString(locale, { timeStyle: 'short' })}
+                      {endAt && ` - ${endAt.toLocaleTimeString(locale, { timeStyle: 'short' })}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed px-2">
+                      {timezoneText}
+                    </p>
                   </div>
                 )}
                 <Separator />
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 mt-0.5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Local</p>
-                    <p className="text-sm text-muted-foreground">
-                      Transmissão Online
-                    </p>
+                <div className="text-center">
+                  <div className="flex justify-center mb-2">
+                    <MapPin className="w-5 h-5 text-muted-foreground" />
                   </div>
+                  <p className="font-semibold text-base mb-1">
+                    {t('transmission.location', 'Local')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('transmission.onlineTransmission', 'Transmissão Online')}
+                  </p>
                 </div>
               </div>
             </Card>
 
             {/* Quick Links */}
             <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">Links úteis</h3>
-              <div className="space-y-2">
+              <h3 className="font-semibold text-lg mb-6 text-center">
+                {t('transmission.usefulLinks', 'Links úteis')}
+              </h3>
+              <div className="space-y-3">
                 {transmission.schedule_url && (
-                  <Button variant="outline" className="w-full justify-start" asChild>
+                  <Button variant="outline" className="w-full justify-center gap-2" asChild>
                     <a href={transmission.schedule_url}>
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Ver programação
+                      <Calendar className="w-4 h-4" />
+                      {t('transmission.viewSchedule', 'Ver programação')}
                     </a>
                   </Button>
                 )}
                 {transmission.faq_url && (
-                  <Button variant="outline" className="w-full justify-start" asChild>
+                  <Button variant="outline" className="w-full justify-center gap-2" asChild>
                     <a href={transmission.faq_url}>
-                      <ExternalLink className="w-4 h-4 mr-2" />
+                      <ExternalLink className="w-4 h-4" />
                       FAQ
                     </a>
                   </Button>
                 )}
-                <Button variant="outline" className="w-full justify-start" asChild>
+                <Button variant="outline" className="w-full justify-center gap-2" asChild>
                   <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
-                    <Video className="w-4 h-4 mr-2" />
-                    Canal do YouTube
+                    <Video className="w-4 h-4" />
+                    {t('transmission.youtubeChannel', 'Canal do YouTube')}
                   </a>
                 </Button>
               </div>
