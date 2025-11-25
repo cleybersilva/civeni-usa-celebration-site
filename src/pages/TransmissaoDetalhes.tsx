@@ -208,8 +208,7 @@ const TransmissaoDetalhes = () => {
               )}
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white/20 w-full sm:w-auto"
+                className="bg-white text-civeni-blue hover:bg-white/90 border-2 border-white w-full sm:w-auto"
                 asChild
               >
                 <a href="https://civeni.com/inscricoes" target="_blank" rel="noopener noreferrer">
