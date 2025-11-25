@@ -816,10 +816,10 @@ const TransmissaoAoVivo = () => {
                               ))}
                             </div>
                           </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">
-                  {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
-                </p>
+                        ) : (
+                          <p className="text-gray-500 text-center py-4">
+                            {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
+                          </p>
                         )}
                       </div>
                     </Card>
