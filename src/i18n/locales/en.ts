@@ -362,21 +362,6 @@ export const enTranslations = {
       title: 'Article/Slide Templates',
       subtitle: 'Standardized templates for academic papers and presentations for III CIVENI 2025 - Facilitate the formatting of your papers and presentations',
     },
-  },
-      userRights: {
-        title: "5. Your Rights",
-        content: "You have the right to:",
-        access: "Access your personal data",
-        correction: "Correct incorrect information",
-        deletion: "Request deletion of your data",
-        portability: "Request data portability"
-      },
-      cookies: {
-        title: "6. Cookies",
-        content: "We use essential cookies for site functionality and analytical cookies to improve your experience. You can manage your cookie preferences in your browser settings."
-      }
-    },
-    
     contactPage: {
       pageTitle: "Contact",
       breadcrumbHome: "Home",
@@ -388,16 +373,6 @@ export const enTranslations = {
       talkToUs: "Contact Us",
       talkToUsDescription: "Choose the best way to get in touch. We are ready to assist you!",
     },
-    
-    contact: {
-      title: "7. Contact",
-      content: "For data privacy questions, contact us:"
-    },
-    changes: {
-      title: "8. Changes",
-      content: "This policy may be updated periodically. We will notify about significant changes through our website or email."
-    }
-  },
     hybrid: {
       title: "Hybrid Format",
       description: "Experience the best of both worlds with our innovative hybrid format",
