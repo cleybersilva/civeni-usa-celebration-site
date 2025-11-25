@@ -561,69 +561,6 @@ export const ptTranslations = {
         posterSessions: "Sessões de Pôster",
         manuscripts: "Manuscritos"
       }
-    }
-  },
-  events: {
-    title: "Eventos",
-    subtitle: "Congresso Internacional Multidisciplinar",
-    description: "Gerencie eventos acadêmicos e científicos",
-    list: "Lista de Eventos",
-    create: "Criar Evento", 
-    edit: "Editar Evento",
-    filters: "Filtros",
-    search: "Buscar eventos",
-    status: {
-      upcoming: "Próximos",
-      ongoing: "Em andamento", 
-      finished: "Encerrados",
-      draft: "Rascunho",
-      published: "Publicado",
-      archived: "Arquivado"
-    },
-    modality: {
-      online: "Online",
-      presencial: "Presencial", 
-      hybrid: "Híbrido"
-    },
-    details: "Ver detalhes",
-    addToCalendar: "Adicionar ao calendário",
-    share: "Compartilhar",
-    watch: "Assistir",
-    certificate: "Baixar certificado",
-    registration: "Inscrever-se",
-    location: "Local",
-    when: "Quando",
-    speakers: "Palestrantes",
-    program: "Programação",
-    materials: "Materiais",
-    relatedEvents: "Eventos relacionados",
-    noEvents: "Nenhum evento encontrado",
-    loadingEvents: "Carregando eventos...",
-    form: {
-      title: "Título",
-      subtitle: "Subtítulo", 
-      slug: "Slug",
-      description: "Descrição",
-      startDate: "Data de início",
-      endDate: "Data de fim",
-      timezone: "Fuso horário",
-      mode: "Modalidade",
-      address: "Endereço",
-      banner: "Banner",
-      youtubeUrl: "URL do YouTube",
-      playlistUrl: "URL da Playlist",
-      hasRegistration: "Possui inscrições",
-      registrationUrl: "URL de inscrição",
-      featured: "Evento em destaque",
-      showWhenPast: "Exibir quando passado",
-      status: "Status",
-      metaTitle: "Título Meta (SEO)",
-      metaDescription: "Descrição Meta (SEO)", 
-      ogImage: "Imagem Open Graph",
-      save: "Salvar",
-      cancel: "Cancelar",
-      creating: "Criando...",
-      updating: "Atualizando..."
     },
     transmission: {
       countdown: {
@@ -712,7 +649,76 @@ export const ptTranslations = {
           answer: "Entre em contato com nossa equipe de suporte através do email suporte@civeni.org ou pelo WhatsApp disponível na página de contato." 
         },
         ctaTitle: "Ainda tem dúvidas?" 
+      },
+      common: {
+        loading: "Carregando",
+        previous: "Anterior",
+        next: "Próximo",
+        goToImage: "Ir para imagem"
       }
+    }
+  },
+  events: {
+    title: "Eventos",
+    subtitle: "Congresso Internacional Multidisciplinar",
+    description: "Gerencie eventos acadêmicos e científicos",
+    list: "Lista de Eventos",
+    create: "Criar Evento", 
+    edit: "Editar Evento",
+    filters: "Filtros",
+    search: "Buscar eventos",
+    status: {
+      upcoming: "Próximos",
+      ongoing: "Em andamento", 
+      finished: "Encerrados",
+      draft: "Rascunho",
+      published: "Publicado",
+      archived: "Arquivado"
+    },
+    modality: {
+      online: "Online",
+      presencial: "Presencial", 
+      hybrid: "Híbrido"
+    },
+    details: "Ver detalhes",
+    addToCalendar: "Adicionar ao calendário",
+    share: "Compartilhar",
+    watch: "Assistir",
+    certificate: "Baixar certificado",
+    registration: "Inscrever-se",
+    location: "Local",
+    when: "Quando",
+    speakers: "Palestrantes",
+    program: "Programação",
+    materials: "Materiais",
+    relatedEvents: "Eventos relacionados",
+    noEvents: "Nenhum evento encontrado",
+    loadingEvents: "Carregando eventos...",
+    form: {
+      title: "Título",
+      subtitle: "Subtítulo", 
+      slug: "Slug",
+      description: "Descrição",
+      startDate: "Data de início",
+      endDate: "Data de fim",
+      timezone: "Fuso horário",
+      mode: "Modalidade",
+      address: "Endereço",
+      banner: "Banner",
+      youtubeUrl: "URL do YouTube",
+      playlistUrl: "URL da Playlist",
+      hasRegistration: "Possui inscrições",
+      registrationUrl: "URL de inscrição",
+      featured: "Evento em destaque",
+      showWhenPast: "Exibir quando passado",
+      status: "Status",
+      metaTitle: "Título Meta (SEO)",
+      metaDescription: "Descrição Meta (SEO)", 
+      ogImage: "Imagem Open Graph",
+      save: "Salvar",
+      cancel: "Cancelar",
+      creating: "Criando...",
+      updating: "Atualizando..."
     }
   }
 };
