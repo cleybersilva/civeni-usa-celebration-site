@@ -575,7 +575,7 @@ export const enTranslations = {
         description: "Follow all live broadcasts from III CIVENI 2025",
         ctaWatch: "Watch Now (YouTube)",
         ctaRooms: "Oral Presentation Rooms",
-        timezoneInfo: "Times shown in Florida (ET) and Fortaleza (BRT)",
+        timezoneInfo: "Times in {{user}} • Local: {{event}}",
         noStream: "No live stream at the moment",
         noStreamTitle: "Wait for the next broadcast",
         noStreamDesc: "Check our schedule below",
@@ -601,6 +601,9 @@ export const enTranslations = {
         enrolledOnly: "Enrolled Only",
         roomsTitle: "Presentation Rooms (Google Meet)",
         roomsDescription: "Access virtual rooms (registration required)",
+        joinMeet: "Join Google Meet",
+        roomWorks: "Works in this room",
+        noWorkTitle: "Title not available",
         faqTitle: "Frequently Asked Questions",
         badges: { 
           live: "LIVE", 

@@ -575,7 +575,7 @@ export const esTranslations = {
         description: "Sigue todas las transmisiones en vivo del III CIVENI 2025",
         ctaWatch: "Ver Ahora (YouTube)",
         ctaRooms: "Salas de Presentación Oral",
-        timezoneInfo: "Horarios en Florida (ET) y Fortaleza (BRT)",
+        timezoneInfo: "Horarios en {{user}} • Local: {{event}}",
         noStream: "No hay transmisión en este momento",
         noStreamTitle: "Espera la próxima transmisión",
         noStreamDesc: "Consulta nuestra programación",
@@ -601,6 +601,9 @@ export const esTranslations = {
         enrolledOnly: "Solo Inscriptos",
         roomsTitle: "Salas de Presentación (Google Meet)",
         roomsDescription: "Accede a las salas virtuales (inscripción requerida)",
+        joinMeet: "Entrar a Google Meet",
+        roomWorks: "Trabajos en esta sala",
+        noWorkTitle: "Título no disponible",
         faqTitle: "Preguntas Frecuentes",
         badges: { 
           live: "EN VIVO", 

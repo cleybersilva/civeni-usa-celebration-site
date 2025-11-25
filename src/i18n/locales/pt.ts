@@ -643,7 +643,7 @@ export const ptTranslations = {
       description: "Acompanhe ao vivo",
       ctaWatch: "Assistir",
       ctaRooms: "Salas",
-      timezoneInfo: "Florida (ET) e Fortaleza (BRT)",
+      timezoneInfo: "Horários em {{user}} • Local: {{event}}",
       noStream: "Sem transmissão",
       noStreamTitle: "Aguarde",
       noStreamDesc: "Veja a programação",
@@ -669,6 +669,9 @@ export const ptTranslations = {
       enrolledOnly: "Inscritos",
       roomsTitle: "Salas Meet",
       roomsDescription: "Requer inscrição",
+      joinMeet: "Entrar no Google Meet",
+      roomWorks: "Trabalhos desta sala",
+      noWorkTitle: "Título não disponível",
       faqTitle: "Perguntas Frequentes",
       badges: { 
         live: "AO VIVO", 
