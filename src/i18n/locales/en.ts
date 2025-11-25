@@ -299,6 +299,43 @@ export const enTranslations = {
       description: "Relive the best moments of the II International Multidisciplinary Congress of VCCU",
       registerButton: "Join III CIVENI 2025"
     },
+    works: {
+      breadcrumb: "Papers",
+      submitWork: "Submit Paper",
+      makeRegistration: "Register",
+      viewThematicAreas: "View Thematic Areas",
+      oral: {
+        title: 'Oral Presentation List/Template',
+        subtitle: 'Academic papers oral presentation modality for III CIVENI 2025 - Share your research with experts from around the world',
+        pageTitle: 'Oral Presentation List/Template',
+        infoTitle: 'Oral Presentation Information',
+        infoDescription: 'Learn about the requirements, formats and guidelines for presenting your work orally at the congress',
+        noContent: 'Content coming soon',
+        noContentDescription: 'Information about oral presentations will be published soon.',
+      },
+      poster: {
+        title: 'Poster Sessions',
+        subtitle: 'Poster presentation modality for III CIVENI 2025 - Present your discoveries and innovative research visually',
+        infoTitle: 'Poster Sessions Information',
+        infoDescription: 'Learn how to prepare and present your scientific poster following the congress guidelines',
+        noContent: 'Content coming soon',
+        noContentDescription: 'Information about poster sessions will be published soon.',
+      },
+      videos: {
+        title: 'Video Submission',
+        subtitle: 'Submit your video material for evaluation by the III CIVENI 2025 judging panel',
+      },
+      submissionPage: {
+        title: 'Article/Consortium Submission',
+        subtitle: 'Share your research and experiences at III CIVENI 2025 - Contribute to the advancement of multidisciplinary knowledge worldwide',
+        pageTitle: 'Article/Consortium Submission',
+        formDescription: 'Choose the submission type and fill in all required fields',
+      },
+      templates: {
+        title: 'Article/Slide Templates',
+        subtitle: 'Standardized templates for academic papers and presentations for III CIVENI 2025 - Facilitate the formatting of your papers and presentations',
+      },
+    },
     privacy: {
       title: "Privacy Policy",
       lastUpdated: "Last updated:",
