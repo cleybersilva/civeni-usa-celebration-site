@@ -130,11 +130,11 @@ const CongressoApresentacao = () => {
           {/* Breadcrumbs */}
           <nav className="mb-6 md:mb-8 text-xs md:text-sm">
             <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">{t('presentationPage.breadcrumbHome')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li><Link to="/congresso/apresentacao" className="hover:text-blue-200 transition-colors">Congresso</Link></li>
+              <li><Link to="/congresso/apresentacao" className="hover:text-blue-200 transition-colors">{t('presentationPage.breadcrumbCongress')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Apresentação</li>
+              <li>{t('presentationPage.breadcrumbPresentation')}</li>
             </ol>
           </nav>
           
@@ -150,14 +150,14 @@ const CongressoApresentacao = () => {
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 md:w-5 md:h-5" />
-                  Fazer Inscrição
+                  {t('presentationPage.registerButton')}
                 </button>
               </Link>
               
               <Link to="/programacao-presencial" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                  Ver Programação
+                  {t('presentationPage.viewSchedule')}
                 </button>
               </Link>
             </div>
@@ -192,11 +192,11 @@ const CongressoApresentacao = () => {
                       <div className="relative bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 shadow-2xl border border-gray-100">
                         <div className="flex items-center justify-center mb-4 md:mb-6">
                           <div className="h-1 w-12 md:w-16 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                          <span className="mx-3 md:mx-4 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-wider">TEMA</span>
+                          <span className="mx-3 md:mx-4 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-wider">{t('presentationPage.themeLabel')}</span>
                           <div className="h-1 w-12 md:w-16 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
                         </div>
                         <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 font-poppins leading-tight">
-                          Saberes em Conexão: <span className="bg-gradient-to-r from-civeni-blue to-civeni-red bg-clip-text text-transparent">Inovação, Justiça e Humanidade</span> na Sociedade Contemporânea
+                          {t('presentationPage.themeTitle')}
                         </h3>
                       </div>
                     </div>
@@ -213,9 +213,15 @@ const CongressoApresentacao = () => {
                             <Globe className="w-5 h-5 md:w-6 md:h-6 text-white" />
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">Contexto Global</h4>
+                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{t('presentationPage.globalContextTitle')}</h4>
                             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                              No contexto da sociedade contemporânea, marcada por <span className="font-semibold text-civeni-blue">crises globais</span>, <span className="font-semibold text-civeni-red">desigualdades persistentes</span> e <span className="font-semibold text-purple-600">transformações tecnológicas aceleradas</span>, torna-se urgente repensar os modos de produção e circulação do conhecimento.
+                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextCrises'))[0]}
+                              <span className="font-semibold text-civeni-blue">{t('presentationPage.globalContextCrises')}</span>
+                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextCrises'))[1].split(t('presentationPage.globalContextInequalities'))[0]}
+                              <span className="font-semibold text-civeni-red">{t('presentationPage.globalContextInequalities')}</span>
+                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextInequalities'))[1].split(t('presentationPage.globalContextTech'))[0]}
+                              <span className="font-semibold text-purple-600">{t('presentationPage.globalContextTech')}</span>
+                              {t('presentationPage.globalContextText').split(t('presentationPage.globalContextTech'))[1]}
                             </p>
                           </div>
                         </div>
@@ -231,9 +237,15 @@ const CongressoApresentacao = () => {
                             <Brain className="w-5 h-5 md:w-6 md:h-6 text-white" />
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">Articulação de Saberes</h4>
+                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{t('presentationPage.knowledgeArticulationTitle')}</h4>
                             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                              A articulação entre <span className="px-2 md:px-3 py-1 bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-full font-semibold text-sm md:text-base">saberes diversos e conectados</span> — científicos, éticos, culturais e espirituais — revela-se fundamental para promover soluções inovadoras que estejam alinhadas não apenas à eficiência, mas à <span className="font-semibold text-civeni-blue">justiça social</span> e ao <span className="font-semibold text-civeni-red">cuidado com a dignidade humana</span>.
+                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationDiverse'))[0]}
+                              <span className="px-2 md:px-3 py-1 bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-full font-semibold text-sm md:text-base">{t('presentationPage.knowledgeArticulationDiverse')}</span>
+                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationDiverse'))[1].split(t('presentationPage.knowledgeArticulationJustice'))[0]}
+                              <span className="font-semibold text-civeni-blue">{t('presentationPage.knowledgeArticulationJustice')}</span>
+                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationJustice'))[1].split(t('presentationPage.knowledgeArticulationDignity'))[0]}
+                              <span className="font-semibold text-civeni-red">{t('presentationPage.knowledgeArticulationDignity')}</span>
+                              {t('presentationPage.knowledgeArticulationText').split(t('presentationPage.knowledgeArticulationDignity'))[1]}
                             </p>
                           </div>
                         </div>
@@ -248,14 +260,24 @@ const CongressoApresentacao = () => {
                           <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl md:rounded-2xl mb-4 md:mb-6">
                             <Network className="w-6 h-6 md:w-8 md:h-8 text-white" />
                           </div>
-                          <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Visão Transformadora da Inovação</h4>
+                          <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">{t('presentationPage.innovationVisionTitle')}</h4>
                           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl md:rounded-2xl p-5 md:p-8">
                             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed text-left">
-                              Sob esse horizonte, a <span className="font-bold text-civeni-blue">inovação não pode ser compreendida apenas como avanço técnico</span>, mas como <span className="font-semibold text-civeni-red">prática situada e comprometida com o bem comum</span>. 
+                              {t('presentationPage.innovationVisionIntro').split(t('presentationPage.innovationVisionNotTechnical'))[0]}
+                              <span className="font-bold text-civeni-blue">{t('presentationPage.innovationVisionNotTechnical')}</span>
+                              {t('presentationPage.innovationVisionIntro').split(t('presentationPage.innovationVisionNotTechnical'))[1].split(t('presentationPage.innovationVisionCommitted'))[0]}
+                              <span className="font-semibold text-civeni-red">{t('presentationPage.innovationVisionCommitted')}</span>
+                              {t('presentationPage.innovationVisionIntro').split(t('presentationPage.innovationVisionCommitted'))[1]}
                             </p>
                             <div className="mt-4 md:mt-6 p-4 md:p-6 bg-white rounded-lg md:rounded-xl border-l-4 border-civeni-blue">
                               <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                                Unir <span className="font-semibold text-purple-600">inovação</span>, <span className="font-semibold text-civeni-blue">justiça</span> e <span className="font-semibold text-civeni-red">humanidade</span> significa construir pontes entre disciplinas, setores e povos, em busca de uma sociedade mais inclusiva, sensível às diferenças e orientada por valores que transcendam o utilitarismo e a exclusão.
+                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionInnovation'))[0]}
+                                <span className="font-semibold text-purple-600">{t('presentationPage.innovationVisionInnovation')}</span>
+                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionInnovation'))[1].split(t('presentationPage.innovationVisionJustice'))[0]}
+                                <span className="font-semibold text-civeni-blue">{t('presentationPage.innovationVisionJustice')}</span>
+                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionJustice'))[1].split(t('presentationPage.innovationVisionHumanity'))[0]}
+                                <span className="font-semibold text-civeni-red">{t('presentationPage.innovationVisionHumanity')}</span>
+                                {t('presentationPage.innovationVisionBridge').split(t('presentationPage.innovationVisionHumanity'))[1]}
                               </p>
                             </div>
                           </div>
@@ -272,10 +294,12 @@ const CongressoApresentacao = () => {
                             <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-civeni-blue rounded-full flex items-center justify-center mr-3 md:mr-4">
                               <Award className="w-4 h-4 md:w-5 md:h-5 text-white" />
                             </div>
-                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">Objetivo Principal</h4>
+                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">{t('presentationPage.mainObjectiveTitle')}</h4>
                           </div>
                           <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                            Promover a <span className="font-semibold text-civeni-blue">integração de saberes</span> para enfrentar os desafios contemporâneos com soluções inovadoras e humanizadas.
+                            {t('presentationPage.mainObjectiveText').split(t('presentationPage.mainObjectiveIntegration'))[0]}
+                            <span className="font-semibold text-civeni-blue">{t('presentationPage.mainObjectiveIntegration')}</span>
+                            {t('presentationPage.mainObjectiveText').split(t('presentationPage.mainObjectiveIntegration'))[1]}
                           </p>
                         </div>
                       </div>
@@ -287,10 +311,12 @@ const CongressoApresentacao = () => {
                             <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-civeni-red to-red-500 rounded-full flex items-center justify-center mr-3 md:mr-4">
                               <Users className="w-4 h-4 md:w-5 md:h-5 text-white" />
                             </div>
-                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">Impacto Esperado</h4>
+                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">{t('presentationPage.expectedImpactTitle')}</h4>
                           </div>
                           <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                            Formar uma <span className="font-semibold text-civeni-red">rede global</span> de profissionais comprometidos com a transformação social através da educação e tecnologia.
+                            {t('presentationPage.expectedImpactText').split(t('presentationPage.expectedImpactNetwork'))[0]}
+                            <span className="font-semibold text-civeni-red">{t('presentationPage.expectedImpactNetwork')}</span>
+                            {t('presentationPage.expectedImpactText').split(t('presentationPage.expectedImpactNetwork'))[1]}
                           </p>
                         </div>
                       </div>
@@ -329,7 +355,7 @@ const CongressoApresentacao = () => {
                   {feature1Desc}
                 </p>
                 <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Saiba mais <ArrowRight className="w-4 h-4 ml-1" />
+                  {t('presentationPage.learnMore')} <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </CardContent>
             </Card>
@@ -347,7 +373,7 @@ const CongressoApresentacao = () => {
                   {feature2Desc}
                 </p>
                 <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Saiba mais <ArrowRight className="w-4 h-4 ml-1" />
+                  {t('presentationPage.learnMore')} <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </CardContent>
             </Card>
@@ -365,7 +391,7 @@ const CongressoApresentacao = () => {
                   {feature3Desc}
                 </p>
                 <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Saiba mais <ArrowRight className="w-4 h-4 ml-1" />
+                  {t('presentationPage.learnMore')} <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </CardContent>
             </Card>
@@ -395,7 +421,7 @@ const CongressoApresentacao = () => {
             <Link to="/programacao-presencial" className="w-full sm:w-auto">
               <button className="w-full sm:w-auto bg-transparent text-white hover:bg-white hover:text-civeni-blue border-2 border-white px-6 py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full transition-all hover:scale-105 flex items-center justify-center gap-2">
                 <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                Ver Programação
+                {t('presentationPage.viewSchedule')}
               </button>
             </Link>
           </div>
