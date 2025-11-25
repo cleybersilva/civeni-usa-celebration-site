@@ -663,7 +663,7 @@ const TransmissaoAoVivo = () => {
                           >
                             <a href={room.meet_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-4 h-4 mr-2" />
-                              Entrar no Google Meet
+                              {t('transmission.joinMeet', 'Entrar no Google Meet')}
                             </a>
                           </Button>
                         </div>
@@ -672,7 +672,7 @@ const TransmissaoAoVivo = () => {
                         {room.assignments && room.assignments.length > 0 ? (
                           <div className="space-y-3">
                             <h4 className="font-semibold text-lg text-gray-800">
-                              Trabalhos desta sala ({room.assignments.length})
+                              {t('transmission.roomWorks', 'Trabalhos desta sala')} ({room.assignments.length})
                             </h4>
                             <div className="space-y-3">
                               {room.assignments.map((assignment: any, idx: number) => (
@@ -704,7 +704,7 @@ const TransmissaoAoVivo = () => {
                                         <div className="flex items-start gap-2">
                                           <FileText className="w-4 h-4 mt-1 text-civeni-red shrink-0" />
                                           <span className="text-gray-700">
-                                            {assignment.submission?.titulo || 'Título não disponível'}
+                                            {assignment.submission?.titulo || t('transmission.noWorkTitle', 'Título não disponível')}
                                           </span>
                                         </div>
                                       </div>
@@ -735,9 +735,9 @@ const TransmissaoAoVivo = () => {
                       <Video className="w-10 h-10 text-gray-400" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-gray-900">Nenhuma sala disponível no momento</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{t('transmission.noRooms', 'Nenhuma sala disponível no momento')}</h3>
                       <p className="text-gray-600">
-                        As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.
+                        {t('transmission.noStreamDesc', 'As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.')}
                       </p>
                     </div>
                   </div>

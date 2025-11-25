@@ -556,7 +556,7 @@ export const trTranslations = {
         description: "III CIVENI 2025 tüm canlı yayınlarını takip edin",
         ctaWatch: "Şimdi İzle (YouTube)",
         ctaRooms: "Sözlü Sunum Odaları",
-        timezoneInfo: "Florida (ET) ve Fortaleza (BRT) saatleri",
+        timezoneInfo: "{{user}} saatinde • Etkinlik: {{event}}",
         noStream: "Şu anda canlı yayın yok",
         noStreamTitle: "Bir sonraki yayını bekleyin",
         noStreamDesc: "Programımıza göz atın",
@@ -582,6 +582,9 @@ export const trTranslations = {
         enrolledOnly: "Sadece Kayıtlı",
         roomsTitle: "Sunum Odaları (Google Meet)",
         roomsDescription: "Sanal odalara erişim (kayıt gerekli)",
+        joinMeet: "Google Meet'e Katıl",
+        roomWorks: "Bu odadaki çalışmalar",
+        noWorkTitle: "Başlık mevcut değil",
         faqTitle: "Sık Sorulan Sorular",
         badges: { 
           live: "CANLI", 
