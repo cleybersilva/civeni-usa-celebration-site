@@ -378,7 +378,19 @@ export const ptTranslations = {
         title: "6. Cookies",
         content: "Utilizamos cookies essenciais para o funcionamento do site e cookies analíticos para melhorar sua experiência. Você pode gerenciar suas preferências de cookies nas configurações do seu navegador."
       },
-      contact: {
+    contactPage: {
+      pageTitle: "Contato",
+      breadcrumbHome: "Home",
+      breadcrumbContact: "Contato",
+      heroTitle: "Contato",
+      heroDescription: "Entre em contato conosco para esclarecer dúvidas sobre o III CIVENI 2025 - Estamos aqui para ajudar você a participar desta experiência única de aprendizado mundial",
+      registerButton: "Fazer Inscrição",
+      directEmail: "E-mail Direto",
+      talkToUs: "Fale Conosco",
+      talkToUsDescription: "Escolha a melhor forma de entrar em contato. Estamos prontos para atendê-lo!",
+    },
+    
+    contact: {
         title: "7. Contato",
         content: "Para questões relacionadas à privacidade de dados, entre em contato conosco:"
       },
