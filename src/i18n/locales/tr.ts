@@ -344,21 +344,7 @@ export const trTranslations = {
           noContentDescription: 'El yazmaları hakkında bilgiler yakında yayınlanacak.',
         },
       },
-      userRights: {
-        title: "5. Haklarınız",
-        content: "Aşağıdaki haklara sahipsiniz:",
-        access: "Kişisel verilerinize erişim",
-        correction: "Yanlış bilgileri düzeltme",
-        deletion: "Verilerinizin silinmesini talep etme",
-        portability: "Veri taşınabilirliği talep etme"
-      },
-      cookies: {
-        title: "6. Çerezler",
-        content: "Site işlevselliği için temel çerezler ve deneyiminizi geliştirmek için analitik çerezler kullanıyoruz. Çerez tercihlerinizi tarayıcı ayarlarınızdan yönetebilirsiniz."
-      }
-    },
-    
-    contactPage: {
+      videos: {
       pageTitle: "İletişim",
       breadcrumbHome: "Ana Sayfa",
       breadcrumbContact: "İletişim",
