@@ -646,12 +646,12 @@ export const enTranslations = {
           },
           ctaTitle: "Still have questions?"
         }
+      },
+      common: {
+        loading: "Loading",
+        previous: "Previous",
+        next: "Next",
+        goToImage: "Go to image"
       }
-  },
-  common: {
-    loading: "Loading",
-    previous: "Previous",
-    next: "Next",
-    goToImage: "Go to image"
   }
 };
