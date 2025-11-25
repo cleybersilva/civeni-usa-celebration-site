@@ -440,7 +440,9 @@ const TransmissaoAoVivo = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Próximas Transmissões</h2>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  {t('transmission.upcomingStreams', 'Próximas Transmissões')}
+                </h2>
               </div>
               {upcomingLoading ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -458,7 +460,7 @@ const TransmissaoAoVivo = () => {
                       <div className="space-y-4">
                         <div className="flex items-start justify-between">
                           <Badge variant="outline" className="bg-civeni-blue/10 text-civeni-blue border-civeni-blue/20">
-                            Agendado
+                            {t('transmission.badges.scheduled', 'Agendado')}
                           </Badge>
                           <Calendar className="w-5 h-5 text-civeni-blue" />
                         </div>
@@ -482,7 +484,7 @@ const TransmissaoAoVivo = () => {
                           asChild
                         >
                           <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
-                            Ver Detalhes
+                            {t('eventsPage.viewDetails', 'Ver Detalhes')}
                             <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
