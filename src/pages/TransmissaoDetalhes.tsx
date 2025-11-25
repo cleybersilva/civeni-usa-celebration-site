@@ -262,11 +262,11 @@ const TransmissaoDetalhes = () => {
             ) : (
               <Card className="p-12 text-center">
                 <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">Vídeo não disponível</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('transmission.noVideoTitle')}</h3>
                 <p className="text-muted-foreground mb-4">
                   {transmission.status === 'scheduled' 
-                    ? 'A transmissão ainda não começou.'
-                    : 'Não há replay disponível no momento.'}
+                    ? t('transmission.noVideoDescription')
+                    : t('transmission.noReplayAvailable')}
                 </p>
                 {transmission.channel_handle && (
                   <Button variant="outline" asChild>
@@ -275,7 +275,7 @@ const TransmissaoDetalhes = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Visite o canal
+                      {t('transmission.visitChannel')}
                     </a>
                   </Button>
                 )}
