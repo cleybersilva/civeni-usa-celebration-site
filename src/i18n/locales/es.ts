@@ -556,8 +556,7 @@ export const esTranslations = {
         oralPresentation: "Presentación Oral",
         posterSessions: "Sesiones de Póster",
         manuscripts: "Manuscritos"
-      }
-    },
+      },
     transmission: {
       countdown: {
         days: 'Días',
@@ -606,10 +605,8 @@ export const esTranslations = {
         roomWorks: "Trabajos en esta sala",
         noWorkTitle: "Título no disponible",
         faqTitle: "Preguntas Frecuentes",
-        faqCtaTitle: "¿Aún tienes dudas?",
-        faqCtaDescription: "Nuestro equipo está listo para ayudar. Contáctanos para más información.",
         badges: { 
-          live: "EN VIVO",
+          live: "EN VIVO", 
           scheduled: "PROGRAMADO", 
           ended: "FINALIZADO" 
         },
@@ -649,6 +646,7 @@ export const esTranslations = {
           ctaTitle: "¿Aún tienes dudas?"
         }
       }
+    }
   },
   common: {
     loading: "Cargando",

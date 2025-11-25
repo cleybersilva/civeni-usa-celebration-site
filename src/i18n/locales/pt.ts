@@ -673,8 +673,6 @@ export const ptTranslations = {
       roomWorks: "Trabalhos desta sala",
       noWorkTitle: "Título não disponível",
       faqTitle: "Perguntas Frequentes",
-      faqCtaTitle: "Ainda tem dúvidas?",
-      faqCtaDescription: "Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.",
       badges: { 
         live: "AO VIVO", 
         scheduled: "AGENDADO", 

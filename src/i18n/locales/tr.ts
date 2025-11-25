@@ -537,8 +537,7 @@ export const trTranslations = {
         oralPresentation: "Sözlü Sunum",
         posterSessions: "Poster Oturumları",
         manuscripts: "El Yazmaları"
-      }
-    },
+      },
     transmission: {
       countdown: {
         days: 'Günler',
@@ -587,9 +586,7 @@ export const trTranslations = {
         roomWorks: "Bu odadaki çalışmalar",
         noWorkTitle: "Başlık mevcut değil",
         faqTitle: "Sık Sorulan Sorular",
-        faqCtaTitle: "Hala sorularınız mı var?",
-        faqCtaDescription: "Ekibimiz yardıma hazır. Daha fazla bilgi için bizimle iletişime geçin.",
-        badges: {
+        badges: { 
           live: "CANLI", 
           scheduled: "PLANLI", 
           ended: "BİTTİ" 
@@ -630,6 +627,7 @@ export const trTranslations = {
           ctaTitle: "Hâlâ sorularınız mı var?"
         }
       }
+    }
   },
   common: {
     loading: "Yükleniyor",

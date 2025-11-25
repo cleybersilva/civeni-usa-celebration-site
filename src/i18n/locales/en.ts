@@ -556,8 +556,7 @@ export const enTranslations = {
         oralPresentation: "Oral Presentation",
         posterSessions: "Poster Sessions",
         manuscripts: "Manuscripts"
-      }
-    },
+      },
     transmission: {
       countdown: {
         days: 'Days',
@@ -606,10 +605,8 @@ export const enTranslations = {
         roomWorks: "Works in this room",
         noWorkTitle: "Title not available",
         faqTitle: "Frequently Asked Questions",
-        faqCtaTitle: "Still have questions?",
-        faqCtaDescription: "Our team is ready to help. Contact us for more information.",
         badges: { 
-          live: "LIVE",
+          live: "LIVE", 
           scheduled: "SCHEDULED", 
           ended: "ENDED" 
         },
@@ -649,6 +646,7 @@ export const enTranslations = {
           ctaTitle: "Still have questions?"
         }
       }
+    }
   },
   common: {
     loading: "Loading",
