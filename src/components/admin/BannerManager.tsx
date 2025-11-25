@@ -41,17 +41,21 @@ const BannerManager = () => {
     title: '',
     titleEn: '',
     titleEs: '',
+    titleTr: '',
     subtitle: '',
     subtitleEn: '',
     subtitleEs: '',
+    subtitleTr: '',
     description: '',
     descriptionEn: '',
     descriptionEs: '',
+    descriptionTr: '',
     bgImage: '',
     uploadedImage: '',
     buttonText: '',
     buttonTextEn: '',
     buttonTextEs: '',
+    buttonTextTr: '',
     buttonLink: '',
     order: 1
   });
@@ -61,17 +65,21 @@ const BannerManager = () => {
       title: '',
       titleEn: '',
       titleEs: '',
+      titleTr: '',
       subtitle: '',
       subtitleEn: '',
       subtitleEs: '',
+      subtitleTr: '',
       description: '',
       descriptionEn: '',
       descriptionEs: '',
+      descriptionTr: '',
       bgImage: '',
       uploadedImage: '',
       buttonText: '',
       buttonTextEn: '',
       buttonTextEs: '',
+      buttonTextTr: '',
       buttonLink: '',
       order: content.bannerSlides.length + 1
     });
@@ -144,17 +152,21 @@ const BannerManager = () => {
       title: slide.title,
       titleEn: slide.titleEn || '',
       titleEs: slide.titleEs || '',
+      titleTr: slide.titleTr || '',
       subtitle: slide.subtitle,
       subtitleEn: slide.subtitleEn || '',
       subtitleEs: slide.subtitleEs || '',
+      subtitleTr: slide.subtitleTr || '',
       description: slide.description,
       descriptionEn: slide.descriptionEn || '',
       descriptionEs: slide.descriptionEs || '',
+      descriptionTr: slide.descriptionTr || '',
       bgImage: slide.bgImage,
       uploadedImage: '', // Limpar upload quando editar
       buttonText: slide.buttonText,
       buttonTextEn: slide.buttonTextEn || '',
       buttonTextEs: slide.buttonTextEs || '',
+      buttonTextTr: slide.buttonTextTr || '',
       buttonLink: slide.buttonLink,
       order: slide.order
     });
@@ -317,6 +329,44 @@ const BannerManager = () => {
                         value={formData.buttonTextEs}
                         onChange={(e) => setFormData({...formData, buttonTextEs: e.target.value})}
                         placeholder="Ej: Inscríbete ahora"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Seção Turco */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-civeni-blue border-b pb-2">🇹🇷 Türkçe</h3>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Título (TR)</label>
+                      <Input
+                        value={formData.titleTr}
+                        onChange={(e) => setFormData({...formData, titleTr: e.target.value})}
+                        placeholder="Türkçe başlık"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Subtítulo (TR)</label>
+                      <Input
+                        value={formData.subtitleTr}
+                        onChange={(e) => setFormData({...formData, subtitleTr: e.target.value})}
+                        placeholder="Türkçe alt başlık"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Descrição (TR)</label>
+                      <Textarea
+                        value={formData.descriptionTr}
+                        onChange={(e) => setFormData({...formData, descriptionTr: e.target.value})}
+                        rows={2}
+                        placeholder="Türkçe açıklama"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Texto do Botão (TR)</label>
+                      <Input
+                        value={formData.buttonTextTr}
+                        onChange={(e) => setFormData({...formData, buttonTextTr: e.target.value})}
+                        placeholder="Örnek: Şimdi kaydol"
                       />
                     </div>
                   </div>
