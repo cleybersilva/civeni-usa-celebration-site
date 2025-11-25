@@ -191,6 +191,18 @@ export const esTranslations = {
       previous: "Anterior",
       next: "Siguiente"
     },
+    speakersPage: {
+      pageTitle: "Ponentes",
+      breadcrumbHome: "Inicio",
+      description: "Conoce a los expertos de renombre internacional que compartirán sus conocimientos en III CIVENI 2025 - Líderes en educación, innovación, justicia, humanidad, religiosidad y tecnología",
+      registerButton: "Inscribirse",
+      viewSchedule: "Ver Cronograma",
+      featuredSpeakersTitle: "Nuestros Ponentes Destacados",
+      featuredSpeakersDescription: "Profesionales reconocidos mundialmente que traerán las innovaciones y perspectivas más recientes en sus áreas de especialidad",
+      comingSoon: "Ponentes Próximamente",
+      comingSoonDescription: "Estamos finalizando nuestra selección de expertos de renombre mundial. ¡Los ponentes serán anunciados pronto!",
+      secureSpot: "Asegurar Mi Lugar"
+    },
     videos: {
       title: "Videos del I y II Civeni 2023/2024",
       description: "Revive los mejores momentos y presentaciones del II Congreso Internacional",

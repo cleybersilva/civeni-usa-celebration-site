@@ -189,6 +189,18 @@ export const trTranslations = {
       previous: "Önceki",
       next: "Sonraki"
     },
+    speakersPage: {
+      pageTitle: "Konuşmacılar",
+      breadcrumbHome: "Ana Sayfa",
+      description: "III CIVENI 2025'te bilgilerini paylaşacak uluslararası üne sahip uzmanlarla tanışın - Eğitim, inovasyon, adalet, insanlık, dindarlık ve teknolojide liderler",
+      registerButton: "Kayıt Ol",
+      viewSchedule: "Programı Gör",
+      featuredSpeakersTitle: "Öne Çıkan Konuşmacılarımız",
+      featuredSpeakersDescription: "Uzmanlık alanlarında en son yenilikleri ve perspektifleri getirecek dünya çapında tanınan profesyoneller",
+      comingSoon: "Konuşmacılar Yakında",
+      comingSoonDescription: "Dünya çapında ünlü uzmanlardan oluşan seçimimizi tamamlıyoruz. Konuşmacılar yakında duyurulacak!",
+      secureSpot: "Yerimizi Ayır"
+    },
     videos: {
       title: "I ve II Civeni 2023/2024'ten Videolar",
       description: "II Uluslararası Kongre'nin en iyi anlarını ve sunumlarını yeniden yaşayın",

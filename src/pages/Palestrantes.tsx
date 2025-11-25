@@ -36,33 +36,32 @@ const Palestrantes = () => {
           {/* Breadcrumbs */}
           <nav className="mb-6 md:mb-8 text-xs md:text-sm">
             <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">{t('speakersPage.breadcrumbHome')}</Link></li>
               <li className="text-blue-200">›</li>
-              <li>Palestrantes</li>
+              <li>{t('speakersPage.pageTitle')}</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
-              Palestrantes
+              {t('speakersPage.pageTitle')}
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
-              Conheça os especialistas de renome internacional que compartilharão seus conhecimentos no III CIVENI 2025 - 
-              Líderes em educação, inovação, justiça, humanidade, religiosidade e tecnologia
+              {t('speakersPage.description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 md:w-5 md:h-5" />
-                  Fazer Inscrição
+                  {t('speakersPage.registerButton')}
                 </button>
               </Link>
               
               <Link to="/programacao-presencial" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                  Ver Programação
+                  {t('speakersPage.viewSchedule')}
                 </button>
               </Link>
             </div>
@@ -75,10 +74,10 @@ const Palestrantes = () => {
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6 font-poppins flex items-center justify-center gap-2 md:gap-3">
               <Star className="w-6 h-6 md:w-8 md:h-8 text-civeni-blue" />
-              Nossos Palestrantes de Destaque
+              {t('speakersPage.featuredSpeakersTitle')}
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2">
-              Profissionais reconhecidos mundialmente que trarão as mais recentes inovações e perspectivas em suas áreas de especialidade
+              {t('speakersPage.featuredSpeakersDescription')}
             </p>
           </div>
           
@@ -97,15 +96,14 @@ const Palestrantes = () => {
               <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-xl md:rounded-2xl p-6 md:p-12 max-w-2xl mx-auto">
                 <Users className="w-12 h-12 md:w-16 md:h-16 text-civeni-blue mx-auto mb-4 md:mb-6" />
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4">
-                  Palestrantes em Breve
+                  {t('speakersPage.comingSoon')}
                 </h3>
                 <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8">
-                  Estamos finalizando nossa seleção de especialistas de renome mundial. 
-                  Os palestrantes serão anunciados em breve!
+                  {t('speakersPage.comingSoonDescription')}
                 </p>
                 <Link to="/inscricoes">
                   <button className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold hover:shadow-lg transition-all flex items-center gap-2 mx-auto">
-                    Garantir Minha Vaga
+                    {t('speakersPage.secureSpot')}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </Link>
