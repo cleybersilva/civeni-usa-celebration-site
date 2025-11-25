@@ -629,7 +629,9 @@ export const trTranslations = {
         },
         noVideoTitle: "Kullanılabilir video yok",
         noVideoDescription: "Yayın henüz başlamadı veya tekrar mevcut değil.",
-        visitChannel: "Kanalı ziyaret edin"
+        visitChannel: "Kanalı ziyaret edin",
+        noRoomsAvailable: "Şu anda uygun oda yok",
+        noRoomsDescription: "Sunum odaları yakında yayınlanacaktır. Programa dikkat edin.",
       },
       common: {
         loading: "Yükleniyor",
