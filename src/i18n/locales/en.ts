@@ -203,6 +203,18 @@ export const enTranslations = {
       comingSoonDescription: "We are finalizing our selection of world-renowned experts. Speakers will be announced soon!",
       secureSpot: "Secure My Spot"
     },
+    thematicAreasPage: {
+      pageTitle: "Thematic Areas",
+      breadcrumbHome: "Home",
+      description: "Explore the main areas of knowledge that will be addressed at III CIVENI 2025 - A multidisciplinary congress connecting education, innovation, justice, humanity, religiosity and technology",
+      submitWork: "Submit Work",
+      registerButton: "Register Now",
+      sectionTitle: "Discover Our Knowledge Areas",
+      sectionDescription: "Each thematic area represents a fundamental pillar of the multidisciplinary knowledge that characterizes CIVENI",
+      submissionTitle: "Work Submission",
+      submissionDescription: "Present your research and experiences in one of these thematic areas and contribute to the advancement of multidisciplinary knowledge",
+      learnMoreSubmissions: "Learn More About Submissions"
+    },
     videos: {
       title: "Videos from I and II Civeni 2023/2024",
       description: "Relive the best moments and presentations from the II International Congress",
