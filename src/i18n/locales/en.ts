@@ -374,7 +374,9 @@ export const enTranslations = {
       cookies: {
         title: "6. Cookies",
         content: "We use essential cookies for site functionality and analytical cookies to improve your experience. You can manage your cookie preferences in your browser settings."
-      },
+      }
+    },
+    
     contactPage: {
       pageTitle: "Contact",
       breadcrumbHome: "Home",
@@ -388,14 +390,14 @@ export const enTranslations = {
     },
     
     contact: {
-        title: "7. Contact",
-        content: "For data privacy questions, contact us:"
-      },
-      changes: {
-        title: "8. Changes",
-        content: "This policy may be updated periodically. We will notify about significant changes through our website or email."
-      }
+      title: "7. Contact",
+      content: "For data privacy questions, contact us:"
     },
+    changes: {
+      title: "8. Changes",
+      content: "This policy may be updated periodically. We will notify about significant changes through our website or email."
+    }
+  },
     hybrid: {
       title: "Hybrid Format",
       description: "Experience the best of both worlds with our innovative hybrid format",
@@ -644,6 +646,7 @@ export const enTranslations = {
       }
     }
   },
+  
   common: {
     loading: "Loading",
     previous: "Previous",
