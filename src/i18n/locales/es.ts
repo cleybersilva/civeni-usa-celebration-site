@@ -648,7 +648,9 @@ export const esTranslations = {
         },
         noVideoTitle: "Ningún video disponible",
         noVideoDescription: "La transmisión aún no ha comenzado o no hay replay disponible.",
-        visitChannel: "Visita el canal"
+        visitChannel: "Visita el canal",
+        noRoomsAvailable: "Ninguna sala disponible en este momento",
+        noRoomsDescription: "Las salas de presentación se publicarán próximamente. Mantente atento a la programación.",
       },
       common: {
         loading: "Cargando",

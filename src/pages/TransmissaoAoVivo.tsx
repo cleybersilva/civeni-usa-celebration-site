@@ -20,8 +20,19 @@ import {
 import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentationRooms';
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS, es, tr } from 'date-fns/locale';
 import { useCMS } from '@/contexts/CMSContext';
+
+// Helper: map i18n language to date-fns locale
+const getDateLocale = (lang: string) => {
+  switch (lang) {
+    case 'en': return enUS;
+    case 'es': return es;
+    case 'tr': return tr;
+    case 'pt':
+    default: return ptBR;
+  }
+};
 
 const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
@@ -638,7 +649,7 @@ const TransmissaoAoVivo = () => {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale(i18n.language) })}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
@@ -719,7 +730,7 @@ const TransmissaoAoVivo = () => {
                               ))}
                             </div>
                           </div>
-              ) : (
+                ) : (
                 <p className="text-gray-500 text-center py-4">
                   {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
                 </p>
@@ -735,9 +746,9 @@ const TransmissaoAoVivo = () => {
                       <Video className="w-10 h-10 text-gray-400" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-gray-900">{t('transmission.noRooms', 'Nenhuma sala disponível no momento')}</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{t('transmission.noRoomsAvailable')}</h3>
                       <p className="text-gray-600">
-                        {t('transmission.noStreamDesc', 'As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.')}
+                        {t('transmission.noRoomsDescription')}
                       </p>
                     </div>
                   </div>

@@ -648,7 +648,9 @@ export const enTranslations = {
         },
         noVideoTitle: "No video available",
         noVideoDescription: "The broadcast has not started yet or there is no replay available.",
-        visitChannel: "Visit the channel"
+        visitChannel: "Visit the channel",
+        noRoomsAvailable: "No rooms available at the moment",
+        noRoomsDescription: "Presentation rooms will be published soon. Stay tuned to the schedule.",
       },
       common: {
         loading: "Loading",
