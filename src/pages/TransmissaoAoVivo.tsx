@@ -920,9 +920,9 @@ const TransmissaoAoVivo = () => {
               {/* Additional help CTA */}
               <Card className="p-10 text-center bg-gradient-to-br from-civeni-blue/5 to-civeni-red/5 border-civeni-blue/20 shadow-md">
                 <div className="max-w-2xl mx-auto space-y-4">
-                  <h3 className="text-2xl font-bold text-gray-900">{t('transmission.faq.ctaTitle', 'Ainda tem dúvidas?')}</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">{t('transmission.faqCtaTitle', 'Ainda tem dúvidas?')}</h3>
                   <p className="text-gray-600">
-                    {t('transmission.noStreamDesc', 'Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.')}
+                    {t('transmission.faqCtaDescription', 'Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.')}
                   </p>
                   <Button 
                     size="lg"
