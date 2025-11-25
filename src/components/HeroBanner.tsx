@@ -17,9 +17,10 @@ const HeroBanner = () => {
   const getTranslatedText = (pt: string, en?: string, es?: string, tr?: string) => {
     const currentLang = i18n.language.split('-')[0]; // Pega apenas 'en', 'es', 'pt', 'tr'
     
-    if (currentLang === 'en' && en) return en;
-    if (currentLang === 'es' && es) return es;
-    if (currentLang === 'tr' && tr) return tr;
+    // Retorna a tradução se existir e não for string vazia, senão usa português
+    if (currentLang === 'en') return en || pt;
+    if (currentLang === 'es') return es || pt;
+    if (currentLang === 'tr') return tr || pt;
     return pt; // Padrão português
   };
 
