@@ -356,7 +356,19 @@ export const trTranslations = {
         title: "6. Çerezler",
         content: "Site işlevselliği için temel çerezler ve deneyiminizi geliştirmek için analitik çerezler kullanıyoruz. Çerez tercihlerinizi tarayıcı ayarlarınızdan yönetebilirsiniz."
       },
-      contact: {
+    contactPage: {
+      pageTitle: "İletişim",
+      breadcrumbHome: "Ana Sayfa",
+      breadcrumbContact: "İletişim",
+      heroTitle: "İletişim",
+      heroDescription: "III CIVENI 2025 hakkındaki sorularınızı açıklığa kavuşturmak için bizimle iletişime geçin - Bu eşsiz küresel öğrenme deneyimine katılmanıza yardımcı olmak için buradayız",
+      registerButton: "Kayıt Ol",
+      directEmail: "Doğrudan E-posta",
+      talkToUs: "Bizimle İletişime Geçin",
+      talkToUsDescription: "İletişime geçmek için en iyi yolu seçin. Size yardımcı olmaya hazırız!",
+    },
+    
+    contact: {
         title: "7. İletişim",
         content: "Veri gizliliği soruları için bizimle iletişime geçin:"
       },

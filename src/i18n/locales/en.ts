@@ -375,7 +375,19 @@ export const enTranslations = {
         title: "6. Cookies",
         content: "We use essential cookies for site functionality and analytical cookies to improve your experience. You can manage your cookie preferences in your browser settings."
       },
-      contact: {
+    contactPage: {
+      pageTitle: "Contact",
+      breadcrumbHome: "Home",
+      breadcrumbContact: "Contact",
+      heroTitle: "Contact",
+      heroDescription: "Contact us to clarify doubts about III CIVENI 2025 - We are here to help you participate in this unique global learning experience",
+      registerButton: "Register Now",
+      directEmail: "Direct Email",
+      talkToUs: "Contact Us",
+      talkToUsDescription: "Choose the best way to get in touch. We are ready to assist you!",
+    },
+    
+    contact: {
         title: "7. Contact",
         content: "For data privacy questions, contact us:"
       },
