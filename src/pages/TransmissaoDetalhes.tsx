@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
@@ -19,6 +20,13 @@ const TransmissaoDetalhes = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const locale = i18n.language;
+  const normalizedLocale = (locale || 'pt').startsWith('en')
+    ? 'en'
+    : (locale || 'pt').startsWith('es')
+    ? 'es'
+    : (locale || 'pt').startsWith('tr')
+    ? 'tr'
+    : 'pt';
 
   // Fetch transmission by slug
   const { data: transmission, isLoading } = useQuery({
@@ -96,9 +104,88 @@ const TransmissaoDetalhes = () => {
   const startAt = transmission.start_at ? new Date(transmission.start_at) : null;
   const endAt = transmission.end_at ? new Date(transmission.end_at) : null;
 
+  const uiTexts = useMemo(() => {
+    const texts = {
+      pt: {
+        playerTitle: 'Player',
+        channelPrefix: 'Canal:',
+        noVideoTitle: 'Vídeo não disponível',
+        noVideoScheduled: 'A transmissão ainda não começou.',
+        noVideoReplay: 'Não há replay disponível no momento.',
+        visitChannelLabel: 'Visite o canal',
+        infoTitle: 'Informações',
+        dateLabel: 'Data',
+        timeLabel: 'Horário',
+        locationLabel: 'Local',
+        onlineTransmission: 'Transmissão Online',
+        usefulLinksTitle: 'Links úteis',
+        viewSchedule: 'Ver programação',
+        youtubeChannelLabel: 'Canal do YouTube',
+        timezonePrefix: 'Horários em',
+        timezoneLocalLabel: 'Local:',
+      },
+      en: {
+        playerTitle: 'Player',
+        channelPrefix: 'Channel:',
+        noVideoTitle: 'Video not available',
+        noVideoScheduled: 'The broadcast has not started yet.',
+        noVideoReplay: 'There is no replay available at the moment.',
+        visitChannelLabel: 'Visit the channel',
+        infoTitle: 'Information',
+        dateLabel: 'Date',
+        timeLabel: 'Time',
+        locationLabel: 'Location',
+        onlineTransmission: 'Online transmission',
+        usefulLinksTitle: 'Useful links',
+        viewSchedule: 'View schedule',
+        youtubeChannelLabel: 'YouTube channel',
+        timezonePrefix: 'Times in',
+        timezoneLocalLabel: 'Local time:',
+      },
+      es: {
+        playerTitle: 'Reproductor',
+        channelPrefix: 'Canal:',
+        noVideoTitle: 'Video no disponible',
+        noVideoScheduled: 'La transmisión aún no ha comenzado.',
+        noVideoReplay: 'No hay repetición disponible en este momento.',
+        visitChannelLabel: 'Visitar el canal',
+        infoTitle: 'Información',
+        dateLabel: 'Fecha',
+        timeLabel: 'Horario',
+        locationLabel: 'Lugar',
+        onlineTransmission: 'Transmisión en línea',
+        usefulLinksTitle: 'Enlaces útiles',
+        viewSchedule: 'Ver programación',
+        youtubeChannelLabel: 'Canal de YouTube',
+        timezonePrefix: 'Horarios en',
+        timezoneLocalLabel: 'Hora local:',
+      },
+      tr: {
+        playerTitle: 'Oynatıcı',
+        channelPrefix: 'Kanal:',
+        noVideoTitle: 'Video kullanılamıyor',
+        noVideoScheduled: 'Yayın henüz başlamadı.',
+        noVideoReplay: 'Şu anda tekrar yayını mevcut değil.',
+        visitChannelLabel: 'Kanalı ziyaret et',
+        infoTitle: 'Bilgiler',
+        dateLabel: 'Tarih',
+        timeLabel: 'Saat',
+        locationLabel: 'Konum',
+        onlineTransmission: 'Çevrimiçi yayın',
+        usefulLinksTitle: 'Faydalı bağlantılar',
+        viewSchedule: 'Programı gör',
+        youtubeChannelLabel: 'YouTube kanalı',
+        timezonePrefix: 'Saatler',
+        timezoneLocalLabel: 'Yerel saat:',
+      },
+    } as const;
+
+    return texts[normalizedLocale as keyof typeof texts];
+  }, [normalizedLocale]);
+
   const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const eventTZ = transmission.timezone || 'America/New_York';
-  const timezoneText = `Horários em ${formatTimezone(userTZ)} • Local: ${formatTimezone(eventTZ)}`;
+  const timezoneText = `${uiTexts.timezonePrefix} ${formatTimezone(userTZ)} • ${uiTexts.timezoneLocalLabel} ${formatTimezone(eventTZ)}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -229,7 +316,7 @@ const TransmissaoDetalhes = () => {
             {/* YouTube Player */}
             {transmission.youtube_video_id ? (
               <div id="player" className="space-y-4">
-                <h2 className="text-2xl font-bold mb-4">Player</h2>
+                <h2 className="text-2xl font-bold mb-4">{uiTexts.playerTitle}</h2>
                 <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
                   <iframe
                     width="100%"
@@ -245,7 +332,7 @@ const TransmissaoDetalhes = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">
-                    Canal: {transmission.channel_handle}
+                    {uiTexts.channelPrefix} {transmission.channel_handle}
                   </p>
                   <Button variant="ghost" size="sm" asChild>
                     <a
