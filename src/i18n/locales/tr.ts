@@ -355,7 +355,9 @@ export const trTranslations = {
       cookies: {
         title: "6. Çerezler",
         content: "Site işlevselliği için temel çerezler ve deneyiminizi geliştirmek için analitik çerezler kullanıyoruz. Çerez tercihlerinizi tarayıcı ayarlarınızdan yönetebilirsiniz."
-      },
+      }
+    },
+    
     contactPage: {
       pageTitle: "İletişim",
       breadcrumbHome: "Ana Sayfa",
@@ -369,14 +371,14 @@ export const trTranslations = {
     },
     
     contact: {
-        title: "7. İletişim",
-        content: "Veri gizliliği soruları için bizimle iletişime geçin:"
-      },
-      changes: {
-        title: "8. Değişiklikler",
-        content: "Bu politika periyodik olarak güncellenebilir. Önemli değişiklikler hakkında web sitemiz veya e-posta yoluyla bilgilendirme yapacağız."
-      }
+      title: "7. İletişim",
+      content: "Veri gizliliği soruları için bizimle iletişime geçin:"
     },
+    changes: {
+      title: "8. Değişiklikler",
+      content: "Bu politika periyodik olarak güncellenebilir. Önemli değişiklikler hakkında web sitemiz veya e-posta yoluyla bilgilendirme yapacağız."
+    }
+  },
     hybrid: {
       title: "Hibrit Format",
       description: "Yenilikçi hibrit formatımızla her iki dünyanın da en iyisini deneyimleyin",
@@ -625,6 +627,7 @@ export const trTranslations = {
       }
     }
   },
+  
   common: {
     loading: "Yükleniyor",
     previous: "Önceki",

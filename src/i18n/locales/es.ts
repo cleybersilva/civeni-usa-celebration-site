@@ -374,7 +374,9 @@ export const esTranslations = {
       cookies: {
         title: "6. Cookies",
         content: "Utilizamos cookies esenciales para la funcionalidad del sitio y cookies analíticas para mejorar su experiencia. Puede administrar sus preferencias de cookies en la configuración de su navegador."
-      },
+      }
+    },
+    
     contactPage: {
       pageTitle: "Contacto",
       breadcrumbHome: "Inicio",
@@ -388,14 +390,14 @@ export const esTranslations = {
     },
     
     contact: {
-        title: "7. Contacto",
-        content: "Para preguntas relacionadas con la privacidad de datos, contáctenos:"
-      },
-      changes: {
-        title: "8. Cambios",
-        content: "Esta política puede actualizarse periódicamente. Notificaremos sobre cambios significativos a través de nuestro sitio web o correo electrónico."
-      }
+      title: "7. Contacto",
+      content: "Para preguntas relacionadas con la privacidad de datos, contáctenos:"
     },
+    changes: {
+      title: "8. Cambios",
+      content: "Esta política puede actualizarse periódicamente. Notificaremos sobre cambios significativos a través de nuestro sitio web o correo electrónico."
+    }
+  },
     hybrid: {
       title: "Formato Híbrido",
       description: "Experimenta lo mejor de ambos mundos con nuestro formato híbrido innovador",
@@ -644,6 +646,7 @@ export const esTranslations = {
       }
     }
   },
+  
   common: {
     loading: "Cargando",
     previous: "Anterior",
