@@ -537,8 +537,7 @@ export const trTranslations = {
         oralPresentation: "Sözlü Sunum",
         posterSessions: "Poster Oturumları",
         manuscripts: "El Yazmaları"
-      }
-    },
+      },
     transmission: {
       countdown: {
         days: 'Günler',
@@ -628,6 +627,7 @@ export const trTranslations = {
           ctaTitle: "Hâlâ sorularınız mı var?"
         }
       }
+    }
   },
   common: {
     loading: "Yükleniyor",
