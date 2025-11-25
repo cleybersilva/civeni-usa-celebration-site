@@ -294,6 +294,36 @@ const TransmissaoAoVivo = () => {
     return map[lang] || map.pt;
   }, [locale]);
 
+  // No video available texts by language
+  const noVideoTexts = useMemo(() => {
+    const lang = (locale || 'pt').slice(0, 2) as 'pt' | 'en' | 'es' | 'tr';
+
+    const map = {
+      pt: {
+        title: 'Nenhum vídeo disponível',
+        description: 'A transmissão ainda não começou ou não há replay disponível.',
+        button: 'Visite o canal',
+      },
+      en: {
+        title: 'No video available',
+        description: 'The transmission has not started yet or there is no replay available.',
+        button: 'Visit the channel',
+      },
+      es: {
+        title: 'No hay video disponible',
+        description: 'La transmisión aún no ha comenzado o no hay repetición disponible.',
+        button: 'Visitar el canal',
+      },
+      tr: {
+        title: 'Video mevcut değil',
+        description: 'Yayın henüz başlamadı veya tekrar mevcut değil.',
+        button: 'Kanalı ziyaret et',
+      },
+    } as const;
+
+    return map[lang] || map.pt;
+  }, [locale]);
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -524,9 +554,9 @@ const TransmissaoAoVivo = () => {
                     <Video className="w-10 h-10 text-gray-400" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-900">Nenhum vídeo disponível</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">{noVideoTexts.title}</h3>
                     <p className="text-gray-600 text-base">
-                      A transmissão ainda não começou ou não há replay disponível.
+                      {noVideoTexts.description}
                     </p>
                   </div>
                   <Button 
@@ -541,7 +571,7 @@ const TransmissaoAoVivo = () => {
                       rel="noopener noreferrer"
                     >
                       <Youtube className="w-5 h-5 mr-2" />
-                      Visite o canal
+                      {noVideoTexts.button}
                       <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
