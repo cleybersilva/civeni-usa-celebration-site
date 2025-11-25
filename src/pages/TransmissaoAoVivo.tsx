@@ -21,22 +21,62 @@ import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentati
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useCMS } from '@/contexts/CMSContext';
 
 const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const locale = i18n.language;
+  const { content } = useCMS();
 
   // Parse active tab from hash
   const hash = location.hash.replace('#', '') || 'ao-vivo';
   const [activeTab, setActiveTab] = useState(hash);
+  
+  // Countdown state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
 
   // Fetch data
   const { data: transmission, isLoading: txLoading } = useTransmission();
   const { data: rooms = [], isLoading: roomsLoading } = useTransmissionRooms(transmission?.id);
   const { data: upcoming = [], isLoading: upcomingLoading } = useUpcomingTransmissions();
   const { data: presentationRooms = [], isLoading: presentationRoomsLoading } = usePublicPresentationRoomsWithAssignments();
+
+  // Countdown timer
+  useEffect(() => {
+    const eventDate = content.eventConfig.eventDate;
+    if (!eventDate) return;
+
+    const rawTime = content.eventConfig.startTime || '00:00:00';
+    const time = /\d{2}:\d{2}:\d{2}/.test(rawTime) ? rawTime : `${rawTime}:00`;
+    const targetDate = new Date(`${eventDate}T${time}`).getTime();
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [content.eventConfig.eventDate, content.eventConfig.startTime]);
 
   // Sync hash with active tab
   useEffect(() => {
@@ -226,18 +266,55 @@ const TransmissaoAoVivo = () => {
               </Link>
             </div>
 
-            {/* Status info */}
-            {(statusBadge || timezoneText) && (
-              <div className="flex flex-wrap gap-4 items-center justify-center text-sm">
-                {statusBadge}
-                {timezoneText && (
-                  <span className="text-blue-100">
-                    <Clock className="w-4 h-4 inline mr-2" />
-                    {timezoneText}
-                  </span>
-                )}
+            {/* Countdown Timer */}
+            <div className="flex flex-col items-center justify-center gap-4 mt-8">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-6 animate-pulse shadow-2xl border border-white/20">
+                <div className="flex items-center gap-6">
+                  <div className="text-center">
+                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.days.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.days')}
+                    </div>
+                  </div>
+                  <div className="text-3xl md:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-center">
+                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.hours.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.hours')}
+                    </div>
+                  </div>
+                  <div className="text-3xl md:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-center">
+                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.minutes.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.minutes')}
+                    </div>
+                  </div>
+                  <div className="text-3xl md:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-center">
+                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.seconds.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.seconds')}
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+              
+              {timezoneText && (
+                <span className="text-blue-100 text-sm">
+                  <Clock className="w-4 h-4 inline mr-2" />
+                  {timezoneText}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </section>
