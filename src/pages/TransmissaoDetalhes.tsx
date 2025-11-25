@@ -194,13 +194,13 @@ const TransmissaoDetalhes = () => {
                   Assistir agora
                 </Button>
               )}
-              {transmission.status === 'scheduled' && transmission.channel_handle && (
+              {transmission.status === 'scheduled' && (
                 <Button
                   size="lg"
                   className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto"
                   asChild
                 >
-                  <a href={`https://www.youtube.com/${transmission.channel_handle}/live`} target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                     <Calendar className="w-5 h-5 mr-2" />
                     Definir lembrete
                   </a>
@@ -212,7 +212,7 @@ const TransmissaoDetalhes = () => {
                 className="border-white text-white hover:bg-white/20 w-full sm:w-auto"
                 asChild
               >
-                <a href="/inscricoes">
+                <a href="https://civeni.com/inscricoes" target="_blank" rel="noopener noreferrer">
                   <Users className="w-5 h-5 mr-2" />
                   Fazer Inscrição
                 </a>
