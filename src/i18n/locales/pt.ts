@@ -650,6 +650,9 @@ export const ptTranslations = {
         },
         ctaTitle: "Ainda tem dúvidas?" 
       },
+      noVideoTitle: "Nenhum vídeo disponível",
+      noVideoDescription: "A transmissão ainda não começou ou não há replay disponível.",
+      visitChannel: "Visite o canal",
       common: {
         loading: "Carregando",
         previous: "Anterior",

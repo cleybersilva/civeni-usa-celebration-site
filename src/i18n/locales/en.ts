@@ -645,7 +645,10 @@ export const enTranslations = {
             answer: "Contact our support team via email at suporte@civeni.org or through WhatsApp available on the contact page." 
           },
           ctaTitle: "Still have questions?"
-        }
+        },
+        noVideoTitle: "No video available",
+        noVideoDescription: "The broadcast has not started yet or there is no replay available.",
+        visitChannel: "Visit the channel"
       },
       common: {
         loading: "Loading",

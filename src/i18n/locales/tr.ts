@@ -626,7 +626,10 @@ export const trTranslations = {
             answer: "Destek ekibimizle suporte@civeni.org e-posta adresi üzerinden veya iletişim sayfasında bulunan WhatsApp üzerinden iletişime geçin." 
           },
           ctaTitle: "Hâlâ sorularınız mı var?"
-        }
+        },
+        noVideoTitle: "Kullanılabilir video yok",
+        noVideoDescription: "Yayın henüz başlamadı veya tekrar mevcut değil.",
+        visitChannel: "Kanalı ziyaret edin"
       },
       common: {
         loading: "Yükleniyor",
