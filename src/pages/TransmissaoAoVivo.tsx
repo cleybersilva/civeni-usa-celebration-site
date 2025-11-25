@@ -19,8 +19,8 @@ import {
 } from '@/hooks/useTransmission';
 import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentationRooms';
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { format, type Locale } from 'date-fns';
+import { ptBR, enUS, es, tr } from 'date-fns/locale';
 import { useCMS } from '@/contexts/CMSContext';
 
 const TransmissaoAoVivo = () => {
@@ -29,6 +29,18 @@ const TransmissaoAoVivo = () => {
   const navigate = useNavigate();
   const locale = i18n.language;
   const { content } = useCMS();
+
+  // Map locale to date-fns locale
+  const dateLocale = useMemo(() => {
+    const lang = (locale || 'pt').slice(0, 2);
+    const localeMap: Record<string, Locale> = {
+      pt: ptBR,
+      en: enUS,
+      es: es,
+      tr: tr
+    };
+    return localeMap[lang] || ptBR;
+  }, [locale]);
 
   // Parse active tab from hash
   const hash = location.hash.replace('#', '') || 'ao-vivo';
@@ -765,11 +777,7 @@ const TransmissaoAoVivo = () => {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {new Date(room.data_apresentacao).toLocaleDateString(locale, {
-                                  day: '2-digit',
-                                  month: 'long',
-                                  year: 'numeric'
-                                })}
+                                {format(new Date(room.data_apresentacao), 'dd MMMM yyyy', { locale: dateLocale })}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
