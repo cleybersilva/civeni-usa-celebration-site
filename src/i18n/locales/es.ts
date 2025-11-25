@@ -646,12 +646,12 @@ export const esTranslations = {
           },
           ctaTitle: "¿Aún tienes dudas?"
         }
+      },
+      common: {
+        loading: "Cargando",
+        previous: "Anterior",
+        next: "Siguiente",
+        goToImage: "Ir a la imagen"
       }
-  },
-  common: {
-    loading: "Cargando",
-    previous: "Anterior",
-    next: "Siguiente",
-    goToImage: "Ir a la imagen"
   }
 };

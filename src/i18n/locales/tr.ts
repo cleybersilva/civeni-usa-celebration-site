@@ -627,12 +627,12 @@ export const trTranslations = {
           },
           ctaTitle: "Hâlâ sorularınız mı var?"
         }
+      },
+      common: {
+        loading: "Yükleniyor",
+        previous: "Önceki",
+        next: "Sonraki",
+        goToImage: "Resme git"
       }
-  },
-  common: {
-    loading: "Yükleniyor",
-    previous: "Önceki",
-    next: "Sonraki",
-    goToImage: "Resme git"
   }
 };
