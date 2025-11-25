@@ -45,19 +45,19 @@ const TransmissionAgenda = () => {
       const scheduleEnd = endTime ? new Date(`${date}T${endTime}`) : addHours(scheduleDate, 2);
 
       if (isBefore(now, scheduleDate)) {
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Em breve</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">{t('transmission.badges.scheduled', 'Agendado')}</Badge>;
       } else if (isAfter(now, scheduleDate) && isBefore(now, scheduleEnd)) {
         return (
           <Badge className="bg-red-600 text-white animate-pulse flex items-center gap-1">
             <span className="w-2 h-2 bg-white rounded-full"></span>
-            Ao vivo
+            {t('transmission.badges.live', 'Ao vivo')}
           </Badge>
         );
       } else {
-        return <Badge variant="secondary">Encerrado</Badge>;
+        return <Badge variant="secondary">{t('transmission.badges.ended', 'Encerrado')}</Badge>;
       }
     } catch (error) {
-      return <Badge variant="outline">Agendado</Badge>;
+      return <Badge variant="outline">{t('transmission.badges.scheduled', 'Agendado')}</Badge>;
     }
   };
 
@@ -96,9 +96,9 @@ const TransmissionAgenda = () => {
             <Calendar className="w-10 h-10 text-gray-400" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-bold text-gray-900">Agenda em breve</h3>
+            <h3 className="text-xl font-bold text-gray-900">{t('transmission.noUpcoming', 'Agenda em breve')}</h3>
             <p className="text-gray-600">
-              A programação online será publicada em breve. Fique atento!
+              {t('transmission.noStreamDesc', 'A programação online será publicada em breve. Fique atento!')}
             </p>
           </div>
         </div>
@@ -177,7 +177,7 @@ const TransmissionAgenda = () => {
                     >
                       <a href={schedule.virtual_link} target="_blank" rel="noopener noreferrer">
                         <Video className="w-4 h-4 mr-2" />
-                        Acessar transmissão
+                        {t('transmission.watchLive', 'Acessar transmissão')}
                         <ExternalLink className="w-4 h-4 ml-2" />
                       </a>
                     </Button>

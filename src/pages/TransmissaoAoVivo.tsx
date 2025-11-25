@@ -102,14 +102,22 @@ const TransmissaoAoVivo = () => {
     const startAt = transmission.start_at ? new Date(transmission.start_at) : null;
 
     if (transmission.status === 'live') {
-      return <Badge className="bg-red-600 text-white animate-pulse">🔴 AO VIVO</Badge>;
+      return (
+        <Badge className="bg-red-600 text-white animate-pulse">
+          🔴 {t('transmission.badges.live')}
+        </Badge>
+      );
     }
 
     if (transmission.status === 'scheduled' && startAt && startAt > now) {
       const diff = startAt.getTime() - now.getTime();
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return <Badge variant="outline">Começa em {hours}h {minutes}min</Badge>;
+      return (
+        <Badge variant="outline">
+          {t('transmission.startsIn', { hours, minutes })}
+        </Badge>
+      );
     }
 
     if (transmission.status === 'ended' && badgeLabel) {
@@ -125,7 +133,7 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'live') {
       return {
-        label: 'Assistir agora',
+        label: t('transmission.watchNow'),
         href: '#player',
         icon: <Play className="w-4 h-4" />,
       };
@@ -133,7 +141,7 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'scheduled') {
       return {
-        label: 'Definir lembrete',
+        label: t('transmission.setReminder'),
         href: `https://www.youtube.com/${transmission.channel_handle}/live`,
         icon: <Calendar className="w-4 h-4" />,
         external: true,
@@ -142,14 +150,14 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'ended' && transmission.youtube_video_id) {
       return {
-        label: 'Assistir replay',
+        label: t('transmission.watchReplay'),
         href: '#player',
         icon: <Video className="w-4 h-4" />,
       };
     }
 
     return null;
-  }, [transmission]);
+  }, [transmission, t]);
 
   // Timezone text
   const timezoneText = useMemo(() => {
@@ -157,8 +165,8 @@ const TransmissaoAoVivo = () => {
     const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const userLabel = formatTimezone(userTZ);
     const eventLabel = formatTimezone(transmission.timezone);
-    return `Horários em ${userLabel} • Local: ${eventLabel}`;
-  }, [transmission]);
+    return t('transmission.timezoneInfo', { user: userLabel, event: eventLabel });
+  }, [transmission, t]);
 
   if (txLoading) {
     return (
@@ -207,11 +215,19 @@ const TransmissaoAoVivo = () => {
           {/* Breadcrumbs */}
           <nav className="mb-8 text-sm">
             <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li>
+                <Link to="/" className="hover:text-blue-200 transition-colors">
+                  {t('eventsPage.breadcrumbHome', 'Home')}
+                </Link>
+              </li>
               <li className="text-blue-200">›</li>
-              <li><Link to="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</Link></li>
+              <li>
+                <Link to="/programacao-online" className="hover:text-blue-200 transition-colors">
+                  {t('schedule.title', 'Programação')}
+                </Link>
+              </li>
               <li className="text-blue-200">›</li>
-              <li>Transmissão ao Vivo</li>
+              <li>{t('transmission.liveTransmission', 'Transmissão ao Vivo')}</li>
             </ol>
           </nav>
           
@@ -219,7 +235,7 @@ const TransmissaoAoVivo = () => {
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 md:mb-6">
               <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 animate-pulse" />
               <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold font-poppins">
-                {title || 'Transmissão ao vivo'}
+                {title || t('transmission.title', 'Transmissão ao vivo')}
               </h1>
               <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 animate-pulse" />
             </div>
@@ -261,7 +277,7 @@ const TransmissaoAoVivo = () => {
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Fazer Inscrição
+                  {t('transmission.register', 'Fazer Inscrição')}
                 </button>
               </Link>
             </div>
@@ -328,28 +344,28 @@ const TransmissaoAoVivo = () => {
               className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <Play className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">Ao Vivo</span>
+              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.live', 'Ao Vivo')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="agenda" 
               className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <Calendar className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">Agenda</span>
+              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.schedule', 'Agenda')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="salas" 
               className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <Video className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">Salas</span>
+              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.rooms', 'Salas')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="faq" 
               className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <HelpCircle className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">FAQ</span>
+              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.faq', 'FAQ')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -499,9 +515,9 @@ const TransmissaoAoVivo = () => {
                       <Calendar className="w-10 h-10 text-gray-400" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-gray-900">Sem próximas transmissões agendadas</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{t('transmission.noUpcoming', 'Sem próximas transmissões agendadas')}</h3>
                       <p className="text-gray-600">
-                        Fique atento ao nosso canal no YouTube para futuras transmissões
+                        {t('transmission.noStreamDesc', 'Fique atento ao nosso canal no YouTube para futuras transmissões')}
                       </p>
                     </div>
                     <Button 
@@ -512,7 +528,7 @@ const TransmissaoAoVivo = () => {
                     >
                       <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                         <Youtube className="w-5 h-5 mr-2" />
-                        Veja o canal no YouTube
+                        {t('transmission.channel', 'Canal')} YouTube
                         <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                       </a>
                     </Button>
@@ -527,7 +543,7 @@ const TransmissaoAoVivo = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                   <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                  <h2 className="text-3xl font-bold text-gray-900">Agenda Online</h2>
+                  <h2 className="text-3xl font-bold text-gray-900">{t('schedule.onlineTitle', 'Agenda Online')}</h2>
                 </div>
                 <div className="flex gap-3">
                   <Button 
@@ -537,7 +553,7 @@ const TransmissaoAoVivo = () => {
                     asChild
                   >
                     <a href="/programacao-online">
-                      Ver todas as sessões
+                      {t('eventsPage.viewSchedule', 'Ver todas as sessões')}
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </a>
                   </Button>
@@ -553,14 +569,14 @@ const TransmissaoAoVivo = () => {
                       <Calendar className="w-8 h-8 text-civeni-blue" />
                     </div>
                   </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      Programação completa disponível
-                    </h3>
-                    <p className="text-gray-600">
-                      Acesse a programação completa presencial e online com todos os detalhes das atividades
-                    </p>
-                  </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {t('schedule.title', 'Programação completa disponível')}
+                  </h3>
+                  <p className="text-gray-600">
+                    {t('schedule.description', 'Acesse a programação completa presencial e online com todos os detalhes das atividades')}
+                  </p>
+                </div>
                   <div className="flex flex-col sm:flex-row gap-3 shrink-0">
                     <Button 
                       size="lg"
@@ -569,7 +585,7 @@ const TransmissaoAoVivo = () => {
                     >
                       <a href="/programacao-online">
                         <Monitor className="w-5 h-5 mr-2" />
-                        Online
+                        {t('transmission.online', 'Online')}
                       </a>
                     </Button>
                     <Button 
@@ -580,7 +596,7 @@ const TransmissaoAoVivo = () => {
                     >
                       <a href="/programacao-presencial">
                         <MapPin className="w-5 h-5 mr-2" />
-                        Presencial
+                        {t('transmission.inPerson', 'Presencial')}
                       </a>
                     </Button>
                   </div>
@@ -593,10 +609,10 @@ const TransmissaoAoVivo = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Salas de Apresentação de Trabalhos</h2>
+                <h2 className="text-3xl font-bold text-gray-900">{t('transmission.roomsTitle', 'Salas de Apresentação de Trabalhos')}</h2>
               </div>
               <p className="text-gray-600 text-lg max-w-3xl">
-                Confira a programação das apresentações de trabalhos aprovados. Cada sala possui link para acesso via Google Meet.
+                {t('transmission.roomsDescription', 'Confira a programação das apresentações de trabalhos aprovados. Cada sala possui link para acesso via Google Meet.')}
               </p>
               
               {presentationRoomsLoading ? (
@@ -703,10 +719,10 @@ const TransmissaoAoVivo = () => {
                               ))}
                             </div>
                           </div>
-                        ) : (
-                          <p className="text-gray-500 text-center py-4">
-                            Nenhum trabalho agendado para esta sala ainda.
-                          </p>
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
+                </p>
                         )}
                       </div>
                     </Card>
@@ -734,7 +750,7 @@ const TransmissaoAoVivo = () => {
             <div className="space-y-8">
               <div className="flex items-center gap-3">
                 <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Perguntas Frequentes</h2>
+                <h2 className="text-3xl font-bold text-gray-900">{t('transmission.faqTitle', 'Perguntas Frequentes')}</h2>
               </div>
               
               <div className="grid md:grid-cols-2 gap-6">
@@ -745,10 +761,26 @@ const TransmissaoAoVivo = () => {
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
+                    <div className="space-y-2">
+                      <h4 className="font-bold text-gray-900">{t('transmission.faq.tech.title')}</h4>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {t('transmission.faq.tech.answer')}
+                      </p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                      </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">Quais são os requisitos técnicos?</h4>
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.access.title')}</h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          Você precisa de um navegador atualizado (Chrome, Firefox, Safari ou Edge) e uma conexão de internet estável de pelo menos 5 Mbps para melhor experiência.
+                          {t('transmission.faq.access.answer')}
                         </p>
                       </div>
                     </div>
@@ -762,9 +794,9 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">Como acesso as transmissões?</h4>
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.recording.title')}</h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          As transmissões ao vivo são públicas e podem ser acessadas diretamente nesta página. Para acessar as salas de reunião, você precisa estar inscrito no evento.
+                          {t('transmission.faq.recording.answer')}
                         </p>
                       </div>
                     </div>
@@ -778,25 +810,9 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">As sessões serão gravadas?</h4>
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.support.title')}</h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          Sim, todas as sessões principais serão gravadas e disponibilizadas posteriormente no canal oficial do YouTube do CIVENI.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">Preciso de suporte técnico. O que faço?</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          Entre em contato com nossa equipe de suporte através do email suporte@civeni.org ou pelo WhatsApp disponível na página de contato.
+                          {t('transmission.faq.support.answer')}
                         </p>
                       </div>
                     </div>
@@ -807,9 +823,9 @@ const TransmissaoAoVivo = () => {
               {/* Additional help CTA */}
               <Card className="p-10 text-center bg-gradient-to-br from-civeni-blue/5 to-civeni-red/5 border-civeni-blue/20 shadow-md">
                 <div className="max-w-2xl mx-auto space-y-4">
-                  <h3 className="text-2xl font-bold text-gray-900">Ainda tem dúvidas?</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">{t('transmission.faq.ctaTitle', 'Ainda tem dúvidas?')}</h3>
                   <p className="text-gray-600">
-                    Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.
+                    {t('transmission.noStreamDesc', 'Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.')}
                   </p>
                   <Button 
                     size="lg"
@@ -817,7 +833,7 @@ const TransmissaoAoVivo = () => {
                     asChild
                   >
                     <Link to="/contato">
-                      Entre em Contato
+                      {t('contact.title', 'Entre em Contato')}
                       <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
