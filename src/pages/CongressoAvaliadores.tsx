@@ -139,34 +139,34 @@ const CongressoAvaliadores = () => {
             {/* Breadcrumbs */}
             <nav className="mb-6 md:mb-8 text-xs md:text-sm">
               <ol className="flex items-center space-x-2">
-                <li><Link to="/" className="hover:text-blue-200 transition-colors">{t('congressEvaluators.breadcrumbHome')}</Link></li>
+                <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
                 <li className="text-blue-200">›</li>
-                <li><Link to="/congresso/apresentacao" className="hover:text-blue-200 transition-colors">{t('congressEvaluators.breadcrumbCongress')}</Link></li>
+                <li><Link to="/congresso/apresentacao" className="hover:text-blue-200 transition-colors">Congresso</Link></li>
                 <li className="text-blue-200">›</li>
-                <li>{t('congressEvaluators.breadcrumbEvaluators')}</li>
+                <li>Avaliadores</li>
               </ol>
             </nav>
             
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
-                {t('congressEvaluators.pageTitle')}
+                Avaliadores do III CIVENI 2025
               </h1>
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
-                {t('congressEvaluators.heroSubtitle')}
+                Conheça nossos renomados avaliadores acadêmicos que garantem a excelência e qualidade científica do Congresso Internacional Multidisciplinar
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
                 <Link to="/submissao-trabalhos" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                     <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
-                    {t('congressEvaluators.submitWorkButton')}
+                    Submeter Trabalho
                   </button>
                 </Link>
                 
                 <Link to="/inscricoes" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                     <Users className="w-4 h-4 md:w-5 md:h-5" />
-                    {t('congressEvaluators.registerButton')}
+                    Fazer Inscrição
                   </button>
                 </Link>
               </div>
@@ -179,11 +179,13 @@ const CongressoAvaliadores = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center mb-12 md:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-civeni-blue mb-4 md:mb-6 font-poppins">
-                {t('congressEvaluators.excellenceTitle')}
+                Excelência na Avaliação Científica
               </h2>
               <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-xl md:rounded-2xl p-6 md:p-8 mb-6 md:mb-8">
                 <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-                  {t('congressEvaluators.excellenceDescription')}
+                  Nosso corpo de avaliadores é composto por <strong>doutores renomados</strong> de instituições nacionais e internacionais, 
+                  garantindo que todos os trabalhos submetidos ao III CIVENI 2025 sejam avaliados com o mais alto rigor científico 
+                  e acadêmico, seguindo os padrões internacionais de pesquisa.
                 </p>
               </div>
               
@@ -193,8 +195,8 @@ const CongressoAvaliadores = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Award className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-civeni-blue mb-2">{t('congressEvaluators.rigorTitle')}</h3>
-                    <p className="text-gray-600">{t('congressEvaluators.rigorDescription')}</p>
+                    <h3 className="text-xl font-bold text-civeni-blue mb-2">Rigor Científico</h3>
+                    <p className="text-gray-600">Avaliação baseada em critérios internacionais de qualidade acadêmica</p>
                   </CardContent>
                 </Card>
                 
@@ -203,8 +205,8 @@ const CongressoAvaliadores = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                       <GraduationCap className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-civeni-blue mb-2">{t('congressEvaluators.expertiseTitle')}</h3>
-                    <p className="text-gray-600">{t('congressEvaluators.expertiseDescription')}</p>
+                    <h3 className="text-xl font-bold text-civeni-blue mb-2">Expertise Multidisciplinar</h3>
+                    <p className="text-gray-600">Doutores especializados em diversas áreas do conhecimento</p>
                   </CardContent>
                 </Card>
                 
@@ -213,8 +215,8 @@ const CongressoAvaliadores = () => {
                     <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Star className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-civeni-blue mb-2">{t('congressEvaluators.recognitionTitle')}</h3>
-                    <p className="text-gray-600">{t('congressEvaluators.recognitionDescription')}</p>
+                    <h3 className="text-xl font-bold text-civeni-blue mb-2">Reconhecimento Internacional</h3>
+                    <p className="text-gray-600">Avaliadores de instituições nacionais e internacionais renomadas</p>
                   </CardContent>
                 </Card>
               </div>
@@ -227,10 +229,10 @@ const CongressoAvaliadores = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-10 md:mb-16">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-civeni-blue mb-4 md:mb-6 font-poppins">
-                {t('congressEvaluators.ourEvaluatorsTitle')}
+                Nossos Avaliadores
               </h2>
               <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-2">
-                {t('congressEvaluators.ourEvaluatorsDescription')}
+                Conheça os doutores que compõem nosso renomado corpo de avaliadores acadêmicos
               </p>
             </div>
             
@@ -255,7 +257,7 @@ const CongressoAvaliadores = () => {
                     </p>
                     <div className="flex items-center justify-center text-civeni-blue font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-3">
                       <Star className="w-4 h-4 mr-1" />
-                      {t('congressEvaluators.evaluatorBadge')}
+                      Avaliador
                     </div>
                   </CardContent>
                 </Card>
@@ -269,24 +271,24 @@ const CongressoAvaliadores = () => {
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="container mx-auto px-4 text-center relative z-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6 font-poppins px-2">
-              {t('congressEvaluators.ctaTitle')}
+              Submeta Seu Trabalho
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-blue-100 mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed px-2">
-              {t('congressEvaluators.ctaDescription')}
+              Tenha seu trabalho avaliado por nosso renomado corpo de doutores e faça parte do maior congresso internacional multidisciplinar do mundo
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
               <Link to="/submissao-trabalhos" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full transition-all hover:scale-105 flex items-center justify-center gap-2">
                   <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
-                  {t('congressEvaluators.submitWorkButton')}
+                  Submeter Trabalho
                 </button>
               </Link>
               
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-transparent text-white hover:bg-white hover:text-civeni-blue border-2 border-white px-6 py-3 md:px-8 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-full transition-all hover:scale-105 flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 md:w-5 md:h-5" />
-                  {t('congressEvaluators.registerButton')}
+                  Fazer Inscrição
                 </button>
               </Link>
             </div>
