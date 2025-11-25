@@ -671,7 +671,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Proposta do Consórcio * (DOCX, máximo 50MB)
+                        Proposta do Projeto * (DOCX, máximo 50MB)
                       </label>
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
                         <p className="text-sm text-blue-800">
