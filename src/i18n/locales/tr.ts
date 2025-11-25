@@ -324,26 +324,6 @@ export const trTranslations = {
         title: "4. Veri Koruma",
         content: "Bilgilerinizi yetkisiz erişim, değişiklik, ifşa veya imhaya karşı korumak için teknik ve organizasyonel güvenlik önlemleri uyguluyoruz."
       },
-      works: {
-        oral: {
-          title: 'Sözlü Sunum',
-          subtitle: 'III CIVENI 2025 için akademik makalelerin sözlü sunum modalitesi',
-          noContent: 'İçerik yakında',
-          noContentDescription: 'Sözlü sunumlar hakkında bilgiler yakında yayınlanacak.',
-        },
-        poster: {
-          title: 'Poster Oturumları',
-          subtitle: 'III CIVENI 2025 için poster sunum modalitesi',
-          noContent: 'İçerik yakında',
-          noContentDescription: 'Poster oturumları hakkında bilgiler yakında yayınlanacak.',
-        },
-        manuscripts: {
-          title: 'El Yazmaları',
-          subtitle: 'III CIVENI 2025 için el yazması gönderim modalitesi',
-          noContent: 'İçerik yakında',
-          noContentDescription: 'El yazmaları hakkında bilgiler yakında yayınlanacak.',
-        },
-      },
       userRights: {
         title: "5. Haklarınız",
         content: "Aşağıdaki haklara sahipsiniz:",
@@ -364,6 +344,43 @@ export const trTranslations = {
         title: "8. Değişiklikler",
         content: "Bu politika periyodik olarak güncellenebilir. Önemli değişiklikler hakkında web sitemiz veya e-posta yoluyla bilgilendirme yapacağız."
       }
+    },
+    works: {
+      breadcrumb: "Çalışmalar",
+      submitWork: "Çalışma Gönder",
+      makeRegistration: "Kayıt Ol",
+      viewThematicAreas: "Tematik Alanları Görüntüle",
+      oral: {
+        title: 'Sözlü Sunum Listesi/Şablon',
+        subtitle: 'III CIVENI 2025 için akademik makalelerin sözlü sunum modalitesi - Araştırmanızı dünyanın her yerinden uzmanlarla paylaşın',
+        pageTitle: 'Sözlü Sunum Listesi/Şablon',
+        infoTitle: 'Sözlü Sunum Bilgileri',
+        infoDescription: 'Kongrede çalışmanızı sözlü olarak sunmak için gereksinimler, formatlar ve yönergeler hakkında bilgi edinin',
+        noContent: 'İçerik yakında',
+        noContentDescription: 'Sözlü sunumlar hakkında bilgiler yakında yayınlanacak.',
+      },
+      poster: {
+        title: 'Poster Oturumları',
+        subtitle: 'III CIVENI 2025 için poster sunum modalitesi - Keşiflerinizi ve yenilikçi araştırmalarınızı görsel olarak sunun',
+        infoTitle: 'Poster Oturumları Bilgileri',
+        infoDescription: 'Kongre yönergelerini takip ederek bilimsel posterinizi nasıl hazırlayacağınızı ve sunacağınızı öğrenin',
+        noContent: 'İçerik yakında',
+        noContentDescription: 'Poster oturumları hakkında bilgiler yakında yayınlanacak.',
+      },
+      videos: {
+        title: 'Video Gönderimi',
+        subtitle: 'Video materyalinizi III CIVENI 2025 değerlendirme paneli tarafından incelenmek üzere gönderin',
+      },
+      submissionPage: {
+        title: 'Makale/Konsorsiyum Gönderimi',
+        subtitle: 'Araştırmanızı ve deneyimlerinizi III CIVENI 2025\'te paylaşın - Dünya çapında multidisipliner bilginin ilerlemesine katkıda bulunun',
+        pageTitle: 'Makale/Konsorsiyum Gönderimi',
+        formDescription: 'Gönderim türünü seçin ve tüm gerekli alanları doldurun',
+      },
+      templates: {
+        title: 'Makale/Slayt Şablonları',
+        subtitle: 'III CIVENI 2025 için akademik makaleler ve sunumlar için standartlaştırılmış şablonlar - Makalelerinizin ve sunumlarınızın formatlanmasını kolaylaştırın',
+      },
     },
     hybrid: {
       title: "Hibrit Format",
