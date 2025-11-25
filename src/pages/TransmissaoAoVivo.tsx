@@ -220,12 +220,12 @@ const TransmissaoAoVivo = () => {
       <Header />
 
       {/* Hero Banner */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-12 md:py-16 lg:py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
-          <nav className="mb-8 text-sm">
-            <ol className="flex items-center space-x-2">
+          <nav className="mb-6 md:mb-8 text-xs sm:text-sm">
+            <ol className="flex flex-wrap items-center gap-1 sm:gap-2">
               <li>
                 <Link to="/" className="hover:text-blue-200 transition-colors">
                   {t('eventsPage.breadcrumbHome', 'Home')}
@@ -238,7 +238,7 @@ const TransmissaoAoVivo = () => {
                 </Link>
               </li>
               <li className="text-blue-200">›</li>
-              <li>{t('transmission.liveTransmission', 'Transmissão ao Vivo')}</li>
+              <li className="break-all">{t('transmission.liveTransmission', 'Transmissão ao Vivo')}</li>
             </ol>
           </nav>
           
@@ -294,41 +294,41 @@ const TransmissaoAoVivo = () => {
             </div>
 
             {/* Countdown Timer */}
-            <div className="flex flex-col items-center justify-center gap-4 mt-8">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-6 animate-pulse shadow-2xl border border-white/20">
-                <div className="flex items-center gap-6">
+            <div className="flex flex-col items-center justify-center gap-3 md:gap-4 mt-6 md:mt-8">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl md:rounded-2xl px-4 sm:px-6 md:px-8 py-4 md:py-6 animate-pulse shadow-2xl border border-white/20 w-full max-w-lg">
+                <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
                   <div className="text-center">
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
                       {timeLeft.days.toString().padStart(2, '0')}
                     </div>
-                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
                       {t('countdown.days')}
                     </div>
                   </div>
-                  <div className="text-3xl md:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white/60">:</div>
                   <div className="text-center">
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
                       {timeLeft.hours.toString().padStart(2, '0')}
                     </div>
-                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
                       {t('countdown.hours')}
                     </div>
                   </div>
-                  <div className="text-3xl md:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white/60">:</div>
                   <div className="text-center">
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
                       {timeLeft.minutes.toString().padStart(2, '0')}
                     </div>
-                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
                       {t('countdown.minutes')}
                     </div>
                   </div>
-                  <div className="text-3xl md:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white/60">:</div>
                   <div className="text-center">
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-1 font-poppins">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
                       {timeLeft.seconds.toString().padStart(2, '0')}
                     </div>
-                    <div className="text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
                       {t('countdown.seconds')}
                     </div>
                   </div>
@@ -336,8 +336,8 @@ const TransmissaoAoVivo = () => {
               </div>
               
               {timezoneText && (
-                <span className="text-blue-100 text-sm">
-                  <Clock className="w-4 h-4 inline mr-2" />
+                <span className="text-blue-100 text-xs sm:text-sm text-center px-4">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" />
                   {timezoneText}
                 </span>
               )}
@@ -347,36 +347,36 @@ const TransmissaoAoVivo = () => {
       </section>
 
       {/* Tabs Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-8 md:py-12 lg:py-16">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4 mb-12 h-auto p-1 bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-xl">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 sm:grid-cols-4 mb-8 md:mb-12 h-auto p-1 gap-1 bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-xl">
             <TabsTrigger 
               value="ao-vivo" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <Play className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.live', 'Ao Vivo')}</span>
+              <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.live', 'Ao Vivo')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="agenda" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <Calendar className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.schedule', 'Agenda')}</span>
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.schedule', 'Agenda')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="salas" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <Video className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.rooms', 'Salas')}</span>
+              <Video className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.rooms', 'Salas')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="faq" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <HelpCircle className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">{t('transmission.tabs.faq', 'FAQ')}</span>
+              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.faq', 'FAQ')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -464,21 +464,21 @@ const TransmissaoAoVivo = () => {
             )}
 
             {/* Upcoming Transmissions */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                   {t('transmission.upcomingStreams', 'Próximas Transmissões')}
                 </h2>
               </div>
               {upcomingLoading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {[1, 2, 3].map((i) => (
                     <Skeleton key={i} className="h-48 rounded-xl" />
                   ))}
                 </div>
               ) : upcoming.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {upcoming.map((tx) => (
                     <Card 
                       key={tx.id} 
@@ -550,11 +550,11 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="agenda">
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                  <h2 className="text-3xl font-bold text-gray-900">{t('schedule.onlineTitle', 'Agenda Online')}</h2>
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 md:mb-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{t('schedule.onlineTitle', 'Agenda Online')}</h2>
                 </div>
                 <div className="flex gap-3">
                   <Button 
@@ -617,12 +617,12 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="salas">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">{t('transmission.roomsTitle', 'Salas de Apresentação de Trabalhos')}</h2>
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight">{t('transmission.roomsTitle', 'Salas de Apresentação de Trabalhos')}</h2>
               </div>
-              <p className="text-gray-600 text-lg max-w-3xl">
+              <p className="text-gray-600 text-sm sm:text-base md:text-lg max-w-3xl">
                 {t('transmission.roomsDescription', 'Confira a programação das apresentações de trabalhos aprovados. Cada sala possui link para acesso via Google Meet.')}
               </p>
               
@@ -633,20 +633,20 @@ const TransmissaoAoVivo = () => {
                   ))}
                 </div>
               ) : presentationRooms.length > 0 ? (
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   {presentationRooms.map((room) => (
                     <Card 
                       key={room.id} 
-                      className="p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200"
+                      className="p-4 md:p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200"
                     >
-                      <div className="space-y-6">
+                      <div className="space-y-4 md:space-y-6">
                         {/* Cabeçalho da sala */}
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 pb-4 border-b border-gray-200">
+                        <div className="flex flex-col gap-4 pb-4 border-b border-gray-200">
                           <div className="space-y-2">
-                            <h3 className="font-bold text-2xl text-gray-900">
+                            <h3 className="font-bold text-lg sm:text-xl md:text-2xl text-gray-900 leading-tight">
                               {room.nome_sala}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
                                 {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale(i18n.language) })}
@@ -663,18 +663,19 @@ const TransmissaoAoVivo = () => {
                               )}
                             </div>
                             {room.descricao_sala && (
-                              <p className="text-gray-600 text-sm mt-2">
+                              <p className="text-gray-600 text-xs sm:text-sm mt-2">
                                 {room.descricao_sala}
                               </p>
                             )}
                           </div>
                           <Button 
-                            className="bg-civeni-blue hover:bg-civeni-blue/90 shrink-0" 
+                            className="bg-civeni-blue hover:bg-civeni-blue/90 w-full sm:w-auto text-sm" 
+                            size="sm"
                             asChild
                           >
                             <a href={room.meet_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-4 h-4 mr-2" />
-                              {t('transmission.joinMeet', 'Entrar no Google Meet')}
+                              <span className="truncate">{t('transmission.joinMeet', 'Entrar no Google Meet')}</span>
                             </a>
                           </Button>
                         </div>
@@ -682,20 +683,20 @@ const TransmissaoAoVivo = () => {
                         {/* Lista de trabalhos */}
                         {room.assignments && room.assignments.length > 0 ? (
                           <div className="space-y-3">
-                            <h4 className="font-semibold text-lg text-gray-800">
+                            <h4 className="font-semibold text-base sm:text-lg text-gray-800">
                               {t('transmission.roomWorks', 'Trabalhos desta sala')} ({room.assignments.length})
                             </h4>
                             <div className="space-y-3">
                               {room.assignments.map((assignment: any, idx: number) => (
                                 <div 
                                   key={assignment.id} 
-                                  className="p-4 bg-white rounded-lg border border-gray-200 hover:border-civeni-blue transition-colors"
+                                  className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 hover:border-civeni-blue transition-colors"
                                 >
-                                  <div className="flex items-start gap-4">
-                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-civeni-blue/10 text-civeni-blue font-bold shrink-0">
+                                  <div className="flex items-start gap-2 sm:gap-4">
+                                    <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-civeni-blue/10 text-civeni-blue font-bold shrink-0 text-sm">
                                       {idx + 1}
                                     </div>
-                                    <div className="flex-1 space-y-2">
+                                    <div className="flex-1 space-y-2 min-w-0">
                                       <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <Clock className="w-4 h-4" />
                                         {format(new Date(assignment.inicio_apresentacao), 'HH:mm')} - {format(new Date(assignment.fim_apresentacao), 'HH:mm')}
@@ -758,23 +759,23 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="faq">
-            <div className="space-y-8">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">{t('transmission.faqTitle', 'Perguntas Frequentes')}</h2>
+            <div className="space-y-6 md:space-y-8">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{t('transmission.faqTitle', 'Perguntas Frequentes')}</h2>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
                 {/* FAQ Items */}
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                    <div className="space-y-2">
-                      <h4 className="font-bold text-gray-900">{t('transmission.faq.tech.title')}</h4>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                    <div className="space-y-2 min-w-0">
+                      <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.tech.title')}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                         {t('transmission.faq.tech.answer')}
                       </p>
                       </div>
@@ -782,15 +783,15 @@ const TransmissaoAoVivo = () => {
                   </div>
                 </Card>
 
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.access.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
+                      <div className="space-y-2 min-w-0">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.access.title')}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                           {t('transmission.faq.access.answer')}
                         </p>
                       </div>
@@ -798,15 +799,15 @@ const TransmissaoAoVivo = () => {
                   </div>
                 </Card>
 
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.recording.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
+                      <div className="space-y-2 min-w-0">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.recording.title')}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                           {t('transmission.faq.recording.answer')}
                         </p>
                       </div>
@@ -814,15 +815,15 @@ const TransmissaoAoVivo = () => {
                   </div>
                 </Card>
 
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{t('transmission.faq.support.title')}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
+                      <div className="space-y-2 min-w-0">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.support.title')}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                           {t('transmission.faq.support.answer')}
                         </p>
                       </div>
