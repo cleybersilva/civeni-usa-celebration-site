@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCMS } from '@/contexts/CMSContext';
 
 interface CountdownTimerProps {
@@ -7,6 +8,7 @@ interface CountdownTimerProps {
 }
 
 const CountdownTimer = ({ targetDate, className = '' }: CountdownTimerProps) => {
+  const { t } = useTranslation();
   const { content } = useCMS();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -58,25 +60,25 @@ const CountdownTimer = ({ targetDate, className = '' }: CountdownTimerProps) => 
           <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-white animate-pulse">
             {String(timeLeft.days).padStart(2, '0')}
           </div>
-          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">Dias</div>
+          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">{t('transmission.countdown.days', 'Dias')}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-white animate-pulse">
             {String(timeLeft.hours).padStart(2, '0')}
           </div>
-          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">Horas</div>
+          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">{t('transmission.countdown.hours', 'Horas')}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-white animate-pulse">
             {String(timeLeft.minutes).padStart(2, '0')}
           </div>
-          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">Minutos</div>
+          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">{t('transmission.countdown.minutes', 'Minutos')}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-white animate-pulse">
             {String(timeLeft.seconds).padStart(2, '0')}
           </div>
-          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">Segundos</div>
+          <div className="text-xs md:text-sm text-white/80 uppercase mt-1">{t('transmission.countdown.seconds', 'Segundos')}</div>
         </div>
       </div>
     </div>

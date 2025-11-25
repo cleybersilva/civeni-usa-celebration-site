@@ -557,7 +557,17 @@ export const enTranslations = {
         posterSessions: "Poster Sessions",
         manuscripts: "Manuscripts"
       },
-      transmission: {
+    transmission: {
+      countdown: {
+        days: 'Days',
+        hours: 'Hours',
+        minutes: 'Minutes',
+        seconds: 'Seconds',
+      },
+      backToTransmissions: 'Back to Transmissions',
+      liveTransmission: 'Live Broadcast',
+      watchNow: 'Watch now',
+      register: 'Register',
         pageTitle: "Official Broadcast — CIVENI 2025 (Florida)",
         pageDescription: "Watch live broadcasts from III CIVENI 2025",
         title: "Official Broadcast — CIVENI 2025 (Florida)",

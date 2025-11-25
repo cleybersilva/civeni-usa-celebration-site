@@ -122,15 +122,15 @@ const TransmissaoDetalhes = () => {
             onClick={() => navigate('/transmissao-ao-vivo')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para Transmissões
+            {t('transmission.backToTransmissions', 'Voltar para Transmissões')}
           </Button>
 
           {/* Breadcrumbs */}
           <nav className="mb-6 text-sm">
             <ol className="flex items-center space-x-2">
-              <li><a href="/" className="hover:text-blue-200 transition-colors">Home</a></li>
+              <li><a href="/" className="hover:text-blue-200 transition-colors">{t('header.home', 'Home')}</a></li>
               <li className="text-blue-200">›</li>
-              <li><a href="/transmissao-ao-vivo" className="hover:text-blue-200 transition-colors">Transmissão ao Vivo</a></li>
+              <li><a href="/transmissao-ao-vivo" className="hover:text-blue-200 transition-colors">{t('transmission.liveTransmission', 'Transmissão ao Vivo')}</a></li>
               <li className="text-blue-200">›</li>
               <li>{title}</li>
             </ol>
@@ -148,7 +148,7 @@ const TransmissaoDetalhes = () => {
             <div className="flex flex-wrap justify-center gap-3 mb-6">
               {transmission.status === 'live' && (
                 <Badge className="bg-red-600 text-white animate-pulse text-sm md:text-base px-4 py-2">
-                  🔴 AO VIVO
+                  🔴 {t('transmission.live', 'AO VIVO')}
                 </Badge>
               )}
               {transmission.status === 'ended' && badgeLabel && (
@@ -191,7 +191,7 @@ const TransmissaoDetalhes = () => {
                   onClick={() => document.querySelector('#player')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  Assistir agora
+                  {t('transmission.watchNow', 'Assistir agora')}
                 </Button>
               )}
               {transmission.status === 'scheduled' && (
@@ -202,7 +202,7 @@ const TransmissaoDetalhes = () => {
                 >
                   <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                     <Calendar className="w-5 h-5 mr-2" />
-                    Definir lembrete
+                    {t('transmission.setReminder', 'Definir lembrete')}
                   </a>
                 </Button>
               )}
@@ -213,7 +213,7 @@ const TransmissaoDetalhes = () => {
               >
                 <a href="https://civeni.com/inscricoes" target="_blank" rel="noopener noreferrer">
                   <Users className="w-5 h-5 mr-2" />
-                  Fazer Inscrição
+                  {t('transmission.register', 'Fazer Inscrição')}
                 </a>
               </Button>
             </div>
