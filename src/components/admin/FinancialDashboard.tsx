@@ -32,10 +32,10 @@ const FinancialDashboard = () => {
   // Only admin_root can access financial data
   if (user?.user_type !== 'admin_root') {
     return (
-      <div className="p-6">
+      <div className="p-3 sm:p-6">
         <Alert>
           <Shield className="h-4 w-4" />
-          <AlertDescription>
+          <AlertDescription className="text-sm">
             Acesso restrito: Apenas usuários Admin Root podem visualizar dados financeiros.
           </AlertDescription>
         </Alert>
@@ -796,16 +796,16 @@ const FinancialDashboard = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-shrink-0 space-y-6 p-6">
-        <div className="flex justify-between items-center">
+      <div className="flex-shrink-0 space-y-4 sm:space-y-6 p-3 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <div>
-            <h3 className="text-lg font-semibold">Dashboard Financeiro em Tempo Real</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-base sm:text-lg font-semibold">Dashboard Financeiro em Tempo Real</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Dados sincronizados com Stripe • Atualização automática
             </p>
           </div>
           <Select value={range} onValueChange={setRange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -829,30 +829,30 @@ const FinancialDashboard = () => {
       
       <div className="flex-1 min-h-0">
         <Tabs defaultValue="graficos" className="h-full flex flex-col">
-          <div className="flex-shrink-0 px-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="graficos">{t('admin.dashboard.charts', 'Gráficos')}</TabsTrigger>
-              <TabsTrigger value="relatorios">{t('admin.dashboard.reports', 'Relatórios')}</TabsTrigger>
-              <TabsTrigger value="alertas">{t('admin.dashboard.alerts', 'Alertas')}</TabsTrigger>
+          <div className="flex-shrink-0 px-3 sm:px-6">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
+              <TabsTrigger value="graficos" className="text-xs sm:text-sm py-2">{t('admin.dashboard.charts', 'Gráficos')}</TabsTrigger>
+              <TabsTrigger value="relatorios" className="text-xs sm:text-sm py-2">{t('admin.dashboard.reports', 'Relatórios')}</TabsTrigger>
+              <TabsTrigger value="alertas" className="text-xs sm:text-sm py-2">{t('admin.dashboard.alerts', 'Alertas')}</TabsTrigger>
             </TabsList>
           </div>
           
           <div className="flex-1 min-h-0">
             <TabsContent value="graficos" className="h-full m-0">
               <ScrollArea className="h-full">
-                <div className="p-6 space-y-8">
-                  <div className="flex justify-end gap-2 mb-4">
-                    <Button onClick={exportGraficosPDF} variant="outline" size="sm">
-                      <FileText className="w-4 h-4 mr-2" />
+                <div className="p-3 sm:p-6 space-y-6 sm:space-y-8">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mb-3 sm:mb-4">
+                    <Button onClick={exportGraficosPDF} variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Exportar PDF
                     </Button>
-                    <Button onClick={exportGraficosExcel} variant="outline" size="sm">
-                      <FileSpreadsheet className="w-4 h-4 mr-2" />
+                    <Button onClick={exportGraficosExcel} variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Exportar Excel
                     </Button>
                   </div>
                   <div className="w-full">
-                    <h3 className="text-xl font-semibold mb-6">{t('admin.dashboard.registrationCharts', 'Gráficos de Inscrições')}</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{t('admin.dashboard.registrationCharts', 'Gráficos de Inscrições')}</h3>
                     {realtimeLoading ? (
                       <div className="text-center py-8">{t('admin.dashboard.loadingCharts', 'Carregando gráficos...')}</div>
                     ) : (
@@ -867,7 +867,7 @@ const FinancialDashboard = () => {
                   </div>
                   
                   <div className="w-full">
-                    <h3 className="text-xl font-semibold mb-6">{t('admin.dashboard.revenueCharts', 'Gráficos de Faturamento')}</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{t('admin.dashboard.revenueCharts', 'Gráficos de Faturamento')}</h3>
                     {realtimeLoading ? (
                       <div className="text-center py-8">{t('admin.dashboard.loadingCharts', 'Carregando gráficos...')}</div>
                     ) : (
@@ -886,39 +886,39 @@ const FinancialDashboard = () => {
             
             <TabsContent value="relatorios" className="h-full m-0">
               <ScrollArea className="h-full">
-                <div className="p-6">
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-semibold">Relatórios de Inscrições</h3>
-                      <div className="flex gap-2">
+                <div className="p-3 sm:p-6">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-3 sm:mb-4">
+                      <h3 className="text-lg sm:text-xl font-semibold">Relatórios de Inscrições</h3>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Button 
                           onClick={() => {
                             const reports = document.querySelector('[data-registration-reports]');
                             if (reports) {
-                              // Trigger CSV export from RegistrationReports
                               const csvBtn = reports.querySelector('[data-export-csv]') as HTMLButtonElement;
                               csvBtn?.click();
                             }
                           }} 
                           variant="outline" 
                           size="sm"
+                          className="w-full sm:w-auto text-xs sm:text-sm"
                         >
-                          <FileSpreadsheet className="w-4 h-4 mr-2" />
+                          <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                           Exportar CSV
                         </Button>
                         <Button 
                           onClick={() => {
                             const reports = document.querySelector('[data-registration-reports]');
                             if (reports) {
-                              // Trigger PDF export from RegistrationReports
                               const pdfBtn = reports.querySelector('[data-export-pdf]') as HTMLButtonElement;
                               pdfBtn?.click();
                             }
                           }}
                           variant="outline" 
                           size="sm"
+                          className="w-full sm:w-auto text-xs sm:text-sm"
                         >
-                          <FileText className="w-4 h-4 mr-2" />
+                          <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                           Exportar PDF
                         </Button>
                       </div>
@@ -931,14 +931,14 @@ const FinancialDashboard = () => {
             
             <TabsContent value="alertas" className="h-full m-0">
               <ScrollArea className="h-full">
-                <div className="p-6">
-                  <div className="flex justify-end gap-2 mb-4">
-                    <Button onClick={exportAlertasPDF} variant="outline" size="sm">
-                      <FileText className="w-4 h-4 mr-2" />
+                <div className="p-3 sm:p-6">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mb-3 sm:mb-4">
+                    <Button onClick={exportAlertasPDF} variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Exportar PDF
                     </Button>
-                    <Button onClick={exportAlertasExcel} variant="outline" size="sm">
-                      <FileSpreadsheet className="w-4 h-4 mr-2" />
+                    <Button onClick={exportAlertasExcel} variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                       Exportar Excel
                     </Button>
                   </div>
