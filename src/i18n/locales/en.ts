@@ -191,6 +191,18 @@ export const enTranslations = {
       previous: "Previous",
       next: "Next"
     },
+    speakersPage: {
+      pageTitle: "Speakers",
+      breadcrumbHome: "Home",
+      description: "Meet the internationally renowned experts who will share their knowledge at III CIVENI 2025 - Leaders in education, innovation, justice, humanity, religiosity and technology",
+      registerButton: "Register Now",
+      viewSchedule: "View Schedule",
+      featuredSpeakersTitle: "Our Featured Speakers",
+      featuredSpeakersDescription: "Globally recognized professionals who will bring the latest innovations and perspectives in their areas of expertise",
+      comingSoon: "Speakers Coming Soon",
+      comingSoonDescription: "We are finalizing our selection of world-renowned experts. Speakers will be announced soon!",
+      secureSpot: "Secure My Spot"
+    },
     videos: {
       title: "Videos from I and II Civeni 2023/2024",
       description: "Relive the best moments and presentations from the II International Congress",
