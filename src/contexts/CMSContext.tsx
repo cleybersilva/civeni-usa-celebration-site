@@ -493,6 +493,15 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           bgImage = bgImage.replace('src/assets/', '/assets/');
         }
         
+        console.log('🔍 CMSContext - Loading slide from DB:', {
+          id: slide.id,
+          title: slide.title?.substring(0, 30),
+          title_tr: slide.title_tr?.substring(0, 30),
+          subtitle_tr: slide.subtitle_tr?.substring(0, 30),
+          description_tr: slide.description_tr?.substring(0, 30),
+          button_text_tr: slide.button_text_tr?.substring(0, 30)
+        });
+        
         return {
           id: slide.id,
           title: slide.title || '',
