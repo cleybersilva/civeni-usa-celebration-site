@@ -20,7 +20,7 @@ import {
 import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentationRooms';
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS, es, tr } from 'date-fns/locale';
 import { useCMS } from '@/contexts/CMSContext';
 
 const TransmissaoAoVivo = () => {
@@ -765,7 +765,11 @@ const TransmissaoAoVivo = () => {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                                {(() => {
+                                  const dateLocale = locale === 'en' ? enUS : locale === 'es' ? es : locale === 'tr' ? tr : ptBR;
+                                  const dateFormat = locale === 'pt' ? "dd 'de' MMMM 'de' yyyy" : 'dd MMMM yyyy';
+                                  return format(new Date(room.data_apresentacao), dateFormat, { locale: dateLocale });
+                                })()}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
