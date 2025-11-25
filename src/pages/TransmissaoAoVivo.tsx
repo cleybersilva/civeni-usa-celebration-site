@@ -20,7 +20,7 @@ import {
 import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentationRooms';
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 import { format } from 'date-fns';
-import { ptBR, enUS, es, tr } from 'date-fns/locale';
+import { ptBR } from 'date-fns/locale';
 import { useCMS } from '@/contexts/CMSContext';
 
 const TransmissaoAoVivo = () => {
@@ -294,36 +294,6 @@ const TransmissaoAoVivo = () => {
     return map[lang] || map.pt;
   }, [locale]);
 
-  // No video available texts by language
-  const noVideoTexts = useMemo(() => {
-    const lang = (locale || 'pt').slice(0, 2) as 'pt' | 'en' | 'es' | 'tr';
-
-    const map = {
-      pt: {
-        title: 'Nenhum vídeo disponível',
-        description: 'A transmissão ainda não começou ou não há replay disponível.',
-        button: 'Visite o canal',
-      },
-      en: {
-        title: 'No video available',
-        description: 'The transmission has not started yet or there is no replay available.',
-        button: 'Visit the channel',
-      },
-      es: {
-        title: 'No hay video disponible',
-        description: 'La transmisión aún no ha comenzado o no hay repetición disponible.',
-        button: 'Visitar el canal',
-      },
-      tr: {
-        title: 'Video mevcut değil',
-        description: 'Yayın henüz başlamadı veya tekrar mevcut değil.',
-        button: 'Kanalı ziyaret et',
-      },
-    } as const;
-
-    return map[lang] || map.pt;
-  }, [locale]);
-
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -554,9 +524,9 @@ const TransmissaoAoVivo = () => {
                     <Video className="w-10 h-10 text-gray-400" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-900">{noVideoTexts.title}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">Nenhum vídeo disponível</h3>
                     <p className="text-gray-600 text-base">
-                      {noVideoTexts.description}
+                      A transmissão ainda não começou ou não há replay disponível.
                     </p>
                   </div>
                   <Button 
@@ -571,7 +541,7 @@ const TransmissaoAoVivo = () => {
                       rel="noopener noreferrer"
                     >
                       <Youtube className="w-5 h-5 mr-2" />
-                      {noVideoTexts.button}
+                      Visite o canal
                       <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
@@ -765,11 +735,7 @@ const TransmissaoAoVivo = () => {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {(() => {
-                                  const dateLocale = locale === 'en' ? enUS : locale === 'es' ? es : locale === 'tr' ? tr : ptBR;
-                                  const dateFormat = locale === 'pt' ? "dd 'de' MMMM 'de' yyyy" : 'dd MMMM yyyy';
-                                  return format(new Date(room.data_apresentacao), dateFormat, { locale: dateLocale });
-                                })()}
+                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
