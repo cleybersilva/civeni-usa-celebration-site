@@ -299,6 +299,43 @@ export const esTranslations = {
       description: "Revive los mejores momentos del II Congreso Internacional Multidisciplinario de VCCU",
       registerButton: "Participa en III CIVENI 2025"
     },
+    works: {
+      breadcrumb: "Trabajos",
+      submitWork: "Enviar Trabajo",
+      makeRegistration: "Inscribirse",
+      viewThematicAreas: "Ver Áreas Temáticas",
+      oral: {
+        title: 'Presentación Oral Lista/Template',
+        subtitle: 'Modalidad de presentación de trabajos académicos para III CIVENI 2025 - Comparte tu investigación con expertos de todo el mundo',
+        pageTitle: 'Presentación Oral Lista/Template',
+        infoTitle: 'Información sobre Presentación Oral',
+        infoDescription: 'Conoce los requisitos, formatos y orientaciones para presentar tu trabajo de forma oral en el congreso',
+        noContent: 'Contenido próximamente',
+        noContentDescription: 'La información sobre presentaciones orales se publicará pronto.',
+      },
+      poster: {
+        title: 'Sesiones de Póster',
+        subtitle: 'Modalidad de presentación en póster para III CIVENI 2025 - Presenta visualmente tus descubrimientos e investigaciones innovadoras',
+        infoTitle: 'Información sobre Sesiones de Póster',
+        infoDescription: 'Aprende cómo preparar y presentar tu póster científico siguiendo las directrices del congreso',
+        noContent: 'Contenido próximamente',
+        noContentDescription: 'La información sobre sesiones de póster se publicará pronto.',
+      },
+      videos: {
+        title: 'Envío de Videos',
+        subtitle: 'Envía tu material en video para evaluación por el panel de jueces del III CIVENI 2025',
+      },
+      submissionPage: {
+        title: 'Envío de Artículo/Consorcio',
+        subtitle: 'Comparte tu investigación y experiencias en III CIVENI 2025 - Contribuye al avance del conocimiento multidisciplinario mundial',
+        pageTitle: 'Envío de Artículo/Consorcio',
+        formDescription: 'Elige el tipo de envío y completa todos los campos requeridos',
+      },
+      templates: {
+        title: 'Templates de Artículos/Diapositivas',
+        subtitle: 'Plantillas estandarizadas para artículos académicos y presentaciones para III CIVENI 2025 - Facilita el formato de tus trabajos y presentaciones',
+      },
+    },
     privacy: {
       title: "Política de Privacidad",
       lastUpdated: "Última actualización:",
