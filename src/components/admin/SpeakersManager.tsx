@@ -252,10 +252,10 @@ const SpeakersManager = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Palestrantes</h2>
-        <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue">Gerenciar Palestrantes</h2>
+        <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600 w-full sm:w-auto text-sm">
           <Plus className="w-4 h-4 mr-2" />
           Adicionar Palestrante
         </Button>
@@ -273,7 +273,7 @@ const SpeakersManager = () => {
 
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={localSpeakers.map(s => s.id)} strategy={rectSortingStrategy}>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {localSpeakers.map((speaker) => (
               <SpeakerCard
                 key={speaker.id}

@@ -181,23 +181,23 @@ export const SubmissionsManager = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 md:mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Gerenciamento de Submissão Artigos/Consórcio</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Gerenciamento de Submissão Artigos/Consórcio</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             Gerencie as submissões de artigos e trabalhos de consórcio recebidos
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
           <FileText className="h-4 w-4" />
           <span>{submissions.length} submissões</span>
         </div>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-3 sm:p-4 md:p-6">
         <div className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -205,18 +205,19 @@ export const SubmissionsManager = () => {
                   placeholder="Buscar por título, autor ou email..."
                   value={filters.q || ''}
                   onChange={(e) => handleFiltersChange({ ...filters, q: e.target.value })}
-                  className="pl-10"
+                  className="pl-10 text-sm"
                 />
               </div>
             </div>
             
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
             <Select
               value={filters.tipo || 'all'}
               onValueChange={(value) => 
                 handleFiltersChange({ ...filters, tipo: value === 'all' ? undefined : value })
               }
             >
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full text-xs sm:text-sm">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -232,7 +233,7 @@ export const SubmissionsManager = () => {
                 handleFiltersChange({ ...filters, area_tematica: value === 'all' ? undefined : value })
               }
             >
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger className="w-full text-xs sm:text-sm">
                 <SelectValue placeholder="Área" />
               </SelectTrigger>
               <SelectContent>
@@ -251,7 +252,7 @@ export const SubmissionsManager = () => {
                 handleFiltersChange({ ...filters, status: value === 'all' ? undefined : value })
               }
             >
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full text-xs sm:text-sm">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -263,70 +264,72 @@ export const SubmissionsManager = () => {
                 <SelectItem value="arquivado">Arquivado</SelectItem>
               </SelectContent>
             </Select>
+            </div>
           </div>
         </div>
       </Card>
 
-      <Card>
+      <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="min-w-[800px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Título</TableHead>
-                <TableHead>Autor</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Área</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Arquivo</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead className="text-xs sm:text-sm">Data</TableHead>
+                <TableHead className="text-xs sm:text-sm">Tipo</TableHead>
+                <TableHead className="text-xs sm:text-sm">Título</TableHead>
+                <TableHead className="text-xs sm:text-sm">Autor</TableHead>
+                <TableHead className="text-xs sm:text-sm">Email</TableHead>
+                <TableHead className="text-xs sm:text-sm">Área</TableHead>
+                <TableHead className="text-xs sm:text-sm">Status</TableHead>
+                <TableHead className="text-xs sm:text-sm">Arquivo</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedSubmissions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={9} className="text-center text-muted-foreground py-8 text-sm">
                     Nenhuma submissão encontrada
                   </TableCell>
                 </TableRow>
               ) : (
                 paginatedSubmissions.map((submission) => (
                   <TableRow key={submission.id}>
-                    <TableCell className="whitespace-nowrap">
+                    <TableCell className="whitespace-nowrap text-xs sm:text-sm">
                       {format(new Date(submission.created_at), 'dd/MM/yyyy HH:mm')}
                     </TableCell>
-                    <TableCell>{getTipoBadge(submission.tipo)}</TableCell>
-                    <TableCell className="max-w-xs truncate">
+                    <TableCell className="text-xs sm:text-sm">{getTipoBadge(submission.tipo)}</TableCell>
+                    <TableCell className="max-w-[200px] truncate text-xs sm:text-sm">
                       {submission.titulo}
                     </TableCell>
-                    <TableCell>{submission.autor_principal}</TableCell>
-                    <TableCell>{submission.email}</TableCell>
-                    <TableCell className="max-w-xs truncate">
+                    <TableCell className="text-xs sm:text-sm">{submission.autor_principal}</TableCell>
+                    <TableCell className="text-xs sm:text-sm">{submission.email}</TableCell>
+                    <TableCell className="max-w-[150px] truncate text-xs sm:text-sm">
                       {submission.area_tematica || '-'}
                     </TableCell>
-                    <TableCell>{getStatusBadge(submission.status)}</TableCell>
+                    <TableCell className="text-xs sm:text-sm">{getStatusBadge(submission.status)}</TableCell>
                     <TableCell>
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="h-8 px-2 text-xs"
                         onClick={() => {
                           const filename = submission.arquivo_path.split('/').pop();
                           handleDownload(submission.id, filename || 'arquivo');
                         }}
                       >
-                        <Download className="h-4 w-4 mr-2" />
-                        Baixar
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Baixar</span>
                       </Button>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="bg-white z-50">
                           <DropdownMenuItem onClick={() => handleViewDetails(submission)}>
                             <Eye className="h-4 w-4 mr-2" />
                             Ver Detalhes
