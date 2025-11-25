@@ -557,7 +557,17 @@ export const esTranslations = {
         posterSessions: "Sesiones de Póster",
         manuscripts: "Manuscritos"
       },
-      transmission: {
+    transmission: {
+      countdown: {
+        days: 'Días',
+        hours: 'Horas',
+        minutes: 'Minutos',
+        seconds: 'Segundos',
+      },
+      backToTransmissions: 'Volver a Transmisiones',
+      liveTransmission: 'Transmisión en Vivo',
+      watchNow: 'Ver ahora',
+      register: 'Registrarse',
         pageTitle: "Transmisión Oficial — CIVENI 2025 (Florida)",
         pageDescription: "Sigue en vivo las transmisiones del III CIVENI 2025",
         title: "Transmisión Oficial — CIVENI 2025 (Florida)",

@@ -626,6 +626,16 @@ export const ptTranslations = {
       updating: "Atualizando..."
     },
     transmission: {
+      countdown: {
+        days: 'Dias',
+        hours: 'Horas',
+        minutes: 'Minutos',
+        seconds: 'Segundos',
+      },
+      backToTransmissions: 'Voltar para Transmissões',
+      liveTransmission: 'Transmissão ao Vivo',
+      watchNow: 'Assistir agora',
+      register: 'Fazer Inscrição',
       pageTitle: "Transmissão — CIVENI 2025",
       pageDescription: "Transmissões ao vivo",
       title: "Transmissão Oficial",

@@ -538,7 +538,17 @@ export const trTranslations = {
         posterSessions: "Poster Oturumları",
         manuscripts: "El Yazmaları"
       },
-      transmission: {
+    transmission: {
+      countdown: {
+        days: 'Günler',
+        hours: 'Saatler',
+        minutes: 'Dakikalar',
+        seconds: 'Saniyeler',
+      },
+      backToTransmissions: 'Yayınlara Dön',
+      liveTransmission: 'Canlı Yayın',
+      watchNow: 'Şimdi izle',
+      register: 'Kayıt ol',
         pageTitle: "Resmi Yayın — CIVENI 2025 (Florida)",
         pageDescription: "III CIVENI 2025 canlı yayınlarını izleyin",
         title: "Resmi Yayın — CIVENI 2025 (Florida)",
