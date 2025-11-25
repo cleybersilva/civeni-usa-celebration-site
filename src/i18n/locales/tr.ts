@@ -573,7 +573,9 @@ export const trTranslations = {
         noRooms: "Oda yok",
         watchLive: "Canlı İzle",
         joinRoom: "Odaya Katıl",
+        watchReplay: "Tekrarı izle",
         waitingToStart: "Başlangıç Bekleniyor",
+        startsIn: "{{hours}}s {{minutes}}dk içinde başlar",
         capacity: "Kapasite",
         moderators: "Moderatörler",
         staffOnly: "Sadece Personel",
@@ -618,7 +620,8 @@ export const trTranslations = {
           support: { 
             title: "Teknik desteğe ihtiyacım var. Ne yapmalıyım?", 
             answer: "Destek ekibimizle suporte@civeni.org e-posta adresi üzerinden veya iletişim sayfasında bulunan WhatsApp üzerinden iletişime geçin." 
-          }
+          },
+          ctaTitle: "Hâlâ sorularınız mı var?"
         }
       }
     }
