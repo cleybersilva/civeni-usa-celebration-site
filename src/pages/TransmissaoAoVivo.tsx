@@ -50,33 +50,39 @@ const TransmissaoAoVivo = () => {
 
   // Countdown timer
   useEffect(() => {
-    const eventDate = content.eventConfig.eventDate;
-    if (!eventDate) return;
+    if (!content?.eventConfig?.eventDate) return;
 
+    const eventDate = content.eventConfig.eventDate;
     const rawTime = content.eventConfig.startTime || '00:00:00';
     const time = /\d{2}:\d{2}:\d{2}/.test(rawTime) ? rawTime : `${rawTime}:00`;
-    const targetDate = new Date(`${eventDate}T${time}`).getTime();
+    
+    try {
+      const targetDate = new Date(`${eventDate}T${time}`).getTime();
 
-    const updateCountdown = () => {
-      const now = new Date().getTime();
-      const difference = targetDate - now;
+      const updateCountdown = () => {
+        const now = new Date().getTime();
+        const difference = targetDate - now;
 
-      if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((difference % (1000 * 60)) / 1000)
-        });
-      } else {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      }
-    };
+        if (difference > 0) {
+          setTimeLeft({
+            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+            minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+            seconds: Math.floor((difference % (1000 * 60)) / 1000)
+          });
+        } else {
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        }
+      };
 
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-    return () => clearInterval(timer);
-  }, [content.eventConfig.eventDate, content.eventConfig.startTime]);
+      updateCountdown();
+      const timer = setInterval(updateCountdown, 1000);
+      return () => clearInterval(timer);
+    } catch (error) {
+      console.error('Error in countdown timer:', error);
+      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    }
+  }, [content?.eventConfig?.eventDate, content?.eventConfig?.startTime]);
 
   // Sync hash with active tab
   useEffect(() => {
