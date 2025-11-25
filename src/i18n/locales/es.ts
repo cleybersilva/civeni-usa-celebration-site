@@ -556,8 +556,7 @@ export const esTranslations = {
         oralPresentation: "Presentación Oral",
         posterSessions: "Sesiones de Póster",
         manuscripts: "Manuscritos"
-      }
-    },
+      },
     transmission: {
       countdown: {
         days: 'Días',
@@ -647,6 +646,7 @@ export const esTranslations = {
           ctaTitle: "¿Aún tienes dudas?"
         }
       }
+    }
   },
   common: {
     loading: "Cargando",

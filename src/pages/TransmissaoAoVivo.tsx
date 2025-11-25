@@ -131,34 +131,17 @@ const TransmissaoAoVivo = () => {
   const primaryCTA = useMemo(() => {
     if (!transmission) return null;
 
-    const lang = (locale || 'pt').slice(0, 2);
-
     if (transmission.status === 'live') {
       return {
-        label: t('transmission.watchNow', 'Assistir agora'),
+        label: t('transmission.watchNow'),
         href: '#player',
         icon: <Play className="w-4 h-4" />,
       };
     }
 
     if (transmission.status === 'scheduled') {
-      let label: string;
-      switch (lang) {
-        case 'en':
-          label = 'Set Reminder';
-          break;
-        case 'es':
-          label = 'Establecer Recordatorio';
-          break;
-        case 'tr':
-          label = 'Hatırlatıcı Ayarla';
-          break;
-        default:
-          label = 'Definir lembrete';
-      }
-
       return {
-        label,
+        label: t('transmission.setReminder'),
         href: `https://www.youtube.com/${transmission.channel_handle}/live`,
         icon: <Calendar className="w-4 h-4" />,
         external: true,
@@ -167,14 +150,14 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'ended' && transmission.youtube_video_id) {
       return {
-        label: t('transmission.watchReplay', 'Assistir replay'),
+        label: t('transmission.watchReplay'),
         href: '#player',
         icon: <Video className="w-4 h-4" />,
       };
     }
 
     return null;
-  }, [transmission, t, locale]);
+  }, [transmission, t]);
 
   // Timezone text
   const timezoneText = useMemo(() => {
@@ -182,147 +165,37 @@ const TransmissaoAoVivo = () => {
     const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const userLabel = formatTimezone(userTZ);
     const eventLabel = formatTimezone(transmission.timezone);
-    const lang = (locale || 'pt').slice(0, 2);
+    return t('transmission.timezoneInfo', { user: userLabel, event: eventLabel });
+  }, [transmission, t]);
 
-    switch (lang) {
-      case 'en':
-        return `Times in ${userLabel} • Event timezone: ${eventLabel}`;
-      case 'es':
-        return `Horarios en ${userLabel} • Evento: ${eventLabel}`;
-      case 'tr':
-        return `${userLabel} saatinde • Etkinlik saati: ${eventLabel}`;
-      default:
-        return `Horários em ${userLabel} • Local: ${eventLabel}`;
-    }
-  }, [transmission, locale]);
+  if (txLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16">
+          <Skeleton className="h-64 w-full mb-8" />
+          <Skeleton className="h-96 w-full" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
-  // FAQ texts by language (manual mapping to avoid missing keys)
-  const faqTexts = useMemo(() => {
-    const lang = (locale || 'pt').slice(0, 2) as 'pt' | 'en' | 'es' | 'tr';
-
-    const map = {
-      pt: {
-        tech: {
-          title: 'Quais são os requisitos técnicos?',
-          answer:
-            'Você precisa de um navegador atualizado (Chrome, Firefox, Safari ou Edge) e uma conexão de internet estável de pelo menos 5 Mbps para melhor experiência.',
-        },
-        access: {
-          title: 'Como acesso as transmissões?',
-          answer:
-            'As transmissões ao vivo são públicas e podem ser acessadas diretamente nesta página. Para acessar as salas de reunião, você precisa estar inscrito no evento.',
-        },
-        recording: {
-          title: 'As sessões serão gravadas?',
-          answer:
-            'Sim, todas as sessões principais serão gravadas e disponibilizadas posteriormente no canal oficial do YouTube do CIVENI.',
-        },
-        support: {
-          title: 'Preciso de suporte técnico. O que faço?',
-          answer:
-            'Entre em contato com nossa equipe de suporte através do email suporte@civeni.org ou pelo WhatsApp disponível na página de contato.',
-        },
-      },
-      en: {
-        tech: {
-          title: 'What are the technical requirements?',
-          answer:
-            'You need an updated browser (Chrome, Firefox, Safari or Edge) and a stable internet connection of at least 5 Mbps for the best experience.',
-        },
-        access: {
-          title: 'How do I access the transmissions?',
-          answer:
-            'Live transmissions are public and can be accessed directly on this page. To access meeting rooms, you need to be registered for the event.',
-        },
-        recording: {
-          title: 'Will the sessions be recorded?',
-          answer:
-            "Yes, all main sessions will be recorded and made available later on CIVENI's official YouTube channel.",
-        },
-        support: {
-          title: 'I need technical support. What should I do?',
-          answer:
-            'Contact our support team via email at suporte@civeni.org or through WhatsApp available on the contact page.',
-        },
-      },
-      es: {
-        tech: {
-          title: '¿Cuáles son los requisitos técnicos?',
-          answer:
-            'Necesitas un navegador actualizado (Chrome, Firefox, Safari o Edge) y una conexión a internet estable de al menos 5 Mbps para la mejor experiencia.',
-        },
-        access: {
-          title: '¿Cómo accedo a las transmisiones?',
-          answer:
-            'Las transmisiones en vivo son públicas y se pueden acceder directamente en esta página. Para acceder a las salas de reunión, necesitas estar inscrito en el evento.',
-        },
-        recording: {
-          title: '¿Las sesiones serán grabadas?',
-          answer:
-            'Sí, todas las sesiones principales serán grabadas y estarán disponibles posteriormente en el canal oficial de YouTube de CIVENI.',
-        },
-        support: {
-          title: 'Necesito soporte técnico. ¿Qué hago?',
-          answer:
-            'Contacta con nuestro equipo de soporte a través del email suporte@civeni.org o por WhatsApp disponible en la página de contacto.',
-        },
-      },
-      tr: {
-        tech: {
-          title: 'Teknik gereksinimler nelerdir?',
-          answer:
-            'En iyi deneyim için güncel bir tarayıcıya (Chrome, Firefox, Safari veya Edge) ve en az 5 Mbps kararlı internet bağlantısına ihtiyacınız var.',
-        },
-        access: {
-          title: 'Yayınlara nasıl erişirim?',
-          answer:
-            'Canlı yayınlar herkese açıktır ve bu sayfadan doğrudan erişilebilir. Toplantı odalarına erişmek için etkinliğe kayıtlı olmanız gerekir.',
-        },
-        recording: {
-          title: 'Oturumlar kaydedilecek mi?',
-          answer:
-            "Evet, tüm ana oturumlar kaydedilecek ve daha sonra CIVENI'nin resmi YouTube kanalında kullanıma sunulacaktır.",
-        },
-        support: {
-          title: 'Teknik desteğe ihtiyacım var. Ne yapmalıyım?',
-          answer:
-            'Destek ekibimizle suporte@civeni.org e-posta adresi üzerinden veya iletişim sayfasında bulunan WhatsApp üzerinden iletişime geçin.',
-        },
-      },
-    } as const;
-
-    return map[lang] || map.pt;
-  }, [locale]);
-
-  // No video available texts by language
-  const noVideoTexts = useMemo(() => {
-    const lang = (locale || 'pt').slice(0, 2) as 'pt' | 'en' | 'es' | 'tr';
-
-    const map = {
-      pt: {
-        title: 'Nenhum vídeo disponível',
-        description: 'A transmissão ainda não começou ou não há replay disponível.',
-        button: 'Visite o canal',
-      },
-      en: {
-        title: 'No video available',
-        description: 'The transmission has not started yet or there is no replay available.',
-        button: 'Visit the channel',
-      },
-      es: {
-        title: 'No hay video disponible',
-        description: 'La transmisión aún no ha comenzado o no hay repetición disponible.',
-        button: 'Visitar el canal',
-      },
-      tr: {
-        title: 'Video mevcut değil',
-        description: 'Yayın henüz başlamadı veya tekrar mevcut değil.',
-        button: 'Kanalı ziyaret et',
-      },
-    } as const;
-
-    return map[lang] || map.pt;
-  }, [locale]);
+  if (!transmission) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4">Transmissão não encontrada</h1>
+          <p className="text-muted-foreground mb-8">
+            Não há transmissão disponível no momento.
+          </p>
+          <Button onClick={() => navigate('/')}>Voltar ao início</Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -554,9 +427,9 @@ const TransmissaoAoVivo = () => {
                     <Video className="w-10 h-10 text-gray-400" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-900">{noVideoTexts.title}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">Nenhum vídeo disponível</h3>
                     <p className="text-gray-600 text-base">
-                      {noVideoTexts.description}
+                      A transmissão ainda não começou ou não há replay disponível.
                     </p>
                   </div>
                   <Button 
@@ -571,7 +444,7 @@ const TransmissaoAoVivo = () => {
                       rel="noopener noreferrer"
                     >
                       <Youtube className="w-5 h-5 mr-2" />
-                      {noVideoTexts.button}
+                      Visite o canal
                       <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
@@ -765,11 +638,7 @@ const TransmissaoAoVivo = () => {
                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {new Date(room.data_apresentacao).toLocaleDateString(locale, {
-                                  day: '2-digit',
-                                  month: 'long',
-                                  year: 'numeric'
-                                })}
+                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
@@ -892,10 +761,26 @@ const TransmissaoAoVivo = () => {
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
+                    <div className="space-y-2">
+                      <h4 className="font-bold text-gray-900">{t('transmission.faq.tech.title')}</h4>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {t('transmission.faq.tech.answer')}
+                      </p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                      </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{faqTexts.tech.title}</h4>
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.access.title')}</h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          {faqTexts.tech.answer}
+                          {t('transmission.faq.access.answer')}
                         </p>
                       </div>
                     </div>
@@ -909,9 +794,9 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{faqTexts.access.title}</h4>
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.recording.title')}</h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          {faqTexts.access.answer}
+                          {t('transmission.faq.recording.answer')}
                         </p>
                       </div>
                     </div>
@@ -925,25 +810,9 @@ const TransmissaoAoVivo = () => {
                         <HelpCircle className="w-5 h-5 text-civeni-blue" />
                       </div>
                       <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{faqTexts.recording.title}</h4>
+                        <h4 className="font-bold text-gray-900">{t('transmission.faq.support.title')}</h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          {faqTexts.recording.answer}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">{faqTexts.support.title}</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          {faqTexts.support.answer}
+                          {t('transmission.faq.support.answer')}
                         </p>
                       </div>
                     </div>
