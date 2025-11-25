@@ -362,16 +362,27 @@ export const esTranslations = {
       title: 'Templates de Artículos/Diapositivas',
       subtitle: 'Plantillas estandarizadas para artículos académicos y presentaciones para III CIVENI 2025 - Facilita el formato de tus trabajos y presentaciones',
     },
-    contactPage: {
-      pageTitle: "Contacto",
-      breadcrumbHome: "Inicio",
-      breadcrumbContact: "Contacto",
-      heroTitle: "Contacto",
-      heroDescription: "Contáctanos para aclarar dudas sobre III CIVENI 2025 - Estamos aquí para ayudarte a participar en esta experiencia única de aprendizaje mundial",
-      registerButton: "Inscribirse",
-      directEmail: "Correo Directo",
-      talkToUs: "Contáctanos",
-      talkToUsDescription: "Elige la mejor forma de ponerte en contacto. ¡Estamos listos para atenderte!",
+  },
+      userRights: {
+        title: "5. Sus Derechos",
+        content: "Usted tiene derecho a:",
+        access: "Acceder a sus datos personales",
+        correction: "Corregir información incorrecta",
+        deletion: "Solicitar la eliminación de sus datos",
+        portability: "Solicitar la portabilidad de datos"
+      },
+      cookies: {
+        title: "6. Cookies",
+        content: "Utilizamos cookies esenciales para la funcionalidad del sitio y cookies analíticas para mejorar su experiencia. Puede administrar sus preferencias de cookies en la configuración de su navegador."
+      },
+      contact: {
+        title: "7. Contacto",
+        content: "Para preguntas relacionadas con la privacidad de datos, contáctenos:"
+      },
+      changes: {
+        title: "8. Cambios",
+        content: "Esta política puede actualizarse periódicamente. Notificaremos sobre cambios significativos a través de nuestro sitio web o correo electrónico."
+      }
     },
     hybrid: {
       title: "Formato Híbrido",
@@ -621,7 +632,6 @@ export const esTranslations = {
       }
     }
   },
-  
   common: {
     loading: "Cargando",
     previous: "Anterior",

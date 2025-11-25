@@ -72,32 +72,33 @@ const Contato = () => {
           {/* Breadcrumbs */}
           <nav className="mb-6 md:mb-8 text-xs md:text-sm">
             <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-blue-200 transition-colors">{t('contactPage.breadcrumbHome')}</Link></li>
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
               <li className="text-blue-200">›</li>
-              <li>{t('contactPage.breadcrumbContact')}</li>
+              <li>Contato</li>
             </ol>
           </nav>
           
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
-              {t('contactPage.heroTitle')}
+              Contato
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
-              {t('contactPage.heroDescription')}
+              Entre em contato conosco para esclarecer dúvidas sobre o III CIVENI 2025 - 
+              Estamos aqui para ajudar você a participar desta experiência única de aprendizado mundial
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 md:w-5 md:h-5" />
-                  {t('contactPage.registerButton')}
+                  Fazer Inscrição
                 </button>
               </Link>
               
               <a href="mailto:contact@civeni.com" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                   <Mail className="w-4 h-4 md:w-5 md:h-5" />
-                  {t('contactPage.directEmail')}
+                  E-mail Direto
                 </button>
               </a>
             </div>
@@ -110,10 +111,10 @@ const Contato = () => {
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6 font-poppins flex items-center justify-center gap-2 md:gap-3">
               <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-civeni-blue" />
-              {t('contactPage.talkToUs')}
+              Fale Conosco
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2">
-              {t('contactPage.talkToUsDescription')}
+              Escolha a melhor forma de entrar em contato. Estamos prontos para atendê-lo!
             </p>
           </div>
           

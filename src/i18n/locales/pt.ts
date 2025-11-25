@@ -365,16 +365,27 @@ export const ptTranslations = {
       title: 'Templates Artigos/Slides',
       subtitle: 'Modelos padronizados para artigos acadêmicos e apresentações do III CIVENI 2025 - Facilite a formatação dos seus trabalhos e apresentações',
     },
-    contactPage: {
-      pageTitle: "Contato",
-      breadcrumbHome: "Home",
-      breadcrumbContact: "Contato",
-      heroTitle: "Contato",
-      heroDescription: "Entre em contato conosco para esclarecer dúvidas sobre o III CIVENI 2025 - Estamos aqui para ajudar você a participar desta experiência única de aprendizado mundial",
-      registerButton: "Fazer Inscrição",
-      directEmail: "E-mail Direto",
-      talkToUs: "Fale Conosco",
-      talkToUsDescription: "Escolha a melhor forma de entrar em contato. Estamos prontos para atendê-lo!",
+  },
+      userRights: {
+        title: "5. Seus Direitos",
+        content: "Você tem o direito de:",
+        access: "Acessar seus dados pessoais",
+        correction: "Corrigir informações incorretas",
+        deletion: "Solicitar a exclusão de seus dados",
+        portability: "Solicitar a portabilidade dos dados"
+      },
+      cookies: {
+        title: "6. Cookies",
+        content: "Utilizamos cookies essenciais para o funcionamento do site e cookies analíticos para melhorar sua experiência. Você pode gerenciar suas preferências de cookies nas configurações do seu navegador."
+      },
+      contact: {
+        title: "7. Contato",
+        content: "Para questões relacionadas à privacidade de dados, entre em contato conosco:"
+      },
+      changes: {
+        title: "8. Alterações",
+        content: "Esta política pode ser atualizada periodicamente. Notificaremos sobre mudanças significativas através do nosso site ou por e-mail."
+      }
     },
     hybrid: {
       title: "Formato Híbrido",

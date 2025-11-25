@@ -344,27 +344,27 @@ export const trTranslations = {
           noContentDescription: 'El yazmaları hakkında bilgiler yakında yayınlanacak.',
         },
       },
-      videos: {
-      pageTitle: "İletişim",
-      breadcrumbHome: "Ana Sayfa",
-      breadcrumbContact: "İletişim",
-      heroTitle: "İletişim",
-      heroDescription: "III CIVENI 2025 hakkındaki sorularınızı açıklığa kavuşturmak için bizimle iletişime geçin - Bu eşsiz küresel öğrenme deneyimine katılmanıza yardımcı olmak için buradayız",
-      registerButton: "Kayıt Ol",
-      directEmail: "Doğrudan E-posta",
-      talkToUs: "Bizimle İletişime Geçin",
-      talkToUsDescription: "İletişime geçmek için en iyi yolu seçin. Size yardımcı olmaya hazırız!",
+      userRights: {
+        title: "5. Haklarınız",
+        content: "Aşağıdaki haklara sahipsiniz:",
+        access: "Kişisel verilerinize erişim",
+        correction: "Yanlış bilgileri düzeltme",
+        deletion: "Verilerinizin silinmesini talep etme",
+        portability: "Veri taşınabilirliği talep etme"
+      },
+      cookies: {
+        title: "6. Çerezler",
+        content: "Site işlevselliği için temel çerezler ve deneyiminizi geliştirmek için analitik çerezler kullanıyoruz. Çerez tercihlerinizi tarayıcı ayarlarınızdan yönetebilirsiniz."
+      },
+      contact: {
+        title: "7. İletişim",
+        content: "Veri gizliliği soruları için bizimle iletişime geçin:"
+      },
+      changes: {
+        title: "8. Değişiklikler",
+        content: "Bu politika periyodik olarak güncellenebilir. Önemli değişiklikler hakkında web sitemiz veya e-posta yoluyla bilgilendirme yapacağız."
+      }
     },
-    
-    contact: {
-      title: "7. İletişim",
-      content: "Veri gizliliği soruları için bizimle iletişime geçin:"
-    },
-    changes: {
-      title: "8. Değişiklikler",
-      content: "Bu politika periyodik olarak güncellenebilir. Önemli değişiklikler hakkında web sitemiz veya e-posta yoluyla bilgilendirme yapacağız."
-    }
-  },
     hybrid: {
       title: "Hibrit Format",
       description: "Yenilikçi hibrit formatımızla her iki dünyanın da en iyisini deneyimleyin",
@@ -613,7 +613,6 @@ export const trTranslations = {
       }
     }
   },
-  
   common: {
     loading: "Yükleniyor",
     previous: "Önceki",
