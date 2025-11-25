@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { pickLang, formatTimezone } from '@/hooks/useTransmission';
+import CountdownTimer from '@/components/transmission/CountdownTimer';
 
 const TransmissaoDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -95,19 +96,6 @@ const TransmissaoDetalhes = () => {
   const startAt = transmission.start_at ? new Date(transmission.start_at) : null;
   const endAt = transmission.end_at ? new Date(transmission.end_at) : null;
 
-  // Status badge
-  let statusBadge = null;
-  if (transmission.status === 'live') {
-    statusBadge = <Badge className="bg-red-600 text-white animate-pulse">🔴 AO VIVO</Badge>;
-  } else if (transmission.status === 'scheduled' && startAt && startAt > now) {
-    const diff = startAt.getTime() - now.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    statusBadge = <Badge variant="outline">Começa em {days > 0 ? `${days}d ` : ''}{hours}h</Badge>;
-  } else if (transmission.status === 'ended' && badgeLabel) {
-    statusBadge = <Badge variant="secondary">{badgeLabel}</Badge>;
-  }
-
   const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const eventTZ = transmission.timezone || 'America/New_York';
   const timezoneText = `Horários em ${formatTimezone(userTZ)} • Local: ${formatTimezone(eventTZ)}`;
@@ -124,7 +112,7 @@ const TransmissaoDetalhes = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-16">
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-16 md:py-20">
         <div className="absolute inset-0 bg-black/20" />
         <div className="container mx-auto px-4 relative z-10">
           {/* Back Button */}
@@ -134,82 +122,98 @@ const TransmissaoDetalhes = () => {
             onClick={() => navigate('/transmissao-ao-vivo')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar para Transmissões
+            {t('transmission.backToTransmissions', 'Voltar para Transmissões')}
           </Button>
 
           {/* Breadcrumbs */}
           <nav className="mb-6 text-sm">
             <ol className="flex items-center space-x-2">
-              <li><a href="/" className="hover:text-blue-200 transition-colors">Home</a></li>
+              <li><a href="/" className="hover:text-blue-200 transition-colors">{t('header.home', 'Home')}</a></li>
               <li className="text-blue-200">›</li>
-              <li><a href="/transmissao-ao-vivo" className="hover:text-blue-200 transition-colors">Transmissão ao Vivo</a></li>
+              <li><a href="/transmissao-ao-vivo" className="hover:text-blue-200 transition-colors">{t('transmission.liveTransmission', 'Transmissão ao Vivo')}</a></li>
               <li className="text-blue-200">›</li>
               <li>{title}</li>
             </ol>
           </nav>
 
-          <div className="max-w-4xl">
+          <div className="max-w-4xl mx-auto text-center">
             {subtitle && (
-              <p className="text-lg mb-3 text-blue-100">{subtitle}</p>
+              <p className="text-base md:text-lg mb-3 text-blue-100">{subtitle}</p>
             )}
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 font-poppins">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 font-poppins">
               {title}
             </h1>
             
-            <div className="flex flex-wrap gap-3 mb-6">
-              {statusBadge}
+            {/* Status Info */}
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
+              {transmission.status === 'live' && (
+                <Badge className="bg-red-600 text-white animate-pulse text-sm md:text-base px-4 py-2">
+                  🔴 {t('transmission.live', 'AO VIVO')}
+                </Badge>
+              )}
+              {transmission.status === 'ended' && badgeLabel && (
+                <Badge variant="secondary" className="text-sm md:text-base px-4 py-2">
+                  {badgeLabel}
+                </Badge>
+              )}
               {startAt && (
-                <div className="flex items-center gap-2 text-sm bg-white/10 px-3 py-1 rounded-full">
+                <div className="flex items-center gap-2 text-xs md:text-sm bg-white/10 px-3 py-1.5 rounded-full">
                   <Calendar className="w-4 h-4" />
                   <span>{startAt.toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
                 </div>
               )}
               {startAt && (
-                <div className="flex items-center gap-2 text-sm bg-white/10 px-3 py-1 rounded-full">
+                <div className="flex items-center gap-2 text-xs md:text-sm bg-white/10 px-3 py-1.5 rounded-full">
                   <Clock className="w-4 h-4" />
                   <span>{startAt.toLocaleTimeString(locale, { timeStyle: 'short' })}</span>
                 </div>
               )}
             </div>
 
+            {/* Countdown Timer */}
+            {transmission.status === 'scheduled' && startAt && startAt > now && (
+              <div className="mb-8 flex justify-center">
+                <CountdownTimer targetDate={startAt} className="w-full max-w-lg" />
+              </div>
+            )}
+
             {description && (
-              <p className="text-lg mb-8 text-blue-50 leading-relaxed">
+              <p className="text-base md:text-lg mb-8 text-blue-50 leading-relaxed max-w-2xl mx-auto">
                 {description}
               </p>
             )}
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 md:gap-4">
               {transmission.status === 'live' && (
                 <Button
                   size="lg"
-                  className="bg-white text-civeni-blue hover:bg-white/90"
+                  className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto"
                   onClick={() => document.querySelector('#player')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  Assistir agora
+                  {t('transmission.watchNow', 'Assistir agora')}
                 </Button>
               )}
-              {transmission.status === 'scheduled' && transmission.channel_handle && (
+              {transmission.status === 'scheduled' && (
                 <Button
                   size="lg"
-                  className="bg-white text-civeni-blue hover:bg-white/90"
+                  className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto"
                   asChild
                 >
-                  <a href={`https://www.youtube.com/${transmission.channel_handle}/live`} target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                     <Calendar className="w-5 h-5 mr-2" />
-                    Definir lembrete
+                    {t('transmission.setReminder', 'Definir lembrete')}
                   </a>
                 </Button>
               )}
               <Button
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white/20"
+                className="bg-white text-civeni-blue hover:bg-white/90 border-2 border-white w-full sm:w-auto"
                 asChild
               >
-                <a href="/inscricoes">
+                <a href="https://civeni.com/inscricoes" target="_blank" rel="noopener noreferrer">
                   <Users className="w-5 h-5 mr-2" />
-                  Fazer Inscrição
+                  {t('transmission.register', 'Fazer Inscrição')}
                 </a>
               </Button>
             </div>
@@ -258,11 +262,11 @@ const TransmissaoDetalhes = () => {
             ) : (
               <Card className="p-12 text-center">
                 <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">Vídeo não disponível</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('transmission.noVideoTitle')}</h3>
                 <p className="text-muted-foreground mb-4">
                   {transmission.status === 'scheduled' 
-                    ? 'A transmissão ainda não começou.'
-                    : 'Não há replay disponível no momento.'}
+                    ? t('transmission.noVideoDescription')
+                    : t('transmission.noReplayAvailable')}
                 </p>
                 {transmission.channel_handle && (
                   <Button variant="outline" asChild>
@@ -271,7 +275,7 @@ const TransmissaoDetalhes = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Visite o canal
+                      {t('transmission.visitChannel')}
                     </a>
                   </Button>
                 )}
@@ -312,76 +316,86 @@ const TransmissaoDetalhes = () => {
           <div className="space-y-6">
             {/* Event Info */}
             <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">Informações</h3>
-              <div className="space-y-4">
+              <h3 className="font-semibold text-lg mb-6 text-center">
+                {t('transmission.info', 'Informações')}
+              </h3>
+              <div className="space-y-6">
                 {startAt && (
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 mt-0.5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Data</p>
-                      <p className="text-sm text-muted-foreground">
-                        {startAt.toLocaleDateString(locale, { 
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
+                  <div className="text-center">
+                    <div className="flex justify-center mb-2">
+                      <Calendar className="w-5 h-5 text-muted-foreground" />
                     </div>
+                    <p className="font-semibold text-base mb-1">
+                      {t('transmission.date', 'Data')}
+                    </p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {startAt.toLocaleDateString(locale, { 
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
                   </div>
                 )}
                 {startAt && (
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 mt-0.5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Horário</p>
-                      <p className="text-sm text-muted-foreground">
-                        {startAt.toLocaleTimeString(locale, { timeStyle: 'short' })}
-                        {endAt && ` - ${endAt.toLocaleTimeString(locale, { timeStyle: 'short' })}`}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {timezoneText}
-                      </p>
+                  <div className="text-center">
+                    <div className="flex justify-center mb-2">
+                      <Clock className="w-5 h-5 text-muted-foreground" />
                     </div>
+                    <p className="font-semibold text-base mb-1">
+                      {t('transmission.time', 'Horário')}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {startAt.toLocaleTimeString(locale, { timeStyle: 'short' })}
+                      {endAt && ` - ${endAt.toLocaleTimeString(locale, { timeStyle: 'short' })}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed px-2">
+                      {timezoneText}
+                    </p>
                   </div>
                 )}
                 <Separator />
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 mt-0.5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Local</p>
-                    <p className="text-sm text-muted-foreground">
-                      Transmissão Online
-                    </p>
+                <div className="text-center">
+                  <div className="flex justify-center mb-2">
+                    <MapPin className="w-5 h-5 text-muted-foreground" />
                   </div>
+                  <p className="font-semibold text-base mb-1">
+                    {t('transmission.location', 'Local')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('transmission.onlineTransmission', 'Transmissão Online')}
+                  </p>
                 </div>
               </div>
             </Card>
 
             {/* Quick Links */}
             <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">Links úteis</h3>
-              <div className="space-y-2">
+              <h3 className="font-semibold text-lg mb-6 text-center">
+                {t('transmission.usefulLinks', 'Links úteis')}
+              </h3>
+              <div className="space-y-3">
                 {transmission.schedule_url && (
-                  <Button variant="outline" className="w-full justify-start" asChild>
+                  <Button variant="outline" className="w-full justify-center gap-2" asChild>
                     <a href={transmission.schedule_url}>
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Ver programação
+                      <Calendar className="w-4 h-4" />
+                      {t('transmission.viewSchedule', 'Ver programação')}
                     </a>
                   </Button>
                 )}
                 {transmission.faq_url && (
-                  <Button variant="outline" className="w-full justify-start" asChild>
+                  <Button variant="outline" className="w-full justify-center gap-2" asChild>
                     <a href={transmission.faq_url}>
-                      <ExternalLink className="w-4 h-4 mr-2" />
+                      <ExternalLink className="w-4 h-4" />
                       FAQ
                     </a>
                   </Button>
                 )}
-                <Button variant="outline" className="w-full justify-start" asChild>
+                <Button variant="outline" className="w-full justify-center gap-2" asChild>
                   <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
-                    <Video className="w-4 h-4 mr-2" />
-                    Canal do YouTube
+                    <Video className="w-4 h-4" />
+                    {t('transmission.youtubeChannel', 'Canal do YouTube')}
                   </a>
                 </Button>
               </div>

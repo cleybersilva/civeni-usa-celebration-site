@@ -27,8 +27,8 @@ interface StripeFiltersProps {
 export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterChange, onClearFilters }) => {
   return (
     <Card className="border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/10 dark:to-cyan-950/10">
-      <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
           {/* Período */}
           <div className="space-y-2">
             <Label className="text-blue-700 dark:text-blue-300 font-semibold">Período</Label>
@@ -149,13 +149,14 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
           </div>
 
           {/* Limpar filtros */}
-          <div className="flex items-end">
+          <div className="flex items-end sm:col-span-2 lg:col-span-1">
             <Button 
               onClick={onClearFilters} 
-              className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0"
+              className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 text-sm sm:text-base"
             >
               <X className="mr-2 h-4 w-4" />
-              Limpar
+              <span className="hidden sm:inline">Limpar</span>
+              <span className="sm:hidden">Limpar Filtros</span>
             </Button>
           </div>
         </div>

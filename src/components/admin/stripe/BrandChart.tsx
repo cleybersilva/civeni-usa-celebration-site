@@ -63,13 +63,14 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
 
   return (
     <Card className="border-l-4 border-l-orange-500 shadow-md">
-      <CardHeader style={{ background: 'linear-gradient(to right, hsl(33 100% 96%), hsl(48 100% 96%))' }}>
-        <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
-          <CreditCard className="h-5 w-5" />
-          Receita por Bandeira
+      <CardHeader style={{ background: 'linear-gradient(to right, hsl(33 100% 96%), hsl(48 100% 96%))' }} className="px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-300 text-base sm:text-lg">
+          <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="hidden sm:inline">Receita por Bandeira</span>
+          <span className="sm:hidden">Por Bandeira</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -101,19 +102,19 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
         </ResponsiveContainer>
         
         {/* Legend com badges coloridos */}
-        <div className="flex flex-wrap gap-2 mt-4">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
           {data.map((item) => (
             <div 
               key={`${item.bandeira}-${item.funding}`}
-              className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border-2 shadow-sm hover:shadow-md transition-shadow"
+              className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border-2 shadow-sm hover:shadow-md transition-shadow"
               style={{ borderColor: getBrandColor(item.bandeira) }}
             >
               <div 
-                className="w-4 h-4 rounded-full shadow-sm" 
+                className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-sm flex-shrink-0" 
                 style={{ backgroundColor: getBrandColor(item.bandeira) }}
               />
-              <span className="font-semibold capitalize">{item.bandeira}</span>
-              <span className="text-muted-foreground font-medium">({item.funding})</span>
+              <span className="font-semibold capitalize whitespace-nowrap">{item.bandeira}</span>
+              <span className="text-muted-foreground font-medium hidden sm:inline">({item.funding})</span>
               <span className="font-bold text-gray-900 dark:text-gray-100">{item.qtd}</span>
             </div>
           ))}

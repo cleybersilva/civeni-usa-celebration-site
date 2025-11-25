@@ -160,12 +160,12 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
 
   return (
     <Card className="border-t-4 border-t-purple-500">
-      <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+      <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 px-4 sm:px-6">
         <div className="space-y-2">
-          <CardTitle className="text-purple-700 dark:text-purple-300">Participantes</CardTitle>
-          <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
-            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
-            <div className="flex-1 text-sm">
+          <CardTitle className="text-purple-700 dark:text-purple-300 text-lg sm:text-xl">Participantes</CardTitle>
+          <div className="flex items-start gap-2 p-2 sm:p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+            <div className="flex-1 text-xs sm:text-sm">
               <p className="font-medium text-yellow-800 dark:text-yellow-200">Exclusão de Registros</p>
               <p className="text-yellow-700 dark:text-yellow-300 mt-1">
                 Use o botão "Excluir" para remover TODOS os registros de um participante específico. 
@@ -175,10 +175,10 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-3 sm:px-6">
         {/* Filtros */}
-        <div className="mb-4 space-y-3">
-          <div className="flex gap-3">
+        <div className="mb-3 sm:mb-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -188,17 +188,17 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                   onSearchChange?.(e.target.value);
                   onPageChange?.(0);
                 }}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
             <select
               value={cursoFilter}
               onChange={(e) => {
                 onCursoFilterChange?.(e.target.value);
-                onTurmaFilterChange?.(''); // Reset turma when curso changes
+                onTurmaFilterChange?.('');
                 onPageChange?.(0);
               }}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[200px]"
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-full sm:w-auto sm:min-w-[200px]"
             >
               <option value="">Todos os Cursos</option>
               {cursos.map((curso) => (
@@ -213,7 +213,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                 onTurmaFilterChange?.(e.target.value);
                 onPageChange?.(0);
               }}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[150px]"
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-full sm:w-auto sm:min-w-[150px]"
             >
               <option value="">Todas as Turmas</option>
               {turmas.map((turma) => (
@@ -223,14 +223,14 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
               ))}
             </select>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <select
               value={statusFilter}
               onChange={(e) => {
                 onStatusFilterChange?.(e.target.value);
                 onPageChange?.(0);
               }}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[150px]"
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-full sm:w-auto sm:min-w-[150px]"
             >
               <option value="">Todos os Status</option>
               <option value="completed">Pago</option>
@@ -244,7 +244,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                 onPaymentMethodFilterChange?.(e.target.value);
                 onPageChange?.(0);
               }}
-              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 min-w-[180px]"
+              className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-full sm:w-auto sm:min-w-[180px]"
             >
               <option value="">Todas as Formas</option>
               <option value="voucher">Voucher/Gratuito</option>
@@ -261,7 +261,7 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                 onPageChange?.(0);
               }}
               placeholder="Data Inicial"
-              className="min-w-[150px]"
+              className="w-full sm:w-auto sm:min-w-[150px] text-sm"
             />
             <Input
               type="date"
@@ -271,12 +271,13 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                 onPageChange?.(0);
               }}
               placeholder="Data Final"
-              className="min-w-[150px]"
+              className="w-full sm:w-auto sm:min-w-[150px] text-sm"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-3 sm:mx-0">
+          <div className="min-w-[1000px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -407,13 +408,15 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
 
         {/* Paginação */}
         {pagination && (
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-muted-foreground">
-              Mostrando {pagination.offset + 1} a {Math.min(pagination.offset + pagination.limit, pagination.total)} de {pagination.total} participantes
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              <span className="hidden sm:inline">Mostrando {pagination.offset + 1} a {Math.min(pagination.offset + pagination.limit, pagination.total)} de {pagination.total} participantes</span>
+              <span className="sm:hidden">{pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} de {pagination.total}</span>
             </p>
             <div className="flex gap-2">
               <Button
@@ -421,18 +424,20 @@ export const ParticipantsTable: React.FC<ParticipantsTableProps> = ({
                 size="sm"
                 onClick={() => onPageChange?.(Math.max(0, pagination.offset - pagination.limit))}
                 disabled={pagination.offset === 0}
+                className="text-xs sm:text-sm"
               >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Anterior
+                <ChevronLeft className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Anterior</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onPageChange?.(pagination.offset + pagination.limit)}
                 disabled={!pagination.hasMore}
+                className="text-xs sm:text-sm"
               >
-                Próxima
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <span className="hidden sm:inline">Próxima</span>
+                <ChevronRight className="h-4 w-4 sm:ml-1" />
               </Button>
             </div>
           </div>

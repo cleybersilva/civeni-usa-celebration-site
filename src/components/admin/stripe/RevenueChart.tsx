@@ -39,10 +39,10 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data, loading }) => 
 
   return (
     <Card className="border-l-4 border-l-blue-500 shadow-md">
-      <CardHeader style={{ background: 'linear-gradient(to right, hsl(214 100% 97%), hsl(189 94% 93%))' }}>
-        <CardTitle className="text-blue-700 dark:text-blue-300">Receita ao longo do tempo</CardTitle>
+      <CardHeader style={{ background: 'linear-gradient(to right, hsl(214 100% 97%), hsl(189 94% 93%))' }} className="px-4 sm:px-6">
+        <CardTitle className="text-blue-700 dark:text-blue-300 text-base sm:text-lg">Receita ao longo do tempo</CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data}>
             <defs>

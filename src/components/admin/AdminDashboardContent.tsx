@@ -264,11 +264,11 @@ const AdminDashboardContent = () => {
     <SidebarProvider>
       <div className="min-h-screen bg-gray-100 flex w-full">
         <AdminSidebar />
-        <SidebarInset>
+        <SidebarInset className="flex-1">
           <AdminHeader />
-          <main className="flex-1 space-y-6 p-6">
+          <main className="flex-1 space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6">
             <UserInfo />
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {renderTabContent()}
             </div>
           </main>

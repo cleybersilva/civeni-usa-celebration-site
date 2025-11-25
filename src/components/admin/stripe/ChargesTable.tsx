@@ -119,27 +119,28 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Transações Detalhadas</CardTitle>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-lg sm:text-xl">Transações Detalhadas</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-3 sm:px-6">
         {/* Campo de busca */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por nome, email ou ID da transação..."
+              placeholder="Buscar por nome, email ou ID..."
               value={searchValue}
               onChange={(e) => {
                 onSearchChange?.(e.target.value);
-                onPageChange?.(0); // Reset to first page on search
+                onPageChange?.(0);
               }}
-              className="pl-10"
+              className="pl-10 text-sm"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-3 sm:mx-0">
+          <div className="min-w-[800px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -294,13 +295,15 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
 
         {/* Paginação */}
         {pagination && (
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-muted-foreground">
-              Mostrando {pagination.offset + 1} a {Math.min(pagination.offset + pagination.limit, pagination.total)} de {pagination.total} transações
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              <span className="hidden sm:inline">Mostrando {pagination.offset + 1} a {Math.min(pagination.offset + pagination.limit, pagination.total)} de {pagination.total} transações</span>
+              <span className="sm:hidden">{pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} de {pagination.total}</span>
             </p>
             <div className="flex gap-2">
               <Button
@@ -308,18 +311,20 @@ export const ChargesTable: React.FC<ChargesTableProps> = ({
                 size="sm"
                 onClick={() => onPageChange?.(Math.max(0, pagination.offset - pagination.limit))}
                 disabled={pagination.offset === 0}
+                className="text-xs sm:text-sm"
               >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Anterior
+                <ChevronLeft className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Anterior</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onPageChange?.(pagination.offset + pagination.limit)}
                 disabled={!pagination.hasMore}
+                className="text-xs sm:text-sm"
               >
-                Próxima
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <span className="hidden sm:inline">Próxima</span>
+                <ChevronRight className="h-4 w-4 sm:ml-1" />
               </Button>
             </div>
           </div>

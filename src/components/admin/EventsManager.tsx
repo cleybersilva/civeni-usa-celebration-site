@@ -172,18 +172,18 @@ const EventsManager = () => {
       onReset={refetch}
       fallbackTitle="Erro ao carregar Eventos"
     >
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
               {t('admin.events.title', 'Gerenciar Eventos')}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">
               {t('admin.events.description', 'Crie e gerencie eventos, palestras e atividades')}
             </p>
           </div>
-          <Button onClick={() => setShowCreateDialog(true)}>
+          <Button onClick={() => setShowCreateDialog(true)} className="w-full sm:w-auto text-sm">
             <Plus className="h-4 w-4 mr-2" />
             Novo Evento
           </Button>
@@ -192,27 +192,27 @@ const EventsManager = () => {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5" />
             Filtros e Busca
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-3">
             <div>
               <Input
                 placeholder="Buscar por título ou slug..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
+                className="w-full text-sm"
               />
             </div>
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="text-sm">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white z-50">
                 <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="draft">Rascunho</SelectItem>
                 <SelectItem value="published">Publicado</SelectItem>
@@ -224,10 +224,10 @@ const EventsManager = () => {
             </Select>
 
             <Select value={modalidadeFilter} onValueChange={setModalidadeFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="text-sm">
                 <SelectValue placeholder="Modalidade" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white z-50">
                 <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="online">Online</SelectItem>
                 <SelectItem value="presencial">Presencial</SelectItem>
@@ -236,7 +236,7 @@ const EventsManager = () => {
             </Select>
           </div>
           
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs sm:text-sm text-muted-foreground">
             Mostrando {filteredEvents.length} de {events?.length || 0} eventos
           </div>
         </CardContent>
@@ -278,64 +278,65 @@ const EventsManager = () => {
         ) : (
           filteredEvents.map((event: any) => (
             <Card key={event.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold line-clamp-1">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0 w-full">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold line-clamp-1">
                         {event.titulo || event.slug}
                       </h3>
                       {event.featured && (
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        <Star className="h-4 w-4 text-yellow-500 fill-current shrink-0" />
                       )}
                       {getStatusBadge(event)}
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="outline" className="capitalize text-xs">
                         {event.modalidade}
                       </Badge>
                     </div>
                     
-                    <div className="grid gap-2 text-sm text-muted-foreground mb-3">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Início: {formatEventDate(event.inicio_at)}</span>
+                    <div className="grid gap-2 text-xs sm:text-sm text-muted-foreground mb-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                        <span className="break-all">Início: {formatEventDate(event.inicio_at)}</span>
                         {event.fim_at && (
-                          <span>• Fim: {formatEventDate(event.fim_at)}</span>
+                          <span className="break-all">• Fim: {formatEventDate(event.fim_at)}</span>
                         )}
                       </div>
                       
                       {event.endereco && (
-                        <div className="line-clamp-1">
+                        <div className="line-clamp-1 break-all">
                           📍 {event.endereco}
                         </div>
                       )}
                       
-                      <div className="flex items-center gap-4 text-xs">
-                        <span>Slug: {event.slug}</span>
-                        <span>Criado: {formatEventDate(event.created_at)}</span>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
+                        <span className="break-all">Slug: {event.slug}</span>
+                        <span className="break-all">Criado: {formatEventDate(event.created_at)}</span>
                         {event.updated_at !== event.created_at && (
-                          <span>Atualizado: {formatEventDate(event.updated_at)}</span>
+                          <span className="break-all">Atualizado: {formatEventDate(event.updated_at)}</span>
                         )}
                       </div>
                     </div>
                     
                     {event.subtitulo && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3">
                         {event.subtitulo}
                       </p>
                     )}
                   </div>
                   
-                  <div className="flex items-center gap-2 ml-4">
+                  <div className="flex flex-row lg:flex-col items-center gap-2 w-full lg:w-auto">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleToggleFeatured(event)}
                       title={event.featured ? 'Remover destaque' : 'Destacar evento'}
+                      className="flex-1 lg:flex-none text-xs"
                     >
                       {event.featured ? (
-                        <StarOff className="h-4 w-4" />
+                        <StarOff className="h-3 w-3 sm:h-4 sm:w-4" />
                       ) : (
-                        <Star className="h-4 w-4" />
+                        <Star className="h-3 w-3 sm:h-4 sm:w-4" />
                       )}
                     </Button>
                     
@@ -344,9 +345,10 @@ const EventsManager = () => {
                       size="sm"
                       onClick={() => handleTogglePublish(event)}
                       title={event.status_publicacao === 'published' ? 'Despublicar' : 'Publicar'}
+                      className="flex-1 lg:flex-none text-xs"
                     >
                       {event.status_publicacao === 'published' ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" />
                       ) : (
                         <Eye className="h-4 w-4" />
                       )}

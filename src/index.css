@@ -167,3 +167,60 @@
 .prose u {
   @apply underline;
 }
+
+/* Admin Panel Mobile Responsiveness */
+@layer components {
+  /* Dropdown menus always have background and high z-index */
+  [role="menu"],
+  [data-radix-popper-content-wrapper] {
+    @apply bg-white dark:bg-gray-800 z-50;
+  }
+
+  /* Table responsive wrapper */
+  .admin-table-wrapper {
+    @apply overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6;
+  }
+
+  /* Admin cards responsive padding */
+  .admin-card {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+
+  /* Admin form fields stack on mobile */
+  .admin-form-row {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6;
+  }
+
+  .admin-form-row-full {
+    @apply grid grid-cols-1 gap-3 sm:gap-4 md:gap-6;
+  }
+
+  /* Admin action buttons responsive */
+  .admin-action-buttons {
+    @apply flex flex-col sm:flex-row gap-2 sm:gap-3;
+  }
+
+  /* Admin section titles */
+  .admin-section-title {
+    @apply text-xl sm:text-2xl md:text-3xl font-bold;
+  }
+
+  .admin-section-subtitle {
+    @apply text-sm sm:text-base text-muted-foreground;
+  }
+
+  /* Mobile-friendly spacing */
+  .admin-content {
+    @apply space-y-4 md:space-y-6;
+  }
+}
+
+/* Ensure dropdowns are visible on mobile */
+@media (max-width: 768px) {
+  [data-radix-select-content],
+  [data-radix-dropdown-menu-content],
+  [data-radix-popover-content] {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+}

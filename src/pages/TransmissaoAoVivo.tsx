@@ -20,23 +20,74 @@ import {
 import { usePublicPresentationRoomsWithAssignments } from '@/hooks/usePresentationRooms';
 import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR, enUS, es, tr } from 'date-fns/locale';
+import { useCMS } from '@/contexts/CMSContext';
+
+// Helper: map i18n language to date-fns locale
+const getDateLocale = (lang: string) => {
+  switch (lang) {
+    case 'en': return enUS;
+    case 'es': return es;
+    case 'tr': return tr;
+    case 'pt':
+    default: return ptBR;
+  }
+};
 
 const TransmissaoAoVivo = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const locale = i18n.language;
+  const { content } = useCMS();
 
   // Parse active tab from hash
   const hash = location.hash.replace('#', '') || 'ao-vivo';
   const [activeTab, setActiveTab] = useState(hash);
+  
+  // Countdown state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
 
   // Fetch data
   const { data: transmission, isLoading: txLoading } = useTransmission();
   const { data: rooms = [], isLoading: roomsLoading } = useTransmissionRooms(transmission?.id);
   const { data: upcoming = [], isLoading: upcomingLoading } = useUpcomingTransmissions();
   const { data: presentationRooms = [], isLoading: presentationRoomsLoading } = usePublicPresentationRoomsWithAssignments();
+
+  // Countdown timer
+  useEffect(() => {
+    const eventDate = content.eventConfig.eventDate;
+    if (!eventDate) return;
+
+    const rawTime = content.eventConfig.startTime || '00:00:00';
+    const time = /\d{2}:\d{2}:\d{2}/.test(rawTime) ? rawTime : `${rawTime}:00`;
+    const targetDate = new Date(`${eventDate}T${time}`).getTime();
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [content.eventConfig.eventDate, content.eventConfig.startTime]);
 
   // Sync hash with active tab
   useEffect(() => {
@@ -62,14 +113,22 @@ const TransmissaoAoVivo = () => {
     const startAt = transmission.start_at ? new Date(transmission.start_at) : null;
 
     if (transmission.status === 'live') {
-      return <Badge className="bg-red-600 text-white animate-pulse">🔴 AO VIVO</Badge>;
+      return (
+        <Badge className="bg-red-600 text-white animate-pulse">
+          🔴 {t('transmission.badges.live')}
+        </Badge>
+      );
     }
 
     if (transmission.status === 'scheduled' && startAt && startAt > now) {
       const diff = startAt.getTime() - now.getTime();
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return <Badge variant="outline">Começa em {hours}h {minutes}min</Badge>;
+      return (
+        <Badge variant="outline">
+          {t('transmission.startsIn', { hours, minutes })}
+        </Badge>
+      );
     }
 
     if (transmission.status === 'ended' && badgeLabel) {
@@ -85,7 +144,7 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'live') {
       return {
-        label: 'Assistir agora',
+        label: t('transmission.watchNow'),
         href: '#player',
         icon: <Play className="w-4 h-4" />,
       };
@@ -93,7 +152,7 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'scheduled') {
       return {
-        label: 'Definir lembrete',
+        label: t('transmission.setReminder'),
         href: `https://www.youtube.com/${transmission.channel_handle}/live`,
         icon: <Calendar className="w-4 h-4" />,
         external: true,
@@ -102,14 +161,14 @@ const TransmissaoAoVivo = () => {
 
     if (transmission.status === 'ended' && transmission.youtube_video_id) {
       return {
-        label: 'Assistir replay',
+        label: t('transmission.watchReplay'),
         href: '#player',
         icon: <Video className="w-4 h-4" />,
       };
     }
 
     return null;
-  }, [transmission]);
+  }, [transmission, t]);
 
   // Timezone text
   const timezoneText = useMemo(() => {
@@ -117,8 +176,8 @@ const TransmissaoAoVivo = () => {
     const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const userLabel = formatTimezone(userTZ);
     const eventLabel = formatTimezone(transmission.timezone);
-    return `Horários em ${userLabel} • Local: ${eventLabel}`;
-  }, [transmission]);
+    return t('transmission.timezoneInfo', { user: userLabel, event: eventLabel });
+  }, [transmission, t]);
 
   if (txLoading) {
     return (
@@ -161,17 +220,25 @@ const TransmissaoAoVivo = () => {
       <Header />
 
       {/* Hero Banner */}
-      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-12 md:py-16 lg:py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
-          <nav className="mb-8 text-sm">
-            <ol className="flex items-center space-x-2">
-              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+          <nav className="mb-6 md:mb-8 text-xs sm:text-sm">
+            <ol className="flex flex-wrap items-center gap-1 sm:gap-2">
+              <li>
+                <Link to="/" className="hover:text-blue-200 transition-colors">
+                  {t('eventsPage.breadcrumbHome', 'Home')}
+                </Link>
+              </li>
               <li className="text-blue-200">›</li>
-              <li><Link to="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</Link></li>
+              <li>
+                <Link to="/programacao-online" className="hover:text-blue-200 transition-colors">
+                  {t('schedule.title', 'Programação')}
+                </Link>
+              </li>
               <li className="text-blue-200">›</li>
-              <li>Transmissão ao Vivo</li>
+              <li className="break-all">{t('transmission.liveTransmission', 'Transmissão ao Vivo')}</li>
             </ol>
           </nav>
           
@@ -179,7 +246,7 @@ const TransmissaoAoVivo = () => {
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 md:mb-6">
               <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 animate-pulse" />
               <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold font-poppins">
-                {title || 'Transmissão ao vivo'}
+                {title || t('transmission.title', 'Transmissão ao vivo')}
               </h1>
               <Video className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 animate-pulse" />
             </div>
@@ -221,58 +288,95 @@ const TransmissaoAoVivo = () => {
               <Link to="/inscricoes" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                   <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Fazer Inscrição
+                  {t('transmission.register', 'Fazer Inscrição')}
                 </button>
               </Link>
             </div>
 
-            {/* Status info */}
-            {(statusBadge || timezoneText) && (
-              <div className="flex flex-wrap gap-4 items-center justify-center text-sm">
-                {statusBadge}
-                {timezoneText && (
-                  <span className="text-blue-100">
-                    <Clock className="w-4 h-4 inline mr-2" />
-                    {timezoneText}
-                  </span>
-                )}
+            {/* Countdown Timer */}
+            <div className="flex flex-col items-center justify-center gap-3 md:gap-4 mt-6 md:mt-8">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl md:rounded-2xl px-4 sm:px-6 md:px-8 py-4 md:py-6 animate-pulse shadow-2xl border border-white/20 w-full max-w-lg">
+                <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.days.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.days')}
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.hours.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.hours')}
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.minutes.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.minutes')}
+                    </div>
+                  </div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white/60">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 font-poppins">
+                      {timeLeft.seconds.toString().padStart(2, '0')}
+                    </div>
+                    <div className="text-[10px] sm:text-xs md:text-sm text-white/90 font-semibold uppercase tracking-wider">
+                      {t('countdown.seconds')}
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+              
+              {timezoneText && (
+                <span className="text-blue-100 text-xs sm:text-sm text-center px-4">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" />
+                  {timezoneText}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Tabs Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-8 md:py-12 lg:py-16">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4 mb-12 h-auto p-1 bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-xl">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 sm:grid-cols-4 mb-8 md:mb-12 h-auto p-1 gap-1 bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-xl">
             <TabsTrigger 
               value="ao-vivo" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <Play className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">Ao Vivo</span>
+              <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.live', 'Ao Vivo')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="agenda" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <Calendar className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">Agenda</span>
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.schedule', 'Agenda')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="salas" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <Video className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">Salas</span>
+              <Video className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.rooms', 'Salas')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="faq" 
-              className="flex flex-col md:flex-row items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
-              <HelpCircle className="w-5 h-5" />
-              <span className="text-sm md:text-base font-semibold">FAQ</span>
+              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.faq', 'FAQ')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -334,9 +438,9 @@ const TransmissaoAoVivo = () => {
                     <Video className="w-10 h-10 text-gray-400" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-900">Nenhum vídeo disponível</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">{t('transmission.noVideoTitle')}</h3>
                     <p className="text-gray-600 text-base">
-                      A transmissão ainda não começou ou não há replay disponível.
+                      {t('transmission.noVideoDescription')}
                     </p>
                   </div>
                   <Button 
@@ -351,7 +455,7 @@ const TransmissaoAoVivo = () => {
                       rel="noopener noreferrer"
                     >
                       <Youtube className="w-5 h-5 mr-2" />
-                      Visite o canal
+                      {t('transmission.visitChannel')}
                       <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
@@ -360,19 +464,21 @@ const TransmissaoAoVivo = () => {
             )}
 
             {/* Upcoming Transmissions */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Próximas Transmissões</h2>
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                  {t('transmission.upcomingStreams', 'Próximas Transmissões')}
+                </h2>
               </div>
               {upcomingLoading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {[1, 2, 3].map((i) => (
                     <Skeleton key={i} className="h-48 rounded-xl" />
                   ))}
                 </div>
               ) : upcoming.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {upcoming.map((tx) => (
                     <Card 
                       key={tx.id} 
@@ -381,7 +487,7 @@ const TransmissaoAoVivo = () => {
                       <div className="space-y-4">
                         <div className="flex items-start justify-between">
                           <Badge variant="outline" className="bg-civeni-blue/10 text-civeni-blue border-civeni-blue/20">
-                            Agendado
+                            {t('transmission.badges.scheduled', 'Agendado')}
                           </Badge>
                           <Calendar className="w-5 h-5 text-civeni-blue" />
                         </div>
@@ -405,7 +511,7 @@ const TransmissaoAoVivo = () => {
                           asChild
                         >
                           <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
-                            Ver Detalhes
+                            {t('eventsPage.viewDetails', 'Ver Detalhes')}
                             <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                           </Link>
                         </Button>
@@ -420,9 +526,9 @@ const TransmissaoAoVivo = () => {
                       <Calendar className="w-10 h-10 text-gray-400" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-gray-900">Sem próximas transmissões agendadas</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{t('transmission.noUpcoming', 'Sem próximas transmissões agendadas')}</h3>
                       <p className="text-gray-600">
-                        Fique atento ao nosso canal no YouTube para futuras transmissões
+                        {t('transmission.noStreamDesc', 'Fique atento ao nosso canal no YouTube para futuras transmissões')}
                       </p>
                     </div>
                     <Button 
@@ -433,7 +539,7 @@ const TransmissaoAoVivo = () => {
                     >
                       <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                         <Youtube className="w-5 h-5 mr-2" />
-                        Veja o canal no YouTube
+                        {t('transmission.channel', 'Canal')} YouTube
                         <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                       </a>
                     </Button>
@@ -444,11 +550,11 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="agenda">
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                  <h2 className="text-3xl font-bold text-gray-900">Agenda Online</h2>
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 md:mb-6">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{t('schedule.onlineTitle', 'Agenda Online')}</h2>
                 </div>
                 <div className="flex gap-3">
                   <Button 
@@ -458,7 +564,7 @@ const TransmissaoAoVivo = () => {
                     asChild
                   >
                     <a href="/programacao-online">
-                      Ver todas as sessões
+                      {t('eventsPage.viewSchedule', 'Ver todas as sessões')}
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </a>
                   </Button>
@@ -474,14 +580,14 @@ const TransmissaoAoVivo = () => {
                       <Calendar className="w-8 h-8 text-civeni-blue" />
                     </div>
                   </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      Programação completa disponível
-                    </h3>
-                    <p className="text-gray-600">
-                      Acesse a programação completa presencial e online com todos os detalhes das atividades
-                    </p>
-                  </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {t('schedule.title', 'Programação completa disponível')}
+                  </h3>
+                  <p className="text-gray-600">
+                    {t('schedule.description', 'Acesse a programação completa presencial e online com todos os detalhes das atividades')}
+                  </p>
+                </div>
                   <div className="flex flex-col sm:flex-row gap-3 shrink-0">
                     <Button 
                       size="lg"
@@ -490,7 +596,7 @@ const TransmissaoAoVivo = () => {
                     >
                       <a href="/programacao-online">
                         <Monitor className="w-5 h-5 mr-2" />
-                        Online
+                        {t('transmission.online', 'Online')}
                       </a>
                     </Button>
                     <Button 
@@ -501,7 +607,7 @@ const TransmissaoAoVivo = () => {
                     >
                       <a href="/programacao-presencial">
                         <MapPin className="w-5 h-5 mr-2" />
-                        Presencial
+                        {t('transmission.inPerson', 'Presencial')}
                       </a>
                     </Button>
                   </div>
@@ -511,13 +617,13 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="salas">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Salas de Apresentação de Trabalhos</h2>
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight">{t('transmission.roomsTitle', 'Salas de Apresentação de Trabalhos')}</h2>
               </div>
-              <p className="text-gray-600 text-lg max-w-3xl">
-                Confira a programação das apresentações de trabalhos aprovados. Cada sala possui link para acesso via Google Meet.
+              <p className="text-gray-600 text-sm sm:text-base md:text-lg max-w-3xl">
+                {t('transmission.roomsDescription', 'Confira a programação das apresentações de trabalhos aprovados. Cada sala possui link para acesso via Google Meet.')}
               </p>
               
               {presentationRoomsLoading ? (
@@ -527,23 +633,23 @@ const TransmissaoAoVivo = () => {
                   ))}
                 </div>
               ) : presentationRooms.length > 0 ? (
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   {presentationRooms.map((room) => (
                     <Card 
                       key={room.id} 
-                      className="p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200"
+                      className="p-4 md:p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 border-gray-200"
                     >
-                      <div className="space-y-6">
+                      <div className="space-y-4 md:space-y-6">
                         {/* Cabeçalho da sala */}
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 pb-4 border-b border-gray-200">
+                        <div className="flex flex-col gap-4 pb-4 border-b border-gray-200">
                           <div className="space-y-2">
-                            <h3 className="font-bold text-2xl text-gray-900">
+                            <h3 className="font-bold text-lg sm:text-xl md:text-2xl text-gray-900 leading-tight">
                               {room.nome_sala}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale(i18n.language) })}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
@@ -557,18 +663,19 @@ const TransmissaoAoVivo = () => {
                               )}
                             </div>
                             {room.descricao_sala && (
-                              <p className="text-gray-600 text-sm mt-2">
+                              <p className="text-gray-600 text-xs sm:text-sm mt-2">
                                 {room.descricao_sala}
                               </p>
                             )}
                           </div>
                           <Button 
-                            className="bg-civeni-blue hover:bg-civeni-blue/90 shrink-0" 
+                            className="bg-civeni-blue hover:bg-civeni-blue/90 w-full sm:w-auto text-sm" 
+                            size="sm"
                             asChild
                           >
                             <a href={room.meet_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-4 h-4 mr-2" />
-                              Entrar no Google Meet
+                              <span className="truncate">{t('transmission.joinMeet', 'Entrar no Google Meet')}</span>
                             </a>
                           </Button>
                         </div>
@@ -576,20 +683,20 @@ const TransmissaoAoVivo = () => {
                         {/* Lista de trabalhos */}
                         {room.assignments && room.assignments.length > 0 ? (
                           <div className="space-y-3">
-                            <h4 className="font-semibold text-lg text-gray-800">
-                              Trabalhos desta sala ({room.assignments.length})
+                            <h4 className="font-semibold text-base sm:text-lg text-gray-800">
+                              {t('transmission.roomWorks', 'Trabalhos desta sala')} ({room.assignments.length})
                             </h4>
                             <div className="space-y-3">
                               {room.assignments.map((assignment: any, idx: number) => (
                                 <div 
                                   key={assignment.id} 
-                                  className="p-4 bg-white rounded-lg border border-gray-200 hover:border-civeni-blue transition-colors"
+                                  className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 hover:border-civeni-blue transition-colors"
                                 >
-                                  <div className="flex items-start gap-4">
-                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-civeni-blue/10 text-civeni-blue font-bold shrink-0">
+                                  <div className="flex items-start gap-2 sm:gap-4">
+                                    <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-civeni-blue/10 text-civeni-blue font-bold shrink-0 text-sm">
                                       {idx + 1}
                                     </div>
-                                    <div className="flex-1 space-y-2">
+                                    <div className="flex-1 space-y-2 min-w-0">
                                       <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <Clock className="w-4 h-4" />
                                         {format(new Date(assignment.inicio_apresentacao), 'HH:mm')} - {format(new Date(assignment.fim_apresentacao), 'HH:mm')}
@@ -609,7 +716,7 @@ const TransmissaoAoVivo = () => {
                                         <div className="flex items-start gap-2">
                                           <FileText className="w-4 h-4 mt-1 text-civeni-red shrink-0" />
                                           <span className="text-gray-700">
-                                            {assignment.submission?.titulo || 'Título não disponível'}
+                                            {assignment.submission?.titulo || t('transmission.noWorkTitle', 'Título não disponível')}
                                           </span>
                                         </div>
                                       </div>
@@ -624,10 +731,10 @@ const TransmissaoAoVivo = () => {
                               ))}
                             </div>
                           </div>
-                        ) : (
-                          <p className="text-gray-500 text-center py-4">
-                            Nenhum trabalho agendado para esta sala ainda.
-                          </p>
+                ) : (
+                <p className="text-gray-500 text-center py-4">
+                  {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
+                </p>
                         )}
                       </div>
                     </Card>
@@ -640,9 +747,9 @@ const TransmissaoAoVivo = () => {
                       <Video className="w-10 h-10 text-gray-400" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-gray-900">Nenhuma sala disponível no momento</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{t('transmission.noRoomsAvailable')}</h3>
                       <p className="text-gray-600">
-                        As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.
+                        {t('transmission.noRoomsDescription')}
                       </p>
                     </div>
                   </div>
@@ -652,72 +759,72 @@ const TransmissaoAoVivo = () => {
           </TabsContent>
 
           <TabsContent value="faq">
-            <div className="space-y-8">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
-                <h2 className="text-3xl font-bold text-gray-900">Perguntas Frequentes</h2>
+            <div className="space-y-6 md:space-y-8">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="h-1 w-8 md:w-12 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{t('transmission.faqTitle', 'Perguntas Frequentes')}</h2>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-4 md:gap-6">
                 {/* FAQ Items */}
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">Quais são os requisitos técnicos?</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          Você precisa de um navegador atualizado (Chrome, Firefox, Safari ou Edge) e uma conexão de internet estável de pelo menos 5 Mbps para melhor experiência.
+                    <div className="space-y-2 min-w-0">
+                      <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.tech.title')}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                        {t('transmission.faq.tech.answer')}
+                      </p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2 md:gap-3">
+                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
+                      </div>
+                      <div className="space-y-2 min-w-0">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.access.title')}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                          {t('transmission.faq.access.answer')}
                         </p>
                       </div>
                     </div>
                   </div>
                 </Card>
 
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">Como acesso as transmissões?</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          As transmissões ao vivo são públicas e podem ser acessadas diretamente nesta página. Para acessar as salas de reunião, você precisa estar inscrito no evento.
+                      <div className="space-y-2 min-w-0">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.recording.title')}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                          {t('transmission.faq.recording.answer')}
                         </p>
                       </div>
                     </div>
                   </div>
                 </Card>
 
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                <Card className="p-4 md:p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 md:gap-3">
                       <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
+                        <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-civeni-blue" />
                       </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">As sessões serão gravadas?</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          Sim, todas as sessões principais serão gravadas e disponibilizadas posteriormente no canal oficial do YouTube do CIVENI.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-civeni-blue/10 rounded-lg shrink-0">
-                        <HelpCircle className="w-5 h-5 text-civeni-blue" />
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-gray-900">Preciso de suporte técnico. O que faço?</h4>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          Entre em contato com nossa equipe de suporte através do email suporte@civeni.org ou pelo WhatsApp disponível na página de contato.
+                      <div className="space-y-2 min-w-0">
+                        <h4 className="font-bold text-sm sm:text-base text-gray-900">{t('transmission.faq.support.title')}</h4>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                          {t('transmission.faq.support.answer')}
                         </p>
                       </div>
                     </div>
@@ -728,9 +835,9 @@ const TransmissaoAoVivo = () => {
               {/* Additional help CTA */}
               <Card className="p-10 text-center bg-gradient-to-br from-civeni-blue/5 to-civeni-red/5 border-civeni-blue/20 shadow-md">
                 <div className="max-w-2xl mx-auto space-y-4">
-                  <h3 className="text-2xl font-bold text-gray-900">Ainda tem dúvidas?</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">{t('transmission.faq.ctaTitle', 'Ainda tem dúvidas?')}</h3>
                   <p className="text-gray-600">
-                    Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.
+                    {t('transmission.noStreamDesc', 'Nossa equipe está pronta para ajudar. Entre em contato conosco para mais informações.')}
                   </p>
                   <Button 
                     size="lg"
@@ -738,7 +845,7 @@ const TransmissaoAoVivo = () => {
                     asChild
                   >
                     <Link to="/contato">
-                      Entre em Contato
+                      {t('contact.title', 'Entre em Contato')}
                       <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>

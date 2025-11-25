@@ -30,39 +30,42 @@ const AdminHeader = () => {
 
   return (
     <header 
-      className="border-b h-16"
+      className="border-b h-auto min-h-[64px] md:h-16"
       style={{
         background: 'linear-gradient(to bottom right, hsl(200 48% 21%), hsl(200 35% 27%), hsl(300 35% 28%))'
       }}
     >
-      <div className="flex justify-between items-center px-6 py-3 h-full">
-        <div className="flex items-center space-x-4">
-          <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80" />
-          <div>
-            <h1 className="text-xl font-bold text-white drop-shadow-md">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-3 sm:px-6 py-3 gap-3">
+        <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+          <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base sm:text-xl font-bold text-white drop-shadow-md truncate">
               Dashboard
             </h1>
-            <p className="text-xs text-white/90 drop-shadow-sm">
-              {user?.email} ({getUserTypeLabel(user?.user_type || '')})
-              {isAdminRoot() && <span className="ml-2 text-red-300 font-bold">[ROOT]</span>}
+            <p className="text-[10px] sm:text-xs text-white/90 drop-shadow-sm truncate">
+              <span className="hidden sm:inline">{user?.email}</span>
+              <span className="sm:hidden">{user?.email?.split('@')[0]}</span>
+              <span className="hidden md:inline"> ({getUserTypeLabel(user?.user_type || '')})</span>
+              {isAdminRoot() && <span className="ml-1 sm:ml-2 text-red-300 font-bold">[ROOT]</span>}
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
           <LanguageSelector />
           <Button 
             variant="outline" 
             onClick={() => navigate('/')}
             size="sm"
-            className="border-white text-white bg-white/10 hover:bg-white hover:text-civeni-blue transition-all duration-200"
+            className="border-white text-white bg-white/10 hover:bg-white hover:text-civeni-blue transition-all duration-200 text-xs sm:text-sm px-2 sm:px-3"
           >
-            {t('admin.viewSite', 'Ver Site')}
+            <span className="hidden sm:inline">{t('admin.viewSite', 'Ver Site')}</span>
+            <span className="sm:hidden">Site</span>
           </Button>
           <Button 
             variant="destructive" 
             onClick={handleLogout}
             size="sm"
-            className="bg-civeni-red hover:bg-civeni-red/90"
+            className="bg-civeni-red hover:bg-civeni-red/90 text-xs sm:text-sm px-2 sm:px-3"
           >
             {t('admin.logout', 'Sair')}
           </Button>

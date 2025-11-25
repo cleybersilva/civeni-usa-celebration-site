@@ -324,26 +324,6 @@ export const trTranslations = {
         title: "4. Veri Koruma",
         content: "Bilgilerinizi yetkisiz erişim, değişiklik, ifşa veya imhaya karşı korumak için teknik ve organizasyonel güvenlik önlemleri uyguluyoruz."
       },
-      works: {
-        oral: {
-          title: 'Sözlü Sunum',
-          subtitle: 'III CIVENI 2025 için akademik makalelerin sözlü sunum modalitesi',
-          noContent: 'İçerik yakında',
-          noContentDescription: 'Sözlü sunumlar hakkında bilgiler yakında yayınlanacak.',
-        },
-        poster: {
-          title: 'Poster Oturumları',
-          subtitle: 'III CIVENI 2025 için poster sunum modalitesi',
-          noContent: 'İçerik yakında',
-          noContentDescription: 'Poster oturumları hakkında bilgiler yakında yayınlanacak.',
-        },
-        manuscripts: {
-          title: 'El Yazmaları',
-          subtitle: 'III CIVENI 2025 için el yazması gönderim modalitesi',
-          noContent: 'İçerik yakında',
-          noContentDescription: 'El yazmaları hakkında bilgiler yakında yayınlanacak.',
-        },
-      },
       userRights: {
         title: "5. Haklarınız",
         content: "Aşağıdaki haklara sahipsiniz:",
@@ -364,6 +344,43 @@ export const trTranslations = {
         title: "8. Değişiklikler",
         content: "Bu politika periyodik olarak güncellenebilir. Önemli değişiklikler hakkında web sitemiz veya e-posta yoluyla bilgilendirme yapacağız."
       }
+    },
+    works: {
+      breadcrumb: "Çalışmalar",
+      submitWork: "Çalışma Gönder",
+      makeRegistration: "Kayıt Ol",
+      viewThematicAreas: "Tematik Alanları Görüntüle",
+      oral: {
+        title: 'Sözlü Sunum Listesi/Şablon',
+        subtitle: 'III CIVENI 2025 için akademik makalelerin sözlü sunum modalitesi - Araştırmanızı dünyanın her yerinden uzmanlarla paylaşın',
+        pageTitle: 'Sözlü Sunum Listesi/Şablon',
+        infoTitle: 'Sözlü Sunum Bilgileri',
+        infoDescription: 'Kongrede çalışmanızı sözlü olarak sunmak için gereksinimler, formatlar ve yönergeler hakkında bilgi edinin',
+        noContent: 'İçerik yakında',
+        noContentDescription: 'Sözlü sunumlar hakkında bilgiler yakında yayınlanacak.',
+      },
+      poster: {
+        title: 'Poster Oturumları',
+        subtitle: 'III CIVENI 2025 için poster sunum modalitesi - Keşiflerinizi ve yenilikçi araştırmalarınızı görsel olarak sunun',
+        infoTitle: 'Poster Oturumları Bilgileri',
+        infoDescription: 'Kongre yönergelerini takip ederek bilimsel posterinizi nasıl hazırlayacağınızı ve sunacağınızı öğrenin',
+        noContent: 'İçerik yakında',
+        noContentDescription: 'Poster oturumları hakkında bilgiler yakında yayınlanacak.',
+      },
+      videos: {
+        title: 'Video Gönderimi',
+        subtitle: 'Video materyalinizi III CIVENI 2025 değerlendirme paneli tarafından incelenmek üzere gönderin',
+      },
+      submissionPage: {
+        title: 'Makale/Konsorsiyum Gönderimi',
+        subtitle: 'Araştırmanızı ve deneyimlerinizi III CIVENI 2025\'te paylaşın - Dünya çapında multidisipliner bilginin ilerlemesine katkıda bulunun',
+        pageTitle: 'Makale/Konsorsiyum Gönderimi',
+        formDescription: 'Gönderim türünü seçin ve tüm gerekli alanları doldurun',
+      },
+      templates: {
+        title: 'Makale/Slayt Şablonları',
+        subtitle: 'III CIVENI 2025 için akademik makaleler ve sunumlar için standartlaştırılmış şablonlar - Makalelerinizin ve sunumlarınızın formatlanmasını kolaylaştırın',
+      },
     },
     hybrid: {
       title: "Hibrit Format",
@@ -537,8 +554,19 @@ export const trTranslations = {
         oralPresentation: "Sözlü Sunum",
         posterSessions: "Poster Oturumları",
         manuscripts: "El Yazmaları"
+      }
+    },
+    transmission: {
+      countdown: {
+        days: 'Günler',
+        hours: 'Saatler',
+        minutes: 'Dakikalar',
+        seconds: 'Saniyeler',
       },
-      transmission: {
+      backToTransmissions: 'Yayınlara Dön',
+      liveTransmission: 'Canlı Yayın',
+      watchNow: 'Şimdi izle',
+      register: 'Kayıt ol',
         pageTitle: "Resmi Yayın — CIVENI 2025 (Florida)",
         pageDescription: "III CIVENI 2025 canlı yayınlarını izleyin",
         title: "Resmi Yayın — CIVENI 2025 (Florida)",
@@ -546,7 +574,7 @@ export const trTranslations = {
         description: "III CIVENI 2025 tüm canlı yayınlarını takip edin",
         ctaWatch: "Şimdi İzle (YouTube)",
         ctaRooms: "Sözlü Sunum Odaları",
-        timezoneInfo: "Florida (ET) ve Fortaleza (BRT) saatleri",
+        timezoneInfo: "{{user}} saatinde • Etkinlik: {{event}}",
         noStream: "Şu anda canlı yayın yok",
         noStreamTitle: "Bir sonraki yayını bekleyin",
         noStreamDesc: "Programımıza göz atın",
@@ -563,13 +591,18 @@ export const trTranslations = {
         noRooms: "Oda yok",
         watchLive: "Canlı İzle",
         joinRoom: "Odaya Katıl",
+        watchReplay: "Tekrarı izle",
         waitingToStart: "Başlangıç Bekleniyor",
+        startsIn: "{{hours}}s {{minutes}}dk içinde başlar",
         capacity: "Kapasite",
         moderators: "Moderatörler",
         staffOnly: "Sadece Personel",
         enrolledOnly: "Sadece Kayıtlı",
         roomsTitle: "Sunum Odaları (Google Meet)",
         roomsDescription: "Sanal odalara erişim (kayıt gerekli)",
+        joinMeet: "Google Meet'e Katıl",
+        roomWorks: "Bu odadaki çalışmalar",
+        noWorkTitle: "Başlık mevcut değil",
         faqTitle: "Sık Sorulan Sorular",
         badges: { 
           live: "CANLI", 
@@ -608,15 +641,29 @@ export const trTranslations = {
           support: { 
             title: "Teknik desteğe ihtiyacım var. Ne yapmalıyım?", 
             answer: "Destek ekibimizle suporte@civeni.org e-posta adresi üzerinden veya iletişim sayfasında bulunan WhatsApp üzerinden iletişime geçin." 
-          }
-        }
+          },
+          ctaTitle: "Hâlâ sorularınız mı var?"
+        },
+        info: "Bilgiler",
+        date: "Tarih",
+        time: "Saat",
+        location: "Konum",
+        onlineTransmission: "Çevrim içi yayın",
+        usefulLinks: "Faydalı bağlantılar",
+        viewSchedule: "Programı görüntüle",
+        youtubeChannel: "YouTube kanalı",
+        noVideoTitle: "Video mevcut değil",
+        noVideoDescription: "Yayın henüz başlamadı.",
+        noReplayAvailable: "Şu anda tekrar mevcut değil.",
+        visitChannel: "Kanalı ziyaret edin",
+        noRoomsAvailable: "Şu anda uygun oda yok",
+        noRoomsDescription: "Sunum odaları yakında yayınlanacaktır. Programa dikkat edin.",
+      },
+      common: {
+        loading: "Yükleniyor",
+        previous: "Önceki",
+        next: "Sonraki",
+        goToImage: "Resme git"
       }
-    }
-  },
-  common: {
-    loading: "Yükleniyor",
-    previous: "Önceki",
-    next: "Sonraki",
-    goToImage: "Resme git"
   }
 };

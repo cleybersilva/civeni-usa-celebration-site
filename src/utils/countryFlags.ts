@@ -34,6 +34,7 @@ export const COUNTRIES = [
   { code: "EG", name: "Egypt" },
   { code: "RU", name: "Russia" },
   { code: "TR", name: "Turkey" },
+  { code: "UA", name: "Ukraine" },
   { code: "SA", name: "Saudi Arabia" },
   { code: "AE", name: "United Arab Emirates" },
   { code: "TH", name: "Thailand" },

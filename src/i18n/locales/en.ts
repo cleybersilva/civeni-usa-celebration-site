@@ -299,6 +299,43 @@ export const enTranslations = {
       description: "Relive the best moments of the II International Multidisciplinary Congress of VCCU",
       registerButton: "Join III CIVENI 2025"
     },
+    works: {
+      breadcrumb: "Papers",
+      submitWork: "Submit Paper",
+      makeRegistration: "Register",
+      viewThematicAreas: "View Thematic Areas",
+      oral: {
+        title: 'Oral Presentation List/Template',
+        subtitle: 'Academic papers oral presentation modality for III CIVENI 2025 - Share your research with experts from around the world',
+        pageTitle: 'Oral Presentation List/Template',
+        infoTitle: 'Oral Presentation Information',
+        infoDescription: 'Learn about the requirements, formats and guidelines for presenting your work orally at the congress',
+        noContent: 'Content coming soon',
+        noContentDescription: 'Information about oral presentations will be published soon.',
+      },
+      poster: {
+        title: 'Poster Sessions',
+        subtitle: 'Poster presentation modality for III CIVENI 2025 - Present your discoveries and innovative research visually',
+        infoTitle: 'Poster Sessions Information',
+        infoDescription: 'Learn how to prepare and present your scientific poster following the congress guidelines',
+        noContent: 'Content coming soon',
+        noContentDescription: 'Information about poster sessions will be published soon.',
+      },
+      videos: {
+        title: 'Video Submission',
+        subtitle: 'Submit your video material for evaluation by the III CIVENI 2025 judging panel',
+      },
+      submissionPage: {
+        title: 'Article/Consortium Submission',
+        subtitle: 'Share your research and experiences at III CIVENI 2025 - Contribute to the advancement of multidisciplinary knowledge worldwide',
+        pageTitle: 'Article/Consortium Submission',
+        formDescription: 'Choose the submission type and fill in all required fields',
+      },
+      templates: {
+        title: 'Article/Slide Templates',
+        subtitle: 'Standardized templates for academic papers and presentations for III CIVENI 2025 - Facilitate the formatting of your papers and presentations',
+      },
+    },
     privacy: {
       title: "Privacy Policy",
       lastUpdated: "Last updated:",
@@ -556,8 +593,19 @@ export const enTranslations = {
         oralPresentation: "Oral Presentation",
         posterSessions: "Poster Sessions",
         manuscripts: "Manuscripts"
+      }
+    },
+    transmission: {
+      countdown: {
+        days: 'Days',
+        hours: 'Hours',
+        minutes: 'Minutes',
+        seconds: 'Seconds',
       },
-      transmission: {
+      backToTransmissions: 'Back to Transmissions',
+      liveTransmission: 'Live Broadcast',
+      watchNow: 'Watch now',
+      register: 'Register',
         pageTitle: "Official Broadcast — CIVENI 2025 (Florida)",
         pageDescription: "Watch live broadcasts from III CIVENI 2025",
         title: "Official Broadcast — CIVENI 2025 (Florida)",
@@ -565,7 +613,7 @@ export const enTranslations = {
         description: "Follow all live broadcasts from III CIVENI 2025",
         ctaWatch: "Watch Now (YouTube)",
         ctaRooms: "Oral Presentation Rooms",
-        timezoneInfo: "Times shown in Florida (ET) and Fortaleza (BRT)",
+        timezoneInfo: "Times in {{user}} • Local: {{event}}",
         noStream: "No live stream at the moment",
         noStreamTitle: "Wait for the next broadcast",
         noStreamDesc: "Check our schedule below",
@@ -582,13 +630,18 @@ export const enTranslations = {
         noRooms: "No rooms available",
         watchLive: "Watch Live",
         joinRoom: "Join Room",
+        watchReplay: "Watch replay",
         waitingToStart: "Waiting to Start",
+        startsIn: "Starts in {{hours}}h {{minutes}}min",
         capacity: "Capacity",
         moderators: "Moderators",
         staffOnly: "Staff Only",
         enrolledOnly: "Enrolled Only",
         roomsTitle: "Presentation Rooms (Google Meet)",
         roomsDescription: "Access virtual rooms (registration required)",
+        joinMeet: "Join Google Meet",
+        roomWorks: "Works in this room",
+        noWorkTitle: "Title not available",
         faqTitle: "Frequently Asked Questions",
         badges: { 
           live: "LIVE", 
@@ -627,15 +680,29 @@ export const enTranslations = {
           support: { 
             title: "I need technical support. What should I do?", 
             answer: "Contact our support team via email at suporte@civeni.org or through WhatsApp available on the contact page." 
-          }
-        }
+          },
+          ctaTitle: "Still have questions?"
+        },
+        info: "Information",
+        date: "Date",
+        time: "Time",
+        location: "Location",
+        onlineTransmission: "Online transmission",
+        usefulLinks: "Useful links",
+        viewSchedule: "View schedule",
+        youtubeChannel: "YouTube channel",
+        noVideoTitle: "Video not available",
+        noVideoDescription: "The broadcast has not started yet.",
+        noReplayAvailable: "No replay available at the moment.",
+        visitChannel: "Visit the channel",
+        noRoomsAvailable: "No rooms available at the moment",
+        noRoomsDescription: "Presentation rooms will be published soon. Stay tuned to the schedule.",
+      },
+      common: {
+        loading: "Loading",
+        previous: "Previous",
+        next: "Next",
+        goToImage: "Go to image"
       }
-    }
-  },
-  common: {
-    loading: "Loading",
-    previous: "Previous",
-    next: "Next",
-    goToImage: "Go to image"
   }
 };
