@@ -201,6 +201,18 @@ export const trTranslations = {
       comingSoonDescription: "Dünya çapında ünlü uzmanlardan oluşan seçimimizi tamamlıyoruz. Konuşmacılar yakında duyurulacak!",
       secureSpot: "Yerimizi Ayır"
     },
+    thematicAreasPage: {
+      pageTitle: "Tematik Alanlar",
+      breadcrumbHome: "Ana Sayfa",
+      description: "III CIVENI 2025'te ele alınacak ana bilgi alanlarını keşfedin - Eğitim, inovasyon, adalet, insanlık, dindarlık ve teknolojiyi birleştiren multidisipliner bir kongre",
+      submitWork: "Çalışma Gönder",
+      registerButton: "Kayıt Ol",
+      sectionTitle: "Bilgi Alanlarımızı Keşfedin",
+      sectionDescription: "Her tematik alan, CIVENI'yi karakterize eden multidisipliner bilginin temel bir direğini temsil eder",
+      submissionTitle: "Çalışma Gönderimi",
+      submissionDescription: "Bu tematik alanlardan birinde araştırmalarınızı ve deneyimlerinizi sunun ve multidisipliner bilginin ilerlemesine katkıda bulunun",
+      learnMoreSubmissions: "Gönderimler Hakkında Daha Fazla Bilgi"
+    },
     videos: {
       title: "I ve II Civeni 2023/2024'ten Videolar",
       description: "II Uluslararası Kongre'nin en iyi anlarını ve sunumlarını yeniden yaşayın",

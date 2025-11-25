@@ -203,6 +203,18 @@ export const esTranslations = {
       comingSoonDescription: "Estamos finalizando nuestra selección de expertos de renombre mundial. ¡Los ponentes serán anunciados pronto!",
       secureSpot: "Asegurar Mi Lugar"
     },
+    thematicAreasPage: {
+      pageTitle: "Áreas Temáticas",
+      breadcrumbHome: "Inicio",
+      description: "Explora las principales áreas de conocimiento que se abordarán en III CIVENI 2025 - Un congreso multidisciplinario que conecta educación, innovación, justicia, humanidad, religiosidad y tecnología",
+      submitWork: "Enviar Trabajo",
+      registerButton: "Inscribirse",
+      sectionTitle: "Conoce Nuestras Áreas de Conocimiento",
+      sectionDescription: "Cada área temática representa un pilar fundamental del conocimiento multidisciplinario que caracteriza CIVENI",
+      submissionTitle: "Envío de Trabajos",
+      submissionDescription: "Presenta tus investigaciones y experiencias en una de estas áreas temáticas y contribuye al avance del conocimiento multidisciplinario",
+      learnMoreSubmissions: "Más Información sobre Envíos"
+    },
     videos: {
       title: "Videos del I y II Civeni 2023/2024",
       description: "Revive los mejores momentos y presentaciones del II Congreso Internacional",
