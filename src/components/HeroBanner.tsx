@@ -13,9 +13,34 @@ const HeroBanner = () => {
     .filter(slide => slide.id && slide.id !== 'new') // Filtrar slides válidos
     .sort((a, b) => a.order - b.order);
 
+  // Debug: Log completo dos slides
+  useEffect(() => {
+    console.log('🎯 HeroBanner - Current Language:', i18n.language);
+    console.log('🎯 HeroBanner - Total Slides:', slides.length);
+    slides.forEach((slide, idx) => {
+      console.log(`📋 Slide ${idx}:`, {
+        id: slide.id,
+        title: slide.title?.substring(0, 30),
+        titleEn: slide.titleEn?.substring(0, 30),
+        titleEs: slide.titleEs?.substring(0, 30),
+        titleTr: slide.titleTr?.substring(0, 30),
+        hasTr: !!slide.titleTr
+      });
+    });
+  }, [slides, i18n.language]);
+
   // Função para obter texto traduzido
   const getTranslatedText = (pt: string, en?: string, es?: string, tr?: string) => {
     const currentLang = i18n.language.split('-')[0]; // Pega apenas 'en', 'es', 'pt', 'tr'
+    
+    console.log('🌍 getTranslatedText:', {
+      currentLang,
+      pt: pt?.substring(0, 20),
+      en: en?.substring(0, 20),
+      es: es?.substring(0, 20),
+      tr: tr?.substring(0, 20),
+      willReturn: currentLang === 'tr' ? (tr || pt)?.substring(0, 20) : 'other'
+    });
     
     // Retorna a tradução se existir e não for string vazia, senão usa português
     if (currentLang === 'en') return en || pt;
