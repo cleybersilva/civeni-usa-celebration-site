@@ -120,7 +120,7 @@ const SubmissaoTrabalhos = () => {
           toast.error(
             'Você ainda não está inscrito(a) no Civeni 2025.',
             {
-              description: 'Para enviar Artigo/Consórcio, primeiro faça sua inscrição.',
+              description: 'Para enviar Artigo/Projeto, primeiro faça sua inscrição.',
               action: {
                 label: 'Inscreva-se no Civeni 2025',
                 onClick: () => navigate('/inscricoes')
@@ -132,7 +132,7 @@ const SubmissaoTrabalhos = () => {
           toast.error(
             'Limite de envios atingido.',
             {
-              description: `Você já realizou o número máximo de 3 submissões para ${activeTab === 'artigo' ? 'Artigo' : 'Consórcio'} no Civeni 2025.`
+              description: `Você já realizou o número máximo de 3 submissões para ${activeTab === 'artigo' ? 'Artigo' : 'Projeto'} no Civeni 2025.`
             }
           );
         } else {
@@ -150,7 +150,7 @@ const SubmissaoTrabalhos = () => {
       // Validação bem-sucedida
       setValidationStatus({ allowed: true, reason: null, remaining: result.remaining, checked: true });
       toast.success(
-        `Validação concluída! Você pode enviar mais ${result.remaining} ${activeTab === 'artigo' ? 'artigo(s)' : 'consórcio(s)'}.`
+        `Validação concluída! Você pode enviar mais ${result.remaining} ${activeTab === 'artigo' ? 'artigo(s)' : 'projeto(s)'}.`
       );
       
     } catch (error) {
@@ -186,7 +186,7 @@ const SubmissaoTrabalhos = () => {
         toast.error(
           'Limite de envios atingido.',
           {
-            description: `Você já realizou o número máximo de 3 submissões para ${activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}.`
+            description: `Você já realizou o número máximo de 3 submissões para ${activeTab === 'artigo' ? 'Artigo' : 'Projeto'}.`
           }
         );
       } else {
@@ -330,7 +330,7 @@ const SubmissaoTrabalhos = () => {
               <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="artigo">Submissão de Artigos</TabsTrigger>
-                  <TabsTrigger value="consorcio">Submissão de Consórcio</TabsTrigger>
+                  <TabsTrigger value="consorcio">Submissão de Projeto</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="artigo" className="mt-6">
@@ -394,7 +394,7 @@ const SubmissaoTrabalhos = () => {
                         )}
                         {validationStatus.checked && validationStatus.reason === 'LIMIT_REACHED' && (
                           <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
-                            ⚠️ Limite de envios atingido. Você já realizou o número máximo de 3 submissões para {activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}.
+                            ⚠️ Limite de envios atingido. Você já realizou o número máximo de 3 submissões para {activeTab === 'artigo' ? 'Artigo' : 'Projeto'}.
                           </div>
                         )}
                         {validationStatus.checked && validationStatus.allowed && (
@@ -585,12 +585,12 @@ const SubmissaoTrabalhos = () => {
                         )}
                         {validationStatus.checked && validationStatus.reason === 'LIMIT_REACHED' && (
                           <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
-                            ⚠️ Limite de envios atingido. Você já realizou o número máximo de 3 submissões para {activeTab === 'artigo' ? 'Artigo' : 'Consórcio'}.
+                            ⚠️ Limite de envios atingido. Você já realizou o número máximo de 3 submissões para {activeTab === 'artigo' ? 'Artigo' : 'Projeto'}.
                           </div>
                         )}
                         {validationStatus.checked && validationStatus.allowed && (
                           <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-                            ✅ Validação concluída! Você pode enviar mais {validationStatus.remaining} {activeTab === 'artigo' ? 'artigo(s)' : 'consórcio(s)'}.
+                            ✅ Validação concluída! Você pode enviar mais {validationStatus.remaining} {activeTab === 'artigo' ? 'artigo(s)' : 'projeto(s)'}.
                           </div>
                         )}
                       </div>
@@ -598,7 +598,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Título do Consórcio *
+                        Título do Projeto *
                       </label>
                       <input
                         type="text"
@@ -638,7 +638,7 @@ const SubmissaoTrabalhos = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Descrição do Consórcio * (máximo 1500 caracteres)
+                        Descrição do Projeto * (máximo 1500 caracteres)
                       </label>
                       <textarea
                         name="abstract"
@@ -709,7 +709,7 @@ const SubmissaoTrabalhos = () => {
                         disabled={isSubmitting || !validationStatus.checked || !validationStatus.allowed}
                         className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? 'Enviando...' : 'Submeter Consórcio'}
+                        {isSubmitting ? 'Enviando...' : 'Submeter Projeto'}
                       </button>
                     </div>
                   </form>
