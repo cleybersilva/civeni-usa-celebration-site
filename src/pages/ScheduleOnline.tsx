@@ -24,30 +24,38 @@ const ScheduleOnline = () => {
 
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     try {
       setIsGeneratingPdf(true);
-      const url = `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=online&t=${Date.now()}`;
-      const newWindow = window.open(url, '_blank');
+      
+      toast({
+        title: "Gerando PDF...",
+        description: "Buscando programação atualizada do banco de dados...",
+      });
 
-      if (!newWindow) {
-        toast({
-          title: "Pop-up bloqueado",
-          description: "Por favor, permita pop-ups para este site e tente novamente.",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Importar dinamicamente para evitar problemas de build
+      const { fetchProgramacaoData } = await import('@/lib/pdf/fetchProgramacao');
+      const { gerarProgramacaoPDF } = await import('@/lib/pdf/programacao');
+      
+      const programacao = await fetchProgramacaoData('online');
+      const pdfBlob = await gerarProgramacaoPDF(programacao);
+
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `programacao_civeni_2025_online_${new Date().toISOString().split('T')[0]}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
 
       toast({
-        title: "Programação aberta",
-        description: "A programação atualizada foi aberta em uma nova aba. Use Ctrl+P (ou Cmd+P) para imprimir/salvar em PDF.",
+        title: "PDF gerado com sucesso!",
+        description: "A programação atualizada foi baixada.",
       });
     } catch (error) {
-      console.error('[PDF] Erro ao abrir programação:', error);
+      console.error('[PDF] Erro ao gerar PDF:', error);
       toast({
-        title: "Erro ao abrir programação",
-        description: error instanceof Error ? error.message : "Não foi possível abrir a programação agora. Tente novamente em instantes.",
+        title: "Erro ao gerar PDF",
+        description: error instanceof Error ? error.message : "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
         variant: "destructive",
       });
     } finally {
