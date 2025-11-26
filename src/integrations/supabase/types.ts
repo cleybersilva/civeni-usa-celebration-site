@@ -4569,6 +4569,10 @@ export type Database = {
         }
         Returns: number
       }
+      admin_delete_civeni_session: {
+        Args: { session_id: string; session_token: string; user_email: string }
+        Returns: undefined
+      }
       admin_delete_event: {
         Args: { event_id: string; session_token: string; user_email: string }
         Returns: Json
