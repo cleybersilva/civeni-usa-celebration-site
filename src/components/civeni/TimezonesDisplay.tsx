@@ -24,16 +24,27 @@ const TIMEZONES: TimezoneInfo[] = [
 ];
 
 const TimezonesDisplay: React.FC<TimezonesDisplayProps> = ({ startTime, endTime, className = '' }) => {
+  const parseBrazilDateTime = (value: string): Date | null => {
+    if (!value) return null;
+    try {
+      const match = value.match(/(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/);
+      if (match) {
+        const [, datePart, timePart] = match;
+        return new Date(`${datePart}T${timePart}:00-03:00`);
+      }
+      // Fallback: try native parsing without timezone assumptions
+      return new Date(value);
+    } catch {
+      return null;
+    }
+  };
+
   const formatTimeForTimezone = (time: string, timezone: string) => {
     try {
-      // Interpret the input time as being in America/Fortaleza (Brazil timezone)
-      // This ensures consistent conversion to other timezones
-      const timeStr = time.includes('T') ? time : `${time}T00:00:00`;
-      const adjustedTime = timeStr.includes('Z') || timeStr.includes('+') || timeStr.includes('-') 
-        ? time 
-        : `${timeStr}-03:00`; // Add Brazil offset if not present
-      
-      const date = new Date(adjustedTime);
+      const date = parseBrazilDateTime(time);
+      if (!date || isNaN(date.getTime())) {
+        return '--:--';
+      }
       return formatInTimeZone(date, timezone, 'HH:mm');
     } catch (error) {
       console.error('Error formatting time:', error);
