@@ -17,24 +17,37 @@ export const useCiveniOnlineProgramData = () => {
   });
 
   const { data: days, isLoading } = useQuery({
-    queryKey: ['civeni-online-program-days'],
+    queryKey: ['civeni-program-days', 'online'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Check if we're in admin mode by checking the current path
+      const isAdminMode = window.location.pathname.includes('/admin');
+
+      let query = supabase
         .from('civeni_program_days')
         .select('*')
-        .eq('event_slug', 'iii-civeni-2025-online')
-        .eq('is_published', true)
-        .order('sort_order');
-      
+        .eq('event_slug', 'iii-civeni-2025-online');
+
+      // Only filter published if not in admin mode
+      if (!isAdminMode) {
+        query = query.eq('is_published', true);
+      }
+
+      query = query.order('sort_order');
+
+      const { data, error } = await query;
+
       if (error) throw error;
       return data || [];
     }
   });
 
   const { data: sessions } = useQuery({
-    queryKey: ['civeni-online-program-sessions'],
+    queryKey: ['civeni-program-sessions', 'online'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Check if we're in admin mode by checking the current path
+      const isAdminMode = window.location.pathname.includes('/admin');
+
+      let query = supabase
         .from('civeni_program_sessions')
         .select(`
           *,
@@ -42,10 +55,17 @@ export const useCiveniOnlineProgramData = () => {
             event_slug
           )
         `)
-        .eq('civeni_program_days.event_slug', 'iii-civeni-2025-online')
-        .eq('is_published', true)
-        .order('order_in_day');
-      
+        .eq('civeni_program_days.event_slug', 'iii-civeni-2025-online');
+
+      // Only filter published if not in admin mode
+      if (!isAdminMode) {
+        query = query.eq('is_published', true);
+      }
+
+      query = query.order('order_in_day');
+
+      const { data, error } = await query;
+
       if (error) throw error;
       return data || [];
     },

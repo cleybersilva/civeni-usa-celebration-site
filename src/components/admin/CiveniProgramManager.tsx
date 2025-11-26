@@ -6,11 +6,42 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Settings, Calendar, Users } from 'lucide-react';
 import { useCiveniProgramData } from '@/hooks/useCiveniProgramData';
+import { useCiveniScheduleOperations, CiveniDay, CiveniDayUpdate } from './schedule/useCiveniScheduleOperations';
+import CiveniDayFormDialog from './schedule/CiveniDayFormDialog';
 
 const CiveniProgramManager = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('days');
   const { settings, days, sessions, isLoading, getSessionsForDay } = useCiveniProgramData();
+  const { dayUpsertMutation } = useCiveniScheduleOperations();
+
+  const [isDayDialogOpen, setIsDayDialogOpen] = useState(false);
+  const [editingDay, setEditingDay] = useState<CiveniDay | null>(null);
+
+  const handleOpenDayDialog = (day?: CiveniDay) => {
+    setEditingDay(day || null);
+    setIsDayDialogOpen(true);
+  };
+
+  const handleCloseDayDialog = () => {
+    setIsDayDialogOpen(false);
+    setEditingDay(null);
+  };
+
+  const handleSaveDay = (formData: CiveniDayUpdate) => {
+    dayUpsertMutation.mutate(
+      {
+        formData,
+        editingDay,
+        type: 'presencial'
+      },
+      {
+        onSuccess: () => {
+          handleCloseDayDialog();
+        }
+      }
+    );
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR');
@@ -97,7 +128,7 @@ const CiveniProgramManager = () => {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Dias da Programação</h2>
-              <Button>
+              <Button onClick={() => handleOpenDayDialog()}>
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Dia
               </Button>
@@ -124,7 +155,7 @@ const CiveniProgramManager = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => handleOpenDayDialog(day)}>
                         Editar
                       </Button>
                       <Button size="sm" variant="outline">
@@ -303,6 +334,15 @@ const CiveniProgramManager = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <CiveniDayFormDialog
+        isOpen={isDayDialogOpen}
+        onClose={handleCloseDayDialog}
+        onSubmit={handleSaveDay}
+        editingDay={editingDay}
+        isLoading={dayUpsertMutation.isPending}
+        type="presencial"
+      />
     </div>
   );
 };
