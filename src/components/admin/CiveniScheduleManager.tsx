@@ -12,6 +12,22 @@ import {
 } from './schedule/useCiveniScheduleOperations';
 import CiveniDayFormDialog from './schedule/CiveniDayFormDialog';
 import CiveniSessionFormDialog from './schedule/CiveniSessionFormDialog';
+import { DraggableSessionCard } from './schedule/DraggableSessionCard';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +38,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const CiveniScheduleManager = () => {
   const [selectedType, setSelectedType] = useState<EventType>('presencial');
@@ -45,9 +64,54 @@ const CiveniScheduleManager = () => {
 
   const { data: days, isLoading: daysLoading } = useDays(selectedType);
   const { data: sessions, isLoading: sessionsLoading } = useSessions(selectedType);
+  const queryClient = useQueryClient();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const getSessionsForDay = (dayId: string) => {
-    return sessions?.filter(session => session.day_id === dayId) || [];
+    return sessions?.filter(session => session.day_id === dayId)
+      .sort((a, b) => a.order_in_day - b.order_in_day) || [];
+  };
+
+  const reorderSessionsMutation = useMutation({
+    mutationFn: async ({ sessionIds, dayId }: { sessionIds: string[], dayId: string }) => {
+      const updates = sessionIds.map((id, index) => 
+        supabase
+          .from('civeni_program_sessions')
+          .update({ order_in_day: index })
+          .eq('id', id)
+      );
+      
+      await Promise.all(updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['civeni-sessions', selectedType] });
+      toast.success('Ordem das sessões atualizada');
+    },
+    onError: (error) => {
+      console.error('Erro ao reordenar sessões:', error);
+      toast.error('Erro ao atualizar ordem das sessões');
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent, dayId: string) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const daySessions = getSessionsForDay(dayId);
+    const oldIndex = daySessions.findIndex(s => s.id === active.id);
+    const newIndex = daySessions.findIndex(s => s.id === over.id);
+
+    const reorderedSessions = arrayMove(daySessions, oldIndex, newIndex);
+    const sessionIds = reorderedSessions.map(s => s.id);
+
+    reorderSessionsMutation.mutate({ sessionIds, dayId });
   };
 
   const formatDate = (dateString: string) => {
@@ -314,76 +378,33 @@ const CiveniScheduleManager = () => {
                               Nova Sessão
                             </Button>
                           </div>
-                          <div className="space-y-3">
-                            {daySessions.map((session) => (
-                              <Card key={session.id} className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
-                                <div className="flex justify-between items-start">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <span className="font-mono text-sm">
-                                        {formatTime(session.start_at)}
-                                        {session.end_at && ` - ${formatTime(session.end_at)}`}
-                                      </span>
-                                      <Badge className={getSessionTypeColor(session.session_type)}>
-                                        {session.session_type}
-                                      </Badge>
-                                      {session.is_parallel && (
-                                        <Badge variant="outline">Simultânea</Badge>
-                                      )}
-                                      {session.is_featured && (
-                                        <Badge variant="secondary">Destaque</Badge>
-                                      )}
-                                      <Badge variant={session.is_published ? "default" : "secondary"}>
-                                        {session.is_published ? "Publicado" : "Rascunho"}
-                                      </Badge>
-                                    </div>
-                                    <h5 className="font-medium mb-1">{session.title}</h5>
-                                    {session.description && (
-                                      <p className="text-sm text-muted-foreground mb-2">
-                                        {session.description}
-                                      </p>
-                                    )}
-                                    {session.room && (
-                                      <p className="text-xs text-muted-foreground">
-                                        📍 {session.room}
-                                      </p>
-                                    )}
-                                    {session.livestream_url && (
-                                      <p className="text-xs text-blue-600 mt-1">
-                                        🔗 Link de transmissão configurado
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => handleTogglePublishSession(session.id, session.is_published)}
-                                    >
-                                      {session.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => {
-                                        setEditingSession(session);
-                                        setIsSessionDialogOpen(true);
-                                      }}
-                                    >
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={() => setDeleteConfirm({ type: 'session', id: session.id })}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </Card>
-                            ))}
-                          </div>
+                          <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={(event) => handleDragEnd(event, day.id)}
+                          >
+                            <SortableContext
+                              items={daySessions.map(s => s.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              <div className="space-y-3">
+                                {daySessions.map((session) => (
+                                  <DraggableSessionCard
+                                    key={session.id}
+                                    session={session}
+                                    formatTime={formatTime}
+                                    getSessionTypeColor={getSessionTypeColor}
+                                    onTogglePublish={handleTogglePublishSession}
+                                    onEdit={(session) => {
+                                      setEditingSession(session);
+                                      setIsSessionDialogOpen(true);
+                                    }}
+                                    onDelete={(id) => setDeleteConfirm({ type: 'session', id })}
+                                  />
+                                ))}
+                              </div>
+                            </SortableContext>
+                          </DndContext>
                         </div>
                       );
                     })}
