@@ -147,7 +147,18 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit((data) => {
+            // Convert empty strings to null for nullish fields
+            const cleanedData = {
+              ...data,
+              description: data.description || null,
+              end_at: data.end_at || null,
+              room: data.room || null,
+              livestream_url: data.livestream_url || null,
+              materials_url: data.materials_url || null,
+            };
+            onSubmit(cleanedData);
+          })} className="space-y-4">
               <FormField
                 control={form.control}
                 name="day_id"
@@ -255,6 +266,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                       placeholder="Descrição detalhada da sessão"
                       rows={3}
                       {...field}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -284,7 +296,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                   <FormItem>
                     <FormLabel>Fim</FormLabel>
                     <FormControl>
-                      <Input type="datetime-local" {...field} />
+                      <Input type="datetime-local" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -299,7 +311,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                 <FormItem>
                   <FormLabel>Sala/Local</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Auditório Principal" {...field} />
+                    <Input placeholder="Ex: Auditório Principal" {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -315,7 +327,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                     <FormItem>
                       <FormLabel>Link de Transmissão</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <Input placeholder="https://..." {...field} value={field.value || ''} />
                       </FormControl>
                       <FormDescription>
                         Link da transmissão ao vivo (YouTube, Meet, etc.)
@@ -332,7 +344,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                     <FormItem>
                       <FormLabel>Link de Materiais</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <Input placeholder="https://..." {...field} value={field.value || ''} />
                       </FormControl>
                       <FormDescription>
                         Link para slides, documentos, etc.
