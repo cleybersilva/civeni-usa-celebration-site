@@ -74,6 +74,15 @@ const formatDateTimeForInput = (value: string | null | undefined): string => {
   return value;
 };
 
+const normalizeDateTimeForDatabase = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toISOString();
+};
+
 type SessionFormData = z.infer<typeof sessionSchema>;
 
 interface CiveniSessionFormDialogProps {
@@ -125,6 +134,8 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
     if (editingSession) {
       form.reset({
         ...editingSession,
+        start_at: formatDateTimeForInput(editingSession.start_at),
+        end_at: formatDateTimeForInput(editingSession.end_at),
         is_parallel: editingSession.is_parallel || false,
         is_featured: editingSession.is_featured || false,
       });
@@ -163,11 +174,12 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit((data) => {
-            // Convert empty strings to null for nullish fields
+            // Normalizar datas/horários e converter strings vazias para null
             const cleanedData = {
               ...data,
+              start_at: normalizeDateTimeForDatabase(data.start_at) || data.start_at,
+              end_at: data.end_at ? normalizeDateTimeForDatabase(data.end_at) : null,
               description: data.description || null,
-              end_at: data.end_at || null,
               room: data.room || null,
               livestream_url: data.livestream_url || null,
               materials_url: data.materials_url || null,
@@ -382,7 +394,11 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                       <Input 
                         type="number" 
                         {...field} 
-                        onChange={e => field.onChange(parseInt(e.target.value))}
+                        onChange={e => {
+                          const raw = e.target.value;
+                          const parsed = raw === '' ? 0 : parseInt(raw, 10);
+                          field.onChange(Number.isNaN(parsed) ? 0 : parsed);
+                        }}
                       />
                     </FormControl>
                     <FormDescription>
