@@ -108,6 +108,40 @@ export const useCiveniScheduleOperations = () => {
         console.log('🟢 Dia atualizado com sucesso:', data);
         return data;
       } else {
+        console.log('Nenhum editingDay.id fornecido, buscando dia por data e event_slug');
+        const { data: existingDay, error: findError } = await supabase
+          .from('civeni_program_days')
+          .select('id')
+          .eq('event_slug', getEventSlug(type))
+          .eq('date', formData.date)
+          .maybeSingle();
+
+        if (findError) {
+          console.error('Erro ao buscar dia existente por data:', findError);
+          throw findError;
+        }
+
+        if (existingDay?.id) {
+          console.log('🟡 Atualizando dia encontrado por data, ID:', existingDay.id);
+          const { data, error } = await supabase
+            .from('civeni_program_days')
+            .update({
+              ...dayData,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingDay.id)
+            .select()
+            .single();
+
+          if (error) {
+            console.error('Erro ao atualizar dia encontrado por data:', error);
+            throw error;
+          }
+
+          console.log('Dia atualizado com sucesso (fallback por data):', data);
+          return data;
+        }
+
         console.log('Criando novo dia');
         const { data, error } = await supabase
           .from('civeni_program_days')
