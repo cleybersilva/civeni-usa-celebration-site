@@ -304,12 +304,18 @@ export const useCiveniScheduleOperations = () => {
   // Delete Session
   const deleteSessionMutation = useMutation({
     mutationFn: async ({ id, type }: { id: string; type: EventType }) => {
-      const { error } = await supabase
-        .from('civeni_program_sessions')
-        .delete()
-        .eq('id', id);
+      if (!user || !sessionToken) {
+        throw new Error('Você precisa estar logado como administrador para excluir sessões.');
+      }
+
+      const { data, error } = await supabase.rpc('admin_delete_civeni_session', {
+        session_id: id,
+        user_email: user.email,
+        session_token: sessionToken,
+      });
       
       if (error) throw error;
+      return data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['civeni-program-sessions', variables.type] });
