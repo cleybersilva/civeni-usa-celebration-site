@@ -264,19 +264,8 @@ const CiveniScheduleManager = () => {
 
               {/* Sessões Section */}
               <div>
-                <div className="flex justify-between items-center mb-4">
+                <div className="mb-4">
                   <h3 className="text-lg font-semibold">Sessões</h3>
-                  <Button 
-                    onClick={() => {
-                      setEditingSession(null);
-                      setPreselectedDayId(null);
-                      setIsSessionDialogOpen(true);
-                    }}
-                    disabled={!days || days.length === 0}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nova Sessão
-                  </Button>
                 </div>
 
                 {sessionsLoading ? (
