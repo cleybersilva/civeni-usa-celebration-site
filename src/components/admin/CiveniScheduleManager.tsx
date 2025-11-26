@@ -29,6 +29,7 @@ const CiveniScheduleManager = () => {
   const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
   const [editingDay, setEditingDay] = useState<CiveniDay | null>(null);
   const [editingSession, setEditingSession] = useState<CiveniSession | null>(null);
+  const [preselectedDayId, setPreselectedDayId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'day' | 'session', id: string } | null>(null);
 
   const {
@@ -238,6 +239,18 @@ const CiveniScheduleManager = () => {
                             </Button>
                             <Button
                               size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSession(null);
+                                setPreselectedDayId(day.id);
+                                setIsSessionDialogOpen(true);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Nova Sessão
+                            </Button>
+                            <Button
+                              size="sm"
                               variant="ghost"
                               onClick={() => {
                                 setEditingDay(day);
@@ -268,6 +281,7 @@ const CiveniScheduleManager = () => {
                   <Button 
                     onClick={() => {
                       setEditingSession(null);
+                      setPreselectedDayId(null);
                       setIsSessionDialogOpen(true);
                     }}
                     disabled={!days || days.length === 0}
@@ -394,9 +408,11 @@ const CiveniScheduleManager = () => {
         onClose={() => {
           setIsSessionDialogOpen(false);
           setEditingSession(null);
+          setPreselectedDayId(null);
         }}
         onSubmit={handleSessionSubmit}
         editingSession={editingSession}
+        preselectedDayId={preselectedDayId}
         isLoading={sessionUpsertMutation.isPending}
         type={selectedType}
         days={days || []}

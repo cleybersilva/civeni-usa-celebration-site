@@ -106,6 +106,7 @@ interface CiveniSessionFormDialogProps {
   onClose: () => void;
   onSubmit: (data: SessionFormData) => void;
   editingSession: CiveniSession | null;
+  preselectedDayId?: string | null;
   isLoading: boolean;
   type: 'presencial' | 'online';
   days: CiveniDay[];
@@ -116,6 +117,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
   onClose,
   onSubmit,
   editingSession,
+  preselectedDayId,
   isLoading,
   type,
   days,
@@ -158,7 +160,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
     } else if (isOpen && days.length > 0) {
       // Reset to default values when opening for new session
       form.reset({
-        day_id: days[0]?.id || '',
+        day_id: preselectedDayId || days[0]?.id || '',
         session_type: 'palestra',
         title: '',
         description: '',
