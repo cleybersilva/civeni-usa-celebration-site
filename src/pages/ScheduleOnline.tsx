@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Download, Users, Clock, ExternalLink, Plus } from 'lucide-react';
+import { Calendar, Download, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs } from '@/components/ui/tabs';
 import DayTabs from '@/components/civeni/DayTabs';
 import DayTimeline from '@/components/civeni/DayTimeline';
 import { useCiveniOnlineProgramData } from '@/hooks/useCiveniOnlineProgramData';
-import { toast } from '@/hooks/use-toast';
 
 const ScheduleOnline = () => {
   const { settings, days, isLoading, getSessionsForDay } = useCiveniOnlineProgramData();
@@ -22,53 +19,8 @@ const ScheduleOnline = () => {
     }
   }, [days, activeDay]);
 
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-
-  const generatePDF = async () => {
-    try {
-      setIsGeneratingPdf(true);
-      
-      toast({
-        title: "Gerando PDF...",
-        description: "Buscando programação atualizada do banco de dados...",
-      });
-
-      // Importar dinamicamente para evitar problemas de build
-      const { fetchProgramacaoData } = await import('@/lib/pdf/fetchProgramacao');
-      const { gerarProgramacaoPDF } = await import('@/lib/pdf/programacao');
-      
-      const programacao = await fetchProgramacaoData('online');
-      const pdfBlob = await gerarProgramacaoPDF(programacao);
-
-      const url = URL.createObjectURL(pdfBlob);
-      const newWindow = window.open(url, '_blank');
-
-      if (!newWindow) {
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = `programacao_civeni_2025_online_${new Date().toISOString().split('T')[0]}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-
-      toast({
-        title: "PDF gerado com sucesso!",
-        description: "A programação atualizada foi baixada.",
-      });
-    } catch (error) {
-      console.error('[PDF] Erro ao gerar PDF:', error);
-      toast({
-        title: "Erro ao gerar PDF",
-        description: error instanceof Error ? error.message : "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingPdf(false);
-    }
+  const generatePDF = () => {
+    window.open('/programacao/impressao?modalidade=online', '_blank');
   };
 
   return (
@@ -113,20 +65,10 @@ const ScheduleOnline = () => {
                 
                 <button 
                   onClick={generatePDF}
-                  disabled={isGeneratingPdf}
-                  className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2"
                 >
-                  {isGeneratingPdf ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
-                      Gerando PDF...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                      Baixar Programação
-                    </>
-                  )}
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Baixar Programação
                 </button>
               </div>
             </div>
