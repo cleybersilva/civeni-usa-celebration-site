@@ -14,6 +14,7 @@ import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import ScheduleInPerson from "./pages/ScheduleInPerson";
 import ScheduleOnline from "./pages/ScheduleOnline";
+import ProgramacaoImpressao from "./pages/ProgramacaoImpressao";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import RegistrationCanceled from "./pages/RegistrationCanceled";
 import WorkSubmissionSuccess from "./pages/WorkSubmissionSuccess";
@@ -65,6 +66,7 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/programacao-presencial" element={<ScheduleInPerson />} />
         <Route path="/programacao-online" element={<ScheduleOnline />} />
+        <Route path="/programacao/impressao" element={<ProgramacaoImpressao />} />
                 {/* Keep legacy routes for backward compatibility */}
                 <Route path="/cronograma-presencial" element={<ScheduleInPerson />} />
                 <Route path="/cronograma-online" element={<ScheduleOnline />} />
