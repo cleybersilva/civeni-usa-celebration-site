@@ -38,7 +38,7 @@ const daySchema = z.object({
   theme: z.string().min(1, 'Tema é obrigatório'),
   location: z.string().optional(),
   modality: z.enum(['presencial', 'online', 'hibrido']),
-  sort_order: z.number().min(0),
+  sort_order: z.coerce.number().min(0),
   is_published: z.boolean(),
   seo_title: z.string().nullable().optional(),
   seo_description: z.string().nullable().optional(),
@@ -86,6 +86,7 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
       // Garante que a modalidade sempre tenha um valor válido mesmo para dias antigos
       form.reset({
         ...editingDay,
+        sort_order: (editingDay as any).sort_order ?? 0,
         modality:
           (editingDay as any).modality ?? (type === 'presencial' ? 'presencial' : 'online'),
       });
@@ -231,8 +232,7 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
                   <FormControl>
                     <Input 
                       type="number" 
-                      {...field} 
-                      onChange={e => field.onChange(parseInt(e.target.value))}
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
