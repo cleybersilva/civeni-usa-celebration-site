@@ -24,80 +24,30 @@ const ScheduleInPerson = () => {
 
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const generatePDF = async () => {
-    const previewWindow = window.open('', '_blank');
-
-    if (!previewWindow) {
-      toast({
-        title: "Pop-up bloqueado",
-        description: "Por favor, permita pop-ups para este site e tente novamente.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Conteúdo inicial enquanto carrega
-    previewWindow.document.write('<html><head><title>Carregando programação...</title></head><body><p style="font-family:sans-serif;padding:16px;">Carregando programação atualizada...</p></body></html>');
-    previewWindow.document.close();
-
+  const generatePDF = () => {
     try {
       setIsGeneratingPdf(true);
-      console.log('[PDF] Iniciando fetch do edge function...');
-      
-      const response = await fetch(`https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=presencial&t=${Date.now()}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka2VxeGZnbG1yaXRnaG1ha21hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyNDc0ODksImV4cCI6MjA2NTgyMzQ4OX0.h-HiLfyMh2EaYWQro1TvCVROwHnOJDyynsUIptmhKuo`,
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
-        },
-      });
+      const url = `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=presencial&t=${Date.now()}`;
+      const newWindow = window.open(url, '_blank');
 
-      console.log('[PDF] Response recebido:', response.status, response.statusText);
-      console.log('[PDF] Content-Type:', response.headers.get('content-type'));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[PDF] Erro na resposta:', errorText);
-        previewWindow.close();
-        throw new Error(`Erro ao gerar PDF: ${response.status} - ${errorText}`);
+      if (!newWindow) {
+        toast({
+          title: "Pop-up bloqueado",
+          description: "Por favor, permita pop-ups para este site e tente novamente.",
+          variant: "destructive",
+        });
+        return;
       }
 
-      console.log('[PDF] Lendo HTML...');
-      const html = await response.text();
-      console.log('[PDF] HTML recebido, tamanho:', html.length, 'bytes');
-      console.log('[PDF] Primeiros 200 caracteres:', html.substring(0, 200));
-      
-      if (!html || html.length < 100) {
-        console.error('[PDF] HTML muito curto ou vazio');
-        previewWindow.close();
-        throw new Error('HTML vazio ou inválido recebido');
-      }
-      
-      console.log('[PDF] Escrevendo HTML na nova janela...');
-      previewWindow.document.open();
-      previewWindow.document.write(html);
-      previewWindow.document.close();
-      console.log('[PDF] HTML escrito com sucesso!');
-      
-      setTimeout(() => {
-        console.log('[PDF] Abrindo diálogo de impressão...');
-        previewWindow.print();
-      }, 1000);
-      
       toast({
-        title: "PDF gerado com sucesso!",
-        description: "A janela de impressão foi aberta com a programação atualizada.",
+        title: "Programação aberta",
+        description: "A programação atualizada foi aberta em uma nova aba. Use Ctrl+P (ou Cmd+P) para imprimir/salvar em PDF.",
       });
-      
     } catch (error) {
-      console.error('[PDF] Erro completo:', error);
-      if (previewWindow && !previewWindow.closed) {
-        previewWindow.close();
-      }
+      console.error('[PDF] Erro ao abrir programação:', error);
       toast({
-        title: "Erro ao gerar PDF",
-        description: error instanceof Error ? error.message : "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
+        title: "Erro ao abrir programação",
+        description: error instanceof Error ? error.message : "Não foi possível abrir a programação agora. Tente novamente em instantes.",
         variant: "destructive",
       });
     } finally {
