@@ -308,14 +308,23 @@ export const useCiveniScheduleOperations = () => {
         throw new Error('Você precisa estar logado como administrador para excluir sessões.');
       }
 
-      const { data, error } = await supabase.rpc('admin_delete_civeni_session', {
-        session_id: id,
+      // Primeiro valida a sessão de admin
+      const { data: sessionValid } = await supabase.rpc('set_current_user_email_secure', {
         user_email: user.email,
         session_token: sessionToken,
       });
+
+      if (!sessionValid) {
+        throw new Error('Sessão de administrador inválida ou expirada.');
+      }
+
+      // Agora deleta a sessão
+      const { error } = await supabase
+        .from('civeni_program_sessions')
+        .delete()
+        .eq('id', id);
       
       if (error) throw error;
-      return data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['civeni-program-sessions', variables.type] });
