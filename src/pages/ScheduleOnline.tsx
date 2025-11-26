@@ -27,6 +27,7 @@ const ScheduleOnline = () => {
   const generatePDF = async () => {
     try {
       setIsGeneratingPdf(true);
+      console.log('Iniciando geração de PDF...');
       
       const response = await fetch(`https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=online&t=${Date.now()}`, {
         method: 'GET',
@@ -37,23 +38,43 @@ const ScheduleOnline = () => {
         },
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
       if (!response.ok) {
-        throw new Error('Erro ao gerar PDF');
+        const errorText = await response.text();
+        console.error('Erro na resposta:', errorText);
+        throw new Error(`Erro ao gerar PDF: ${response.status}`);
       }
 
       const html = await response.text();
+      console.log('HTML recebido, tamanho:', html.length);
+      
+      if (!html || html.length < 100) {
+        throw new Error('HTML vazio ou inválido recebido');
+      }
       
       // Open HTML in new window that can be printed as PDF
       const newWindow = window.open('', '_blank');
-      if (newWindow) {
-        newWindow.document.write(html);
-        newWindow.document.close();
-        
-        // Add print functionality
-        setTimeout(() => {
-          newWindow.print();
-        }, 1000);
+      
+      if (!newWindow) {
+        toast({
+          title: "Pop-up bloqueado",
+          description: "Por favor, permita pop-ups para este site e tente novamente.",
+          variant: "destructive",
+        });
+        return;
       }
+      
+      console.log('Nova janela aberta, escrevendo HTML...');
+      newWindow.document.write(html);
+      newWindow.document.close();
+      
+      // Add print functionality
+      setTimeout(() => {
+        console.log('Iniciando impressão...');
+        newWindow.print();
+      }, 1000);
       
       toast({
         title: "PDF gerado com sucesso!",
@@ -61,10 +82,10 @@ const ScheduleOnline = () => {
       });
       
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
+      console.error('Erro completo ao gerar PDF:', error);
       toast({
         title: "Erro ao gerar PDF",
-        description: "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
+        description: error instanceof Error ? error.message : "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
         variant: "destructive",
       });
     } finally {
