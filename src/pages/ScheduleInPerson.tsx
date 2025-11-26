@@ -42,6 +42,7 @@ const ScheduleInPerson = () => {
 
     try {
       setIsGeneratingPdf(true);
+      console.log('[PDF] Iniciando fetch do edge function...');
       
       const response = await fetch(`https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=presencial&t=${Date.now()}`, {
         method: 'GET',
@@ -52,23 +53,35 @@ const ScheduleInPerson = () => {
         },
       });
 
+      console.log('[PDF] Response recebido:', response.status, response.statusText);
+      console.log('[PDF] Content-Type:', response.headers.get('content-type'));
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[PDF] Erro na resposta:', errorText);
         previewWindow.close();
-        throw new Error(`Erro ao gerar PDF: ${response.status}`);
+        throw new Error(`Erro ao gerar PDF: ${response.status} - ${errorText}`);
       }
 
+      console.log('[PDF] Lendo HTML...');
       const html = await response.text();
+      console.log('[PDF] HTML recebido, tamanho:', html.length, 'bytes');
+      console.log('[PDF] Primeiros 200 caracteres:', html.substring(0, 200));
       
       if (!html || html.length < 100) {
+        console.error('[PDF] HTML muito curto ou vazio');
         previewWindow.close();
         throw new Error('HTML vazio ou inválido recebido');
       }
       
+      console.log('[PDF] Escrevendo HTML na nova janela...');
       previewWindow.document.open();
       previewWindow.document.write(html);
       previewWindow.document.close();
+      console.log('[PDF] HTML escrito com sucesso!');
       
       setTimeout(() => {
+        console.log('[PDF] Abrindo diálogo de impressão...');
         previewWindow.print();
       }, 1000);
       
@@ -78,7 +91,10 @@ const ScheduleInPerson = () => {
       });
       
     } catch (error) {
-      console.error('Erro completo ao gerar PDF:', error);
+      console.error('[PDF] Erro completo:', error);
+      if (previewWindow && !previewWindow.closed) {
+        previewWindow.close();
+      }
       toast({
         title: "Erro ao gerar PDF",
         description: error instanceof Error ? error.message : "Não foi possível gerar o PDF agora. Tente novamente em instantes.",

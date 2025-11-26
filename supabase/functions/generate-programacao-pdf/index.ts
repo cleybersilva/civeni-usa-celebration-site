@@ -14,26 +14,32 @@ const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 serve(async (req) => {
+  console.log('[Edge Function] Request recebido:', req.method, req.url);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('[Edge Function] CORS preflight, retornando...');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const url = new URL(req.url);
     const modalidade = url.searchParams.get('modalidade');
+    console.log('[Edge Function] Modalidade:', modalidade);
 
     if (!modalidade || !['presencial', 'online'].includes(modalidade)) {
+      console.error('[Edge Function] Modalidade inválida:', modalidade);
       return new Response(JSON.stringify({ error: 'Modalidade deve ser "presencial" ou "online"' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log(`Generating PDF for modalidade: ${modalidade}`);
+    console.log(`[Edge Function] Generating PDF for modalidade: ${modalidade}`);
 
     // Get banner from banner_slides
-    const { data: bannerData } = await supabase
+    console.log('[Edge Function] Buscando banner...');
+    const { data: bannerData, error: bannerError } = await supabase
       .from('banner_slides')
       .select('bg_image')
       .eq('is_active', true)
@@ -41,7 +47,9 @@ serve(async (req) => {
       .limit(1)
       .single();
 
+    if (bannerError) console.error('[Edge Function] Erro ao buscar banner:', bannerError);
     const bannerUrl = bannerData?.bg_image || '';
+    console.log('[Edge Function] Banner URL:', bannerUrl);
 
     // Get program data based on modalidade
     let eventSlug, settingsId;
@@ -52,24 +60,34 @@ serve(async (req) => {
       eventSlug = 'iii-civeni-2025-online';
       settingsId = 2;
     }
+    console.log('[Edge Function] Event slug:', eventSlug, 'Settings ID:', settingsId);
 
     // Get settings
-    const { data: settings } = await supabase
+    console.log('[Edge Function] Buscando settings...');
+    const { data: settings, error: settingsError } = await supabase
       .from('civeni_program_settings')
       .select('*')
       .eq('id', settingsId)
       .single();
+    
+    if (settingsError) console.error('[Edge Function] Erro ao buscar settings:', settingsError);
+    console.log('[Edge Function] Settings:', settings);
 
     // Get days
-    const { data: days } = await supabase
+    console.log('[Edge Function] Buscando dias...');
+    const { data: days, error: daysError } = await supabase
       .from('civeni_program_days')
       .select('*')
       .eq('event_slug', eventSlug)
       .eq('is_published', true)
       .order('sort_order');
 
+    if (daysError) console.error('[Edge Function] Erro ao buscar dias:', daysError);
+    console.log('[Edge Function] Dias encontrados:', days?.length || 0);
+
     // Get sessions with speakers
-    const { data: sessions } = await supabase
+    console.log('[Edge Function] Buscando sessões...');
+    const { data: sessions, error: sessionsError } = await supabase
       .from('civeni_program_sessions')
       .select(`
         *,
@@ -89,6 +107,9 @@ serve(async (req) => {
       .eq('civeni_program_days.event_slug', eventSlug)
       .eq('is_published', true)
       .order('order_in_day');
+
+    if (sessionsError) console.error('[Edge Function] Erro ao buscar sessões:', sessionsError);
+    console.log('[Edge Function] Sessões encontradas:', sessions?.length || 0);
 
     if (!days || days.length === 0) {
       console.log('No days found for', modalidade);
