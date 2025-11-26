@@ -24,37 +24,49 @@ const ScheduleOnline = () => {
 
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     try {
       setIsGeneratingPdf(true);
+      
+      const response = await fetch(`https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=online`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indka2VxeGZnbG1yaXRnaG1ha21hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyNDc0ODksImV4cCI6MjA2NTgyMzQ4OX0.h-HiLfyMh2EaYWQro1TvCVROwHnOJDyynsUIptmhKuo`,
+        },
+      });
 
-      // Abre a URL da função em uma nova aba com design moderno e inovador
-      const timestamp = new Date().getTime();
-      const url = `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=online&t=${timestamp}`;
-      
-      const newWindow = window.open(url, '_blank');
-      
-      if (!newWindow) {
-        toast({
-          title: "Pop-up bloqueado",
-          description: "Permita janelas pop-up no navegador para visualizar a programação.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Programação aberta!",
-          description: "Uma nova aba foi aberta. Use Ctrl+P (ou Cmd+P) para imprimir/salvar como PDF.",
-        });
+      if (!response.ok) {
+        throw new Error('Erro ao gerar PDF');
       }
-    } catch (error) {
-      console.error('Erro ao abrir programação:', error);
+
+      const html = await response.text();
+      
+      // Open HTML in new window that can be printed as PDF
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(html);
+        newWindow.document.close();
+        
+        // Add print functionality
+        setTimeout(() => {
+          newWindow.print();
+        }, 1000);
+      }
+      
       toast({
-        title: "Erro",
-        description: "Não foi possível abrir a programação. Tente novamente.",
+        title: "PDF gerado com sucesso!",
+        description: "Abra a nova janela e use Ctrl+P (ou Cmd+P) para imprimir/salvar como PDF.",
+      });
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro ao gerar PDF",
+        description: "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
         variant: "destructive",
       });
     } finally {
-      setTimeout(() => setIsGeneratingPdf(false), 1500);
+      setIsGeneratingPdf(false);
     }
   };
 

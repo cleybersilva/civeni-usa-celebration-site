@@ -44,7 +44,7 @@ serve(async (req) => {
     const bannerUrl = bannerData?.bg_image || '';
 
     // Get program data based on modalidade
-    var eventSlug, settingsId;
+    let eventSlug, settingsId;
     if (modalidade === 'presencial') {
       eventSlug = 'iii-civeni-2025';
       settingsId = 1;
@@ -61,46 +61,25 @@ serve(async (req) => {
       .single();
 
     // Get days
-    const { data: days, error: daysError } = await supabase
+    const { data: days } = await supabase
       .from('civeni_program_days')
       .select('*')
       .eq('event_slug', eventSlug)
       .eq('is_published', true)
       .order('sort_order');
 
-    console.log(`Days found: ${days?.length || 0}`);
-    if (daysError) console.error('Error fetching days:', daysError);
-    if (days && days.length > 0) {
-      console.log('First day:', JSON.stringify(days[0]));
-    }
-
-    // Get sessions with speakers
-    const { data: sessions, error: sessionsError } = await supabase
+    // Get sessions
+    const { data: sessions } = await supabase
       .from('civeni_program_sessions')
       .select(`
         *,
         civeni_program_days!inner (
           event_slug
-        ),
-        civeni_session_speakers (
-          speaker_id,
-          role,
-          civeni_speakers (
-            name,
-            affiliation,
-            title
-          )
         )
       `)
       .eq('civeni_program_days.event_slug', eventSlug)
       .eq('is_published', true)
       .order('order_in_day');
-
-    console.log(`Sessions found: ${sessions?.length || 0}`);
-    if (sessionsError) console.error('Error fetching sessions:', sessionsError);
-    if (sessions && sessions.length > 0) {
-      console.log('First session:', JSON.stringify(sessions[0]));
-    }
 
     if (!days || days.length === 0) {
       console.log('No days found for', modalidade);
@@ -111,7 +90,7 @@ serve(async (req) => {
     return new Response(new Uint8Array(pdfBytes), {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Type': 'text/html',
         'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store'
       },
@@ -140,7 +119,7 @@ serve(async (req) => {
     return new Response(new Uint8Array(pdfBytes), {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Type': 'text/html',
         'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff'
@@ -219,23 +198,6 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       
       const timeRange = endTime ? `${startTime}–${endTime}` : startTime;
       
-      // Format speakers
-      let speakersText = '';
-      if (session.civeni_session_speakers && session.civeni_session_speakers.length > 0) {
-        speakersText = session.civeni_session_speakers
-          .map((ss: any) => {
-            const speaker = ss.civeni_speakers;
-            if (speaker) {
-              const parts = [speaker.name];
-              if (speaker.affiliation) parts.push(speaker.affiliation);
-              return parts.join(' - ');
-            }
-            return '';
-          })
-          .filter((s: string) => s)
-          .join(', ');
-      }
-      
       return `
         <tr>
           <td class="time-cell">${timeRange}</td>
@@ -243,8 +205,8 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
             <div class="session-title">${session.title}</div>
             ${session.description ? `<div class="session-description">${session.description}</div>` : ''}
           </td>
-          <td class="speaker-cell">${speakersText}</td>
-          <td class="location-cell">${session.room || day.location || ''}</td>
+          <td class="speaker-cell">${session.speaker_names || ''}</td>
+          <td class="location-cell">${session.room || session.location || ''}</td>
         </tr>
       `;
     }).join('');
