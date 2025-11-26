@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export type EventType = 'presencial' | 'online';
 
@@ -22,6 +23,7 @@ const getEventSlug = (type: EventType) => {
 
 export const useCiveniScheduleOperations = () => {
   const queryClient = useQueryClient();
+  const { user, sessionToken } = useAdminAuth();
 
   // Fetch days (admin sees all, published or not)
   const useDays = (type: EventType) => {
@@ -238,6 +240,11 @@ export const useCiveniScheduleOperations = () => {
       type: EventType;
     }) => {
       console.log('sessionUpsertMutation executando com:', { formData, editingSession, type });
+
+      if (!user || !sessionToken) {
+        console.error('Sessão admin inválida ao salvar sessão CIVENI');
+        throw new Error('Você precisa estar logado como administrador para salvar sessões.');
+      }
       
       // Normalizar dados antes de enviar
       const sessionData: any = {
@@ -257,39 +264,24 @@ export const useCiveniScheduleOperations = () => {
         is_published: formData.is_published || false,
       };
 
-      if (editingSession) {
-        console.log('Atualizando sessão existente:', editingSession.id);
-        const { data, error } = await supabase
-          .from('civeni_program_sessions')
-          .update({
-            ...sessionData,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingSession.id)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Erro ao atualizar sessão:', error);
-          throw error;
-        }
-        console.log('Sessão atualizada com sucesso:', data);
-        return data;
-      } else {
-        console.log('Criando nova sessão');
-        const { data, error } = await supabase
-          .from('civeni_program_sessions')
-          .insert(sessionData)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Erro ao criar sessão:', error);
-          throw error;
-        }
-        console.log('Sessão criada com sucesso:', data);
-        return data;
+      // Incluir ID quando for edição para que o RPC faça UPDATE em vez de INSERT
+      if (editingSession?.id) {
+        (sessionData as any).id = editingSession.id;
       }
+
+      const { data, error } = await supabase.rpc('admin_upsert_civeni_session', {
+        session_data: sessionData,
+        user_email: user.email,
+        session_token: sessionToken,
+      });
+
+      if (error) {
+        console.error('Erro ao salvar sessão via RPC admin_upsert_civeni_session:', error);
+        throw error;
+      }
+
+      console.log('Sessão salva com sucesso via RPC:', data);
+      return data;
     },
     onSuccess: (_, variables) => {
       console.log('Mutation onSuccess, invalidando queries');

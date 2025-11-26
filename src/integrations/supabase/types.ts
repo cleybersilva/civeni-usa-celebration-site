@@ -4610,6 +4610,10 @@ export type Database = {
         Args: { session_token: string; slide: Json; user_email: string }
         Returns: Json
       }
+      admin_upsert_civeni_session: {
+        Args: { session_data: Json; session_token: string; user_email: string }
+        Returns: Json
+      }
       admin_upsert_event: {
         Args: { event_data: Json; session_token: string; user_email: string }
         Returns: Json
