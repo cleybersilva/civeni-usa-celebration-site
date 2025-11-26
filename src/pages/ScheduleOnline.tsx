@@ -25,6 +25,18 @@ const ScheduleOnline = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const generatePDF = async () => {
+    // Abre a janela imediatamente para evitar bloqueio de pop-up
+    const newWindow = window.open('', '_blank');
+
+    if (!newWindow) {
+      toast({
+        title: "Pop-up bloqueado",
+        description: "Permita janelas pop-up no navegador para baixar a programação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsGeneratingPdf(true);
       
@@ -45,25 +57,22 @@ const ScheduleOnline = () => {
 
       const html = await response.text();
       
-      // Open HTML in new window that can be printed as PDF
-      const newWindow = window.open('', '_blank');
-      if (newWindow) {
-        newWindow.document.write(html);
-        newWindow.document.close();
-        
-        // Add print functionality
-        setTimeout(() => {
-          newWindow.print();
-        }, 1000);
-      }
+      // Escreve o HTML na nova janela e aciona a impressão
+      newWindow.document.write(html);
+      newWindow.document.close();
+      
+      setTimeout(() => {
+        newWindow.print();
+      }, 1000);
       
       toast({
         title: "PDF gerado com sucesso!",
-        description: "Abra a nova janela e use Ctrl+P (ou Cmd+P) para imprimir/salvar como PDF.",
+        description: "A nova janela foi aberta. Use Ctrl+P (ou Cmd+P) para imprimir/salvar como PDF.",
       });
       
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
+      newWindow.close();
       toast({
         title: "Erro ao gerar PDF",
         description: "Não foi possível gerar o PDF agora. Tente novamente em instantes.",
