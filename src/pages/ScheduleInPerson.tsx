@@ -25,97 +25,67 @@ const ScheduleInPerson = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
       <Header />
       
-      {/* Hero Section - Premium Design */}
-      <section className="relative bg-gradient-to-br from-primary via-primary/90 to-accent text-primary-foreground py-16 md:py-24 overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 bg-[url('/assets/conference-event.jpg')] bg-cover bg-center opacity-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-transparent"></div>
-        
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-civeni-blue to-civeni-red text-white py-20">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs */}
-          <nav className="mb-6 md:mb-8 text-xs sm:text-sm">
-            <ol className="flex items-center space-x-2 flex-wrap">
-              <li><Link to="/" className="hover:text-primary-foreground/80 transition-colors">Home</Link></li>
-              <li className="text-primary-foreground/60">›</li>
-              <li><Link to="/programacao-presencial" className="hover:text-primary-foreground/80 transition-colors">Programação</Link></li>
-              <li className="text-primary-foreground/60">›</li>
-              <li className="font-medium">Presencial</li>
+          <nav className="mb-8 text-sm">
+            <ol className="flex items-center space-x-2">
+              <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+              <li className="text-blue-200">›</li>
+              <li><Link to="/programacao-presencial" className="hover:text-blue-200 transition-colors">Programação</Link></li>
+              <li className="text-blue-200">›</li>
+              <li>Presencial</li>
             </ol>
           </nav>
           
-          <div className="text-center max-w-5xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-foreground/10 backdrop-blur-sm rounded-full mb-4 md:mb-6">
-              <Calendar className="w-4 h-4" />
-              <span className="text-xs sm:text-sm font-medium">III CIVENI 2025 - Evento Internacional</span>
-            </div>
-            
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
               {settings?.page_title || 'Programação Presencial'}
             </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 md:mb-10 max-w-3xl mx-auto text-primary-foreground/90 leading-relaxed">
+            <p className="text-sm sm:text-base md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100">
               {settings?.page_subtitle || 'Confira toda a programação presencial do III CIVENI 2025'}
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/inscricoes" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto bg-background text-foreground hover:bg-background/90 px-6 md:px-8 py-3 md:py-3.5 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-105">
-                  <Users className="w-4 h-4 md:w-5 md:h-5" />
-                  <span className="text-sm md:text-base">Fazer Inscrição</span>
+                <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Fazer Inscrição
                 </button>
               </Link>
               
               <button 
                 onClick={generatePDF}
-                className="w-full sm:w-auto border-2 border-primary-foreground/30 bg-primary-foreground/10 backdrop-blur-sm text-primary-foreground hover:bg-primary-foreground/20 px-6 md:px-8 py-3 md:py-3.5 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+                className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2"
               >
-                <Download className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-sm md:text-base">Baixar Programação</span>
+                <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                Baixar Programação
               </button>
             </div>
           </div>
         </div>
-        
-        {/* Bottom wave decoration */}
-        <div className="absolute bottom-0 left-0 right-0 h-16">
-          <svg className="w-full h-full" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z" fill="hsl(var(--background))" fillOpacity="1"/>
-          </svg>
-        </div>
       </section>
       
-      {/* Main Content */}
-      <main className="py-12 md:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          {/* Intro Section */}
-          <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-              Selecione o dia para ver a programação completa
-            </h2>
-            <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto">
-              Acompanhe todas as palestras, workshops e atividades do evento. Horários em GMT-3 (Fortaleza/CE).
-            </p>
-          </div>
-
+      <main className="py-20">
+        <div className="container mx-auto px-4">
           {isLoading ? (
-            <div className="text-center py-16">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
-              <p className="text-muted-foreground text-sm md:text-base">Carregando programação...</p>
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Carregando programação...</p>
             </div>
           ) : !days || days.length === 0 ? (
-            <div className="text-center py-16 md:py-24">
-              <div className="bg-card rounded-2xl shadow-lg p-8 md:p-12 max-w-2xl mx-auto border border-border">
-                <Calendar className="w-16 h-16 md:w-20 md:h-20 mx-auto text-muted-foreground/50 mb-6" />
-                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">
-                  Programação em breve
-                </h2>
-                <p className="text-muted-foreground text-sm md:text-base">
-                  A programação ainda não foi publicada. Volte em breve!
-                </p>
-              </div>
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Programação em breve
+              </h2>
+              <p className="text-gray-600">
+                A programação ainda não foi publicada. Volte em breve!
+              </p>
             </div>
           ) : (
             <Tabs value={activeDay} onValueChange={setActiveDay}>

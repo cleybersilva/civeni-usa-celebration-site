@@ -118,18 +118,11 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
   };
 
   return (
-    <Card className={`relative transition-all duration-300 hover:shadow-xl border-2 rounded-xl overflow-hidden ${
-      isLive ? 'ring-2 ring-destructive border-destructive/50 bg-destructive/5' : 
-      isNext ? 'ring-2 ring-primary border-primary/50 bg-primary/5' : 
-      'border-border hover:border-accent'
+    <Card className={`relative transition-all duration-200 hover:shadow-md ${
+      isLive ? 'ring-2 ring-red-500 bg-red-50' : 
+      isNext ? 'ring-2 ring-blue-500 bg-blue-50' : ''
     }`}>
-      {isLive && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive via-destructive/80 to-destructive animate-pulse"></div>
-      )}
-      {isNext && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary"></div>
-      )}
-      <CardContent className="p-5 md:p-7">
+      <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="flex-1">
             <div className="mb-3">
