@@ -184,12 +184,13 @@ const CiveniScheduleManager = () => {
             <TabsContent value={selectedType} className="space-y-6">
               {/* Dias Section */}
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">Dias da Programação</h3>
+                <div className="flex flex-col items-center mb-4 p-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                  <h3 className="text-lg font-semibold mb-3 text-center">Dias da Programação</h3>
                   <Button onClick={() => {
                     setEditingDay(null);
                     setIsDayDialogOpen(true);
-                  }}>
+                  }}
+                  className="shadow-lg hover:shadow-xl transition-all hover:scale-105">
                     <Plus className="h-4 w-4 mr-2" />
                     Novo Dia
                   </Button>
@@ -205,7 +206,7 @@ const CiveniScheduleManager = () => {
                 ) : (
                   <div className="space-y-3">
                     {days.map((day) => (
-                      <Card key={day.id} className="p-4">
+                      <Card key={day.id} className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
                           <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
