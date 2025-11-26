@@ -68,13 +68,22 @@ serve(async (req) => {
       .eq('is_published', true)
       .order('sort_order');
 
-    // Get sessions
+    // Get sessions with speakers
     const { data: sessions } = await supabase
       .from('civeni_program_sessions')
       .select(`
         *,
         civeni_program_days!inner (
           event_slug
+        ),
+        civeni_session_speakers (
+          speaker_id,
+          role,
+          civeni_speakers (
+            name,
+            affiliation,
+            title
+          )
         )
       `)
       .eq('civeni_program_days.event_slug', eventSlug)
@@ -198,6 +207,23 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
       
       const timeRange = endTime ? `${startTime}–${endTime}` : startTime;
       
+      // Format speakers
+      let speakersText = '';
+      if (session.civeni_session_speakers && session.civeni_session_speakers.length > 0) {
+        speakersText = session.civeni_session_speakers
+          .map((ss: any) => {
+            const speaker = ss.civeni_speakers;
+            if (speaker) {
+              const parts = [speaker.name];
+              if (speaker.affiliation) parts.push(speaker.affiliation);
+              return parts.join(' - ');
+            }
+            return '';
+          })
+          .filter((s: string) => s)
+          .join(', ');
+      }
+      
       return `
         <tr>
           <td class="time-cell">${timeRange}</td>
@@ -205,8 +231,8 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
             <div class="session-title">${session.title}</div>
             ${session.description ? `<div class="session-description">${session.description}</div>` : ''}
           </td>
-          <td class="speaker-cell">${session.speaker_names || ''}</td>
-          <td class="location-cell">${session.room || session.location || ''}</td>
+          <td class="speaker-cell">${speakersText}</td>
+          <td class="location-cell">${session.room || day.location || ''}</td>
         </tr>
       `;
     }).join('');
