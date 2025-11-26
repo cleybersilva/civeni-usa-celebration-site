@@ -96,14 +96,15 @@ serve(async (req) => {
       const emptyHtml = generateEmptyProgramHtml(modalidade, bannerUrl);
       const pdfBytes = await generatePdfFromHtml(emptyHtml);
       
-    return new Response(new Uint8Array(pdfBytes), {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'text/html',
-        'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
-        'Cache-Control': 'no-store'
-      },
-    });
+      return new Response(emptyHtml, {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        },
+      });
     }
 
     // Organize sessions by day
@@ -120,18 +121,16 @@ serve(async (req) => {
       bannerUrl
     );
 
-    console.log('Generating PDF from HTML...');
-    const pdfBytes = await generatePdfFromHtml(html);
-
-    const filename = `civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf`;
+    console.log('Generating HTML for print...');
+    const fullHtml = await generatePdfFromHtml(html);
     
-    return new Response(new Uint8Array(pdfBytes), {
+    return new Response(fullHtml, {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'text/html',
-        'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
-        'Cache-Control': 'no-store',
-        'X-Content-Type-Options': 'nosniff'
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       },
     });
 
@@ -273,7 +272,7 @@ function generateProgramHtml(modalidade: string, days: any[], settings: any, ban
   </div>`;
 }
 
-async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
+async function generatePdfFromHtml(html: string): Promise<string> {
   try {
     // Generate complete HTML with proper styling for PDF conversion
     const fullHtml = `
@@ -550,7 +549,7 @@ async function generatePdfFromHtml(html: string): Promise<Uint8Array> {
 </body>
 </html>`;
     
-    return new TextEncoder().encode(fullHtml);
+    return fullHtml;
     
   } catch (error) {
     console.error('Error generating PDF HTML:', error);
