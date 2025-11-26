@@ -51,6 +51,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
       return null;
     }
   };
+
+  const getSessionTypeColor = (type: string) => {
     const colors: Record<string, string> = {
       'conferencia': 'bg-blue-100 text-blue-800',
       'palestra': 'bg-green-100 text-green-800',
