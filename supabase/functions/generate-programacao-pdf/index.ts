@@ -31,6 +31,7 @@ serve(async (req) => {
     }
 
     console.log(`Generating PDF for modalidade: ${modalidade}`);
+    console.log(`Event slug: ${eventSlug}, Settings ID: ${settingsId}`);
 
     // Get banner from banner_slides
     const { data: bannerData } = await supabase
@@ -61,15 +62,21 @@ serve(async (req) => {
       .single();
 
     // Get days
-    const { data: days } = await supabase
+    const { data: days, error: daysError } = await supabase
       .from('civeni_program_days')
       .select('*')
       .eq('event_slug', eventSlug)
       .eq('is_published', true)
       .order('sort_order');
 
+    console.log(`Days found: ${days?.length || 0}`);
+    if (daysError) console.error('Error fetching days:', daysError);
+    if (days && days.length > 0) {
+      console.log('First day:', JSON.stringify(days[0]));
+    }
+
     // Get sessions with speakers
-    const { data: sessions } = await supabase
+    const { data: sessions, error: sessionsError } = await supabase
       .from('civeni_program_sessions')
       .select(`
         *,
@@ -89,6 +96,12 @@ serve(async (req) => {
       .eq('civeni_program_days.event_slug', eventSlug)
       .eq('is_published', true)
       .order('order_in_day');
+
+    console.log(`Sessions found: ${sessions?.length || 0}`);
+    if (sessionsError) console.error('Error fetching sessions:', sessionsError);
+    if (sessions && sessions.length > 0) {
+      console.log('First session:', JSON.stringify(sessions[0]));
+    }
 
     if (!days || days.length === 0) {
       console.log('No days found for', modalidade);
