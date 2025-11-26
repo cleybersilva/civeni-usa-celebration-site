@@ -25,6 +25,21 @@ const ScheduleInPerson = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const generatePDF = async () => {
+    const previewWindow = window.open('', '_blank');
+
+    if (!previewWindow) {
+      toast({
+        title: "Pop-up bloqueado",
+        description: "Por favor, permita pop-ups para este site e tente novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Conteúdo inicial enquanto carrega
+    previewWindow.document.write('<html><head><title>Carregando programação...</title></head><body><p style="font-family:sans-serif;padding:16px;">Carregando programação atualizada...</p></body></html>');
+    previewWindow.document.close();
+
     try {
       setIsGeneratingPdf(true);
       
@@ -38,36 +53,28 @@ const ScheduleInPerson = () => {
       });
 
       if (!response.ok) {
+        previewWindow.close();
         throw new Error(`Erro ao gerar PDF: ${response.status}`);
       }
 
       const html = await response.text();
       
       if (!html || html.length < 100) {
+        previewWindow.close();
         throw new Error('HTML vazio ou inválido recebido');
       }
       
-      const newWindow = window.open('', '_blank');
-      
-      if (!newWindow) {
-        toast({
-          title: "Pop-up bloqueado",
-          description: "Por favor, permita pop-ups para este site e tente novamente.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      newWindow.document.write(html);
-      newWindow.document.close();
+      previewWindow.document.open();
+      previewWindow.document.write(html);
+      previewWindow.document.close();
       
       setTimeout(() => {
-        newWindow.print();
+        previewWindow.print();
       }, 1000);
       
       toast({
         title: "PDF gerado com sucesso!",
-        description: "Abra a nova janela e use Ctrl+P (ou Cmd+P) para imprimir/salvar como PDF.",
+        description: "A janela de impressão foi aberta com a programação atualizada.",
       });
       
     } catch (error) {
