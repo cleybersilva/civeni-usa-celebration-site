@@ -36,13 +36,13 @@ const daySchema = z.object({
   weekday_label: z.string().min(1, 'Dia da semana é obrigatório'),
   headline: z.string().min(1, 'Título é obrigatório'),
   theme: z.string().min(1, 'Tema é obrigatório'),
-  location: z.string().optional(),
+  location: z.string().optional().nullable(),
   modality: z.enum(['presencial', 'online', 'hibrido']),
-  sort_order: z.coerce.number().min(0),
-  is_published: z.boolean(),
-  seo_title: z.string().nullable().optional(),
-  seo_description: z.string().nullable().optional(),
-  slug: z.string().nullable().optional(),
+  sort_order: z.number().min(0).default(0),
+  is_published: z.boolean().default(false),
+  seo_title: z.string().optional().nullable(),
+  seo_description: z.string().optional().nullable(),
+  slug: z.string().optional().nullable(),
 });
 
 type DayFormData = z.infer<typeof daySchema>;
@@ -66,44 +66,49 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
 }) => {
   const form = useForm<DayFormData>({
     resolver: zodResolver(daySchema),
-    defaultValues: editingDay || {
+    defaultValues: {
       date: '',
       weekday_label: '',
       headline: '',
       theme: '',
-      location: type === 'presencial' ? 'Fortaleza/CE' : '',
+      location: type === 'presencial' ? 'Fortaleza/CE' : null,
       modality: type === 'presencial' ? 'presencial' : 'online',
       sort_order: 0,
       is_published: false,
-      seo_title: '',
-      seo_description: '',
-      slug: '',
+      seo_title: null,
+      seo_description: null,
+      slug: null,
     },
   });
 
   React.useEffect(() => {
     if (editingDay) {
-      // Garante que a modalidade sempre tenha um valor válido mesmo para dias antigos
       form.reset({
-        ...editingDay,
-        sort_order: (editingDay as any).sort_order ?? 0,
-        modality:
-          (editingDay as any).modality ?? (type === 'presencial' ? 'presencial' : 'online'),
+        date: editingDay.date,
+        weekday_label: editingDay.weekday_label,
+        headline: editingDay.headline,
+        theme: editingDay.theme,
+        location: editingDay.location || (type === 'presencial' ? 'Fortaleza/CE' : null),
+        modality: editingDay.modality || (type === 'presencial' ? 'presencial' : 'online'),
+        sort_order: editingDay.sort_order ?? 0,
+        is_published: editingDay.is_published ?? false,
+        seo_title: editingDay.seo_title || null,
+        seo_description: editingDay.seo_description || null,
+        slug: editingDay.slug || null,
       });
     } else if (isOpen) {
-      // Reset to default values when opening for new day
       form.reset({
         date: '',
         weekday_label: '',
         headline: '',
         theme: '',
-        location: type === 'presencial' ? 'Fortaleza/CE' : '',
+        location: type === 'presencial' ? 'Fortaleza/CE' : null,
         modality: type === 'presencial' ? 'presencial' : 'online',
         sort_order: 0,
         is_published: false,
-        seo_title: '',
-        seo_description: '',
-        slug: '',
+        seo_title: null,
+        seo_description: null,
+        slug: null,
       });
     }
   }, [editingDay, isOpen, type, form]);
@@ -223,25 +228,26 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="sort_order"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ordem de Exibição *</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Número para ordenar os dias (menor aparece primeiro)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="sort_order"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ordem de Exibição *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        value={field.value}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Número para ordenar os dias (menor aparece primeiro)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <FormField
               control={form.control}

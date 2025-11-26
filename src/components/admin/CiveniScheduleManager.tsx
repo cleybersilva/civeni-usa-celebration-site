@@ -80,25 +80,41 @@ const CiveniScheduleManager = () => {
   };
 
   const handleDaySubmit = (data: any) => {
+    console.log('handleDaySubmit chamado com:', data);
+    console.log('editingDay:', editingDay);
+    console.log('selectedType:', selectedType);
+    
     dayUpsertMutation.mutate(
       { formData: data, editingDay, type: selectedType },
       {
         onSuccess: () => {
+          console.log('Dia salvo com sucesso, fechando dialog');
           setIsDayDialogOpen(false);
           setEditingDay(null);
         },
+        onError: (error) => {
+          console.error('Erro ao salvar dia:', error);
+        }
       }
     );
   };
 
   const handleSessionSubmit = (data: any) => {
+    console.log('handleSessionSubmit chamado com:', data);
+    console.log('editingSession:', editingSession);
+    console.log('selectedType:', selectedType);
+    
     sessionUpsertMutation.mutate(
       { formData: data, editingSession, type: selectedType },
       {
         onSuccess: () => {
+          console.log('Sessão salva com sucesso, fechando dialog');
           setIsSessionDialogOpen(false);
           setEditingSession(null);
         },
+        onError: (error) => {
+          console.error('Erro ao salvar sessão:', error);
+        }
       }
     );
   };

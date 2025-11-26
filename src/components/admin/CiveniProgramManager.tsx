@@ -65,13 +65,20 @@ const CiveniProgramManager = () => {
   };
 
   const handleSaveDay = (formData: any) => {
+    console.log('handleSaveDay chamado com:', formData);
+    console.log('editingDay:', editingDay);
+    
     dayUpsertMutation.mutate(
       { formData, editingDay, type },
       {
         onSuccess: () => {
+          console.log('Dia salvo com sucesso, fechando dialog');
           setIsDayDialogOpen(false);
           setEditingDay(null);
         },
+        onError: (error) => {
+          console.error('Erro ao salvar dia:', error);
+        }
       }
     );
   };
@@ -113,13 +120,20 @@ const CiveniProgramManager = () => {
   };
 
   const handleSaveSession = (formData: any) => {
+    console.log('handleSaveSession chamado com:', formData);
+    console.log('editingSession:', editingSession);
+    
     sessionUpsertMutation.mutate(
       { formData, editingSession, type },
       {
         onSuccess: () => {
+          console.log('Sessão salva com sucesso, fechando dialog');
           setIsSessionDialogOpen(false);
           setEditingSession(null);
         },
+        onError: (error) => {
+          console.error('Erro ao salvar sessão:', error);
+        }
       }
     );
   };
