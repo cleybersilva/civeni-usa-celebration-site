@@ -65,39 +65,64 @@ export const useCiveniScheduleOperations = () => {
   // Create/Update Day
   const dayUpsertMutation = useMutation({
     mutationFn: async ({ formData, editingDay, type }: { 
-      formData: CiveniDayUpdate; 
+      formData: any; 
       editingDay: CiveniDay | null;
       type: EventType;
     }) => {
-      const dayData: CiveniDayUpdate = {
-        ...formData,
+      console.log('dayUpsertMutation executando com:', { formData, editingDay, type });
+      
+      // Normalizar dados antes de enviar
+      const dayData: any = {
+        date: formData.date,
+        weekday_label: formData.weekday_label,
+        headline: formData.headline,
+        theme: formData.theme,
+        location: formData.location || null,
+        modality: formData.modality,
+        sort_order: typeof formData.sort_order === 'number' ? formData.sort_order : 0,
+        is_published: formData.is_published || false,
+        seo_title: formData.seo_title || null,
+        seo_description: formData.seo_description || null,
+        slug: formData.slug || null,
         event_slug: getEventSlug(type),
-        updated_at: new Date().toISOString()
       };
 
       if (editingDay) {
+        console.log('Atualizando dia existente:', editingDay.id);
         const { data, error } = await supabase
           .from('civeni_program_days')
-          .update(dayData)
+          .update({
+            ...dayData,
+            updated_at: new Date().toISOString()
+          })
           .eq('id', editingDay.id)
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao atualizar dia:', error);
+          throw error;
+        }
+        console.log('Dia atualizado com sucesso:', data);
         return data;
       } else {
-        const insertData: CiveniDayInsert = dayData as CiveniDayInsert;
+        console.log('Criando novo dia');
         const { data, error } = await supabase
           .from('civeni_program_days')
-          .insert(insertData)
+          .insert(dayData)
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao criar dia:', error);
+          throw error;
+        }
+        console.log('Dia criado com sucesso:', data);
         return data;
       }
     },
     onSuccess: (_, variables) => {
+      console.log('Mutation onSuccess, invalidando queries');
       queryClient.invalidateQueries({ queryKey: ['civeni-program-days', variables.type] });
       toast({
         title: "Sucesso!",
@@ -105,6 +130,7 @@ export const useCiveniScheduleOperations = () => {
       });
     },
     onError: (error: any) => {
+      console.error('Mutation onError:', error);
       toast({
         title: "Erro",
         description: error.message || "Erro ao salvar dia.",
@@ -171,38 +197,66 @@ export const useCiveniScheduleOperations = () => {
   // Create/Update Session
   const sessionUpsertMutation = useMutation({
     mutationFn: async ({ formData, editingSession, type }: { 
-      formData: CiveniSessionUpdate; 
+      formData: any; 
       editingSession: CiveniSession | null;
       type: EventType;
     }) => {
-      const sessionData: CiveniSessionUpdate = {
-        ...formData,
-        updated_at: new Date().toISOString()
+      console.log('sessionUpsertMutation executando com:', { formData, editingSession, type });
+      
+      // Normalizar dados antes de enviar
+      const sessionData: any = {
+        day_id: formData.day_id,
+        session_type: formData.session_type,
+        title: formData.title,
+        description: formData.description || null,
+        start_at: formData.start_at,
+        end_at: formData.end_at || null,
+        room: formData.room || null,
+        modality: formData.modality || null,
+        livestream_url: formData.livestream_url || null,
+        materials_url: formData.materials_url || null,
+        is_parallel: formData.is_parallel || false,
+        is_featured: formData.is_featured || false,
+        order_in_day: typeof formData.order_in_day === 'number' ? formData.order_in_day : 0,
+        is_published: formData.is_published || false,
       };
 
       if (editingSession) {
+        console.log('Atualizando sessão existente:', editingSession.id);
         const { data, error } = await supabase
           .from('civeni_program_sessions')
-          .update(sessionData)
+          .update({
+            ...sessionData,
+            updated_at: new Date().toISOString()
+          })
           .eq('id', editingSession.id)
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao atualizar sessão:', error);
+          throw error;
+        }
+        console.log('Sessão atualizada com sucesso:', data);
         return data;
       } else {
-        const insertData: CiveniSessionInsert = sessionData as CiveniSessionInsert;
+        console.log('Criando nova sessão');
         const { data, error } = await supabase
           .from('civeni_program_sessions')
-          .insert(insertData)
+          .insert(sessionData)
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao criar sessão:', error);
+          throw error;
+        }
+        console.log('Sessão criada com sucesso:', data);
         return data;
       }
     },
     onSuccess: (_, variables) => {
+      console.log('Mutation onSuccess, invalidando queries');
       queryClient.invalidateQueries({ queryKey: ['civeni-program-sessions', variables.type] });
       toast({
         title: "Sucesso!",
@@ -210,6 +264,7 @@ export const useCiveniScheduleOperations = () => {
       });
     },
     onError: (error: any) => {
+      console.error('Mutation onError:', error);
       toast({
         title: "Erro",
         description: error.message || "Erro ao salvar sessão.",
