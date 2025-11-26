@@ -40,9 +40,9 @@ const daySchema = z.object({
   modality: z.enum(['presencial', 'online', 'hibrido']),
   sort_order: z.number().min(0),
   is_published: z.boolean(),
-  seo_title: z.string().optional(),
-  seo_description: z.string().optional(),
-  slug: z.string().optional(),
+  seo_title: z.string().nullable().optional(),
+  seo_description: z.string().nullable().optional(),
+  slug: z.string().nullable().optional(),
 });
 
 type DayFormData = z.infer<typeof daySchema>;
