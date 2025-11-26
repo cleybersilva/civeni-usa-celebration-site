@@ -1,5 +1,6 @@
-
 import React, { useState } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Link } from 'react-router-dom';
 import { Calendar, Download, Users } from 'lucide-react';
 import Header from '@/components/Header';
@@ -28,15 +29,93 @@ const ScheduleInPerson = () => {
     try {
       setIsGeneratingPdf(true);
 
-      // Abrir diretamente a URL da função em uma nova aba (usa sempre os dados atuais)
-      const timestamp = new Date().getTime();
-      const url = `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=presencial&t=${timestamp}`;
-      window.open(url, '_blank');
+      if (!days || days.length === 0) {
+        toast({
+          title: 'Programação indisponível',
+          description: 'Não há dados publicados para gerar o PDF no momento.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+      const titulo = settings?.page_title || 'Programação Presencial';
+      const subtitulo = settings?.page_subtitle || 'III CIVENI 2025';
+      const agora = new Date().toLocaleString('pt-BR', {
+        timeZone: 'America/Fortaleza',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      doc.setFontSize(16);
+      doc.text(`III CIVENI 2025 - ${titulo}`, 40, 40);
+      doc.setFontSize(11);
+      doc.text(subtitulo, 40, 60);
+      doc.setFontSize(9);
+      doc.text(`Atualizado em ${agora} (GMT-3)`, 40, 76);
+
+      let currentY = 100;
+
+      days.forEach((day) => {
+        const dayDate = new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR');
+        const dayTitle = `${day.weekday_label} – ${day.headline} – ${dayDate}`;
+
+        doc.setFontSize(12);
+        doc.text(dayTitle, 40, currentY);
+
+        const sessions = getSessionsForDay(day.id) as any[];
+        const rows = sessions.map((session) => {
+          const startTime = new Date(session.start_at).toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'America/Fortaleza',
+          });
+          const endTime = session.end_at
+            ? new Date(session.end_at).toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'America/Fortaleza',
+              })
+            : '';
+          const timeRange = endTime ? `${startTime}–${endTime}` : startTime;
+
+          return [timeRange, session.title || '', session.room || day.location || ''];
+        });
+
+        const tableResult: any = autoTable(doc, {
+          startY: currentY + 10,
+          head: [['Horário', 'Atividade', 'Local']],
+          body: rows,
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [32, 64, 128] },
+        });
+
+        const lastY =
+          tableResult?.lastAutoTable?.finalY ?? (doc as any).lastAutoTable?.finalY ?? currentY + 60;
+
+        currentY = lastY + 30;
+
+        const pageHeight = (doc.internal.pageSize as any).getHeight();
+        if (currentY > pageHeight - 80) {
+          doc.addPage();
+          currentY = 60;
+        }
+      });
+
+      const dateTag = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      doc.save(`civeni-programacao-presencial-${dateTag}.pdf`);
     } catch (error) {
-      console.error('Erro ao abrir programação:', error);
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: 'Erro ao gerar PDF',
+        description: 'Não foi possível gerar o PDF agora. Tente novamente em instantes.',
+        variant: 'destructive',
+      });
     } finally {
-      // Apenas para mostrar o estado de carregamento rapidamente
-      setTimeout(() => setIsGeneratingPdf(false), 1500);
+      setIsGeneratingPdf(false);
     }
   };
 
