@@ -27,7 +27,6 @@ const ScheduleInPerson = () => {
   const generatePDF = async () => {
     try {
       setIsGeneratingPdf(true);
-      console.log('Iniciando geração de PDF...');
       
       const response = await fetch(`https://wdkeqxfglmritghmakma.supabase.co/functions/v1/generate-programacao-pdf?modalidade=presencial&t=${Date.now()}`, {
         method: 'GET',
@@ -38,23 +37,16 @@ const ScheduleInPerson = () => {
         },
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Erro na resposta:', errorText);
         throw new Error(`Erro ao gerar PDF: ${response.status}`);
       }
 
       const html = await response.text();
-      console.log('HTML recebido, tamanho:', html.length);
       
       if (!html || html.length < 100) {
         throw new Error('HTML vazio ou inválido recebido');
       }
       
-      // Open HTML in new window that can be printed as PDF
       const newWindow = window.open('', '_blank');
       
       if (!newWindow) {
@@ -66,13 +58,10 @@ const ScheduleInPerson = () => {
         return;
       }
       
-      console.log('Nova janela aberta, escrevendo HTML...');
       newWindow.document.write(html);
       newWindow.document.close();
       
-      // Add print functionality
       setTimeout(() => {
-        console.log('Iniciando impressão...');
         newWindow.print();
       }, 1000);
       
