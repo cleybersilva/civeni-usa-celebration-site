@@ -42,9 +42,12 @@ const ScheduleInPerson = () => {
 
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
       a.download = `programacao_civeni_2025_presencial_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
       toast({
