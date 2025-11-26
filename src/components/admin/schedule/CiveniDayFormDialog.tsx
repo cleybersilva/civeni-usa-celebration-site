@@ -268,7 +268,11 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button
+                type="button"
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={isLoading}
+              >
                 {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
