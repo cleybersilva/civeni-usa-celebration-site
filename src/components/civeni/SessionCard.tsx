@@ -38,7 +38,19 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
     return timeString;
   };
 
-  const getSessionTypeColor = (type: string) => {
+  const parseBrazilDateTime = (value: string): Date | null => {
+    if (!value) return null;
+    try {
+      const match = value.match(/(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/);
+      if (match) {
+        const [, datePart, timePart] = match;
+        return new Date(`${datePart}T${timePart}:00-03:00`);
+      }
+      return new Date(value);
+    } catch {
+      return null;
+    }
+  };
     const colors: Record<string, string> = {
       'conferencia': 'bg-blue-100 text-blue-800',
       'palestra': 'bg-green-100 text-green-800',
@@ -66,8 +78,11 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
   };
 
   const generateICS = () => {
-    const startDate = new Date(session.start_at);
-    const endDate = session.end_at ? new Date(session.end_at) : new Date(startDate.getTime() + 60 * 60 * 1000);
+    const startDate = parseBrazilDateTime(session.start_at) || new Date(session.start_at);
+    const endDateBase = session.end_at
+      ? parseBrazilDateTime(session.end_at) || new Date(session.end_at)
+      : null;
+    const endDate = endDateBase || new Date(startDate.getTime() + 60 * 60 * 1000);
     
     const formatDateForICS = (date: Date) => {
       return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';

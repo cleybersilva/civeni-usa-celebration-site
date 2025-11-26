@@ -2,6 +2,19 @@ import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import SessionCard from './SessionCard';
 
+const parseBrazilDateTime = (value: string): Date | null => {
+  if (!value) return null;
+  try {
+    const match = value.match(/(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/);
+    if (match) {
+      const [, datePart, timePart] = match;
+      return new Date(`${datePart}T${timePart}:00-03:00`);
+    }
+    return new Date(value);
+  } catch {
+    return null;
+  }
+};
 interface Session {
   id: string;
   start_at: string;
@@ -38,8 +51,10 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
   const getCurrentSessionStatus = (session: Session) => {
     if (!isToday) return null;
     
-    const sessionStart = new Date(session.start_at);
-    const sessionEnd = session.end_at ? new Date(session.end_at) : new Date(sessionStart.getTime() + 60 * 60 * 1000);
+    const sessionStart = parseBrazilDateTime(session.start_at) || new Date(session.start_at);
+    const sessionEnd = session.end_at
+      ? parseBrazilDateTime(session.end_at) || new Date(session.end_at)
+      : new Date(sessionStart.getTime() + 60 * 60 * 1000);
     
     if (now >= sessionStart && now <= sessionEnd) {
       return 'live';
