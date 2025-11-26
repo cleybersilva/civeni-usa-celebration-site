@@ -206,7 +206,7 @@ const CiveniScheduleManager = () => {
                   <div className="space-y-3">
                     {days.map((day) => (
                       <Card key={day.id} className="p-4">
-                        <div className="flex justify-between items-start">
+                          <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <h4 className="font-semibold">{day.weekday_label}</h4>
@@ -236,18 +236,6 @@ const CiveniScheduleManager = () => {
                               onClick={() => handleTogglePublishDay(day.id, day.is_published)}
                             >
                               {day.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setEditingSession(null);
-                                setPreselectedDayId(day.id);
-                                setIsSessionDialogOpen(true);
-                              }}
-                            >
-                              <Plus className="h-4 w-4 mr-1" />
-                              Nova Sessão
                             </Button>
                             <Button
                               size="sm"
@@ -307,12 +295,23 @@ const CiveniScheduleManager = () => {
                       return (
                         <div key={day.id}>
                           <div className="flex justify-between items-center mb-3">
-                            <h4 className="font-semibold text-base">
-                              {day.weekday_label} - {formatDate(day.date)}
-                            </h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-base">
+                                {day.weekday_label} - {formatDate(day.date)}
+                              </h4>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingDay(day);
+                                  setIsDayDialogOpen(true);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
                             <Button
                               size="sm"
-                              variant="outline"
                               onClick={() => {
                                 setEditingSession(null);
                                 setPreselectedDayId(day.id);
