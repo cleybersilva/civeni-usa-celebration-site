@@ -31,7 +31,6 @@ serve(async (req) => {
     }
 
     console.log(`Generating PDF for modalidade: ${modalidade}`);
-    console.log(`Event slug: ${eventSlug}, Settings ID: ${settingsId}`);
 
     // Get banner from banner_slides
     const { data: bannerData } = await supabase
@@ -45,7 +44,7 @@ serve(async (req) => {
     const bannerUrl = bannerData?.bg_image || '';
 
     // Get program data based on modalidade
-    let eventSlug, settingsId;
+    var eventSlug, settingsId;
     if (modalidade === 'presencial') {
       eventSlug = 'iii-civeni-2025';
       settingsId = 1;
