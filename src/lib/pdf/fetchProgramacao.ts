@@ -47,26 +47,19 @@ export async function fetchProgramacaoData(modalidade: 'presencial' | 'online'):
     const daySessions = sessions?.filter(session => session.day_id === day.id) || [];
     
     const atividades: ProgramacaoAtividade[] = daySessions.map(session => {
-      // Parse do horário garantindo timezone de Brasília
-      const startDate = new Date(session.start_at);
-      const startTime = startDate.toLocaleTimeString('pt-BR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'America/Fortaleza',
-        hour12: false
-      });
-      
-      let horario = startTime;
-      if (session.end_at) {
-        const endDate = new Date(session.end_at);
-        const endTime = endDate.toLocaleTimeString('pt-BR', {
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'America/Fortaleza',
-          hour12: false
-        });
-        horario = `${startTime} - ${endTime}`;
-      }
+      // Usar o mesmo formato de horário exibido na programação pública (HH:mm)
+      const extractTime = (value: string | null): string => {
+        if (!value) return '';
+        const match = value.match(/T(\d{2}:\d{2})| (\d{2}:\d{2})/);
+        if (match) {
+          return match[1] || match[2];
+        }
+        return value;
+      };
+
+      const startTime = extractTime(session.start_at);
+      const endTime = session.end_at ? extractTime(session.end_at) : '';
+      const horario = endTime ? `${startTime} - ${endTime}` : startTime;
       
       // Formatar palestrantes
       let palestranteOrigem = '';

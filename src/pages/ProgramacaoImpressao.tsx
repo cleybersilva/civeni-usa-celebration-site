@@ -116,22 +116,41 @@ const ProgramacaoImpressao = () => {
         .header-programacao {
           text-align: center;
           margin-bottom: 30px;
+          padding: 20px;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #003366, #0077cc);
+          color: #fff;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .header-programacao::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          opacity: 0.15;
+          background-image: url('/assets/conference-event.jpg');
+          background-size: cover;
+          background-position: center;
+        }
+        
+        .header-programacao-content {
+          position: relative;
+          z-index: 1;
         }
         
         .header-programacao h1 {
           font-size: 16pt;
           font-weight: bold;
           margin: 0 0 10px 0;
-          color: #000;
+          color: #fff;
         }
         
         .header-programacao p {
           font-size: 9pt;
-          color: #666;
+          color: #e0e7ff;
           margin: 5px 0;
         }
-        
-        .footer-programacao {
           margin-top: 30px;
           padding-top: 15px;
           border-top: 1px solid #ddd;
@@ -142,13 +161,15 @@ const ProgramacaoImpressao = () => {
       `}</style>
 
       <header className="header-programacao">
-        <h1>III CIVENI 2025 – PROGRAMAÇÃO OFICIAL</h1>
-        <p>
-          {modalidade === 'presencial' ? 'Programação Presencial' : 'Programação Online'}
-        </p>
-        <p style={{ fontSize: '8pt', color: '#999' }}>
-          *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.
-        </p>
+        <div className="header-programacao-content">
+          <h1>III CIVENI 2025 – PROGRAMAÇÃO OFICIAL</h1>
+          <p>
+            {modalidade === 'presencial' ? 'Programação Presencial' : 'Programação Online'}
+          </p>
+          <p style={{ fontSize: '8pt', color: '#e0e7ff' }}>
+            *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.
+          </p>
+        </div>
       </header>
 
       {programacao.map((dia, index) => (
