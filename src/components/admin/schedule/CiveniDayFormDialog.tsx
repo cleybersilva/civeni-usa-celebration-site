@@ -83,7 +83,12 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
 
   React.useEffect(() => {
     if (editingDay) {
-      form.reset(editingDay);
+      // Garante que a modalidade sempre tenha um valor válido mesmo para dias antigos
+      form.reset({
+        ...editingDay,
+        modality:
+          (editingDay as any).modality ?? (type === 'presencial' ? 'presencial' : 'online'),
+      });
     } else if (isOpen) {
       // Reset to default values when opening for new day
       form.reset({
