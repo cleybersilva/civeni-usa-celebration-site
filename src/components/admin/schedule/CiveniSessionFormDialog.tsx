@@ -76,11 +76,27 @@ const formatDateTimeForInput = (value: string | null | undefined): string => {
 
 const normalizeDateTimeForDatabase = (value: string | null | undefined): string | null => {
   if (!value) return null;
-  const date = new Date(value);
-  if (isNaN(date.getTime())) {
+
+  // Não converter fuso horário: apenas normalizar o formato para o banco
+  // Aceita formatos como:
+  // - "YYYY-MM-DDTHH:MM"
+  // - "YYYY-MM-DD HH:MM" / "YYYY-MM-DD HH:MM:SS"
+  // - já em ISO completo
+  if (value.match(/T\d{2}:\d{2}:\d{2}/)) {
+    // Já parece ISO com segundos, devolve como está
     return value;
   }
-  return date.toISOString();
+
+  if (value.includes(' ')) {
+    const [datePart, timePartRaw] = value.split(' ');
+    if (datePart && timePartRaw) {
+      const timePart = timePartRaw.slice(0, 5); // HH:MM
+      return `${datePart}T${timePart}`;
+    }
+  }
+
+  // Para valores como "YYYY-MM-DDTHH:MM" ou outros válidos, devolve sem alterar
+  return value;
 };
 
 type SessionFormData = z.infer<typeof sessionSchema>;
