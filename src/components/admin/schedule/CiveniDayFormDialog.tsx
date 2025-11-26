@@ -81,6 +81,12 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
     },
   });
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('🔴 Form submit disparado, editingDay atual:', editingDay);
+    form.handleSubmit(onSubmit)();
+  };
+
   React.useEffect(() => {
     if (editingDay) {
       form.reset({
@@ -126,7 +132,7 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleFormSubmit} className="space-y-4">
             <FormField
               control={form.control}
               name="date"
@@ -274,7 +280,16 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('🔵 Botão Salvar clicado, editingDay:', editingDay);
+                  console.log('🔵 Form values:', form.getValues());
+                  handleFormSubmit(e as any);
+                }}
+              >
                 {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
