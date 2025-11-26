@@ -87,8 +87,10 @@ export const useCiveniScheduleOperations = () => {
         event_slug: getEventSlug(type),
       };
 
-      if (editingDay) {
-        console.log('Atualizando dia existente:', editingDay.id);
+      if (editingDay?.id) {
+        console.log('🟢 Atualizando dia existente, ID:', editingDay.id);
+        console.log('🟢 Dados a serem atualizados:', dayData);
+        
         const { data, error } = await supabase
           .from('civeni_program_days')
           .update({
@@ -100,10 +102,10 @@ export const useCiveniScheduleOperations = () => {
           .single();
         
         if (error) {
-          console.error('Erro ao atualizar dia:', error);
+          console.error('🔴 Erro ao atualizar dia:', error);
           throw error;
         }
-        console.log('Dia atualizado com sucesso:', data);
+        console.log('🟢 Dia atualizado com sucesso:', data);
         return data;
       } else {
         console.log('Criando novo dia');
