@@ -282,10 +282,10 @@ const CiveniScheduleManager = () => {
                       if (!daySessions.length) return null;
 
                       return (
-                        <div key={day.id}>
-                          <div className="flex justify-between items-center mb-3">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-base">
+                        <div key={day.id} className="animate-fade-in">
+                          <div className="flex flex-col items-center mb-4 p-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                            <div className="flex items-center gap-2 mb-3">
+                              <h4 className="font-semibold text-lg text-center">
                                 {day.weekday_label} - {formatDate(day.date)}
                               </h4>
                               <Button
@@ -295,6 +295,7 @@ const CiveniScheduleManager = () => {
                                   setEditingDay(day);
                                   setIsDayDialogOpen(true);
                                 }}
+                                className="hover:scale-110 transition-transform"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -306,14 +307,15 @@ const CiveniScheduleManager = () => {
                                 setPreselectedDayId(day.id);
                                 setIsSessionDialogOpen(true);
                               }}
+                              className="shadow-lg hover:shadow-xl transition-all hover:scale-105"
                             >
                               <Plus className="h-4 w-4 mr-1" />
                               Nova Sessão
                             </Button>
                           </div>
-                          <div className="space-y-2 ml-4">
+                          <div className="space-y-3">
                             {daySessions.map((session) => (
-                              <Card key={session.id} className="p-4">
+                              <Card key={session.id} className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-2">
