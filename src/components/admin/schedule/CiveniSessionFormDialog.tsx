@@ -61,6 +61,19 @@ const sessionSchema = z.object({
   is_published: z.boolean(),
 });
 
+const formatDateTimeForInput = (value: string | null | undefined): string => {
+  if (!value) return '';
+  if (value.includes('T')) {
+    return value.slice(0, 16);
+  }
+  const [datePart, rest] = value.split(' ');
+  if (datePart && rest) {
+    const timePart = rest.slice(0, 5);
+    return `${datePart}T${timePart}`;
+  }
+  return value;
+};
+
 type SessionFormData = z.infer<typeof sessionSchema>;
 
 interface CiveniSessionFormDialogProps {
@@ -86,6 +99,8 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
     resolver: zodResolver(sessionSchema),
     defaultValues: editingSession ? {
       ...editingSession,
+      start_at: formatDateTimeForInput(editingSession.start_at),
+      end_at: formatDateTimeForInput(editingSession.end_at),
       is_parallel: editingSession.is_parallel || false,
       is_featured: editingSession.is_featured || false,
     } : {
