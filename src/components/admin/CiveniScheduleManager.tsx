@@ -306,9 +306,23 @@ const CiveniScheduleManager = () => {
 
                       return (
                         <div key={day.id}>
-                          <h4 className="font-semibold text-base mb-3">
-                            {day.weekday_label} - {formatDate(day.date)}
-                          </h4>
+                          <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-semibold text-base">
+                              {day.weekday_label} - {formatDate(day.date)}
+                            </h4>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingSession(null);
+                                setPreselectedDayId(day.id);
+                                setIsSessionDialogOpen(true);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Nova Sessão
+                            </Button>
+                          </div>
                           <div className="space-y-2 ml-4">
                             {daySessions.map((session) => (
                               <Card key={session.id} className="p-4">
