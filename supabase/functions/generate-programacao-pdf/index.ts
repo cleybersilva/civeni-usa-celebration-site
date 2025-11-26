@@ -111,8 +111,8 @@ serve(async (req) => {
     return new Response(new Uint8Array(pdfBytes), {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf"`,
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store'
       },
     });
@@ -140,8 +140,8 @@ serve(async (req) => {
     return new Response(new Uint8Array(pdfBytes), {
       headers: {
         ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.pdf"`,
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Disposition': `inline; filename="civeni-programacao-${modalidade}-${getCurrentDateString()}.html"`,
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff'
       },
