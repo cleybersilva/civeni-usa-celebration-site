@@ -50,161 +50,256 @@ const ProgramacaoImpressao = () => {
   }
 
   return (
-    <div style={{
-      padding: '40px 30px',
-      fontFamily: 'Arial, Helvetica, sans-serif',
-      fontSize: '10pt',
-      lineHeight: '1.4',
-      color: '#000',
-      backgroundColor: '#fff'
-    }}>
+    <div className="print-programacao" style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', background: '#0b1020' }}>
       <style>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 20mm;
-          }
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
+        body {
+          margin: 0;
+          padding: 0;
         }
-        
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-          page-break-inside: auto;
+
+        .program-wrapper {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: #f9fafb;
         }
-        
-        thead {
-          display: table-header-group;
-        }
-        
-        tr {
-          page-break-inside: avoid;
-          page-break-after: auto;
-        }
-        
-        th, td {
-          border: 1px solid #ddd;
-          padding: 8px 6px;
-          text-align: left;
-          vertical-align: top;
-        }
-        
-        th {
-          background-color: #f5f5f5;
-          font-weight: bold;
-          font-size: 9pt;
-        }
-        
-        .dia-section {
-          page-break-before: auto;
-          margin-bottom: 30px;
-        }
-        
-        .dia-titulo {
-          font-size: 12pt;
-          font-weight: bold;
-          color: #003366;
-          margin: 20px 0 10px 0;
-          padding-bottom: 5px;
-          border-bottom: 2px solid #003366;
-        }
-        
-        .header-programacao {
-          text-align: center;
-          margin-bottom: 30px;
-          padding: 20px;
-          border-radius: 8px;
-          background: linear-gradient(135deg, #003366, #0077cc);
-          color: #fff;
+
+        .program-header {
           position: relative;
           overflow: hidden;
+          padding: 32px 32px 40px;
+          color: #fff;
+          text-align: center;
+          background: linear-gradient(135deg, #021b3a 0%, #731b4c 50%, #c51d3b 100%);
         }
-        
-        .header-programacao::before {
-          content: '';
+
+        .program-header-overlay {
           position: absolute;
           inset: 0;
-          opacity: 0.15;
           background-image: url('/assets/conference-event.jpg');
           background-size: cover;
           background-position: center;
+          opacity: 0.25;
+          mix-blend-mode: soft-light;
+          pointer-events: none;
         }
-        
-        .header-programacao-content {
+
+        .program-header-content {
           position: relative;
           z-index: 1;
         }
-        
-        .header-programacao h1 {
-          font-size: 16pt;
-          font-weight: bold;
-          margin: 0 0 10px 0;
-          color: #fff;
+
+        .program-header h1 {
+          margin: 0 0 8px;
+          font-size: 20px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          font-weight: 700;
         }
-        
-        .header-programacao p {
-          font-size: 9pt;
-          color: #e0e7ff;
-          margin: 5px 0;
+
+        .program-header p {
+          margin: 4px 0;
+          font-size: 11px;
         }
-          margin-top: 30px;
-          padding-top: 15px;
-          border-top: 1px solid #ddd;
+
+        .program-content {
+          padding: 24px 24px 32px;
+        }
+
+        .day-block {
+          margin-bottom: 24px;
+          border-radius: 12px;
+          background: #ffffff;
+          box-shadow: 0 8px 18px rgba(15, 23, 42, 0.09);
+          border: 1px solid #e5e7eb;
+          overflow: hidden;
+          page-break-inside: avoid;
+        }
+
+        .day-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 14px 18px;
+          background: linear-gradient(90deg, rgba(15,23,42,0.9), rgba(30,64,175,0.9));
+          color: #f9fafb;
+        }
+
+        .day-header-left h2 {
+          margin: 0 0 2px 0;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .day-header-left .day-date {
+          font-size: 11px;
+          opacity: 0.85;
+        }
+
+        .day-badge {
+          font-size: 11px;
+          text-transform: uppercase;
+          border-radius: 999px;
+          padding: 4px 10px;
+          border: 1px solid rgba(248, 250, 252, 0.9);
+          background: rgba(16, 185, 129, 0.18);
+        }
+
+        .day-table-wrapper {
+          padding: 10px 14px 16px;
+        }
+
+        .program-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 11px;
+        }
+
+        .program-table thead th {
+          text-align: left;
+          padding: 6px 6px;
+          font-weight: 600;
+          color: #111827;
+          border-bottom: 1px solid #e5e7eb;
+          background: #f3f4f6;
+        }
+
+        .program-table tbody td {
+          padding: 5px 6px;
+          border-bottom: 1px solid #e5e7eb;
+          vertical-align: top;
+        }
+
+        .program-table tbody tr:nth-child(even) {
+          background-color: #f9fafb;
+        }
+
+        .program-table th:nth-child(1),
+        .program-table td:nth-child(1) {
+          width: 14%;
+        }
+
+        .program-table th:nth-child(2),
+        .program-table td:nth-child(2) {
+          width: 42%;
+        }
+
+        .program-table th:nth-child(3),
+        .program-table td:nth-child(3) {
+          width: 26%;
+        }
+
+        .program-table th:nth-child(4),
+        .program-table td:nth-child(4) {
+          width: 18%;
+        }
+
+        .program-footer {
           text-align: center;
-          font-size: 8pt;
-          color: #999;
+          padding: 12px 16px 18px;
+          font-size: 10px;
+          color: #6b7280;
+          background: #f3f4f6;
+        }
+
+        @media (max-width: 768px) {
+          .program-wrapper {
+            max-width: 100%;
+          }
+
+          .program-header {
+            padding: 24px 16px 28px;
+          }
+
+          .program-content {
+            padding: 16px;
+          }
+
+          .day-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+          }
+        }
+
+        @page {
+          size: A4;
+          margin: 12mm 10mm;
+        }
+
+        @media print {
+          body {
+            background: #ffffff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .program-wrapper {
+            box-shadow: none;
+            margin: 0;
+          }
+
+          .day-block {
+            page-break-inside: avoid;
+          }
         }
       `}</style>
 
-      <header className="header-programacao">
-        <div className="header-programacao-content">
-          <h1>III CIVENI 2025 – PROGRAMAÇÃO OFICIAL</h1>
-          <p>
-            {modalidade === 'presencial' ? 'Programação Presencial' : 'Programação Online'}
-          </p>
-          <p style={{ fontSize: '8pt', color: '#e0e7ff' }}>
-            *Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.
-          </p>
-        </div>
-      </header>
+      <div className="program-wrapper">
+        <header className="program-header">
+          <div className="program-header-overlay"></div>
+          <div className="program-header-content">
+            <h1>III CIVENI 2025 – PROGRAMAÇÃO OFICIAL</h1>
+            <p>
+              {modalidade === 'presencial' ? 'Programação Presencial' : 'Programação Online'}
+            </p>
+            <p>*Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.</p>
+          </div>
+        </header>
 
-      {programacao.map((dia, index) => (
-        <section key={index} className="dia-section">
-          <h2 className="dia-titulo">
-            {dia.tituloDia} – {dia.data}
-          </h2>
-          
-          <table>
-            <thead>
-              <tr>
-                <th style={{ width: '12%' }}>Horário</th>
-                <th style={{ width: '35%' }}>Atividade</th>
-                <th style={{ width: '35%' }}>Palestrante / Origem</th>
-                <th style={{ width: '18%' }}>Local</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dia.atividades.map((atividade, idx) => (
-                <tr key={idx}>
-                  <td style={{ fontSize: '9pt' }}>{atividade.horario}</td>
-                  <td style={{ fontSize: '9pt' }}>{atividade.atividade}</td>
-                  <td style={{ fontSize: '9pt' }}>{atividade.palestranteOrigem}</td>
-                  <td style={{ fontSize: '9pt' }}>{atividade.local}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      ))}
+        <main className="program-content">
+          {programacao.map((dia, index) => (
+            <section key={index} className="day-block">
+              <header className="day-header">
+                <div className="day-header-left">
+                  <h2>{dia.tituloDia}</h2>
+                  <span className="day-date">{dia.data}</span>
+                </div>
+                <span className="day-badge">
+                  {modalidade === 'presencial' ? 'Presencial' : 'Online'}
+                </span>
+              </header>
 
-      <footer className="footer-programacao">
-        <p>III CIVENI 2025 – Congresso Internacional Virtual de Educação e Inovação</p>
-        <p>Programação sujeita a ajustes – Versão atualizada em {new Date().toLocaleDateString('pt-BR')}</p>
-      </footer>
+              <div className="day-table-wrapper">
+                <table className="program-table">
+                  <thead>
+                    <tr>
+                      <th>Horário</th>
+                      <th>Atividade</th>
+                      <th>Palestrante / Origem</th>
+                      <th>Local</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dia.atividades.map((atividade, idx) => (
+                      <tr key={idx}>
+                        <td>{atividade.horario}</td>
+                        <td>{atividade.atividade}</td>
+                        <td>{atividade.palestranteOrigem}</td>
+                        <td>{atividade.local}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ))}
+        </main>
+
+        <footer className="program-footer">
+          III CIVENI 2025 – Congresso Internacional Virtual de Educação e Inovação<br/>
+          Programação sujeita a ajustes – Versão atualizada em {new Date().toLocaleDateString('pt-BR')}
+        </footer>
+      </div>
     </div>
   );
 };
