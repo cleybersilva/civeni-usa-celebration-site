@@ -4,43 +4,153 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Settings, Calendar, Users } from 'lucide-react';
+import { Plus, Settings, Calendar, Users, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useCiveniProgramData } from '@/hooks/useCiveniProgramData';
-import { useCiveniScheduleOperations, CiveniDay, CiveniDayUpdate } from './schedule/useCiveniScheduleOperations';
-import CiveniDayFormDialog from './schedule/CiveniDayFormDialog';
+import { useCiveniScheduleOperations, CiveniDay, EventType } from '@/components/admin/schedule/useCiveniScheduleOperations';
+import CiveniDayFormDialog from '@/components/admin/schedule/CiveniDayFormDialog';
+import CiveniSessionFormDialog from '@/components/admin/schedule/CiveniSessionFormDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const CiveniProgramManager = () => {
   const { t } = useTranslation();
+  const type: EventType = 'presencial'; // Fixed to presencial for this manager
   const [activeTab, setActiveTab] = useState('days');
-  const { settings, days, sessions, isLoading, getSessionsForDay } = useCiveniProgramData();
-  const { dayUpsertMutation } = useCiveniScheduleOperations();
+  const { settings, isLoading: settingsLoading } = useCiveniProgramData();
+  
+  // Use the schedule operations hook
+  const {
+    useDays,
+    useSessions,
+    dayUpsertMutation,
+    deleteDayMutation,
+    togglePublishDayMutation,
+    sessionUpsertMutation,
+    deleteSessionMutation,
+    togglePublishSessionMutation,
+  } = useCiveniScheduleOperations();
 
+  const { data: days, isLoading: daysLoading } = useDays(type);
+  const { data: sessions, isLoading: sessionsLoading } = useSessions(type);
+  
+  // State for day dialog
   const [isDayDialogOpen, setIsDayDialogOpen] = useState(false);
   const [editingDay, setEditingDay] = useState<CiveniDay | null>(null);
+  const [dayToDelete, setDayToDelete] = useState<string | null>(null);
+  
+  // State for session dialog
+  const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
+  const [editingSession, setEditingSession] = useState<any>(null);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  
+  const isLoading = settingsLoading || daysLoading || sessionsLoading;
 
-  const handleOpenDayDialog = (day?: CiveniDay) => {
-    setEditingDay(day || null);
+  // Day handlers
+  const handleCreateDay = () => {
+    setEditingDay(null);
     setIsDayDialogOpen(true);
   };
 
-  const handleCloseDayDialog = () => {
-    setIsDayDialogOpen(false);
-    setEditingDay(null);
+  const handleEditDay = (day: CiveniDay) => {
+    setEditingDay(day);
+    setIsDayDialogOpen(true);
   };
 
-  const handleSaveDay = (formData: CiveniDayUpdate) => {
+  const handleSaveDay = (formData: any) => {
     dayUpsertMutation.mutate(
-      {
-        formData,
-        editingDay,
-        type: 'presencial'
-      },
+      { formData, editingDay, type },
       {
         onSuccess: () => {
-          handleCloseDayDialog();
-        }
+          setIsDayDialogOpen(false);
+          setEditingDay(null);
+        },
       }
     );
+  };
+
+  const handleDeleteDay = (dayId: string) => {
+    setDayToDelete(dayId);
+  };
+
+  const confirmDeleteDay = () => {
+    if (dayToDelete) {
+      deleteDayMutation.mutate(
+        { id: dayToDelete, type },
+        {
+          onSuccess: () => {
+            setDayToDelete(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleTogglePublishDay = (dayId: string, currentStatus: boolean) => {
+    togglePublishDayMutation.mutate({
+      id: dayId,
+      is_published: !currentStatus,
+      type,
+    });
+  };
+
+  // Session handlers
+  const handleCreateSession = (dayId?: string) => {
+    setEditingSession(null);
+    setIsSessionDialogOpen(true);
+  };
+
+  const handleEditSession = (session: any) => {
+    setEditingSession(session);
+    setIsSessionDialogOpen(true);
+  };
+
+  const handleSaveSession = (formData: any) => {
+    sessionUpsertMutation.mutate(
+      { formData, editingSession, type },
+      {
+        onSuccess: () => {
+          setIsSessionDialogOpen(false);
+          setEditingSession(null);
+        },
+      }
+    );
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    setSessionToDelete(sessionId);
+  };
+
+  const confirmDeleteSession = () => {
+    if (sessionToDelete) {
+      deleteSessionMutation.mutate(
+        { id: sessionToDelete, type },
+        {
+          onSuccess: () => {
+            setSessionToDelete(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleTogglePublishSession = (sessionId: string, currentStatus: boolean) => {
+    togglePublishSessionMutation.mutate({
+      id: sessionId,
+      is_published: !currentStatus,
+      type,
+    });
+  };
+
+  const getSessionsForDay = (dayId: string) => {
+    return sessions?.filter((s) => s.day_id === dayId) || [];
   };
 
   const formatDate = (dateString: string) => {
@@ -128,9 +238,9 @@ const CiveniProgramManager = () => {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Dias da Programação</h2>
-              <Button onClick={() => handleOpenDayDialog()}>
+              <Button onClick={handleCreateDay}>
                 <Plus className="w-4 h-4 mr-2" />
-                Adicionar Dia
+                Criar Novo Dia
               </Button>
             </div>
 
@@ -155,11 +265,33 @@ const CiveniProgramManager = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handleOpenDayDialog(day)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleTogglePublishDay(day.id, day.is_published)}
+                      >
+                        {day.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditDay(day)}
+                      >
                         Editar
                       </Button>
-                      <Button size="sm" variant="outline">
-                        Sessões
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCreateSession(day.id)}
+                      >
+                        + Sessão
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteDay(day.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
@@ -180,7 +312,7 @@ const CiveniProgramManager = () => {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">Sessões</h2>
-              <Button>
+              <Button onClick={() => handleCreateSession()}>
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Sessão
               </Button>
@@ -235,11 +367,26 @@ const CiveniProgramManager = () => {
                               )}
                             </div>
                             <div className="flex gap-2">
-                              <Button size="sm" variant="outline">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleTogglePublishSession(session.id, session.is_published)}
+                              >
+                                {session.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditSession(session)}
+                              >
                                 Editar
                               </Button>
-                              <Button size="sm" variant="outline">
-                                Duplicar
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleDeleteSession(session.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
                           </div>
@@ -335,14 +482,75 @@ const CiveniProgramManager = () => {
         </TabsContent>
       </Tabs>
 
+      {/* Day Dialog */}
       <CiveniDayFormDialog
         isOpen={isDayDialogOpen}
-        onClose={handleCloseDayDialog}
+        onClose={() => {
+          setIsDayDialogOpen(false);
+          setEditingDay(null);
+        }}
         onSubmit={handleSaveDay}
         editingDay={editingDay}
         isLoading={dayUpsertMutation.isPending}
-        type="presencial"
+        type={type}
       />
+
+      {/* Session Dialog */}
+      <CiveniSessionFormDialog
+        isOpen={isSessionDialogOpen}
+        onClose={() => {
+          setIsSessionDialogOpen(false);
+          setEditingSession(null);
+        }}
+        onSubmit={handleSaveSession}
+        editingSession={editingSession}
+        isLoading={sessionUpsertMutation.isPending}
+        type={type}
+        days={days || []}
+      />
+
+      {/* Delete Day Confirmation */}
+      <AlertDialog open={!!dayToDelete} onOpenChange={() => setDayToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este dia? Todas as sessões associadas também serão excluídas.
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteDay}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Session Confirmation */}
+      <AlertDialog open={!!sessionToDelete} onOpenChange={() => setSessionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta sessão? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteSession}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

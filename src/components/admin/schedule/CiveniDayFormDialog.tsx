@@ -38,11 +38,11 @@ const daySchema = z.object({
   theme: z.string().min(1, 'Tema é obrigatório'),
   location: z.string().optional(),
   modality: z.enum(['presencial', 'online', 'hibrido']),
-  sort_order: z.number().min(0),
+  sort_order: z.coerce.number().min(0),
   is_published: z.boolean(),
-  seo_title: z.string().optional(),
-  seo_description: z.string().optional(),
-  slug: z.string().optional(),
+  seo_title: z.string().nullable().optional(),
+  seo_description: z.string().nullable().optional(),
+  slug: z.string().nullable().optional(),
 });
 
 type DayFormData = z.infer<typeof daySchema>;
@@ -83,7 +83,13 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
 
   React.useEffect(() => {
     if (editingDay) {
-      form.reset(editingDay);
+      // Garante que a modalidade sempre tenha um valor válido mesmo para dias antigos
+      form.reset({
+        ...editingDay,
+        sort_order: (editingDay as any).sort_order ?? 0,
+        modality:
+          (editingDay as any).modality ?? (type === 'presencial' ? 'presencial' : 'online'),
+      });
     } else if (isOpen) {
       // Reset to default values when opening for new day
       form.reset({
@@ -200,7 +206,7 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Modalidade *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a modalidade" />
@@ -226,8 +232,7 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
                   <FormControl>
                     <Input 
                       type="number" 
-                      {...field} 
-                      onChange={e => field.onChange(parseInt(e.target.value))}
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
@@ -263,7 +268,11 @@ const CiveniDayFormDialog: React.FC<CiveniDayFormDialogProps> = ({
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button
+                type="button"
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={isLoading}
+              >
                 {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>

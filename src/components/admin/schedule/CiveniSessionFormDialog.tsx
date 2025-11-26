@@ -148,30 +148,30 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="day_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dia *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o dia" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {days.map(day => (
-                        <SelectItem key={day.id} value={day.id}>
-                          {day.weekday_label} - {new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="day_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dia *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o dia" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {days.map(day => (
+                          <SelectItem key={day.id} value={day.id}>
+                            {day.weekday_label} - {new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -180,7 +180,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o tipo" />
@@ -212,7 +212,7 @@ const CiveniSessionFormDialog: React.FC<CiveniSessionFormDialogProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Modalidade</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione a modalidade" />
