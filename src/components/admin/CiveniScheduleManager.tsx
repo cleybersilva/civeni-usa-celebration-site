@@ -54,11 +54,12 @@ const CiveniScheduleManager = () => {
   };
 
   const formatTime = (timeString: string) => {
-    return new Date(timeString).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'America/Fortaleza'
-    });
+    if (!timeString) return '';
+    const match = timeString.match(/T(\d{2}:\d{2})| (\d{2}:\d{2})/);
+    if (match) {
+      return match[1] || match[2];
+    }
+    return timeString;
   };
 
   const getSessionTypeColor = (type: string) => {
