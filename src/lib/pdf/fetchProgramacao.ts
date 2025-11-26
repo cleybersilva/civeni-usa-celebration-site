@@ -47,21 +47,26 @@ export async function fetchProgramacaoData(modalidade: 'presencial' | 'online'):
     const daySessions = sessions?.filter(session => session.day_id === day.id) || [];
     
     const atividades: ProgramacaoAtividade[] = daySessions.map(session => {
-      const startTime = new Date(session.start_at).toLocaleTimeString('pt-BR', {
+      // Parse do horário garantindo timezone de Brasília
+      const startDate = new Date(session.start_at);
+      const startTime = startDate.toLocaleTimeString('pt-BR', {
         hour: '2-digit',
         minute: '2-digit',
-        timeZone: 'America/Fortaleza'
+        timeZone: 'America/Fortaleza',
+        hour12: false
       });
       
-      const endTime = session.end_at 
-        ? new Date(session.end_at).toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'America/Fortaleza'
-          })
-        : '';
-      
-      const horario = endTime ? `${startTime}–${endTime}` : startTime;
+      let horario = startTime;
+      if (session.end_at) {
+        const endDate = new Date(session.end_at);
+        const endTime = endDate.toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Fortaleza',
+          hour12: false
+        });
+        horario = `${startTime} - ${endTime}`;
+      }
       
       // Formatar palestrantes
       let palestranteOrigem = '';
@@ -94,8 +99,12 @@ export async function fetchProgramacaoData(modalidade: 'presencial' | 'online'):
     });
     
     return {
-      tituloDia: day.headline,
-      data: new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR'),
+      tituloDia: `${day.weekday_label} - ${day.headline}`,
+      data: new Date(day.date + 'T12:00:00').toLocaleDateString('pt-BR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      }),
       modalidade,
       atividades
     };
