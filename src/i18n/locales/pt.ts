@@ -142,6 +142,16 @@ export const ptTranslations = {
         online: 'ONLINE',
         hibrido: 'HÍBRIDO',
       },
+      weekdays: {
+        monday: 'Segunda-feira',
+        tuesday: 'Terça-feira',
+        wednesday: 'Quarta-feira',
+        thursday: 'Quinta-feira',
+        friday: 'Sexta-feira',
+        saturday: 'Sábado',
+        sunday: 'Domingo',
+      },
+      noSessionsForDay: 'Nenhuma sessão publicada para este dia ainda.',
     },
     scheduleSection: {
       title: "Escolha Sua Experiência"

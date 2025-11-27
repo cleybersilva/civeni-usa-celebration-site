@@ -18,11 +18,32 @@ interface DayTabsProps {
 }
 
 const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  const getLocale = () => {
+    const lang = i18n.language;
+    if (lang === 'pt') return 'pt-BR';
+    if (lang === 'es') return 'es-ES';
+    if (lang === 'tr') return 'tr-TR';
+    return 'en-US';
+  };
+
+  const translateWeekday = (weekdayLabel: string) => {
+    const weekdayMap: Record<string, string> = {
+      'Segunda-feira': t('schedule.weekdays.monday'),
+      'Terça-feira': t('schedule.weekdays.tuesday'),
+      'Quarta-feira': t('schedule.weekdays.wednesday'),
+      'Quinta-feira': t('schedule.weekdays.thursday'),
+      'Sexta-feira': t('schedule.weekdays.friday'),
+      'Sábado': t('schedule.weekdays.saturday'),
+      'Domingo': t('schedule.weekdays.sunday'),
+    };
+    return weekdayMap[weekdayLabel] || weekdayLabel;
+  };
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    return date.toLocaleDateString(getLocale(), { day: '2-digit', month: '2-digit' });
   };
 
   return (
@@ -41,7 +62,7 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
               </span>
             </div>
             <div className="text-xs text-muted-foreground">
-              {day.weekday_label}, {formatDate(day.date)}
+              {translateWeekday(day.weekday_label)}, {formatDate(day.date)}
             </div>
           </TabsTrigger>
         ))}

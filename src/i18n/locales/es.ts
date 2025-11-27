@@ -139,6 +139,16 @@ export const esTranslations = {
         online: 'ONLINE',
         hibrido: 'HÍBRIDO',
       },
+      weekdays: {
+        monday: 'Lunes',
+        tuesday: 'Martes',
+        wednesday: 'Miércoles',
+        thursday: 'Jueves',
+        friday: 'Viernes',
+        saturday: 'Sábado',
+        sunday: 'Domingo',
+      },
+      noSessionsForDay: 'Aún no hay sesiones publicadas para este día.',
     },
     scheduleSection: {
       title: "Elige Tu Experiencia"

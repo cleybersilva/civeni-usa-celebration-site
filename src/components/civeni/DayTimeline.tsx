@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { TabsContent } from '@/components/ui/tabs';
 import SessionCard from './SessionCard';
 
@@ -44,9 +45,31 @@ interface DayTimelineProps {
 }
 
 const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
+  const { t, i18n } = useTranslation();
   const now = new Date();
   const dayDate = new Date(day.date + 'T00:00:00');
   const isToday = dayDate.toDateString() === now.toDateString();
+
+  const getLocale = () => {
+    const lang = i18n.language;
+    if (lang === 'pt') return 'pt-BR';
+    if (lang === 'es') return 'es-ES';
+    if (lang === 'tr') return 'tr-TR';
+    return 'en-US';
+  };
+
+  const translateWeekday = (weekdayLabel: string) => {
+    const weekdayMap: Record<string, string> = {
+      'Segunda-feira': t('schedule.weekdays.monday'),
+      'Terça-feira': t('schedule.weekdays.tuesday'),
+      'Quarta-feira': t('schedule.weekdays.wednesday'),
+      'Quinta-feira': t('schedule.weekdays.thursday'),
+      'Sexta-feira': t('schedule.weekdays.friday'),
+      'Sábado': t('schedule.weekdays.saturday'),
+      'Domingo': t('schedule.weekdays.sunday'),
+    };
+    return weekdayMap[weekdayLabel] || weekdayLabel;
+  };
 
   const getCurrentSessionStatus = (session: Session) => {
     if (!isToday) return null;
@@ -79,7 +102,7 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
           {day.theme}
         </p>
         <div className="text-sm text-muted-foreground mt-2">
-          {day.weekday_label}, {new Date(day.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+          {translateWeekday(day.weekday_label)}, {new Date(day.date + 'T00:00:00').toLocaleDateString(getLocale())}
         </div>
       </div>
 
@@ -87,7 +110,7 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
         {sessions.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              Nenhuma sessão publicada para este dia ainda.
+              {t('schedule.noSessionsForDay')}
             </p>
           </div>
         ) : (

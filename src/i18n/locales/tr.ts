@@ -139,6 +139,16 @@ export const trTranslations = {
         online: 'ÇEVRİMİÇİ',
         hibrido: 'HİBRİT',
       },
+      weekdays: {
+        monday: 'Pazartesi',
+        tuesday: 'Salı',
+        wednesday: 'Çarşamba',
+        thursday: 'Perşembe',
+        friday: 'Cuma',
+        saturday: 'Cumartesi',
+        sunday: 'Pazar',
+      },
+      noSessionsForDay: 'Bu gün için henüz yayınlanmış oturum yok.',
     },
     scheduleSection: {
       title: "Deneyiminizi Seçin"
