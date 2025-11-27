@@ -352,28 +352,28 @@ const TransmissaoAoVivo = () => {
           <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 sm:grid-cols-4 mb-8 md:mb-12 h-auto p-1 gap-1 bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-xl">
             <TabsTrigger 
               value="ao-vivo" 
-              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <Play className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.live', 'Ao Vivo')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="agenda" 
-              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.schedule', 'Agenda')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="salas" 
-              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <Video className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.rooms', 'Salas')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="faq" 
-              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-br data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-blue/90 data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-3 px-2 sm:px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-lg transition-all duration-300 data-[state=active]:shadow-md"
             >
               <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-xs sm:text-sm md:text-base font-semibold">{t('transmission.tabs.faq', 'FAQ')}</span>
@@ -415,7 +415,7 @@ const TransmissaoAoVivo = () => {
                     <Button 
                       variant="default" 
                       size="lg" 
-                      className="bg-civeni-blue hover:bg-civeni-blue/90 group" 
+                      className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white group" 
                       asChild
                     >
                       <a
@@ -444,9 +444,8 @@ const TransmissaoAoVivo = () => {
                     </p>
                   </div>
                   <Button 
-                    variant="outline" 
                     size="lg"
-                    className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300 group"
+                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white transition-all duration-300 group"
                     asChild
                   >
                     <a
@@ -507,7 +506,7 @@ const TransmissaoAoVivo = () => {
                         )}
                         <Button 
                           size="sm" 
-                          className="w-full bg-civeni-blue hover:bg-civeni-blue/90 group-hover:shadow-md transition-all" 
+                          className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white group-hover:shadow-md transition-all" 
                           asChild
                         >
                           <Link to={`/transmissao-ao-vivo/${tx.slug}`}>
@@ -532,9 +531,8 @@ const TransmissaoAoVivo = () => {
                       </p>
                     </div>
                     <Button 
-                      variant="outline"
                       size="lg"
-                      className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white transition-all duration-300 group"
+                      className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white transition-all duration-300 group"
                       asChild
                     >
                       <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
@@ -558,9 +556,8 @@ const TransmissaoAoVivo = () => {
                 </div>
                 <div className="flex gap-3">
                   <Button 
-                    variant="outline" 
                     size="sm"
-                    className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white"
+                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white"
                     asChild
                   >
                     <a href="/programacao-online">
@@ -591,7 +588,7 @@ const TransmissaoAoVivo = () => {
                   <div className="flex flex-col sm:flex-row gap-3 shrink-0">
                     <Button 
                       size="lg"
-                      className="bg-civeni-blue hover:bg-civeni-blue/90"
+                      className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white"
                       asChild
                     >
                       <a href="/programacao-online">
@@ -601,8 +598,7 @@ const TransmissaoAoVivo = () => {
                     </Button>
                     <Button 
                       size="lg"
-                      variant="outline"
-                      className="border-civeni-blue text-civeni-blue hover:bg-civeni-blue hover:text-white"
+                      className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white"
                       asChild
                     >
                       <a href="/programacao-presencial">
@@ -669,7 +665,7 @@ const TransmissaoAoVivo = () => {
                             )}
                           </div>
                           <Button 
-                            className="bg-civeni-blue hover:bg-civeni-blue/90 w-full sm:w-auto text-sm" 
+                            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white w-full sm:w-auto text-sm" 
                             size="sm"
                             asChild
                           >
@@ -841,7 +837,7 @@ const TransmissaoAoVivo = () => {
                   </p>
                   <Button 
                     size="lg"
-                    className="bg-civeni-blue hover:bg-civeni-blue/90 group shadow-lg"
+                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white group shadow-lg"
                     asChild
                   >
                     <Link to="/contato">
