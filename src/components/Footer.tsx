@@ -118,7 +118,7 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="mt-8 md:mt-12 pt-6 md:pt-8 text-center" style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)' }}>
+        <div className="border-t border-white border-opacity-20 mt-8 md:mt-12 pt-6 md:pt-8 text-center">
           <div className="grid md:grid-cols-3 gap-3 md:gap-4 items-center text-center">
             <div className="text-xs md:text-sm opacity-75">
               {content.siteTexts.footerCopyright || t('footer.copyright')}
