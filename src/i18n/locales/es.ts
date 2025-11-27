@@ -382,6 +382,47 @@ export const esTranslations = {
         description: "Únase a cientos de profesionales y estudiantes que están moldeando el futuro de la educación con innovación, justicia, humanidad, religiosidad y tecnología",
         register_now: "Inscríbase Ahora",
         view_schedule: "Ver Programación"
+      },
+      evaluators: {
+        breadcrumb: {
+          congress: "Congreso",
+          evaluators: "Evaluadores"
+        },
+        hero: {
+          title: "Evaluadores del III CIVENI 2025",
+          subtitle: "Conozca a nuestros renombrados evaluadores académicos que garantizan la excelencia y calidad científica del Congreso Internacional Multidisciplinario"
+        },
+        cta: {
+          submitWork: "Enviar Trabajo",
+          register: "Inscribirse"
+        },
+        excellence: {
+          title: "Excelencia en la Evaluación Científica",
+          description: "Nuestro cuerpo de evaluadores está compuesto por doctores renombrados de instituciones nacionales e internacionales, garantizando que todos los trabajos enviados al III CIVENI 2025 sean evaluados con el más alto rigor científico y académico, siguiendo los estándares internacionales de investigación."
+        },
+        features: {
+          rigor: {
+            title: "Rigor Científico",
+            description: "Evaluación basada en criterios internacionales de calidad académica"
+          },
+          expertise: {
+            title: "Expertise Multidisciplinario",
+            description: "Doctores especializados en diversas áreas del conocimiento"
+          },
+          recognition: {
+            title: "Reconocimiento Internacional",
+            description: "Evaluadores de instituciones nacionales e internacionales reconocidas"
+          }
+        },
+        grid: {
+          title: "Nuestros Evaluadores",
+          subtitle: "Conozca a los doctores que componen nuestro renombrado cuerpo de evaluadores académicos",
+          evaluatorLabel: "Evaluador"
+        },
+        ctaSection: {
+          title: "Envíe Su Trabajo",
+          description: "Tenga su trabajo evaluado por nuestro renombrado cuerpo de doctores y forme parte del mayor congreso internacional multidisciplinario del mundo"
+        }
       }
     },
     

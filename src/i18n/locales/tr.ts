@@ -380,6 +380,47 @@ export const trTranslations = {
         description: "İnovasyon, adalet, insanlık, dindarlık ve teknolojiyle eğitimin geleceğini şekillendiren yüzlerce profesyonel ve öğrenciye katılın",
         register_now: "Şimdi Kaydol",
         view_schedule: "Programı Görüntüle"
+      },
+      evaluators: {
+        breadcrumb: {
+          congress: "Kongre",
+          evaluators: "Değerlendiriciler"
+        },
+        hero: {
+          title: "III CIVENI 2025 Değerlendiricileri",
+          subtitle: "Uluslararası Çok Disiplinli Kongre'nin mükemmellik ve bilimsel kalitesini garanti eden ünlü akademik değerlendiricilerimizle tanışın"
+        },
+        cta: {
+          submitWork: "Çalışma Gönder",
+          register: "Kayıt Ol"
+        },
+        excellence: {
+          title: "Bilimsel Değerlendirmede Mükemmellik",
+          description: "Değerlendirici kadromuz, ulusal ve uluslararası kurumlardan ünlü doktorlardan oluşmaktadır ve III CIVENI 2025'e gönderilen tüm çalışmaların uluslararası araştırma standartlarına uygun olarak en yüksek bilimsel ve akademik titizlikle değerlendirilmesini garanti eder."
+        },
+        features: {
+          rigor: {
+            title: "Bilimsel Titizlik",
+            description: "Uluslararası akademik kalite kriterlerine dayalı değerlendirme"
+          },
+          expertise: {
+            title: "Çok Disiplinli Uzmanlık",
+            description: "Çeşitli bilgi alanlarında uzmanlaşmış doktorlar"
+          },
+          recognition: {
+            title: "Uluslararası Tanınırlık",
+            description: "Tanınmış ulusal ve uluslararası kurumlardan değerlendiriciler"
+          }
+        },
+        grid: {
+          title: "Değerlendiricilerimiz",
+          subtitle: "Ünlü akademik değerlendirici kadromuzu oluşturan doktorlarla tanışın",
+          evaluatorLabel: "Değerlendirici"
+        },
+        ctaSection: {
+          title: "Çalışmanızı Gönderin",
+          description: "Çalışmanızın ünlü doktor kadromuz tarafından değerlendirilmesini sağlayın ve dünyanın en büyük uluslararası çok disiplinli kongresinin bir parçası olun"
+        }
       }
     },
     

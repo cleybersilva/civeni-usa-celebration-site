@@ -385,6 +385,47 @@ export const ptTranslations = {
         description: "Junte-se a centenas de profissionais e estudantes que estão moldando o futuro da educação com inovação, justiça, humanidade, religiosidade e tecnologia",
         register_now: "Inscreva-se Agora",
         view_schedule: "Ver Programação"
+      },
+      evaluators: {
+        breadcrumb: {
+          congress: "Congresso",
+          evaluators: "Avaliadores"
+        },
+        hero: {
+          title: "Avaliadores do III CIVENI 2025",
+          subtitle: "Conheça nossos renomados avaliadores acadêmicos que garantem a excelência e qualidade científica do Congresso Internacional Multidisciplinar"
+        },
+        cta: {
+          submitWork: "Submeter Trabalho",
+          register: "Fazer Inscrição"
+        },
+        excellence: {
+          title: "Excelência na Avaliação Científica",
+          description: "Nosso corpo de avaliadores é composto por doutores renomados de instituições nacionais e internacionais, garantindo que todos os trabalhos submetidos ao III CIVENI 2025 sejam avaliados com o mais alto rigor científico e acadêmico, seguindo os padrões internacionais de pesquisa."
+        },
+        features: {
+          rigor: {
+            title: "Rigor Científico",
+            description: "Avaliação baseada em critérios internacionais de qualidade acadêmica"
+          },
+          expertise: {
+            title: "Expertise Multidisciplinar",
+            description: "Doutores especializados em diversas áreas do conhecimento"
+          },
+          recognition: {
+            title: "Reconhecimento Internacional",
+            description: "Avaliadores de instituições nacionais e internacionais renomadas"
+          }
+        },
+        grid: {
+          title: "Nossos Avaliadores",
+          subtitle: "Conheça os doutores que compõem nosso renomado corpo de avaliadores acadêmicos",
+          evaluatorLabel: "Avaliador"
+        },
+        ctaSection: {
+          title: "Submeta Seu Trabalho",
+          description: "Tenha seu trabalho avaliado por nosso renomado corpo de doutores e faça parte do maior congresso internacional multidisciplinar do mundo"
+        }
       }
     },
     
