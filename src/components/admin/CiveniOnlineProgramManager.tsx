@@ -192,14 +192,15 @@ const CiveniOnlineProgramManager = () => {
         </TabsContent>
 
         <TabsContent value="sessions">
-          <Card className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Sessões Online</h2>
-              <Button>
+          <Card className="p-0 overflow-hidden">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
+              <h2 className="text-xl font-semibold text-white">Sessões Online</h2>
+              <Button variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Sessão
               </Button>
             </div>
+            <div className="p-6">
 
             <div className="space-y-4">
               {days?.map((day) => {
@@ -207,12 +208,14 @@ const CiveniOnlineProgramManager = () => {
                 if (!daySessions.length) return null;
 
                 return (
-                  <div key={day.id}>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      {day.weekday_label} - {formatDate(day.date)}
-                      <Badge className="bg-blue-100 text-blue-800">Online</Badge>
-                    </h3>
-                    <div className="space-y-2 ml-4">
+                  <div key={day.id} className="overflow-hidden rounded-lg border">
+                    <div className="bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue p-4 flex items-center justify-center gap-2">
+                      <h3 className="font-semibold text-lg text-white">
+                        {day.weekday_label} - {formatDate(day.date)}
+                      </h3>
+                      <Badge className="bg-white/20 text-white border-white/30">Online</Badge>
+                    </div>
+                    <div className="space-y-2 p-4">
                       {daySessions.map((session) => (
                         <Card key={session.id} className="p-4">
                           <div className="flex justify-between items-start">
@@ -277,6 +280,7 @@ const CiveniOnlineProgramManager = () => {
                   <p>Nenhuma sessão configurada ainda</p>
                 </div>
               )}
+            </div>
             </div>
           </Card>
         </TabsContent>
