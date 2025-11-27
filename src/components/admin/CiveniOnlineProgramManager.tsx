@@ -135,14 +135,15 @@ const CiveniOnlineProgramManager = () => {
         </TabsList>
 
         <TabsContent value="days">
-          <Card className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Dias da Programação Online</h2>
-              <Button onClick={() => handleOpenDayDialog()}>
+          <Card className="p-0 overflow-hidden">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
+              <h2 className="text-xl font-semibold text-white">Dias da Programação Online</h2>
+              <Button onClick={() => handleOpenDayDialog()} variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Dia
               </Button>
             </div>
+            <div className="p-6">
 
             <div className="space-y-4">
               {days?.map((day) => (
@@ -185,6 +186,7 @@ const CiveniOnlineProgramManager = () => {
                   <p>Nenhum dia configurado ainda</p>
                 </div>
               )}
+            </div>
             </div>
           </Card>
         </TabsContent>
