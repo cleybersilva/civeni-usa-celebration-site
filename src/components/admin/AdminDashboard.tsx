@@ -997,7 +997,8 @@ const AdminDashboard = () => {
           <Button 
             onClick={handleExportPDF} 
             disabled={loading} 
-            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white border-0"
+            className="text-white border-0"
+            style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <FileText className="h-4 w-4 mr-2" />
             Exportar PDF
@@ -1005,7 +1006,8 @@ const AdminDashboard = () => {
           <Button 
             onClick={handleExportExcel} 
             disabled={loading} 
-            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0"
+            className="text-white border-0"
+            style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <Download className="h-4 w-4 mr-2" />
             Exportar Excel
@@ -1013,7 +1015,8 @@ const AdminDashboard = () => {
           <Button 
             onClick={handleSync} 
             disabled={syncing} 
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0"
+            className="text-white border-0"
+            style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <Database className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
             Sincronizar
@@ -1021,7 +1024,8 @@ const AdminDashboard = () => {
           <Button 
             onClick={refresh} 
             disabled={loading} 
-            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0"
+            className="text-white border-0"
+            style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Atualizar
