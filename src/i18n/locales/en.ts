@@ -17,7 +17,7 @@ export const enTranslations = {
       online: "Online",
       papers: "Papers",
       submission: "Submission",
-      oralPresentation: "Oral Presentation",
+      oralPresentation: "Presentation List Articles/Projects",
       posterSessions: "Poster Sessions",
       manuscripts: "Manuscripts",
       thematicAreas: "Thematic Areas",
@@ -662,7 +662,7 @@ export const enTranslations = {
       works: {
         title: "Works",
         description: "Manage academic works content",
-        oralPresentation: "Oral Presentation",
+        oralPresentation: "Presentation List Articles/Projects",
         posterSessions: "Poster Sessions",
         manuscripts: "Manuscripts"
       }

@@ -19,7 +19,7 @@ export const ptTranslations = {
       papers: "Trabalhos",
       submission: "Submissão",
       submissionArticleConsortium: "Submissão Artigo/Consórcio",
-      oralPresentation: "Apresentação Oral Lista/Template",
+      oralPresentation: "Lista de Apresentação Artigos/Projetos",
       posterSessions: "Sessões de Pôster",
       manuscripts: "Envio de Vídeos",
       templatesArticlesSlides: "Templates Artigos/Slides",
@@ -380,10 +380,10 @@ export const ptTranslations = {
       makeRegistration: "Fazer Inscrição",
       viewThematicAreas: "Ver Áreas Temáticas",
       oral: {
-        title: 'Apresentação Oral Lista/Template',
+        title: 'Lista de Apresentação Artigos/Projetos',
         subtitle: 'Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025 - Compartilhe suas pesquisas com especialistas de todo o mundo',
-        pageTitle: 'Apresentação Oral Lista/Template',
-        infoTitle: 'Informações sobre Apresentação Oral Lista/Template',
+        pageTitle: 'Lista de Apresentação Artigos/Projetos',
+        infoTitle: 'Informações sobre Lista de Apresentação Artigos/Projetos',
         infoDescription: 'Conheça os requisitos, formatos e orientações para apresentar seu trabalho de forma oral no congresso',
         noContent: 'Conteúdo em breve',
         noContentDescription: 'As informações sobre apresentação oral serão publicadas em breve.',
@@ -444,10 +444,10 @@ export const ptTranslations = {
     makeRegistration: "Fazer Inscrição",
     viewThematicAreas: "Ver Áreas Temáticas",
     oral: {
-      title: 'Apresentação Oral Lista/Template',
+      title: 'Lista de Apresentação Artigos/Projetos',
       subtitle: 'Modalidade de apresentação de trabalhos acadêmicos para o III CIVENI 2025 - Compartilhe suas pesquisas com especialistas de todo o mundo',
-      pageTitle: 'Apresentação Oral Lista/Template',
-      infoTitle: 'Informações sobre Apresentação Oral Lista/Template',
+      pageTitle: 'Lista de Apresentação Artigos/Projetos',
+      infoTitle: 'Informações sobre Lista de Apresentação Artigos/Projetos',
       infoDescription: 'Conheça os requisitos, formatos e orientações para apresentar seu trabalho de forma oral no congresso',
       noContent: 'Conteúdo em breve',
       noContentDescription: 'As informações sobre apresentação oral serão publicadas em breve.',
@@ -666,7 +666,7 @@ export const ptTranslations = {
       works: {
         title: "Trabalhos",
         description: "Gerencie conteúdos de trabalhos acadêmicos",
-        oralPresentation: "Apresentação Oral Lista/Template",
+        oralPresentation: "Lista de Apresentação Artigos/Projetos",
         posterSessions: "Sessões de Pôster",
         manuscripts: "Manuscritos"
       }

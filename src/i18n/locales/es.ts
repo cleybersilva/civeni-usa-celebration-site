@@ -17,7 +17,7 @@ export const esTranslations = {
       online: "En Línea",
       papers: "Trabajos",
       submission: "Envío",
-      oralPresentation: "Presentación Oral",
+      oralPresentation: "Lista de Presentación Artículos/Proyectos",
       posterSessions: "Sesiones de Póster",
       manuscripts: "Manuscritos",
       thematicAreas: "Áreas Temáticas",
@@ -662,7 +662,7 @@ export const esTranslations = {
       works: {
         title: "Trabajos",
         description: "Gestiona contenidos de trabajos académicos",
-        oralPresentation: "Presentación Oral",
+        oralPresentation: "Lista de Presentación Artículos/Proyectos",
         posterSessions: "Sesiones de Póster",
         manuscripts: "Manuscritos"
       }
