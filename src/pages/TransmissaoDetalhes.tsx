@@ -338,8 +338,8 @@ const TransmissaoDetalhes = () => {
                 {startAt && (
                   <div className="text-center">
                     <div className="flex justify-center mb-2">
-                      <div className="p-2 bg-civeni-blue/10 rounded-full">
-                        <Calendar className="w-5 h-5 text-civeni-blue" />
+                      <div className="p-3 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full">
+                        <Calendar className="w-5 h-5 text-white" />
                       </div>
                     </div>
                     <p className="font-semibold text-base mb-1">
@@ -358,8 +358,8 @@ const TransmissaoDetalhes = () => {
                 {startAt && (
                   <div className="text-center">
                     <div className="flex justify-center mb-2">
-                      <div className="p-2 bg-civeni-blue/10 rounded-full">
-                        <Clock className="w-5 h-5 text-civeni-blue" />
+                      <div className="p-3 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full">
+                        <Clock className="w-5 h-5 text-white" />
                       </div>
                     </div>
                     <p className="font-semibold text-base mb-1">
@@ -377,8 +377,8 @@ const TransmissaoDetalhes = () => {
                 <Separator />
                 <div className="text-center">
                   <div className="flex justify-center mb-2">
-                    <div className="p-2 bg-civeni-blue/10 rounded-full">
-                      <MapPin className="w-5 h-5 text-civeni-blue" />
+                    <div className="p-3 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full">
+                      <MapPin className="w-5 h-5 text-white" />
                     </div>
                   </div>
                   <p className="font-semibold text-base mb-1">
