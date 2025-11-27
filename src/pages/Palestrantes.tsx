@@ -1,6 +1,6 @@
-
 import SpeakerCard from '@/components/SpeakerCard';
 import { useCMS } from '@/contexts/CMSContext';
+import { LoadingBar } from '@/components/ui/loading-bar';
 import { clearImageCaches, isProduction } from '@/utils/productionImageUtils';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ import '../utils/productionDiagnostic';
 
 const Palestrantes = () => {
   const { t } = useTranslation();
-  const { content } = useCMS();
+  const { content, loading, loadingProgress } = useCMS();
 
   // Limpar cache de imagens em produção
   useEffect(() => {
@@ -27,6 +27,8 @@ const Palestrantes = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-poppins">
+      {loading && <LoadingBar progress={loadingProgress} message={t('speakersPage.loadingSpeakers')} />}
+      
       <Header />
       
       {/* Hero Section */}
@@ -82,7 +84,7 @@ const Palestrantes = () => {
           </div>
           
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
-            {content.speakers
+            {!loading && content.speakers
               .filter(speaker => speaker.id && speaker.id !== 'new')
               .sort((a, b) => a.order - b.order)
               .map((speaker) => {
@@ -91,7 +93,7 @@ const Palestrantes = () => {
           </div>
 
           
-          {content.speakers.length === 0 && (
+          {!loading && content.speakers.length === 0 && (
             <div className="text-center py-12 md:py-16">
               <div className="bg-gradient-to-r from-civeni-blue/10 to-civeni-red/10 rounded-xl md:rounded-2xl p-6 md:p-12 max-w-2xl mx-auto">
                 <Users className="w-12 h-12 md:w-16 md:h-16 text-civeni-blue mx-auto mb-4 md:mb-6" />

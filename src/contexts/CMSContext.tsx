@@ -170,6 +170,7 @@ export interface CMSContent {
 interface CMSContextType {
   content: CMSContent;
   loading: boolean;
+  loadingProgress: number;
   updateSpeakers: (speakers: Speaker[]) => Promise<void>;
   updateBannerSlides: (slides: BannerSlide[]) => Promise<void>;
   updateRegistrationTiers: (tiers: RegistrationTier[]) => Promise<void>;
@@ -183,44 +184,7 @@ interface CMSContextType {
 }
 
 const defaultContent: CMSContent = {
-  speakers: [
-    {
-      id: '1',
-      name: "Dr. Maria Rodriguez",
-      title: "Professor of Biomedical Engineering",
-      institution: "Harvard Medical School",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Leading researcher in regenerative medicine and tissue engineering with over 20 years of experience.",
-      order: 1
-    },
-    {
-      id: '2',
-      name: "Prof. James Chen",
-      title: "Director of AI Research",
-      institution: "Stanford University",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Pioneer in artificial intelligence and machine learning applications in healthcare.",
-      order: 2
-    },
-    {
-      id: '3',
-      name: "Dr. Elena Kowalski",
-      title: "Environmental Scientist",
-      institution: "MIT",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Expert in climate change research and sustainable technology development.",
-      order: 3
-    },
-    {
-      id: '4',
-      name: "Dr. Ahmed Hassan",
-      title: "Professor of Psychology",
-      institution: "Oxford University",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80",
-      bio: "Renowned researcher in cognitive psychology and behavioral sciences.",
-      order: 4
-    }
-  ],
+  speakers: [], // Speakers carregados apenas do Supabase, sem fallback
   bannerSlides: [], // Banners carregados apenas do Supabase, sem fallback
   registrationTiers: [
     {
@@ -408,6 +372,7 @@ const CMSContext = createContext<CMSContextType | undefined>(undefined);
 export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<CMSContent>(defaultContent);
   const [loading, setLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   useEffect(() => {
     const isAdminContext = window.location.pathname.includes('/admin');
@@ -432,9 +397,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loadContent = async (adminMode = false) => {
     setLoading(true);
+    setLoadingProgress(0);
     try {
       const timestamp = Date.now(); // Cache busting
       console.log('🔄 Loading content with fresh data... timestamp:', timestamp);
+      setLoadingProgress(10);
       
       // Carregar banner slides do Supabase (todos para admin, apenas ativos para público)
       let bannerQuery = supabase
@@ -446,7 +413,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         bannerQuery = bannerQuery.eq('is_active', true);
       }
       
+      setLoadingProgress(20);
       const { data: bannerSlidesData, error: bannerError } = await bannerQuery;
+      setLoadingProgress(35);
 
       if (bannerError) {
         console.error('❌ Error loading banner slides:', bannerError);
@@ -499,6 +468,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       // Carregar speakers do Supabase com cache busting
       console.log('🔎 CMSContext: Fetching speakers from DB... (adminMode:', adminMode, ')');
+      setLoadingProgress(40);
       let speakersQuery = supabase
         .from('cms_speakers')
         .select('*')
@@ -509,6 +479,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       
       const { data: speakersData, error: speakersError } = await speakersQuery;
+      setLoadingProgress(55);
 
       if (speakersError) {
         console.error('❌ Error loading speakers:', speakersError);
@@ -542,12 +513,14 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Carregar configurações do evento do Supabase
+      setLoadingProgress(65);
       const { data: eventConfigData, error: eventError } = await supabase
         .from('event_config')
         .select('*')
         .order('updated_at', { ascending: false })
         .limit(1)
         .maybeSingle();
+      setLoadingProgress(75);
 
       let eventConfig = defaultContent.eventConfig;
       if (eventConfigData && !eventError) {
@@ -585,6 +558,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       // Carregar vídeos (admin mode mostra todos, público apenas ativos)
+      setLoadingProgress(80);
       let videosQuery = supabase
         .from('videos')
         .select('*')
@@ -593,6 +567,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         videosQuery = videosQuery.eq('is_active', true);
       }
       const { data: videos, error: videosError } = await videosQuery;
+      setLoadingProgress(90);
 
       if (videosError) {
         console.error('❌ Error loading videos:', videosError);
@@ -646,6 +621,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const hybridActivities = hybridData || [];
       console.log('CMSContext - Loaded hybrid activities:', hybridActivities);
 
+      setLoadingProgress(95);
       setContent({
         ...defaultContent,
         bannerSlides: bannerSlides.length > 0 ? bannerSlides : defaultContent.bannerSlides,
@@ -656,6 +632,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         counterSettings
       });
       
+      setLoadingProgress(100);
       console.log('✅ CMSContext - Content state updated!');
       console.log('📊 Content summary:', {
         banners: bannerSlides.length,
@@ -665,9 +642,13 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (error) {
       console.error('❌ CRITICAL ERROR loading content:', error);
       setContent(defaultContent);
+      setLoadingProgress(100);
     } finally {
-      setLoading(false);
-      console.log('✅ CMSContext loading complete');
+      // Small delay to show 100% before hiding
+      setTimeout(() => {
+        setLoading(false);
+        console.log('✅ CMSContext loading complete');
+      }, 300);
     }
   };
 
@@ -1156,6 +1137,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         content,
         loading,
+        loadingProgress,
         updateSpeakers,
         updateBannerSlides,
         updateRegistrationTiers,

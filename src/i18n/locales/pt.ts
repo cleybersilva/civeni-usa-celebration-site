@@ -1,5 +1,13 @@
 export const ptTranslations = {
   translation: {
+    common: {
+      loading: "Carregando...",
+      loadingProgress: "Progresso",
+      loadingBanners: "Carregando banners do CIVENI 2025...",
+      previous: "Anterior",
+      next: "Próximo",
+      goToImage: "Ir para imagem"
+    },
     header: {
       congress: "Congresso",
       presentation: "Apresentação",
@@ -198,6 +206,7 @@ export const ptTranslations = {
       pageTitle: "Palestrantes",
       breadcrumbHome: "Home",
       description: "Conheça os especialistas de renome internacional que compartilharão seus conhecimentos no III CIVENI 2025 - Líderes em educação, inovação, justiça, humanidade, religiosidade e tecnologia",
+      loadingSpeakers: "Carregando palestrantes...",
       registerButton: "Fazer Inscrição",
       viewSchedule: "Ver Programação",
       featuredSpeakersTitle: "Nossos Palestrantes de Destaque",
@@ -717,14 +726,7 @@ export const ptTranslations = {
       noReplayAvailable: "Não há replay disponível no momento.",
       visitChannel: "Visite o canal",
       noRoomsAvailable: "Nenhuma sala disponível no momento",
-      noRoomsDescription: "As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.",
-      common: {
-        loading: "Carregando",
-        loadingBanners: "Carregando banners do CIVENI 2025...",
-        previous: "Anterior",
-        next: "Próximo",
-        goToImage: "Ir para imagem"
-      }
+      noRoomsDescription: "As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação."
     }
   },
   events: {
