@@ -1,5 +1,13 @@
 export const enTranslations = {
   translation: {
+    common: {
+      loading: "Loading...",
+      loadingProgress: "Progress",
+      loadingBanners: "Loading CIVENI 2025 banners...",
+      previous: "Previous",
+      next: "Next",
+      goToImage: "Go to image"
+    },
     header: {
       congress: "Congress",
       presentation: "Presentation",
@@ -195,6 +203,7 @@ export const enTranslations = {
       pageTitle: "Speakers",
       breadcrumbHome: "Home",
       description: "Meet the internationally renowned experts who will share their knowledge at III CIVENI 2025 - Leaders in education, innovation, justice, humanity, religiosity and technology",
+      loadingSpeakers: "Loading speakers...",
       registerButton: "Register Now",
       viewSchedule: "View Schedule",
       featuredSpeakersTitle: "Our Featured Speakers",
@@ -714,13 +723,6 @@ export const enTranslations = {
         visitChannel: "Visit the channel",
         noRoomsAvailable: "No rooms available at the moment",
         noRoomsDescription: "Presentation rooms will be published soon. Stay tuned to the schedule.",
-      },
-      common: {
-        loading: "Loading",
-        loadingBanners: "Loading CIVENI 2025 banners...",
-        previous: "Previous",
-        next: "Next",
-        goToImage: "Go to image"
       }
   }
 };

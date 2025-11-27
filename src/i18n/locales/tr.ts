@@ -1,5 +1,13 @@
 export const trTranslations = {
   translation: {
+    common: {
+      loading: "Yükleniyor...",
+      loadingProgress: "İlerleme",
+      loadingBanners: "CIVENI 2025 afişleri yükleniyor...",
+      previous: "Önceki",
+      next: "Sonraki",
+      goToImage: "Resme git"
+    },
     header: {
       congress: "Kongre",
       presentation: "Sunum",
@@ -193,6 +201,7 @@ export const trTranslations = {
       pageTitle: "Konuşmacılar",
       breadcrumbHome: "Ana Sayfa",
       description: "III CIVENI 2025'te bilgilerini paylaşacak uluslararası üne sahip uzmanlarla tanışın - Eğitim, inovasyon, adalet, insanlık, dindarlık ve teknolojide liderler",
+      loadingSpeakers: "Konuşmacılar yükleniyor...",
       registerButton: "Kayıt Ol",
       viewSchedule: "Programı Gör",
       featuredSpeakersTitle: "Öne Çıkan Konuşmacılarımız",
@@ -675,13 +684,6 @@ export const trTranslations = {
         visitChannel: "Kanalı ziyaret edin",
         noRoomsAvailable: "Şu anda uygun oda yok",
         noRoomsDescription: "Sunum odaları yakında yayınlanacaktır. Programa dikkat edin.",
-      },
-      common: {
-        loading: "Yükleniyor",
-        loadingBanners: "CIVENI 2025 afişleri yükleniyor...",
-        previous: "Önceki",
-        next: "Sonraki",
-        goToImage: "Resme git"
       }
   }
 };
