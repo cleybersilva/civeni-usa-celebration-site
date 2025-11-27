@@ -382,6 +382,47 @@ export const enTranslations = {
         description: "Join hundreds of professionals and students who are shaping the future of education with innovation, justice, humanity, religiosity and technology",
         register_now: "Register Now",
         view_schedule: "View Schedule"
+      },
+      evaluators: {
+        breadcrumb: {
+          congress: "Congress",
+          evaluators: "Evaluators"
+        },
+        hero: {
+          title: "III CIVENI 2025 Evaluators",
+          subtitle: "Meet our renowned academic evaluators who ensure the excellence and scientific quality of the International Multidisciplinary Congress"
+        },
+        cta: {
+          submitWork: "Submit Paper",
+          register: "Register"
+        },
+        excellence: {
+          title: "Excellence in Scientific Evaluation",
+          description: "Our panel of evaluators is composed of renowned doctors from national and international institutions, ensuring that all papers submitted to III CIVENI 2025 are evaluated with the highest scientific and academic rigor, following international research standards."
+        },
+        features: {
+          rigor: {
+            title: "Scientific Rigor",
+            description: "Evaluation based on international standards of academic quality"
+          },
+          expertise: {
+            title: "Multidisciplinary Expertise",
+            description: "Doctors specialized in various areas of knowledge"
+          },
+          recognition: {
+            title: "International Recognition",
+            description: "Evaluators from renowned national and international institutions"
+          }
+        },
+        grid: {
+          title: "Our Evaluators",
+          subtitle: "Meet the doctors who make up our renowned panel of academic evaluators",
+          evaluatorLabel: "Evaluator"
+        },
+        ctaSection: {
+          title: "Submit Your Paper",
+          description: "Have your work evaluated by our renowned panel of doctors and be part of the largest international multidisciplinary congress in the world"
+        }
       }
     },
     
