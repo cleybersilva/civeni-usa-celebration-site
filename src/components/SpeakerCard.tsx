@@ -4,6 +4,7 @@ import { useFixedSpeakerImage } from '@/hooks/useFixedSpeakerImage';
 import { RefreshCw } from 'lucide-react';
 import React from 'react';
 import { getFlagEmoji } from '@/utils/countryFlags';
+import { useTranslation } from 'react-i18next';
 
 interface SpeakerCardProps {
   speaker: Speaker;
@@ -11,6 +12,49 @@ interface SpeakerCardProps {
 
 const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
   const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
+  const { t } = useTranslation();
+
+  // Helper function to translate role if it matches known roles
+  const getTranslatedRole = (role: string) => {
+    const roleLower = role.toLowerCase().trim();
+    const roleMap: Record<string, string> = {
+      'professor': t('speakersPage.roles.professor'),
+      'desembargador': t('speakersPage.roles.judge'),
+      'judge': t('speakersPage.roles.judge'),
+      'pesquisador': t('speakersPage.roles.researcher'),
+      'researcher': t('speakersPage.roles.researcher'),
+      'coordenador': t('speakersPage.roles.coordinator'),
+      'coordinator': t('speakersPage.roles.coordinator'),
+      'diretor': t('speakersPage.roles.director'),
+      'director': t('speakersPage.roles.director'),
+      'doutor': t('speakersPage.roles.doctor'),
+      'doctor': t('speakersPage.roles.doctor')
+    };
+    return roleMap[roleLower] || role;
+  };
+
+  // Helper function to translate country name if it matches known countries
+  const getTranslatedCountry = (country: string | null | undefined) => {
+    if (!country) return country;
+    const countryLower = country.toLowerCase().trim();
+    const countryMap: Record<string, string> = {
+      'brasil': t('speakersPage.countries.brazil'),
+      'brazil': t('speakersPage.countries.brazil'),
+      'estados unidos': t('speakersPage.countries.usa'),
+      'united states': t('speakersPage.countries.usa'),
+      'usa': t('speakersPage.countries.usa'),
+      'índia': t('speakersPage.countries.india'),
+      'india': t('speakersPage.countries.india'),
+      'portugal': t('speakersPage.countries.portugal'),
+      'espanha': t('speakersPage.countries.spain'),
+      'españa': t('speakersPage.countries.spain'),
+      'spain': t('speakersPage.countries.spain'),
+      'turquia': t('speakersPage.countries.turkey'),
+      'türkiye': t('speakersPage.countries.turkey'),
+      'turkey': t('speakersPage.countries.turkey')
+    };
+    return countryMap[countryLower] || country;
+  };
 
   return (
     <div className="group relative bg-gradient-to-br from-white via-white to-gray-50/30 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border border-gray-100/50 backdrop-blur-sm cursor-pointer">
@@ -60,7 +104,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
                     <button
                       onClick={retryLoad}
                       className="bg-white/90 text-civeni-blue p-2 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/50"
-                      title="Tentar carregar imagem novamente"
+                      title={t('speakersPage.retryLoadImage')}
                     >
                       <RefreshCw size={16} />
                     </button>
@@ -85,7 +129,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
                     </span>
                     {speaker.countryName && (
                       <span className="text-xs md:text-sm font-medium text-gray-700">
-                        {speaker.countryName}
+                        {getTranslatedCountry(speaker.countryName)}
                       </span>
                     )}
                   </div>
@@ -95,7 +139,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
             </div>
             
             <h4 className="text-sm font-semibold text-civeni-red mb-1 leading-relaxed transition-all duration-500 group-hover:text-civeni-red group-hover:translate-x-1">
-              {speaker.title}
+              {getTranslatedRole(speaker.title)}
             </h4>
             
             <p className="text-gray-600 font-medium text-xs mb-2 flex items-center transition-all duration-500 group-hover:text-gray-800 group-hover:translate-x-1">
