@@ -71,7 +71,8 @@ export const ptTranslations = {
       days: "Dias",
       hours: "Horas",
       minutes: "Minutos",
-      seconds: "Segundos"
+      seconds: "Segundos",
+      registerNow: "Inscrever-se Agora"
     },
     schedule: {
       title: "Programação",

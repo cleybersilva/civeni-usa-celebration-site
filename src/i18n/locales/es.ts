@@ -68,7 +68,8 @@ export const esTranslations = {
       days: "Días",
       hours: "Horas",
       minutes: "Minutos",
-      seconds: "Segundos"
+      seconds: "Segundos",
+      registerNow: "Inscríbete Ahora"
     },
     schedule: {
       title: "Cronograma",

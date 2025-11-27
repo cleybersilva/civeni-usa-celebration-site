@@ -200,8 +200,8 @@ const VideosSection = () => {
 
         <div className="text-center mt-12">
           <a 
-            href="#registration"
-            className="bg-civeni-red text-white px-8 py-4 rounded-full text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 font-poppins"
+            href="/inscricoes"
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-8 py-4 rounded-full text-xl font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 font-poppins"
           >
             {t('videos.registerButton')}
           </a>
