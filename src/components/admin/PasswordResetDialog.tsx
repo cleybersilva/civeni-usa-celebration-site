@@ -74,7 +74,7 @@ const PasswordResetDialog = ({ children }: PasswordResetDialogProps) => {
           )}
           <Button 
             type="submit" 
-            className="w-full bg-civeni-blue hover:bg-blue-700"
+            className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white"
             disabled={isLoading}
           >
             {isLoading ? 'Enviando...' : 'Enviar Instruções'}
