@@ -264,28 +264,28 @@ const Header = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[340px] p-0 border-l-0 bg-gradient-to-br from-civeni-blue via-[#4a1a5e] to-civeni-red overflow-y-auto">
                 {/* Header with logo */}
-                <div className="px-6 pt-8 pb-6 border-b border-white/20">
+                <div className="px-6 pt-5 pb-4 border-b border-white/20">
                   <div className="flex items-center justify-center">
                     <img 
                       src={resolveAssetUrl("/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png")} 
                       alt="III Civeni 2025 Logo" 
-                      className="h-12 w-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.9)] drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]"
+                      className="h-10 w-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.9)] drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]"
                       style={{ filter: 'drop-shadow(0 0 6px white) drop-shadow(0 0 12px rgba(255,255,255,0.7))' }}
                     />
                   </div>
-                  <p className="text-white/70 text-xs text-center mt-2 font-medium tracking-wide">
+                  <p className="text-white/70 text-xs text-center mt-1.5 font-medium tracking-wide">
                     Menu de Navegação
                   </p>
                 </div>
 
-                <div className="flex flex-col px-4 py-6">
+                <div className="flex flex-col px-4 py-3">
                   {/* Mobile Menu Items */}
                   {menuItems.map((item, index) => (
-                    <div key={item.title} className="mb-1">
+                    <div key={item.title} className="mb-0.5">
                       {item.title === t('header.speakers') ? (
                         <Link
                           to="/palestrantes"
-                          className="flex items-center px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                          className="flex items-center px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -294,7 +294,7 @@ const Header = () => {
                       ) : item.title === t('header.thematicAreas') ? (
                         <Link
                           to="/area-tematica"
-                          className="flex items-center px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                          className="flex items-center px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -303,7 +303,7 @@ const Header = () => {
                       ) : item.title === t('header.events') ? (
                         <Link
                           to="/eventos"
-                          className="flex items-center px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                          className="flex items-center px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -313,7 +313,7 @@ const Header = () => {
                         <>
                           <button
                             onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === item.title ? null : item.title)}
-                            className="flex items-center justify-between w-full px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                            className="flex items-center justify-between w-full px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           >
                             <span className="flex items-center">
                               <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -329,13 +329,13 @@ const Header = () => {
                             </svg>
                           </button>
                           {item.items.length > 0 && mobileSubmenuOpen === item.title && (
-                            <div className="mt-1 ml-4 mr-2 overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 animate-fade-in">
-                              <div className="py-1">
+                            <div className="mt-0.5 ml-4 mr-2 overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 animate-fade-in">
+                              <div className="py-0.5">
                                 {item.items.map((subItem) => (
                                   <Link
                                     key={subItem.name}
                                     to={subItem.href}
-                                    className="block px-4 py-3 text-sm text-white/90 font-medium hover:bg-white/15 hover:text-white transition-all duration-200 border-b border-white/10 last:border-b-0"
+                                    className="block px-4 py-2 text-xs text-white/90 font-medium hover:bg-white/15 hover:text-white transition-all duration-200 border-b border-white/10 last:border-b-0"
                                     onClick={() => setMobileMenuOpen(false)}
                                   >
                                     {subItem.name}
@@ -350,20 +350,20 @@ const Header = () => {
                   ))}
                   
                   {/* Divider */}
-                  <div className="my-4 border-t border-white/20"></div>
+                  <div className="my-2 border-t border-white/20"></div>
                   
                   {/* Mobile Action Buttons */}
-                  <div className="space-y-3 px-2">
+                  <div className="space-y-2 px-2">
                     <Link
                       to="/inscricoes"
-                      className="block w-full bg-green-500 text-white px-5 py-3.5 rounded-xl text-sm font-bold hover:bg-green-600 transition-all duration-200 text-center shadow-lg shadow-green-500/30"
+                      className="block w-full bg-green-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-600 transition-all duration-200 text-center shadow-lg shadow-green-500/30"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {t('header.registration')}
                     </Link>
                     <Link
                       to="/contato"
-                      className="block w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white px-5 py-3.5 rounded-xl text-sm font-bold hover:bg-white/30 transition-all duration-200 text-center"
+                      className="block w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-white/30 transition-all duration-200 text-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {t('header.contact')}
@@ -371,40 +371,40 @@ const Header = () => {
                   </div>
 
                   {/* Social Links */}
-                  <div className="mt-6 pt-4 border-t border-white/20">
-                    <p className="text-white/60 text-xs text-center mb-4 font-medium">Siga-nos nas redes sociais</p>
-                    <div className="flex justify-center space-x-4">
+                  <div className="mt-3 pt-3 border-t border-white/20 pb-4">
+                    <p className="text-white/60 text-xs text-center mb-3 font-medium">Siga-nos nas redes sociais</p>
+                    <div className="flex justify-center space-x-3">
                       <a 
                         href="https://www.instagram.com/veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Instagram size={18} />
+                        <Instagram size={16} />
                       </a>
                       <a 
                         href="https://www.facebook.com/veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Facebook size={18} />
+                        <Facebook size={16} />
                       </a>
                       <a 
                         href="https://www.youtube.com/@veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Youtube size={18} />
+                        <Youtube size={16} />
                       </a>
                       <a 
                         href="https://www.linkedin.com/company/veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Linkedin size={18} />
+                        <Linkedin size={16} />
                       </a>
                     </div>
                   </div>
