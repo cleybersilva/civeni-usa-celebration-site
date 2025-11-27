@@ -245,7 +245,7 @@ const Header = () => {
               </Link>
               <Link
                 to="/contato"
-                className="bg-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins"
+                className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-colors font-poppins"
               >
                 {t('header.contact')}
               </Link>
@@ -333,7 +333,7 @@ const Header = () => {
                     </Link>
                     <Link
                       to="/contato"
-                      className="block w-full bg-civeni-red text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-red-700 transition-colors text-center"
+                      className="block w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-colors text-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {t('header.contact')}
