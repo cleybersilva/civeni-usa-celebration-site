@@ -135,9 +135,9 @@ const CiveniOnlineProgramManager = () => {
         </TabsList>
 
         <TabsContent value="days">
-          <Card className="p-0 overflow-hidden">
-            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
-              <h2 className="text-xl font-semibold text-white">Dias da Programação Online</h2>
+          <Card className="p-0 overflow-hidden rounded-lg">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg text-white">
+              <h2 className="text-xl font-semibold">Dias da Programação Online</h2>
               <Button onClick={() => handleOpenDayDialog()} variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Dia
@@ -192,9 +192,9 @@ const CiveniOnlineProgramManager = () => {
         </TabsContent>
 
         <TabsContent value="sessions">
-          <Card className="p-0 overflow-hidden">
-            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
-              <h2 className="text-xl font-semibold text-white">Sessões Online</h2>
+          <Card className="p-0 overflow-hidden rounded-lg">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg text-white">
+              <h2 className="text-xl font-semibold">Sessões Online</h2>
               <Button variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Sessão
@@ -208,9 +208,9 @@ const CiveniOnlineProgramManager = () => {
                 if (!daySessions.length) return null;
 
                 return (
-                  <div key={day.id} className="overflow-hidden rounded-lg border">
-                    <div className="bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue p-4 flex items-center justify-center gap-2">
-                      <h3 className="font-semibold text-lg text-white">
+                  <div key={day.id} className="overflow-hidden rounded-lg border shadow-sm">
+                    <div className="bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue p-4 flex items-center justify-center gap-2 text-white">
+                      <h3 className="font-semibold text-lg">
                         {day.weekday_label} - {formatDate(day.date)}
                       </h3>
                       <Badge className="bg-white/20 text-white border-white/30">Online</Badge>
