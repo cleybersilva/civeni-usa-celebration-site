@@ -33,6 +33,12 @@ export const ptTranslations = {
     },
     contact: {
       title: "Entre em Contato",
+      breadcrumb: "Contato",
+      heroDescription: "Entre em contato conosco para esclarecer dúvidas sobre o III CIVENI 2025 - Estamos aqui para ajudar você a participar desta experiência única de aprendizado mundial",
+      register: "Fazer Inscrição",
+      directEmail: "E-mail Direto",
+      talkToUs: "Fale Conosco",
+      chooseContactMethod: "Escolha a melhor forma de entrar em contato. Estamos prontos para atendê-lo!",
       description: "Estamos aqui para ajudar. Entre em contato conosco para dúvidas, informações ou sugestões.",
       formTitle: "Formulário de Contato",
       contactInfo: "Informações de Contato",

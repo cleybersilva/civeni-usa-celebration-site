@@ -30,6 +30,12 @@ export const trTranslations = {
     },
     contact: {
       title: "Bizimle İletişime Geçin",
+      breadcrumb: "İletişim",
+      heroDescription: "III CIVENI 2025 hakkında sorularınızı netleştirmek için bizimle iletişime geçin - Bu benzersiz dünya çapında öğrenme deneyimine katılmanıza yardımcı olmak için buradayız",
+      register: "Kayıt Ol",
+      directEmail: "Doğrudan E-posta",
+      talkToUs: "Bizimle Konuşun",
+      chooseContactMethod: "Bizimle iletişime geçmenin en iyi yolunu seçin. Size yardımcı olmaya hazırız!",
       description: "Size yardımcı olmak için buradayız. Sorular, bilgiler veya öneriler için bizimle iletişime geçin.",
       formTitle: "İletişim Formu",
       contactInfo: "İletişim Bilgileri",
