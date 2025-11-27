@@ -165,7 +165,7 @@ const AdminLoginForm = () => {
             <Button
               variant="outline"
               onClick={() => navigate('/')}
-              className="text-civeni-red border-civeni-red hover:bg-civeni-red hover:text-white transition-colors"
+              className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white border-0 hover:opacity-90 transition-opacity"
             >
               <Home className="w-4 h-4 mr-2" />
               {t('admin.backToSite', 'Voltar ao Site')}
