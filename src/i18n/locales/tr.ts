@@ -354,6 +354,33 @@ export const trTranslations = {
       expectedImpactNetwork: "küresel ağ",
       learnMore: "Daha fazla bilgi",
     },
+
+    congress: {
+      presentation: {
+        why_participate: "III Civeni 2025'e Neden Katılmalısınız?",
+        why_description: "DÜNYA'nın en büyük Çok Disiplinli Uluslararası Kongresi'ne katılmanın temel nedenlerini keşfedin"
+      },
+      features: {
+        networking: {
+          title: "Nitelikli Ağ Oluşturma",
+          description: "Tüm DÜNYA'dan profesyoneller, araştırmacılar ve öğrencilerle bağlantı kurun"
+        },
+        knowledge: {
+          title: "Güncel Bilgi",
+          description: "Eğitim, inovasyon, adalet, insanlık, dindarlık ve teknolojideki en son trendlerle konferanslar ve atölyeler"
+        },
+        format: {
+          title: "Hibrit Format",
+          description: "Yüz yüze veya çevrimiçi olarak tam esneklik ve etkileşimle katılın"
+        }
+      },
+      cta: {
+        title: "Bu Fırsatı Kaçırmayın!",
+        description: "İnovasyon, adalet, insanlık, dindarlık ve teknolojiyle eğitimin geleceğini şekillendiren yüzlerce profesyonel ve öğrenciye katılın",
+        register_now: "Şimdi Kaydol",
+        view_schedule: "Programı Görüntüle"
+      }
+    },
     
     videos: {
       title: "I ve II Civeni 2023/2024'ten Videolar",

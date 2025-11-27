@@ -359,6 +359,33 @@ export const ptTranslations = {
       expectedImpactNetwork: "rede global",
       learnMore: "Saiba mais",
     },
+
+    congress: {
+      presentation: {
+        why_participate: "Por que Participar do III Civeni 2025?",
+        why_description: "Descubra as principais razões para fazer parte do maior Congresso Internacional Multidisciplinar do MUNDO"
+      },
+      features: {
+        networking: {
+          title: "Networking Qualificado",
+          description: "Conecte-se com profissionais, pesquisadores e estudantes de todo o MUNDO"
+        },
+        knowledge: {
+          title: "Conhecimento Atualizado",
+          description: "Palestras e workshops com as mais recentes tendências em educação, inovação, justiça, humanidade, religiosidade e tecnologia"
+        },
+        format: {
+          title: "Formato Híbrido",
+          description: "Participe presencialmente ou online, com total flexibilidade e interação"
+        }
+      },
+      cta: {
+        title: "Não Perca Esta Oportunidade!",
+        description: "Junte-se a centenas de profissionais e estudantes que estão moldando o futuro da educação com inovação, justiça, humanidade, religiosidade e tecnologia",
+        register_now: "Inscreva-se Agora",
+        view_schedule: "Ver Programação"
+      }
+    },
     
     videos: {
       title: "Vídeos do I e II Civeni 2023/2024",
