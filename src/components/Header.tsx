@@ -206,7 +206,7 @@ const Header = () => {
                   )}
                   
                   {item.items.length > 0 && openDropdown === item.title && (
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-gradient-to-br from-civeni-blue via-civeni-red to-civeni-blue rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden backdrop-blur-sm">
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden">
                       <div className="py-2">
                         {item.items.map((subItem, index) => (
                           subItem.href.startsWith('#') ? (
@@ -306,7 +306,7 @@ const Header = () => {
                             </svg>
                           </button>
                           {item.items.length > 0 && mobileSubmenuOpen === item.title && (
-                            <div className="mt-3 ml-0 overflow-hidden rounded-xl bg-gradient-to-br from-civeni-blue via-civeni-red to-civeni-blue shadow-lg">
+                            <div className="mt-3 ml-0 overflow-hidden rounded-xl bg-gradient-to-r from-civeni-blue to-civeni-red shadow-lg">
                               <div className="py-2">
                                 {item.items.map((subItem) => (
                                   <Link
