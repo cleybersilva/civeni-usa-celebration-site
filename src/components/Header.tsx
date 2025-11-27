@@ -262,44 +262,64 @@ const Header = () => {
                   <Menu size={24} className="md:w-7 md:h-7" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-white overflow-y-auto">
-                <div className="flex flex-col space-y-4 mt-6">
+              <SheetContent side="right" className="w-[300px] sm:w-[340px] p-0 border-l-0 bg-gradient-to-br from-civeni-blue via-[#4a1a5e] to-civeni-red overflow-y-auto">
+                {/* Header with logo */}
+                <div className="px-6 pt-8 pb-6 border-b border-white/20">
+                  <div className="flex items-center justify-center">
+                    <img 
+                      src={resolveAssetUrl("/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png")} 
+                      alt="III Civeni 2025 Logo" 
+                      className="h-12 w-auto brightness-0 invert"
+                    />
+                  </div>
+                  <p className="text-white/70 text-xs text-center mt-2 font-medium tracking-wide">
+                    Menu de Navegação
+                  </p>
+                </div>
+
+                <div className="flex flex-col px-4 py-6">
                   {/* Mobile Menu Items */}
-                  {menuItems.map((item) => (
-                    <div key={item.title} className="border-b border-gray-100 pb-3">
+                  {menuItems.map((item, index) => (
+                    <div key={item.title} className="mb-1">
                       {item.title === t('header.speakers') ? (
                         <Link
                           to="/palestrantes"
-                          className="text-civeni-blue font-semibold text-base hover:text-civeni-red transition-colors"
+                          className="flex items-center px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
+                          <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
                           {item.title}
                         </Link>
                       ) : item.title === t('header.thematicAreas') ? (
                         <Link
                           to="/area-tematica"
-                          className="text-civeni-blue font-semibold text-base hover:text-civeni-red transition-colors"
+                          className="flex items-center px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
+                          <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
                           {item.title}
                         </Link>
                       ) : item.title === t('header.events') ? (
                         <Link
                           to="/eventos"
-                          className="text-civeni-blue font-semibold text-base hover:text-civeni-red transition-colors"
+                          className="flex items-center px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
+                          <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
                           {item.title}
                         </Link>
                       ) : (
                         <>
                           <button
                             onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === item.title ? null : item.title)}
-                            className="text-civeni-blue font-semibold text-base hover:text-civeni-red transition-colors w-full text-left flex items-center justify-between"
+                            className="flex items-center justify-between w-full px-4 py-3.5 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           >
-                            <span>{item.title}</span>
+                            <span className="flex items-center">
+                              <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
+                              {item.title}
+                            </span>
                             <svg
-                              className={`w-4 h-4 transition-transform ${mobileSubmenuOpen === item.title ? 'rotate-180' : ''}`}
+                              className={`w-4 h-4 transition-transform duration-300 ${mobileSubmenuOpen === item.title ? 'rotate-180' : ''}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -308,13 +328,13 @@ const Header = () => {
                             </svg>
                           </button>
                           {item.items.length > 0 && mobileSubmenuOpen === item.title && (
-                            <div className="mt-3 ml-0 overflow-hidden rounded-xl bg-gradient-to-r from-civeni-blue to-civeni-red shadow-lg">
-                              <div className="py-2">
+                            <div className="mt-1 ml-4 mr-2 overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 animate-fade-in">
+                              <div className="py-1">
                                 {item.items.map((subItem) => (
                                   <Link
                                     key={subItem.name}
                                     to={subItem.href}
-                                    className="block px-4 py-3 text-sm text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
+                                    className="block px-4 py-3 text-sm text-white/90 font-medium hover:bg-white/15 hover:text-white transition-all duration-200 border-b border-white/10 last:border-b-0"
                                     onClick={() => setMobileMenuOpen(false)}
                                   >
                                     {subItem.name}
@@ -328,22 +348,64 @@ const Header = () => {
                     </div>
                   ))}
                   
+                  {/* Divider */}
+                  <div className="my-4 border-t border-white/20"></div>
+                  
                   {/* Mobile Action Buttons */}
-                  <div className="space-y-3 pt-4">
+                  <div className="space-y-3 px-2">
                     <Link
                       to="/inscricoes"
-                      className="block w-full bg-green-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors text-center"
+                      className="block w-full bg-green-500 text-white px-5 py-3.5 rounded-xl text-sm font-bold hover:bg-green-600 transition-all duration-200 text-center shadow-lg shadow-green-500/30"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {t('header.registration')}
                     </Link>
                     <Link
                       to="/contato"
-                      className="block w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-colors text-center"
+                      className="block w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white px-5 py-3.5 rounded-xl text-sm font-bold hover:bg-white/30 transition-all duration-200 text-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {t('header.contact')}
                     </Link>
+                  </div>
+
+                  {/* Social Links */}
+                  <div className="mt-6 pt-4 border-t border-white/20">
+                    <p className="text-white/60 text-xs text-center mb-4 font-medium">Siga-nos nas redes sociais</p>
+                    <div className="flex justify-center space-x-4">
+                      <a 
+                        href="https://www.instagram.com/veniuniversity/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                      >
+                        <Instagram size={18} />
+                      </a>
+                      <a 
+                        href="https://www.facebook.com/veniuniversity/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                      >
+                        <Facebook size={18} />
+                      </a>
+                      <a 
+                        href="https://www.youtube.com/@veniuniversity/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                      >
+                        <Youtube size={18} />
+                      </a>
+                      <a 
+                        href="https://www.linkedin.com/company/veniuniversity/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                      >
+                        <Linkedin size={18} />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </SheetContent>
