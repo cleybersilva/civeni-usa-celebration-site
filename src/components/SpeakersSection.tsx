@@ -26,7 +26,7 @@ const SpeakersSection = () => {
     const { imageSrc, isLoading, hasError, retryLoad } = useFixedSpeakerImage(speaker);
     
     return (
-      <div className="relative w-full h-64 md:h-full bg-gradient-to-br from-civeni-blue/10 to-civeni-red/10">
+      <div className="relative w-full h-64 md:h-full" style={{ background: 'linear-gradient(90deg, #0A2A43 0%, #C8105A 100%)' }}>
         {hasError ? (
           <SpeakerImagePlaceholder
             name={speaker.name}
