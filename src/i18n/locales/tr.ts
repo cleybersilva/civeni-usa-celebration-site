@@ -324,6 +324,7 @@ export const trTranslations = {
       breadcrumbHome: "Ana Sayfa",
       breadcrumbCongress: "Kongre",
       breadcrumbPresentation: "Sunum",
+      heroSubtitle: "VCCU Uluslararası Çok Disiplinli Kongresi - Etkinliğin tam sunumu, hedefleri ve küresel eğitim için önemi hakkında bilgi edinin",
       registerButton: "Kayıt Ol",
       viewSchedule: "Programı Görüntüle",
       themeLabel: "TEMA",

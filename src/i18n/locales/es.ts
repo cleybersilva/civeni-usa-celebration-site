@@ -326,6 +326,7 @@ export const esTranslations = {
       breadcrumbHome: "Inicio",
       breadcrumbCongress: "Congreso",
       breadcrumbPresentation: "Presentación",
+      heroSubtitle: "Congreso Internacional Multidisciplinario de VCCU - Conozca la presentación completa del evento, sus objetivos y la importancia para la educación mundial",
       registerButton: "Inscribirse",
       viewSchedule: "Ver Programación",
       themeLabel: "TEMA",
