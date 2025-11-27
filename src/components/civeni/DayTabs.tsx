@@ -48,12 +48,12 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-none shadow-none overflow-hidden">
+      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-transparent rounded-none shadow-none overflow-hidden">
         {days.map((day, index) => (
             <TabsTrigger 
               key={day.id} 
               value={day.id}
-              className="flex flex-col items-center gap-1 py-4 sm:py-5 px-2 sm:px-4 rounded-none transition-all duration-300 border-0 min-w-0 bg-transparent text-white data-[state=active]:bg-black/20 data-[state=active]:text-white hover:bg-white/10"
+              className="flex flex-col items-center gap-1 py-4 sm:py-5 px-2 sm:px-4 rounded-none transition-all duration-300 border-0 min-w-0 bg-gradient-to-b from-civeni-blue via-civeni-red to-civeni-blue text-white data-[state=active]:brightness-110 hover:brightness-105"
             >
               <div className="flex items-center gap-1 sm:gap-2">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
