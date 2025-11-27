@@ -274,7 +274,7 @@ const Header = () => {
                     />
                   </div>
                   <p className="text-white/70 text-xs text-center mt-1.5 font-medium tracking-wide">
-                    Menu de Navegação
+                    {t('header.navigationMenu')}
                   </p>
                 </div>
 
@@ -372,7 +372,7 @@ const Header = () => {
 
                   {/* Social Links */}
                   <div className="mt-3 pt-3 border-t border-white/20 pb-4">
-                    <p className="text-white/60 text-xs text-center mb-3 font-medium">Siga-nos nas redes sociais</p>
+                    <p className="text-white/60 text-xs text-center mb-3 font-medium">{t('header.followUs')}</p>
                     <div className="flex justify-center space-x-4">
                       <a 
                         href="https://www.instagram.com/veniuniversity/" 
