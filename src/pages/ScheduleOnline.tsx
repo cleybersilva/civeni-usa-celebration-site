@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Download, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Tabs } from '@/components/ui/tabs';
@@ -9,6 +10,7 @@ import DayTimeline from '@/components/civeni/DayTimeline';
 import { useCiveniOnlineProgramData } from '@/hooks/useCiveniOnlineProgramData';
 
 const ScheduleOnline = () => {
+  const { t } = useTranslation();
   const { settings, days, isLoading, getSessionsForDay } = useCiveniOnlineProgramData();
   const [activeDay, setActiveDay] = useState<string>('');
 
@@ -39,11 +41,11 @@ const ScheduleOnline = () => {
             {/* Breadcrumbs */}
             <nav className="mb-8 text-sm">
               <ol className="flex items-center space-x-2">
-                <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+                <li><Link to="/" className="hover:text-blue-200 transition-colors">{t('schedule.breadcrumbs.home')}</Link></li>
                 <li className="text-blue-200">›</li>
-                <li><Link to="/programacao-online" className="hover:text-blue-200 transition-colors">Programação</Link></li>
+                <li><Link to="/programacao-online" className="hover:text-blue-200 transition-colors">{t('schedule.breadcrumbs.schedule')}</Link></li>
                 <li className="text-blue-200">›</li>
-                <li>Online</li>
+                <li>{t('schedule.breadcrumbs.online')}</li>
               </ol>
             </nav>
             
@@ -59,7 +61,7 @@ const ScheduleOnline = () => {
                 <Link to="/inscricoes" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2">
                     <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                    Fazer Inscrição
+                    {t('schedule.buttons.register')}
                   </button>
                 </Link>
                 
@@ -68,7 +70,7 @@ const ScheduleOnline = () => {
                   className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Baixar Programação
+                  {t('schedule.buttons.download')}
                 </button>
               </div>
             </div>
@@ -80,16 +82,16 @@ const ScheduleOnline = () => {
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Carregando programação...</p>
+                <p className="mt-4 text-gray-600">{t('schedule.loading')}</p>
               </div>
             ) : !days || days.length === 0 ? (
               <div className="text-center py-12">
                 <Calendar className="w-16 h-16 mx-auto text-gray-400 mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  Programação em breve
+                  {t('schedule.empty.title')}
                 </h2>
                 <p className="text-gray-600">
-                  A programação online ainda não foi publicada. Volte em breve!
+                  {t('schedule.empty.descriptionOnline')}
                 </p>
               </div>
             ) : (

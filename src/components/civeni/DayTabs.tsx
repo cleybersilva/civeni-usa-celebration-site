@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from 'lucide-react';
 
@@ -17,6 +18,8 @@ interface DayTabsProps {
 }
 
 const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
+  const { t } = useTranslation();
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString + 'T00:00:00');
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
@@ -34,7 +37,7 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="font-semibold">
-                Dia {days.findIndex(d => d.id === day.id) + 1}
+                {t('schedule.day')} {days.findIndex(d => d.id === day.id) + 1}
               </span>
             </div>
             <div className="text-xs text-muted-foreground">

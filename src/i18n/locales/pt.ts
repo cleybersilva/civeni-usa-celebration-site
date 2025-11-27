@@ -94,7 +94,53 @@ export const ptTranslations = {
       inPersonSchedule: "Programação Presencial",
       inPersonScheduleDescription: "Confira a programação completa para participantes presenciais",
       onlineSchedule: "Programação Online",
-      onlineScheduleDescription: "Confira a programação completa para participantes online"
+      onlineScheduleDescription: "Confira a programação completa para participantes online",
+      breadcrumbs: {
+        home: 'Home',
+        schedule: 'Programação',
+        inPerson: 'Presencial',
+        online: 'Online',
+      },
+      buttons: {
+        register: 'Fazer Inscrição',
+        download: 'Baixar Programação',
+        addToCalendar: 'Adicionar à agenda',
+        watchOnline: 'Assistir online',
+        materials: 'Materiais',
+      },
+      empty: {
+        title: 'Programação em breve',
+        descriptionInPerson: 'A programação ainda não foi publicada. Volte em breve!',
+        descriptionOnline: 'A programação online ainda não foi publicada. Volte em breve!',
+      },
+      day: 'Dia',
+      session: {
+        live: 'AO VIVO',
+        next: 'PRÓXIMA',
+        parallel: 'SIMULTÂNEA',
+        featured: 'DESTAQUE',
+        showTimezones: 'Ver todos os horários',
+        hideTimezones: 'Ocultar todos os horários',
+      },
+      sessionTypes: {
+        conferencia: 'CONFERÊNCIA',
+        palestra: 'PALESTRA',
+        workshop: 'WORKSHOP',
+        mesa_redonda: 'MESA REDONDA',
+        painel: 'PAINEL',
+        sessoes_simultaneas: 'SESSÕES SIMULTÂNEAS',
+        intervalo: 'INTERVALO',
+        abertura: 'ABERTURA',
+        encerramento: 'ENCERRAMENTO',
+        credenciamento: 'CREDENCIAMENTO',
+        cerimonia: 'CERIMÔNIA',
+        outro: 'OUTRO',
+      },
+      modality: {
+        presencial: 'PRESENCIAL',
+        online: 'ONLINE',
+        hibrido: 'HÍBRIDO',
+      },
     },
     scheduleSection: {
       title: "Escolha Sua Experiência"
@@ -790,6 +836,55 @@ export const ptTranslations = {
       cancel: "Cancelar",
       creating: "Criando...",
       updating: "Atualizando..."
-    }
+    },
+    schedule: {
+      breadcrumbs: {
+        home: 'Home',
+        schedule: 'Programação',
+        inPerson: 'Presencial',
+        online: 'Online',
+      },
+      buttons: {
+        register: 'Fazer Inscrição',
+        download: 'Baixar Programação',
+        addToCalendar: 'Adicionar à agenda',
+        watchOnline: 'Assistir online',
+        materials: 'Materiais',
+      },
+      loading: 'Carregando programação...',
+      empty: {
+        title: 'Programação em breve',
+        descriptionInPerson: 'A programação ainda não foi publicada. Volte em breve!',
+        descriptionOnline: 'A programação online ainda não foi publicada. Volte em breve!',
+      },
+      day: 'Dia',
+      session: {
+        live: 'AO VIVO',
+        next: 'PRÓXIMA',
+        parallel: 'SIMULTÂNEA',
+        featured: 'DESTAQUE',
+        showTimezones: 'Ver todos os horários',
+        hideTimezones: 'Ocultar todos os horários',
+      },
+      sessionTypes: {
+        conferencia: 'CONFERÊNCIA',
+        palestra: 'PALESTRA',
+        workshop: 'WORKSHOP',
+        mesa_redonda: 'MESA REDONDA',
+        painel: 'PAINEL',
+        sessoes_simultaneas: 'SESSÕES SIMULTÂNEAS',
+        intervalo: 'INTERVALO',
+        abertura: 'ABERTURA',
+        encerramento: 'ENCERRAMENTO',
+        credenciamento: 'CREDENCIAMENTO',
+        cerimonia: 'CERIMÔNIA',
+        outro: 'OUTRO',
+      },
+      modality: {
+        presencial: 'PRESENCIAL',
+        online: 'ONLINE',
+        hibrido: 'HÍBRIDO',
+      },
+    },
   }
 };
