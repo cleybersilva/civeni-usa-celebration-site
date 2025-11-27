@@ -326,14 +326,15 @@ const CiveniProgramManager = () => {
         </TabsContent>
 
         <TabsContent value="sessions">
-          <Card className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Sessões</h2>
-              <Button onClick={() => handleCreateSession()}>
+          <Card className="p-0 overflow-hidden">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
+              <h2 className="text-xl font-semibold text-white">Sessões</h2>
+              <Button onClick={() => handleCreateSession()} variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Sessão
               </Button>
             </div>
+            <div className="p-6">
 
             <div className="space-y-4">
               {days?.map((day) => {
@@ -341,11 +342,13 @@ const CiveniProgramManager = () => {
                 if (!daySessions.length) return null;
 
                 return (
-                  <div key={day.id}>
-                    <h3 className="font-semibold text-lg mb-3">
-                      {day.weekday_label} - {formatDate(day.date)}
-                    </h3>
-                    <div className="space-y-2 ml-4">
+                  <div key={day.id} className="overflow-hidden rounded-lg border">
+                    <div className="bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue p-4">
+                      <h3 className="font-semibold text-lg text-white text-center">
+                        {day.weekday_label} - {formatDate(day.date)}
+                      </h3>
+                    </div>
+                    <div className="space-y-2 p-4">
                       {daySessions.map((session) => (
                         <Card key={session.id} className="p-4">
                           <div className="flex justify-between items-start">
@@ -420,6 +423,7 @@ const CiveniProgramManager = () => {
                   <p>Nenhuma sessão configurada ainda</p>
                 </div>
               )}
+            </div>
             </div>
           </Card>
         </TabsContent>
