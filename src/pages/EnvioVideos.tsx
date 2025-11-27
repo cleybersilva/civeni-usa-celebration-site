@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Upload, Video, CheckCircle, BookOpen, Users } from 'lucide-react';
+import { Loader2, Video, CheckCircle, BookOpen, Users } from 'lucide-react';
 import { useCursos, useTurmas } from '@/hooks/useCursos';
 import { useParticipantTypes } from '@/hooks/useParticipantTypes';
 import { Button } from '@/components/ui/button';
@@ -307,12 +307,12 @@ const EnvioVideos = () => {
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white"
                 size="lg"
               >
                 {isSubmitting ? (
                   <>
-                    <Upload className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Enviando...
                   </>
                 ) : (
