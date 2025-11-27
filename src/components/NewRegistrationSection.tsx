@@ -305,7 +305,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-civeni-red hover:bg-red-700 text-white py-3 text-lg font-semibold"
+                  className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white py-3 text-lg font-semibold"
                     disabled={
                       loading || 
                       !formData.categoryId || 

@@ -41,16 +41,16 @@ const LoteInfo = ({ lote }: LoteInfoProps) => {
   return (
     <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
       <CardHeader>
-        <CardTitle className="flex items-center justify-center gap-2 text-primary">
+        <CardTitle className="flex items-center justify-center gap-2 bg-gradient-to-r from-civeni-blue to-civeni-red bg-clip-text text-transparent">
           <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-          <DollarSign className="w-5 h-5" />
+          <DollarSign className="w-5 h-5 text-civeni-blue" />
           {lote.nome}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Preço */}
         <div className="text-center">
-          <div className="text-3xl font-bold text-primary">
+          <div className="text-3xl font-bold bg-gradient-to-r from-civeni-blue to-civeni-red bg-clip-text text-transparent">
             {formatPrice(lote.price_cents)}
           </div>
           <Badge variant="secondary" className="mt-1">
