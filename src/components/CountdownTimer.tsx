@@ -133,7 +133,7 @@ const CountdownTimer = () => {
           {t('countdown.description')}
         </p>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-10">
           {timeUnits.map((unit, index) => (
             <div
               key={unit.label}
@@ -149,6 +149,13 @@ const CountdownTimer = () => {
             </div>
           ))}
         </div>
+
+        <a
+          href="/inscricoes"
+          className="inline-block bg-gradient-to-r from-civeni-blue to-civeni-red text-white font-bold py-4 px-10 rounded-full text-lg hover:opacity-90 transition-opacity shadow-lg"
+        >
+          {t('countdown.registerNow')}
+        </a>
       </div>
     </section>
   );
