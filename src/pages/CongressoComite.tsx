@@ -167,19 +167,19 @@ const CongressoComite = () => {
   // Committee data organized by type
   const committeesData = {
     organizador: {
-      name: 'Coordenação Geral do Evento',
+      name: t('congress.committee.tabs.organizing', 'Coordenação Geral do Evento'),
       icon: Crown,
       members: organizadorData || [],
       isLoading: isLoadingOrganizador
     },
     cientifico: {
-      name: 'Comitê Científico',
+      name: t('congress.committee.tabs.scientific', 'Comitê Científico'),
       icon: GraduationCap,
       members: cientificoData || [],
       isLoading: isLoadingCientifico
     },
     apoio_tecnico: {
-      name: 'Comitê Operacional',
+      name: t('congress.committee.tabs.operational', 'Comitê Operacional'),
       icon: Settings,
       members: apoioTecnicoData || [],
       isLoading: isLoadingApoioTecnico
@@ -199,32 +199,32 @@ const CongressoComite = () => {
               <ol className="flex items-center space-x-2">
                 <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
                 <li className="text-blue-200">›</li>
-                <li><Link to="/congresso/comite" className="hover:text-blue-200 transition-colors">Congresso</Link></li>
+                <li><Link to="/congresso/comite" className="hover:text-blue-200 transition-colors">{t('congress.committee.breadcrumb.congress', 'Congresso')}</Link></li>
                 <li className="text-blue-200">›</li>
-                <li>Comitê</li>
+                <li>{t('congress.committee.breadcrumb.committee', 'Comitê')}</li>
               </ol>
             </nav>
             
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 font-poppins">
-                Comissão Organizadora do Evento
+                {t('congress.committee.hero.title', 'Comissão Organizadora do Evento')}
               </h1>
               <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
-                Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência mundial
+                {t('congress.committee.hero.subtitle', 'Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência mundial')}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
                 <Link to="/inscricoes" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto bg-white text-civeni-blue hover:bg-white/90 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                     <Users className="w-4 h-4 md:w-5 md:h-5" />
-                    Fazer Inscrição
+                    {t('congress.committee.cta.register', 'Fazer Inscrição')}
                   </button>
                 </Link>
                 
                 <Link to="/palestrantes" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold transition-colors flex items-center justify-center gap-2">
                     <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                    Ver Palestrantes
+                    {t('congress.committee.cta.viewSpeakers', 'Ver Palestrantes')}
                   </button>
                 </Link>
               </div>
@@ -317,17 +317,17 @@ const CongressoComite = () => {
         <section className="py-12 md:py-16 bg-gradient-to-r from-primary/10 to-secondary/10">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 md:mb-6">
-              Agradecimento Especial
+              {t('congress.committee.acknowledgment.title', 'Agradecimento Especial')}
             </h2>
             
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-2">
-              Nosso sincero agradecimento a todos os membros da comissão organizadora que dedicam seu tempo e expertise para tornar o CIVENI um evento de referência no universo da educação mundial. Seu comprometimento e dedicação são fundamentais para o sucesso do congresso.
+              {t('congress.committee.acknowledgment.description', 'Nosso sincero agradecimento a todos os membros da comissão organizadora que dedicam seu tempo e expertise para tornar o CIVENI um evento de referência no universo da educação mundial. Seu comprometimento e dedicação são fundamentais para o sucesso do congresso.')}
             </p>
             
             <div className="flex items-center justify-center">
               <Users className="w-5 h-5 md:w-6 md:h-6 mr-2 text-primary" />
               <p className="text-sm md:text-base text-muted-foreground">
-                Para mais informações, entre em contato conosco
+                {t('congress.committee.acknowledgment.contact', 'Para mais informações, entre em contato conosco')}
               </p>
             </div>
           </div>

@@ -426,6 +426,30 @@ export const ptTranslations = {
           title: "Submeta Seu Trabalho",
           description: "Tenha seu trabalho avaliado por nosso renomado corpo de doutores e faça parte do maior congresso internacional multidisciplinar do mundo"
         }
+      },
+      committee: {
+        breadcrumb: {
+          congress: "Congresso",
+          committee: "Comitê"
+        },
+        hero: {
+          title: "Comissão Organizadora do Evento",
+          subtitle: "Conheça os profissionais dedicados que tornam o CIVENI uma realidade, trabalhando incansavelmente para oferecer um evento de excelência mundial"
+        },
+        cta: {
+          register: "Fazer Inscrição",
+          viewSpeakers: "Ver Palestrantes"
+        },
+        tabs: {
+          organizing: "Coordenação Geral do Evento",
+          scientific: "Comitê Científico",
+          operational: "Comitê Operacional"
+        },
+        acknowledgment: {
+          title: "Agradecimento Especial",
+          description: "Nosso sincero agradecimento a todos os membros da comissão organizadora que dedicam seu tempo e expertise para tornar o CIVENI um evento de referência no universo da educação mundial. Seu comprometimento e dedicação são fundamentais para o sucesso do congresso.",
+          contact: "Para mais informações, entre em contato conosco"
+        }
       }
     },
     

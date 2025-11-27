@@ -421,6 +421,30 @@ export const trTranslations = {
           title: "Çalışmanızı Gönderin",
           description: "Çalışmanızın ünlü doktor kadromuz tarafından değerlendirilmesini sağlayın ve dünyanın en büyük uluslararası çok disiplinli kongresinin bir parçası olun"
         }
+      },
+      committee: {
+        breadcrumb: {
+          congress: "Kongre",
+          committee: "Komite"
+        },
+        hero: {
+          title: "Etkinlik Organizasyon Komitesi",
+          subtitle: "CIVENI'yi gerçeğe dönüştüren, dünya standartlarında bir etkinlik sunmak için yorulmadan çalışan özverili profesyonellerle tanışın"
+        },
+        cta: {
+          register: "Kayıt Ol",
+          viewSpeakers: "Konuşmacıları Görüntüle"
+        },
+        tabs: {
+          organizing: "Genel Etkinlik Koordinasyonu",
+          scientific: "Bilimsel Komite",
+          operational: "Operasyonel Komite"
+        },
+        acknowledgment: {
+          title: "Özel Teşekkür",
+          description: "CIVENI'yi dünya eğitim evreninde referans bir etkinlik haline getirmek için zamanlarını ve uzmanlıklarını adayan tüm organizasyon komitesi üyelerine içten teşekkürlerimizi sunarız. Bağlılığınız ve özverisiniz kongrenin başarısı için temeldir.",
+          contact: "Daha fazla bilgi için bizimle iletişime geçin"
+        }
       }
     },
     

@@ -423,6 +423,30 @@ export const enTranslations = {
           title: "Submit Your Paper",
           description: "Have your work evaluated by our renowned panel of doctors and be part of the largest international multidisciplinary congress in the world"
         }
+      },
+      committee: {
+        breadcrumb: {
+          congress: "Congress",
+          committee: "Committee"
+        },
+        hero: {
+          title: "Event Organizing Committee",
+          subtitle: "Meet the dedicated professionals who make CIVENI a reality, working tirelessly to deliver a world-class event"
+        },
+        cta: {
+          register: "Register",
+          viewSpeakers: "View Speakers"
+        },
+        tabs: {
+          organizing: "General Event Coordination",
+          scientific: "Scientific Committee",
+          operational: "Operational Committee"
+        },
+        acknowledgment: {
+          title: "Special Acknowledgment",
+          description: "Our sincere gratitude to all members of the organizing committee who dedicate their time and expertise to make CIVENI a reference event in the world of education. Your commitment and dedication are fundamental to the success of the congress.",
+          contact: "For more information, please contact us"
+        }
       }
     },
     
