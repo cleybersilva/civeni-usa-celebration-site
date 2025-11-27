@@ -94,14 +94,14 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
 
   return (
     <TabsContent value={day.id} className="space-y-6 mt-0">
-      <div className="text-center py-6 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
+      <div className="text-center py-6 bg-gradient-to-br from-civeni-blue to-civeni-red rounded-lg text-white">
+        <h2 className="text-2xl font-bold text-white mb-2">
           {day.headline}
         </h2>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-white/90 text-lg">
           {day.theme}
         </p>
-        <div className="text-sm text-muted-foreground mt-2">
+        <div className="text-sm text-white/80 mt-2">
           {translateWeekday(day.weekday_label)}, {new Date(day.date + 'T00:00:00').toLocaleDateString(getLocale())}
         </div>
       </div>
