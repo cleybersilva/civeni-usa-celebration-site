@@ -8,11 +8,14 @@ import { Tabs } from '@/components/ui/tabs';
 import DayTabs from '@/components/civeni/DayTabs';
 import DayTimeline from '@/components/civeni/DayTimeline';
 import { useCiveniOnlineProgramData } from '@/hooks/useCiveniOnlineProgramData';
+import { generateSchedulePdf } from '@/lib/pdf/generateSchedulePdf';
+import { toast } from 'sonner';
 
 const ScheduleOnline = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { settings, days, isLoading, getSessionsForDay } = useCiveniOnlineProgramData();
   const [activeDay, setActiveDay] = useState<string>('');
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   // Set first day as active when data loads
   React.useEffect(() => {
@@ -21,8 +24,18 @@ const ScheduleOnline = () => {
     }
   }, [days, activeDay]);
 
-  const generatePDF = () => {
-    window.open('/programacao/impressao?modalidade=online', '_blank');
+  const generatePDF = async () => {
+    try {
+      setIsGeneratingPdf(true);
+      const lang = i18n.language || 'pt';
+      await generateSchedulePdf('online', lang);
+      toast.success(t('schedule.pdfGenerated') || 'PDF gerado com sucesso!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error(t('schedule.pdfError') || 'Erro ao gerar PDF');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -67,10 +80,15 @@ const ScheduleOnline = () => {
                 
                 <button 
                   onClick={generatePDF}
-                  className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2"
+                  disabled={isGeneratingPdf}
+                  className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                  {t('schedule.buttons.download')}
+                  {isGeneratingPdf ? (
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                  )}
+                  {isGeneratingPdf ? t('common.loading') : t('schedule.buttons.download')}
                 </button>
               </div>
             </div>

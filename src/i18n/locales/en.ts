@@ -149,6 +149,8 @@ export const enTranslations = {
         sunday: 'Sunday',
       },
       noSessionsForDay: 'No sessions published for this day yet.',
+      pdfGenerated: 'PDF generated successfully!',
+      pdfError: 'Error generating PDF. Please try again.',
     },
     scheduleSection: {
       title: "Choose Your Experience"
