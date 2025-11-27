@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { ProgramacaoDia } from '@/types/programacao';
 
 const ProgramacaoImpressao = () => {
   const [searchParams] = useSearchParams();
   const modalidade = searchParams.get('modalidade') as 'presencial' | 'online' || 'presencial';
+  const lang = searchParams.get('lang') || 'pt';
   
+  const { t, i18n } = useTranslation();
   const [programacao, setProgramacao] = useState<ProgramacaoDia[]>([]);
   const [carregando, setCarregando] = useState(true);
+
+  // Set language on mount
+  useEffect(() => {
+    if (lang && i18n.language !== lang) {
+      i18n.changeLanguage(lang);
+    }
+  }, [lang, i18n]);
 
   useEffect(() => {
     const carregar = async () => {
@@ -33,10 +43,21 @@ const ProgramacaoImpressao = () => {
     }
   }, [carregando, programacao]);
 
+  // Format date based on current language
+  const formatCurrentDate = () => {
+    const localeMap: Record<string, string> = {
+      pt: 'pt-BR',
+      en: 'en-US',
+      es: 'es-ES',
+      tr: 'tr-TR'
+    };
+    return new Date().toLocaleDateString(localeMap[lang] || 'pt-BR');
+  };
+
   if (carregando) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-        <p>Carregando programação...</p>
+        <p>{t('schedulePdf.loading')}</p>
       </div>
     );
   }
@@ -44,7 +65,7 @@ const ProgramacaoImpressao = () => {
   if (programacao.length === 0) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-        <p>Nenhuma programação encontrada.</p>
+        <p>{t('schedulePdf.noSchedule')}</p>
       </div>
     );
   }
@@ -248,11 +269,13 @@ const ProgramacaoImpressao = () => {
         <header className="program-header">
           <div className="program-header-overlay"></div>
           <div className="program-header-content">
-            <h1>III CIVENI 2025 – PROGRAMAÇÃO OFICIAL</h1>
+            <h1>{t('schedulePdf.title')}</h1>
             <p>
-              {modalidade === 'presencial' ? 'Programação Presencial' : 'Programação Online'}
+              {modalidade === 'presencial' 
+                ? t('schedulePdf.subtitlePresencial') 
+                : t('schedulePdf.subtitleOnline')}
             </p>
-            <p>*Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.</p>
+            <p>{t('schedulePdf.timezoneObs')}</p>
           </div>
         </header>
 
@@ -265,7 +288,9 @@ const ProgramacaoImpressao = () => {
                   <span className="day-date">{dia.data}</span>
                 </div>
                 <span className="day-badge">
-                  {modalidade === 'presencial' ? 'Presencial' : 'Online'}
+                  {modalidade === 'presencial' 
+                    ? t('schedulePdf.badgePresencial') 
+                    : t('schedulePdf.badgeOnline')}
                 </span>
               </header>
 
@@ -273,10 +298,10 @@ const ProgramacaoImpressao = () => {
                 <table className="program-table">
                   <thead>
                     <tr>
-                      <th>Horário</th>
-                      <th>Atividade</th>
-                      <th>Palestrante / Origem</th>
-                      <th>Local</th>
+                      <th>{t('schedulePdf.tableTime')}</th>
+                      <th>{t('schedulePdf.tableActivity')}</th>
+                      <th>{t('schedulePdf.tableSpeaker')}</th>
+                      <th>{t('schedulePdf.tableLocation')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -296,8 +321,8 @@ const ProgramacaoImpressao = () => {
         </main>
 
         <footer className="program-footer">
-          III CIVENI 2025 – Congresso Internacional Virtual de Educação e Inovação<br/>
-          Programação sujeita a ajustes – Versão atualizada em {new Date().toLocaleDateString('pt-BR')}
+          {t('schedulePdf.footerTitle')}<br/>
+          {t('schedulePdf.footerSubject')} – {t('schedulePdf.footerUpdated')} {formatCurrentDate()}
         </footer>
       </div>
     </div>

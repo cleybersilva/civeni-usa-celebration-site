@@ -991,5 +991,22 @@ export const ptTranslations = {
         hibrido: 'HÍBRIDO',
       },
     },
+    schedulePdf: {
+      title: 'III CIVENI 2025 – PROGRAMAÇÃO OFICIAL',
+      subtitlePresencial: 'Programação Presencial',
+      subtitleOnline: 'Programação Online',
+      timezoneObs: '*Horários em America/Fortaleza (GMT-3). Programação sujeita a ajustes.',
+      badgePresencial: 'Presencial',
+      badgeOnline: 'Online',
+      tableTime: 'Horário',
+      tableActivity: 'Atividade',
+      tableSpeaker: 'Palestrante / Origem',
+      tableLocation: 'Local',
+      footerTitle: 'III CIVENI 2025 – Congresso Internacional Virtual de Educação e Inovação',
+      footerSubject: 'Programação sujeita a ajustes',
+      footerUpdated: 'Versão atualizada em',
+      loading: 'Carregando programação...',
+      noSchedule: 'Nenhuma programação encontrada.',
+    },
   }
 };

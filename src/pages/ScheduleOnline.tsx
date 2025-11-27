@@ -10,7 +10,7 @@ import DayTimeline from '@/components/civeni/DayTimeline';
 import { useCiveniOnlineProgramData } from '@/hooks/useCiveniOnlineProgramData';
 
 const ScheduleOnline = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { settings, days, isLoading, getSessionsForDay } = useCiveniOnlineProgramData();
   const [activeDay, setActiveDay] = useState<string>('');
 
@@ -22,7 +22,7 @@ const ScheduleOnline = () => {
   }, [days, activeDay]);
 
   const generatePDF = () => {
-    window.open('/programacao/impressao?modalidade=online', '_blank');
+    window.open(`/programacao/impressao?modalidade=online&lang=${i18n.language}`, '_blank');
   };
 
   return (

@@ -11,7 +11,7 @@ import DayTimeline from '@/components/civeni/DayTimeline';
 import { Tabs } from '@/components/ui/tabs';
 
 const ScheduleInPerson = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { settings, days, isLoading, getSessionsForDay } = useCiveniProgramData();
   const [activeDay, setActiveDay] = useState<string>('');
 
@@ -23,7 +23,7 @@ const ScheduleInPerson = () => {
   }, [days, activeDay]);
 
   const generatePDF = () => {
-    window.open('/programacao/impressao?modalidade=presencial', '_blank');
+    window.open(`/programacao/impressao?modalidade=presencial&lang=${i18n.language}`, '_blank');
   };
 
   return (

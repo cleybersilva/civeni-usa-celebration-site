@@ -874,6 +874,23 @@ export const esTranslations = {
         visitChannel: "Visita el canal",
         noRoomsAvailable: "Ninguna sala disponible en este momento",
         noRoomsDescription: "Las salas de presentación se publicarán próximamente. Mantente atento a la programación.",
-      }
+      },
+    schedulePdf: {
+      title: 'III CIVENI 2025 – PROGRAMACIÓN OFICIAL',
+      subtitlePresencial: 'Programación Presencial',
+      subtitleOnline: 'Programación En Línea',
+      timezoneObs: '*Horarios en America/Fortaleza (GMT-3). Programación sujeta a cambios.',
+      badgePresencial: 'Presencial',
+      badgeOnline: 'En Línea',
+      tableTime: 'Horario',
+      tableActivity: 'Actividad',
+      tableSpeaker: 'Ponente / Origen',
+      tableLocation: 'Lugar',
+      footerTitle: 'III CIVENI 2025 – Congreso Internacional Virtual de Educación e Innovación',
+      footerSubject: 'Programación sujeta a cambios',
+      footerUpdated: 'Actualizado el',
+      loading: 'Cargando programación...',
+      noSchedule: 'No se encontró programación.',
+    },
   }
 };

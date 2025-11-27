@@ -874,6 +874,23 @@ export const enTranslations = {
         visitChannel: "Visit the channel",
         noRoomsAvailable: "No rooms available at the moment",
         noRoomsDescription: "Presentation rooms will be published soon. Stay tuned to the schedule.",
-      }
+      },
+    schedulePdf: {
+      title: 'III CIVENI 2025 – OFFICIAL SCHEDULE',
+      subtitlePresencial: 'In-Person Schedule',
+      subtitleOnline: 'Online Schedule',
+      timezoneObs: '*Times in America/Fortaleza (GMT-3). Schedule subject to changes.',
+      badgePresencial: 'In-Person',
+      badgeOnline: 'Online',
+      tableTime: 'Time',
+      tableActivity: 'Activity',
+      tableSpeaker: 'Speaker / Origin',
+      tableLocation: 'Location',
+      footerTitle: 'III CIVENI 2025 – International Virtual Congress on Education and Innovation',
+      footerSubject: 'Schedule subject to changes',
+      footerUpdated: 'Updated on',
+      loading: 'Loading schedule...',
+      noSchedule: 'No schedule found.',
+    },
   }
 };
