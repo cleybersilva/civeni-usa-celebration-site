@@ -239,7 +239,7 @@ const Header = () => {
             <div className="hidden lg:flex items-center space-x-4">
               <Link
                 to="/inscricoes"
-                className="bg-civeni-green text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition-colors font-poppins"
+                className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-colors font-poppins"
               >
                 {t('header.registration')}
               </Link>
@@ -326,7 +326,7 @@ const Header = () => {
                   <div className="space-y-3 pt-4">
                     <Link
                       to="/inscricoes"
-                      className="block w-full bg-civeni-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-600 transition-colors text-center"
+                      className="block w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-colors text-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {t('header.registration')}

@@ -127,13 +127,13 @@ const SpeakersSection = () => {
                   <div className="flex justify-between items-center gap-3 md:gap-4">
                     <button
                       onClick={prevSpeaker}
-                      className="bg-civeni-blue text-white px-4 py-2 md:px-6 rounded-full text-sm md:text-base hover:bg-blue-700 transition-colors font-poppins"
+                      className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2 md:px-6 rounded-full text-sm md:text-base hover:opacity-90 transition-colors font-poppins"
                     >
                       {t('speakers.previous')}
                     </button>
                     <button
                       onClick={nextSpeaker}
-                      className="bg-civeni-blue text-white px-4 py-2 md:px-6 rounded-full text-sm md:text-base hover:bg-blue-700 transition-colors font-poppins"
+                      className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2 md:px-6 rounded-full text-sm md:text-base hover:opacity-90 transition-colors font-poppins"
                     >
                       {t('speakers.next')}
                     </button>

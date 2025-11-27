@@ -53,7 +53,7 @@ const ScheduleSection = () => {
                     <span className="text-gray-700">{t('schedule.exhibitionStands')}</span>
                   </div>
                 </div>
-                <button className="w-full mt-6 bg-civeni-blue text-white py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors font-poppins">
+                <button className="w-full mt-6 bg-gradient-to-r from-civeni-blue to-civeni-red text-white py-3 rounded-full font-semibold hover:opacity-90 transition-colors font-poppins">
                   {t('schedule.inPersonButton')}
                 </button>
               </div>
@@ -85,7 +85,7 @@ const ScheduleSection = () => {
                     <span className="text-gray-700">{t('schedule.digitalCertificate')}</span>
                   </div>
                 </div>
-                <button className="w-full mt-6 bg-civeni-red text-white py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins">
+                <button className="w-full mt-6 bg-gradient-to-r from-civeni-blue to-civeni-red text-white py-3 rounded-full font-semibold hover:opacity-90 transition-colors font-poppins">
                   {t('schedule.onlineButton')}
                 </button>
               </div>

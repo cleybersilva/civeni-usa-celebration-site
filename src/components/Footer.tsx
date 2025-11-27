@@ -67,7 +67,7 @@ const Footer = () => {
             <div className="mt-3 md:mt-4 flex justify-center md:justify-start">
               <Link 
                 to="/admin" 
-                className="inline-flex items-center space-x-1.5 md:space-x-2 bg-civeni-red text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-red-700 transition-colors transform hover:scale-105"
+                className="inline-flex items-center space-x-1.5 md:space-x-2 bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:opacity-90 transition-colors transform hover:scale-105"
               >
                 <Lock size={14} className="md:w-4 md:h-4" />
                 <span className="text-xs md:text-sm font-medium">{t('header.adminArea')}</span>

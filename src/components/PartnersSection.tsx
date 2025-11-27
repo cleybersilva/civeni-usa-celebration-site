@@ -149,7 +149,7 @@ const PartnersSection = () => {
             </p>
             <Link 
               to="/seja-nosso-parceiro"
-              className="bg-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition-colors font-poppins inline-block"
+              className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-8 py-3 rounded-full font-semibold hover:opacity-90 transition-colors font-poppins inline-block"
             >
               {t('partners.partnerButton')}
             </Link>
