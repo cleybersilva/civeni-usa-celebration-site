@@ -14,14 +14,11 @@ const AdminSidebarHeader = () => {
       }}
     >
       <div className="flex items-center justify-center h-full">
-        <div>
-          <h2 className="text-xl font-bold text-white drop-shadow-md">
-            CIVENI SaaS
-          </h2>
-          <p className="text-xs text-white/90 drop-shadow-sm">
-            Veni Creator Christian University
-          </p>
-        </div>
+        <img 
+          src="/lovable-uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png" 
+          alt="CIVENI" 
+          className="h-10 w-auto object-contain"
+        />
       </div>
     </SidebarHeader>
   );
