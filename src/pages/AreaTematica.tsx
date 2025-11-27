@@ -110,7 +110,7 @@ const AreaTematica = () => {
                     shouldCenter ? 'md:col-span-2 lg:col-span-3 max-w-md mx-auto' : ''
                   }`}
                 >
-                  <div className={`flex items-center justify-center w-16 h-16 bg-${area.color_class || 'civeni-blue'} rounded-full mb-6 mx-auto`}>
+                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full mb-6 mx-auto">
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-civeni-blue mb-4 font-poppins text-center">
