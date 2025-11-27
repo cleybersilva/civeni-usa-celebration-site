@@ -193,12 +193,18 @@ const Eventos = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="upcoming" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 mb-8 h-auto p-1 bg-gray-100 rounded-xl">
+            <TabsTrigger 
+              value="upcoming" 
+              className="flex items-center gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+            >
               <Calendar className="h-4 w-4" />
               {t('eventsPage.upcomingEvents')}
             </TabsTrigger>
-            <TabsTrigger value="past" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="past" 
+              className="flex items-center gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+            >
               <Clock className="h-4 w-4" />
               {t('eventsPage.pastEvents')}
             </TabsTrigger>
