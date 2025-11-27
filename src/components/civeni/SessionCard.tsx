@@ -159,7 +159,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowTimezones(!showTimezones)}
-                  className="ml-auto text-xs"
+                  className="ml-auto text-xs bg-gradient-to-r from-civeni-blue to-civeni-red text-white hover:opacity-90 hover:text-white"
                 >
                   <Globe className="w-3 h-3 mr-1" />
                   {showTimezones ? t('schedule.session.hideTimezones') : t('schedule.session.showTimezones')}
@@ -223,7 +223,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
               size="sm" 
               variant="outline"
               onClick={generateICS}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white border-0 hover:opacity-90"
             >
               <Download className="w-4 h-4 mr-2" />
               {t('schedule.buttons.addToCalendar')}
@@ -234,7 +234,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                 size="sm" 
                 variant="default"
                 onClick={() => window.open(session.livestream_url, '_blank')}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white border-0 hover:opacity-90"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 {t('schedule.buttons.watchOnline')}
@@ -246,7 +246,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                 size="sm" 
                 variant="secondary"
                 onClick={() => window.open(session.materials_url, '_blank')}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white border-0 hover:opacity-90"
               >
                 <Download className="w-4 h-4 mr-2" />
                 {t('schedule.buttons.materials')}
