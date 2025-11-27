@@ -131,19 +131,21 @@ const Header = () => {
               </button>
               
               {openDropdown === 'language' && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[99999] overflow-hidden">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => changeLanguage(lang.code)}
-                      className={`w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
-                        selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
-                      }`}
-                    >
-                      <FlagEmoji countryCode={lang.code} size="md" />
-                      <span className="text-sm">{lang.name}</span>
-                    </button>
-                  ))}
+                <div className="absolute right-0 mt-2 w-48 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-xl shadow-2xl border border-white/20 z-[99999] overflow-hidden">
+                  <div className="py-2">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => changeLanguage(lang.code)}
+                        className={`w-full px-4 py-3 text-left text-white flex items-center space-x-3 transition-all duration-200 border-b border-white/10 last:border-b-0 hover:bg-white/20 ${
+                          selectedLanguage === lang.code ? 'bg-white/20 font-semibold' : 'font-medium'
+                        }`}
+                      >
+                        <FlagEmoji countryCode={lang.code} size="md" />
+                        <span className="text-sm">{lang.name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
