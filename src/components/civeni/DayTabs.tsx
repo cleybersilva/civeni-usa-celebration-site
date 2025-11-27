@@ -48,15 +48,21 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 h-auto p-0 bg-transparent rounded-none shadow-none overflow-hidden border-0">
-        {days.map((day, index) => (
+      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-none shadow-none overflow-hidden">
+        {days.map((day, index) => {
+          const isActive = activeDay === day.id;
+          
+          return (
             <TabsTrigger 
               key={day.id} 
               value={day.id}
-              className="flex flex-col items-center gap-1 py-4 sm:py-5 px-2 sm:px-4 rounded-none transition-all duration-300 border-0 min-w-0 text-white data-[state=active]:brightness-110 hover:brightness-105"
-              style={{
-                background: 'linear-gradient(90deg, #021b3a 0%, #c51d3b 50%, #021b3a 100%)'
-              }}
+              className={`
+                flex flex-col items-center gap-1 py-4 sm:py-5 px-2 sm:px-4 rounded-none transition-all duration-300 border-0 min-w-0
+                ${isActive 
+                  ? 'bg-white/20 text-white shadow-inner' 
+                  : 'bg-transparent hover:bg-white/10 text-white'
+                }
+              `}
             >
               <div className="flex items-center gap-1 sm:gap-2">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -68,7 +74,8 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
                 {translateWeekday(day.weekday_label)}, {formatDate(day.date)}
               </div>
             </TabsTrigger>
-        ))}
+          );
+        })}
       </TabsList>
     </Tabs>
   );
