@@ -314,7 +314,7 @@ const CongressoComite = () => {
         </section>
 
         {/* Acknowledgment Section */}
-        <section className="py-12 md:py-16 bg-gradient-to-br from-civeni-blue to-civeni-red text-white">
+        <section className="py-12 md:py-16 bg-gradient-to-br from-civeni-red to-civeni-blue text-white">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 md:mb-6">
               {t('congress.committee.acknowledgment.title', 'Agradecimento Especial')}
