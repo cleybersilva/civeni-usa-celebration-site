@@ -195,7 +195,7 @@ const HeroBanner = () => {
               <div className="flex justify-center w-full px-6 sm:px-4">
                 <a 
                   href={slide.buttonLink}
-                  className="inline-block w-full max-w-[280px] sm:max-w-xs bg-civeni-red text-white px-4 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-xs sm:text-sm md:text-base lg:text-xl font-semibold hover:bg-red-700 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins text-center leading-tight"
+                  className="inline-block w-full max-w-[280px] sm:max-w-xs bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-4 rounded-full text-xs sm:text-sm md:text-base lg:text-xl font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 animate-fade-in font-poppins text-center leading-tight"
                   style={{ animationDelay: '0.9s' }}
                 >
                   {getTranslatedText(slide.buttonText, slide.buttonTextEn, slide.buttonTextEs, slide.buttonTextTr)}
