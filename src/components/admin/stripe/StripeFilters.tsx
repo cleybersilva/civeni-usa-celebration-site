@@ -152,7 +152,8 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
           <div className="flex items-end sm:col-span-2 lg:col-span-1">
             <Button 
               onClick={onClearFilters} 
-              className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 text-sm sm:text-base"
+              className="w-full text-white border-0 text-sm sm:text-base"
+              style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
             >
               <X className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Limpar</span>
