@@ -48,7 +48,7 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-2xl shadow-none overflow-hidden">
+      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-none shadow-none overflow-hidden">
         {days.map((day, index) => {
           const isActive = activeDay === day.id;
           
@@ -58,10 +58,10 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
               value={day.id}
               className={`
                 flex flex-col items-center gap-1 py-4 sm:py-5 px-2 sm:px-4 rounded-none transition-all duration-300 border-0 min-w-0
-                !bg-transparent hover:!bg-white/10 !text-white !shadow-none
+                !text-white !shadow-none
                 ${isActive 
-                  ? '!bg-black/30 border-b-2 border-white' 
-                  : 'bg-white/10'
+                  ? '!bg-transparent' 
+                  : '!bg-white/20 hover:!bg-white/10'
                 }
               `}
             >
