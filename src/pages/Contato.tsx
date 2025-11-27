@@ -201,7 +201,7 @@ const Contato = () => {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-civeni-blue hover:bg-blue-700 text-white font-semibold py-3"
+                  className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white font-semibold py-3"
                 >
                   {isSubmitting ? t('contact.sending') : t('contact.sendMessage')}
                 </Button>
@@ -211,7 +211,7 @@ const Contato = () => {
             {/* Informações de Contato e Mapa */}
             <div className="space-y-8">
               {/* Informações de Contato */}
-              <div className="bg-civeni-blue text-white rounded-2xl p-8">
+              <div className="bg-gradient-to-br from-civeni-blue to-civeni-red text-white rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6 font-poppins text-center">
                   {t('contact.contactInfo')}
                 </h2>
@@ -258,7 +258,7 @@ const Contato = () => {
               
               {/* Mapa */}
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="p-4 bg-civeni-blue text-white">
+                <div className="p-4 bg-gradient-to-r from-civeni-blue to-civeni-red text-white">
                   <h3 className="text-lg font-bold font-poppins text-center">
                     {t('contact.location')}
                   </h3>
