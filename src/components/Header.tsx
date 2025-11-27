@@ -121,7 +121,7 @@ const Header = () => {
             <div className="relative">
               <button
                 onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
-                className="flex items-center space-x-1 md:space-x-2 text-white hover:text-civeni-red transition-colors bg-white bg-opacity-10 px-2 py-1 md:px-3 rounded-md hover:bg-opacity-20"
+                className="flex items-center space-x-1 md:space-x-2 text-white hover:opacity-90 transition-colors bg-gradient-to-r from-civeni-blue to-civeni-red px-2 py-1 md:px-3 rounded-md"
               >
                 <FlagEmoji countryCode={selectedLanguage} size="md" />
                 <span className="text-xs md:text-sm font-medium hidden sm:inline">{languages.find(l => l.code === selectedLanguage)?.name}</span>
