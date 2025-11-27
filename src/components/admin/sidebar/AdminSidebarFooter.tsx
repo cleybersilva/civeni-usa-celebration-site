@@ -4,7 +4,7 @@ import { SidebarFooter } from '@/components/ui/sidebar';
 
 const AdminSidebarFooter = () => {
   return (
-    <SidebarFooter className="border-t p-4 bg-gray-50/50">
+    <SidebarFooter className="border-t p-4" style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)' }}>
       <div className="flex justify-center items-center">
         <img 
           src="/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png" 
