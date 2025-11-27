@@ -835,6 +835,23 @@ export const trTranslations = {
         visitChannel: "Kanalı ziyaret edin",
         noRoomsAvailable: "Şu anda uygun oda yok",
         noRoomsDescription: "Sunum odaları yakında yayınlanacaktır. Programa dikkat edin.",
-      }
+      },
+    schedulePdf: {
+      title: 'III CIVENI 2025 – RESMİ PROGRAM',
+      subtitlePresencial: 'Yüz Yüze Program',
+      subtitleOnline: 'Online Program',
+      timezoneObs: '*Saatler America/Fortaleza (GMT-3) saat diliminde. Program değişikliğe tabidir.',
+      badgePresencial: 'Yüz Yüze',
+      badgeOnline: 'Online',
+      tableTime: 'Saat',
+      tableActivity: 'Etkinlik',
+      tableSpeaker: 'Konuşmacı / Köken',
+      tableLocation: 'Konum',
+      footerTitle: 'III CIVENI 2025 – Uluslararası Sanal Eğitim ve İnovasyon Kongresi',
+      footerSubject: 'Program değişikliğe tabidir',
+      footerUpdated: 'Güncellenme tarihi',
+      loading: 'Program yükleniyor...',
+      noSchedule: 'Program bulunamadı.',
+    },
   }
 };
