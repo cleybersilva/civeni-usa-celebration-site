@@ -247,9 +247,9 @@ const ApresentacaoOral = () => {
             </div>
 
             <Tabs defaultValue="lista" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="lista">Lista</TabsTrigger>
-                <TabsTrigger value="template">Template</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-8 h-auto p-1 bg-gray-100 rounded-lg">
+                <TabsTrigger value="lista" className="py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">Lista</TabsTrigger>
+                <TabsTrigger value="template" className="py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">Template</TabsTrigger>
               </TabsList>
 
               <TabsContent value="lista">
@@ -263,7 +263,9 @@ const ApresentacaoOral = () => {
                 ) : (
                   <Card>
                     <CardContent className="p-8 text-center">
-                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full flex items-center justify-center">
+                        <FileText className="h-8 w-8 text-white" />
+                      </div>
                       <h3 className="text-lg font-semibold mb-2">
                         {t('works.oral.noContent', 'Conteúdo em breve')}
                       </h3>
