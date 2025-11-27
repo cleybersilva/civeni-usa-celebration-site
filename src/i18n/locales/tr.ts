@@ -149,8 +149,6 @@ export const trTranslations = {
         sunday: 'Pazar',
       },
       noSessionsForDay: 'Bu gün için henüz yayınlanmış oturum yok.',
-      pdfGenerated: 'PDF başarıyla oluşturuldu!',
-      pdfError: 'PDF oluşturulurken hata. Lütfen tekrar deneyin.',
     },
     scheduleSection: {
       title: "Deneyiminizi Seçin"

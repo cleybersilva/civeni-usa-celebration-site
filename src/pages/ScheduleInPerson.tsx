@@ -9,14 +9,11 @@ import { useCiveniProgramData } from '@/hooks/useCiveniProgramData';
 import DayTabs from '@/components/civeni/DayTabs';
 import DayTimeline from '@/components/civeni/DayTimeline';
 import { Tabs } from '@/components/ui/tabs';
-import { generateSchedulePdf } from '@/lib/pdf/generateSchedulePdf';
-import { toast } from 'sonner';
 
 const ScheduleInPerson = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { settings, days, isLoading, getSessionsForDay } = useCiveniProgramData();
   const [activeDay, setActiveDay] = useState<string>('');
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   // Set first day as active when data loads
   React.useEffect(() => {
@@ -25,18 +22,8 @@ const ScheduleInPerson = () => {
     }
   }, [days, activeDay]);
 
-  const generatePDF = async () => {
-    try {
-      setIsGeneratingPdf(true);
-      const lang = i18n.language || 'pt';
-      await generateSchedulePdf('presencial', lang);
-      toast.success(t('schedule.pdfGenerated') || 'PDF gerado com sucesso!');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error(t('schedule.pdfError') || 'Erro ao gerar PDF');
-    } finally {
-      setIsGeneratingPdf(false);
-    }
+  const generatePDF = () => {
+    window.open('/programacao/impressao?modalidade=presencial', '_blank');
   };
 
   return (
@@ -76,15 +63,10 @@ const ScheduleInPerson = () => {
                 
                 <button 
                   onClick={generatePDF}
-                  disabled={isGeneratingPdf}
-                  className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto border-white text-white hover:bg-white/20 border-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors flex items-center justify-center gap-2"
                 >
-                  {isGeneratingPdf ? (
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                  )}
-                  {isGeneratingPdf ? t('common.loading') : t('schedule.buttons.download')}
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                  {t('schedule.buttons.download')}
                 </button>
               </div>
           </div>
