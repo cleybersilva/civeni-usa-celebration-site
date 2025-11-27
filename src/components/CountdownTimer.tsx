@@ -152,7 +152,7 @@ const CountdownTimer = () => {
 
         <a
           href="/inscricoes"
-          className="inline-block bg-gradient-to-r from-civeni-blue to-civeni-red text-white font-bold py-4 px-10 rounded-full text-lg hover:opacity-90 transition-opacity shadow-lg"
+          className="inline-block bg-civeni-red text-white font-bold py-4 px-10 rounded-full text-lg hover:bg-red-700 transition-colors shadow-lg"
         >
           {t('countdown.registerNow')}
         </a>

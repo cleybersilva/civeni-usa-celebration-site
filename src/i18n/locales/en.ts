@@ -68,7 +68,8 @@ export const enTranslations = {
       days: "Days",
       hours: "Hours",
       minutes: "Minutes",
-      seconds: "Seconds"
+      seconds: "Seconds",
+      registerNow: "Register Now"
     },
     schedule: {
       title: "Schedule",

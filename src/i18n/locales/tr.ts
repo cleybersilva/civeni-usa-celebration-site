@@ -68,7 +68,8 @@ export const trTranslations = {
       days: "Gün",
       hours: "Saat",
       minutes: "Dakika",
-      seconds: "Saniye"
+      seconds: "Saniye",
+      registerNow: "Şimdi Kayıt Ol"
     },
     schedule: {
       title: "Program",
