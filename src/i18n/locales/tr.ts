@@ -199,7 +199,24 @@ export const trTranslations = {
       featuredSpeakersDescription: "Uzmanlık alanlarında en son yenilikleri ve perspektifleri getirecek dünya çapında tanınan profesyoneller",
       comingSoon: "Konuşmacılar Yakında",
       comingSoonDescription: "Dünya çapında ünlü uzmanlardan oluşan seçimimizi tamamlıyoruz. Konuşmacılar yakında duyurulacak!",
-      secureSpot: "Yerimizi Ayır"
+      secureSpot: "Yerimizi Ayır",
+      retryLoadImage: "Resmi yeniden yüklemeyi deneyin",
+      roles: {
+        professor: "Profesör",
+        judge: "Hakim",
+        researcher: "Araştırmacı",
+        coordinator: "Koordinatör",
+        director: "Direktör",
+        doctor: "Doktor"
+      },
+      countries: {
+        brazil: "Brezilya",
+        usa: "Amerika Birleşik Devletleri",
+        india: "Hindistan",
+        portugal: "Portekiz",
+        spain: "İspanya",
+        turkey: "Türkiye"
+      }
     },
     thematicAreasPage: {
       pageTitle: "Tematik Alanlar",

@@ -201,7 +201,24 @@ export const esTranslations = {
       featuredSpeakersDescription: "Profesionales reconocidos mundialmente que traerán las innovaciones y perspectivas más recientes en sus áreas de especialidad",
       comingSoon: "Ponentes Próximamente",
       comingSoonDescription: "Estamos finalizando nuestra selección de expertos de renombre mundial. ¡Los ponentes serán anunciados pronto!",
-      secureSpot: "Asegurar Mi Lugar"
+      secureSpot: "Asegurar Mi Lugar",
+      retryLoadImage: "Reintentar cargar imagen",
+      roles: {
+        professor: "Profesor",
+        judge: "Juez",
+        researcher: "Investigador",
+        coordinator: "Coordinador",
+        director: "Director",
+        doctor: "Doctor"
+      },
+      countries: {
+        brazil: "Brasil",
+        usa: "Estados Unidos",
+        india: "India",
+        portugal: "Portugal",
+        spain: "España",
+        turkey: "Turquía"
+      }
     },
     thematicAreasPage: {
       pageTitle: "Áreas Temáticas",
