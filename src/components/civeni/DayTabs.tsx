@@ -48,24 +48,19 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-2 bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl shadow-sm">
+      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-white rounded-t-2xl shadow-lg border border-border/30 overflow-hidden">
         {days.map((day, index) => {
           const isActive = activeDay === day.id;
-          const gradientColors = [
-            'from-civeni-blue/90 to-civeni-blue/70',
-            'from-civeni-red/90 to-civeni-red/70', 
-            'from-purple-600/90 to-purple-500/70'
-          ];
           
           return (
             <TabsTrigger 
               key={day.id} 
               value={day.id}
               className={`
-                flex flex-col items-center gap-1 py-4 px-3 rounded-lg transition-all duration-300
+                flex flex-col items-center gap-1 py-5 px-4 rounded-none transition-all duration-300 border-0
                 ${isActive 
-                  ? `bg-gradient-to-br ${gradientColors[index % 3]} text-white shadow-lg scale-[1.02]` 
-                  : 'bg-white/60 hover:bg-white hover:shadow-md text-foreground'
+                  ? 'bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue text-white' 
+                  : 'bg-transparent hover:bg-slate-50 text-civeni-blue'
                 }
               `}
             >
