@@ -250,9 +250,9 @@ const CiveniProgramManager = () => {
         </TabsList>
 
         <TabsContent value="days">
-          <Card className="p-0 overflow-hidden">
-            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
-              <h2 className="text-xl font-semibold text-white">Dias da Programação</h2>
+          <Card className="p-0 overflow-hidden rounded-lg">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg text-white">
+              <h2 className="text-xl font-semibold">Dias da Programação</h2>
               <Button onClick={handleCreateDay} variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Dia
@@ -326,9 +326,9 @@ const CiveniProgramManager = () => {
         </TabsContent>
 
         <TabsContent value="sessions">
-          <Card className="p-0 overflow-hidden">
-            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg">
-              <h2 className="text-xl font-semibold text-white">Sessões</h2>
+          <Card className="p-0 overflow-hidden rounded-lg">
+            <div className="flex justify-between items-center p-6 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-lg text-white">
+              <h2 className="text-xl font-semibold">Sessões</h2>
               <Button onClick={() => handleCreateSession()} variant="secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Sessão
@@ -342,9 +342,9 @@ const CiveniProgramManager = () => {
                 if (!daySessions.length) return null;
 
                 return (
-                  <div key={day.id} className="overflow-hidden rounded-lg border">
-                    <div className="bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue p-4">
-                      <h3 className="font-semibold text-lg text-white text-center">
+                  <div key={day.id} className="overflow-hidden rounded-lg border shadow-sm">
+                    <div className="bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue p-4 text-white">
+                      <h3 className="font-semibold text-lg text-center">
                         {day.weekday_label} - {formatDate(day.date)}
                       </h3>
                     </div>
