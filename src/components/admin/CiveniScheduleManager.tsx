@@ -259,12 +259,13 @@ const CiveniScheduleManager = () => {
             <TabsContent value={selectedType} className="space-y-6">
               {/* Dias Section */}
               <div>
-                <div className="flex flex-col items-center mb-4 p-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20">
-                  <h3 className="text-lg font-semibold mb-3 text-center">Dias da Programação</h3>
+                <div className="flex flex-col items-center mb-4 p-4 rounded-lg text-white" style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)' }}>
+                  <h3 className="text-lg font-semibold mb-3 text-center text-white">Dias da Programação</h3>
                   <Button onClick={() => {
                     setEditingDay(null);
                     setIsDayDialogOpen(true);
                   }}
+                  variant="secondary"
                   className="shadow-lg hover:shadow-xl transition-all hover:scale-105">
                     <Plus className="h-4 w-4 mr-2" />
                     Novo Dia
@@ -359,9 +360,9 @@ const CiveniScheduleManager = () => {
 
                       return (
                         <div key={day.id} className="animate-fade-in">
-                          <div className="flex flex-col items-center mb-4 p-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                          <div className="flex flex-col items-center mb-4 p-4 rounded-lg text-white" style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)' }}>
                             <div className="flex items-center gap-2 mb-3">
-                              <h4 className="font-semibold text-lg text-center">
+                              <h4 className="font-semibold text-lg text-center text-white">
                                 {day.weekday_label} - {formatDate(day.date)}
                               </h4>
                               <Button
@@ -371,13 +372,14 @@ const CiveniScheduleManager = () => {
                                   setEditingDay(day);
                                   setIsDayDialogOpen(true);
                                 }}
-                                className="hover:scale-110 transition-transform"
+                                className="hover:scale-110 transition-transform text-white hover:bg-white/20"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </div>
                             <Button
                               size="sm"
+                              variant="secondary"
                               onClick={() => {
                                 setEditingSession(null);
                                 setPreselectedDayId(day.id);
