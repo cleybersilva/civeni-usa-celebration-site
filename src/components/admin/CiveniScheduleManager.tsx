@@ -80,17 +80,28 @@ const CiveniScheduleManager = () => {
 
   const reorderSessionsMutation = useMutation({
     mutationFn: async ({ sessionIds, dayId }: { sessionIds: string[], dayId: string }) => {
-      const updates = sessionIds.map((id, index) => 
-        supabase
-          .from('civeni_program_sessions')
-          .update({ order_in_day: index })
-          .eq('id', id)
+      console.log('Reordenando sessões:', sessionIds);
+      
+      // Executar todas as atualizações em paralelo
+      await Promise.all(
+        sessionIds.map(async (id, index) => {
+          const { error } = await supabase
+            .from('civeni_program_sessions')
+            .update({ order_in_day: index })
+            .eq('id', id);
+          
+          if (error) {
+            console.error(`Erro ao atualizar sessão ${id}:`, error);
+            throw error;
+          }
+        })
       );
       
-      await Promise.all(updates);
+      console.log('Todas as sessões foram reordenadas com sucesso');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['civeni-sessions', selectedType] });
+      queryClient.invalidateQueries({ queryKey: ['civeni-program-sessions', selectedType] });
       toast.success('Ordem das sessões atualizada');
     },
     onError: (error) => {
