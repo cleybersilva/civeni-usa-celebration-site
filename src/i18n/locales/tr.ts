@@ -17,7 +17,7 @@ export const trTranslations = {
       online: "Online",
       papers: "Bildiriler",
       submission: "Gönderim",
-      oralPresentation: "Sözlü Sunum",
+      oralPresentation: "Sunum Listesi Makaleler/Projeler",
       posterSessions: "Poster Oturumları",
       manuscripts: "El Yazmaları",
       thematicAreas: "Tematik Alanlar",
@@ -623,7 +623,7 @@ export const trTranslations = {
       works: {
         title: "Çalışmalar",
         description: "Akademik çalışmalar içeriğini yönetin",
-        oralPresentation: "Sözlü Sunum",
+        oralPresentation: "Sunum Listesi Makaleler/Projeler",
         posterSessions: "Poster Oturumları",
         manuscripts: "El Yazmaları"
       }
