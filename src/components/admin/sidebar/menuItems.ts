@@ -90,7 +90,7 @@ export const createMenuItems = (
       id: 'local',
       label: t('admin.menu.venue', 'Local'),
       icon: MapPin,
-      show: hasPermission('local') || isAdminRoot(),
+      show: false,
       isPriority: false
     },
     {
@@ -125,7 +125,7 @@ export const createMenuItems = (
       id: 'sincronizacao',
       label: t('admin.menu.sync', 'Sincronização'),
       icon: Settings,
-      show: hasPermission('admin') || isAdminRoot(),
+      show: false,
       isPriority: false
     },
     {
