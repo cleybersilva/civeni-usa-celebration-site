@@ -69,7 +69,7 @@ const AboutSection = () => {
               console.log('Button clicked, navigating to /area-tematica');
               navigate('/area-tematica');
             }}
-            className="bg-civeni-blue text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-base md:text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 font-poppins cursor-pointer"
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-base md:text-lg font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-105 font-poppins cursor-pointer"
           >
             {t('about.learnMore')}
           </button>
