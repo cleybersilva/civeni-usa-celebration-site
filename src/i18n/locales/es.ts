@@ -700,6 +700,7 @@ export const esTranslations = {
       },
       common: {
         loading: "Cargando",
+        loadingBanners: "Cargando banners de CIVENI 2025...",
         previous: "Anterior",
         next: "Siguiente",
         goToImage: "Ir a la imagen"

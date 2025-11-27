@@ -703,6 +703,7 @@ export const ptTranslations = {
       noRoomsDescription: "As salas de apresentação serão publicadas em breve. Fique atento aos horários da programação.",
       common: {
         loading: "Carregando",
+        loadingBanners: "Carregando banners do CIVENI 2025...",
         previous: "Anterior",
         next: "Próximo",
         goToImage: "Ir para imagem"
