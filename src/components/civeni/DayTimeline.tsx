@@ -94,7 +94,7 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
 
   return (
     <TabsContent value={day.id} className="space-y-6 mt-0">
-      <div className="text-center py-6 bg-gradient-to-br from-civeni-blue to-civeni-red rounded-lg text-white">
+      <div className="text-center py-6 bg-gradient-to-br from-civeni-blue to-civeni-red rounded-b-lg text-white">
         <h2 className="text-2xl font-bold text-white mb-2">
           {day.headline}
         </h2>
