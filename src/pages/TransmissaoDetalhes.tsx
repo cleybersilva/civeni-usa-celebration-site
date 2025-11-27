@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
-import { ArrowLeft, Play, Calendar, Clock, MapPin, ExternalLink, Users, Video } from 'lucide-react';
+import { ArrowLeft, Play, Calendar, Clock, MapPin, ExternalLink, Users, Video, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,10 @@ const TransmissaoDetalhes = () => {
           <p className="text-muted-foreground mb-8">
             A transmissão que você está procurando não existe ou não está disponível.
           </p>
-          <Button onClick={() => navigate('/transmissao-ao-vivo')}>
+          <Button 
+            onClick={() => navigate('/transmissao-ao-vivo')}
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar para Transmissões
           </Button>
@@ -118,7 +121,7 @@ const TransmissaoDetalhes = () => {
           {/* Back Button */}
           <Button
             variant="ghost"
-            className="mb-6 text-white hover:bg-white/20"
+            className="mb-6 text-white hover:bg-white/20 border border-white/30"
             onClick={() => navigate('/transmissao-ao-vivo')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -187,7 +190,7 @@ const TransmissaoDetalhes = () => {
               {transmission.status === 'live' && (
                 <Button
                   size="lg"
-                  className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto"
+                  className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto font-semibold"
                   onClick={() => document.querySelector('#player')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   <Play className="w-5 h-5 mr-2" />
@@ -197,7 +200,7 @@ const TransmissaoDetalhes = () => {
               {transmission.status === 'scheduled' && (
                 <Button
                   size="lg"
-                  className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto"
+                  className="bg-white text-civeni-blue hover:bg-white/90 w-full sm:w-auto font-semibold"
                   asChild
                 >
                   <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
@@ -208,7 +211,7 @@ const TransmissaoDetalhes = () => {
               )}
               <Button
                 size="lg"
-                className="bg-white text-civeni-blue hover:bg-white/90 border-2 border-white w-full sm:w-auto"
+                className="bg-civeni-red hover:bg-civeni-red/90 text-white w-full sm:w-auto font-semibold"
                 asChild
               >
                 <a href="https://civeni.com/inscricoes" target="_blank" rel="noopener noreferrer">
@@ -230,7 +233,7 @@ const TransmissaoDetalhes = () => {
             {transmission.youtube_video_id ? (
               <div id="player" className="space-y-4">
                 <h2 className="text-2xl font-bold mb-4">Player</h2>
-                <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-gray-200">
                   <iframe
                     width="100%"
                     height="100%"
@@ -247,7 +250,11 @@ const TransmissaoDetalhes = () => {
                   <p className="text-sm text-muted-foreground">
                     Canal: {transmission.channel_handle}
                   </p>
-                  <Button variant="ghost" size="sm" asChild>
+                  <Button 
+                    size="sm" 
+                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white group"
+                    asChild
+                  >
                     <a
                       href="https://www.youtube.com/@veniuniversity"
                       target="_blank"
@@ -255,27 +262,32 @@ const TransmissaoDetalhes = () => {
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Abrir no YouTube
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
                 </div>
               </div>
             ) : (
-              <Card className="p-12 text-center">
+              <Card className="p-12 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
                 <Video className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-xl font-semibold mb-2">{t('transmission.noVideoTitle')}</h3>
-                <p className="text-muted-foreground mb-4">
+                <p className="text-muted-foreground mb-6">
                   {transmission.status === 'scheduled' 
                     ? t('transmission.noVideoDescription')
                     : t('transmission.noReplayAvailable')}
                 </p>
                 {transmission.channel_handle && (
-                  <Button variant="outline" asChild>
+                  <Button 
+                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white group"
+                    asChild
+                  >
                     <a
                       href="https://www.youtube.com/@veniuniversity"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {t('transmission.visitChannel')}
+                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </Button>
                 )}
@@ -288,7 +300,7 @@ const TransmissaoDetalhes = () => {
                 <h2 className="text-2xl font-bold mb-4">Salas disponíveis</h2>
                 <div className="grid gap-4">
                   {rooms.map((room) => (
-                    <Card key={room.id} className="p-6">
+                    <Card key={room.id} className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md hover:shadow-lg transition-all">
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="font-semibold text-lg mb-1">
@@ -299,7 +311,10 @@ const TransmissaoDetalhes = () => {
                           )}
                         </div>
                       </div>
-                      <Button className="w-full" asChild>
+                      <Button 
+                        className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white" 
+                        asChild
+                      >
                         <a href={room.meet_url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="w-4 h-4 mr-2" />
                           Entrar na sala
@@ -315,7 +330,7 @@ const TransmissaoDetalhes = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Event Info */}
-            <Card className="p-6">
+            <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md">
               <h3 className="font-semibold text-lg mb-6 text-center">
                 {t('transmission.info', 'Informações')}
               </h3>
@@ -323,12 +338,14 @@ const TransmissaoDetalhes = () => {
                 {startAt && (
                   <div className="text-center">
                     <div className="flex justify-center mb-2">
-                      <Calendar className="w-5 h-5 text-muted-foreground" />
+                      <div className="p-2 bg-civeni-blue/10 rounded-full">
+                        <Calendar className="w-5 h-5 text-civeni-blue" />
+                      </div>
                     </div>
                     <p className="font-semibold text-base mb-1">
                       {t('transmission.date', 'Data')}
                     </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-civeni-blue leading-relaxed">
                       {startAt.toLocaleDateString(locale, { 
                         weekday: 'long',
                         year: 'numeric',
@@ -341,12 +358,14 @@ const TransmissaoDetalhes = () => {
                 {startAt && (
                   <div className="text-center">
                     <div className="flex justify-center mb-2">
-                      <Clock className="w-5 h-5 text-muted-foreground" />
+                      <div className="p-2 bg-civeni-blue/10 rounded-full">
+                        <Clock className="w-5 h-5 text-civeni-blue" />
+                      </div>
                     </div>
                     <p className="font-semibold text-base mb-1">
                       {t('transmission.time', 'Horário')}
                     </p>
-                    <p className="text-sm text-muted-foreground mb-1">
+                    <p className="text-sm text-civeni-blue mb-1">
                       {startAt.toLocaleTimeString(locale, { timeStyle: 'short' })}
                       {endAt && ` - ${endAt.toLocaleTimeString(locale, { timeStyle: 'short' })}`}
                     </p>
@@ -358,12 +377,14 @@ const TransmissaoDetalhes = () => {
                 <Separator />
                 <div className="text-center">
                   <div className="flex justify-center mb-2">
-                    <MapPin className="w-5 h-5 text-muted-foreground" />
+                    <div className="p-2 bg-civeni-blue/10 rounded-full">
+                      <MapPin className="w-5 h-5 text-civeni-blue" />
+                    </div>
                   </div>
                   <p className="font-semibold text-base mb-1">
                     {t('transmission.location', 'Local')}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-civeni-blue">
                     {t('transmission.onlineTransmission', 'Transmissão Online')}
                   </p>
                 </div>
@@ -371,13 +392,16 @@ const TransmissaoDetalhes = () => {
             </Card>
 
             {/* Quick Links */}
-            <Card className="p-6">
+            <Card className="p-6 bg-gradient-to-br from-white to-gray-50 border-gray-200 shadow-md">
               <h3 className="font-semibold text-lg mb-6 text-center">
                 {t('transmission.usefulLinks', 'Links úteis')}
               </h3>
               <div className="space-y-3">
                 {transmission.schedule_url && (
-                  <Button variant="outline" className="w-full justify-center gap-2" asChild>
+                  <Button 
+                    className="w-full justify-center gap-2 bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white" 
+                    asChild
+                  >
                     <a href={transmission.schedule_url}>
                       <Calendar className="w-4 h-4" />
                       {t('transmission.viewSchedule', 'Ver programação')}
@@ -385,14 +409,20 @@ const TransmissaoDetalhes = () => {
                   </Button>
                 )}
                 {transmission.faq_url && (
-                  <Button variant="outline" className="w-full justify-center gap-2" asChild>
+                  <Button 
+                    className="w-full justify-center gap-2 bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white" 
+                    asChild
+                  >
                     <a href={transmission.faq_url}>
                       <ExternalLink className="w-4 h-4" />
                       FAQ
                     </a>
                   </Button>
                 )}
-                <Button variant="outline" className="w-full justify-center gap-2" asChild>
+                <Button 
+                  className="w-full justify-center gap-2 bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white" 
+                  asChild
+                >
                   <a href="https://www.youtube.com/@veniuniversity" target="_blank" rel="noopener noreferrer">
                     <Video className="w-4 h-4" />
                     {t('transmission.youtubeChannel', 'Canal do YouTube')}
