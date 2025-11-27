@@ -13,7 +13,7 @@ const Footer = () => {
     { name: t('footer.about'), href: '/sobre' },
     { name: t('footer.schedule'), href: '/cronograma-presencial' },
     { name: t('footer.speakers'), href: '/palestrantes' },
-    { name: 'Transmissão ao Vivo', href: '/transmissao-ao-vivo' },
+    { name: t('footer.liveStream'), href: '/transmissao-ao-vivo' },
     { name: t('footer.registration'), href: '/inscricoes' },
     { name: t('footer.contact'), href: '/contato' }
   ];

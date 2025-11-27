@@ -52,7 +52,7 @@ const Header = () => {
       items: [
         { name: t('header.inPerson'), href: '/programacao-presencial' },
         { name: t('header.online'), href: '/programacao-online' },
-        { name: 'Transmissão ao Vivo', href: '/transmissao-ao-vivo' }
+        { name: t('header.liveStream'), href: '/transmissao-ao-vivo' }
       ]
     },
     {
