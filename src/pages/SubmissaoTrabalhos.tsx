@@ -328,9 +328,9 @@ const SubmissaoTrabalhos = () => {
 
             <div className="bg-white rounded-2xl shadow-xl p-8 border">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="artigo">Submissão de Artigos</TabsTrigger>
-                  <TabsTrigger value="consorcio">Submissão de Projeto</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-gray-100 rounded-lg">
+                  <TabsTrigger value="artigo" className="py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">Submissão de Artigos</TabsTrigger>
+                  <TabsTrigger value="consorcio" className="py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">Submissão de Projeto</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="artigo" className="mt-6">
@@ -516,7 +516,7 @@ const SubmissaoTrabalhos = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting || !validationStatus.checked || !validationStatus.allowed}
-                        className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white py-4 px-8 rounded-lg font-semibold hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isSubmitting ? 'Enviando...' : 'Submeter Artigo'}
                       </button>
@@ -707,7 +707,7 @@ const SubmissaoTrabalhos = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting || !validationStatus.checked || !validationStatus.allowed}
-                        className="w-full bg-civeni-blue text-white py-4 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red text-white py-4 px-8 rounded-lg font-semibold hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isSubmitting ? 'Enviando...' : 'Submeter Projeto'}
                       </button>
