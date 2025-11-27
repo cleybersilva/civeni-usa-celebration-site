@@ -48,7 +48,7 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-none shadow-none overflow-hidden">
+      <TabsList className="grid w-full grid-cols-3 mb-0 h-auto p-0 bg-gradient-to-r from-civeni-blue via-civeni-red to-civeni-blue rounded-t-2xl shadow-none overflow-hidden">
         {days.map((day, index) => {
           const isActive = activeDay === day.id;
           
