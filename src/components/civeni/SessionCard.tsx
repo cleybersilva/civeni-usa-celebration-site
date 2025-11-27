@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,6 +28,7 @@ interface SessionCardProps {
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) => {
+  const { t } = useTranslation();
   const [showTimezones, setShowTimezones] = useState(false);
   
   const formatTime = (timeString: string) => {
@@ -77,6 +79,14 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
       'hibrido': 'bg-amber-100 text-amber-800'
     };
     return colors[modality] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getTranslatedSessionType = (type: string) => {
+    return t(`schedule.sessionTypes.${type}`) || type.replace('_', ' ').toUpperCase();
+  };
+
+  const getTranslatedModality = (modality: string) => {
+    return t(`schedule.modality.${modality}`) || modality.toUpperCase();
   };
 
   const generateICS = () => {
@@ -135,13 +145,13 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                 
                 {isLive && (
                   <Badge variant="destructive" className="ml-2">
-                    AO VIVO
+                    {t('schedule.session.live')}
                   </Badge>
                 )}
                 
                 {isNext && (
                   <Badge variant="secondary" className="ml-2">
-                    PRÓXIMA
+                    {t('schedule.session.next')}
                   </Badge>
                 )}
                 
@@ -152,7 +162,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                   className="ml-auto text-xs"
                 >
                   <Globe className="w-3 h-3 mr-1" />
-                  {showTimezones ? 'Ocultar' : 'Ver'} todos os horários
+                  {showTimezones ? t('schedule.session.hideTimezones') : t('schedule.session.showTimezones')}
                 </Button>
               </div>
               
@@ -179,23 +189,23 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
 
             <div className="flex flex-wrap gap-2 mb-4">
               <Badge className={getSessionTypeColor(session.session_type)}>
-                {session.session_type.replace('_', ' ').toUpperCase()}
+                {getTranslatedSessionType(session.session_type)}
               </Badge>
               
               <Badge className={getModalityColor(session.modality)}>
-                {session.modality.toUpperCase()}
+                {getTranslatedModality(session.modality)}
               </Badge>
 
               {session.is_parallel && (
                 <Badge variant="outline">
                   <Users className="w-3 h-3 mr-1" />
-                  SIMULTÂNEA
+                  {t('schedule.session.parallel')}
                 </Badge>
               )}
 
               {session.is_featured && (
                 <Badge variant="secondary">
-                  ⭐ DESTAQUE
+                  ⭐ {t('schedule.session.featured')}
                 </Badge>
               )}
             </div>
@@ -216,7 +226,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
               className="w-full"
             >
               <Download className="w-4 h-4 mr-2" />
-              Adicionar à agenda
+              {t('schedule.buttons.addToCalendar')}
             </Button>
 
             {session.livestream_url && (
@@ -227,7 +237,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                 className="w-full"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Assistir online
+                {t('schedule.buttons.watchOnline')}
               </Button>
             )}
 
@@ -239,7 +249,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
                 className="w-full"
               >
                 <Download className="w-4 h-4 mr-2" />
-                Materiais
+                {t('schedule.buttons.materials')}
               </Button>
             )}
           </div>
