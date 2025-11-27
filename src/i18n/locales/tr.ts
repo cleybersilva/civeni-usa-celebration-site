@@ -661,6 +661,7 @@ export const trTranslations = {
       },
       common: {
         loading: "Yükleniyor",
+        loadingBanners: "CIVENI 2025 afişleri yükleniyor...",
         previous: "Önceki",
         next: "Sonraki",
         goToImage: "Resme git"

@@ -5,13 +5,61 @@ import { useCMS } from '@/contexts/CMSContext';
 
 const HeroBanner = () => {
   const { t, i18n } = useTranslation();
-  const { content } = useCMS();
+  const { content, loading: cmsLoading } = useCMS();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   // Filtrar apenas slides ativos para exibição pública
   const slides = content.bannerSlides
     .filter(slide => slide.id && slide.id !== 'new') // Filtrar slides válidos
     .sort((a, b) => a.order - b.order);
+  
+  // Pré-carregar imagens dos banners
+  useEffect(() => {
+    const preloadImages = async () => {
+      if (slides.length === 0) {
+        setImagesLoaded(true);
+        return;
+      }
+
+      console.log('🖼️ Pré-carregando', slides.length, 'imagens de banner...');
+      let loaded = 0;
+      const total = slides.length;
+
+      await Promise.all(
+        slides.map((slide) => {
+          return new Promise<void>((resolve) => {
+            const img = new Image();
+            img.src = slide.bgImage;
+            
+            img.onload = () => {
+              loaded += 1;
+              const progress = Math.round((loaded / total) * 100);
+              setLoadingProgress(progress);
+              console.log(`✅ Imagem ${loaded}/${total} carregada (${progress}%)`);
+              resolve();
+            };
+            
+            img.onerror = () => {
+              loaded += 1;
+              const progress = Math.round((loaded / total) * 100);
+              setLoadingProgress(progress);
+              console.warn(`⚠️ Erro ao carregar imagem ${loaded}/${total}`);
+              resolve();
+            };
+          });
+        })
+      );
+
+      console.log('🎉 Todas as imagens foram pré-carregadas!');
+      setImagesLoaded(true);
+    };
+
+    if (!cmsLoading && slides.length > 0) {
+      preloadImages();
+    }
+  }, [cmsLoading, slides]);
 
   // Debug: Log completo dos slides
   useEffect(() => {
@@ -61,6 +109,42 @@ const HeroBanner = () => {
   }, [slides.length]);
 
 
+  // Mostrar loading enquanto CMS está carregando ou imagens estão sendo pré-carregadas
+  const isLoading = cmsLoading || !imagesLoaded;
+
+  if (isLoading) {
+    return (
+      <section className="relative h-screen overflow-hidden bg-gradient-to-br from-civeni-blue via-[#731b4c] to-civeni-red">
+        <div className="relative z-10 flex items-center justify-center h-full px-4">
+          <div className="text-center text-white max-w-2xl w-full">
+            <div className="mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold font-poppins mb-4">
+                CIVENI 2025
+              </h1>
+              <p className="text-lg md:text-xl opacity-90">
+                {t('transmission.common.loadingBanners', 'Carregando banners do CIVENI 2025...')}
+              </p>
+            </div>
+            
+            {/* Barra de progresso */}
+            <div className="w-full max-w-md mx-auto">
+              <div className="relative h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                <div 
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-white to-white/90 transition-all duration-300 ease-out rounded-full"
+                  style={{ width: `${loadingProgress}%` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-pulse"></div>
+                </div>
+              </div>
+              <p className="text-2xl font-bold mt-4 font-poppins">{loadingProgress}%</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Se não há banners após o loading, mostrar mensagem
   if (slides.length === 0) {
     return (
       <section className="relative h-screen overflow-hidden bg-gradient-to-br from-civeni-blue to-blue-800">
@@ -71,9 +155,6 @@ const HeroBanner = () => {
             </h1>
             <p className="text-xl md:text-2xl mb-4">
               Congresso Internacional Virtual de Enfermagem
-            </p>
-            <p className="text-lg md:text-xl mb-8">
-              Carregando banner...
             </p>
           </div>
         </div>

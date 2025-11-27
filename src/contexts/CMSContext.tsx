@@ -221,38 +221,7 @@ const defaultContent: CMSContent = {
       order: 4
     }
   ],
-  bannerSlides: [
-    {
-      id: '1',
-      title: "III International Multidisciplinary Congress",
-      subtitle: "Join us for three days of innovation and discovery",
-      description: "December 8-10, 2025 • Celebration, Florida",
-      bgImage: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=2000&q=80",
-      buttonText: "Register Here",
-      buttonLink: "#registration",
-      order: 1
-    },
-    {
-      id: '2',
-      title: "World-Class Speakers",
-      subtitle: "Learn from international experts in various fields",
-      description: "Keynote presentations and panel discussions",
-      bgImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=80",
-      buttonText: "Register Here",
-      buttonLink: "#registration",
-      order: 2
-    },
-    {
-      id: '3',
-      title: "Submit Your Research",
-      subtitle: "Share your work with the global community",
-      description: "Oral presentations and poster sessions available",
-      bgImage: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=2000&q=80",
-      buttonText: "Register Here",
-      buttonLink: "#registration",
-      order: 3
-    }
-  ],
+  bannerSlides: [], // Banners carregados apenas do Supabase, sem fallback
   registrationTiers: [
     {
       id: '1',
