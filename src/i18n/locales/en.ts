@@ -30,6 +30,12 @@ export const enTranslations = {
     },
     contact: {
       title: "Contact Us",
+      breadcrumb: "Contact",
+      heroDescription: "Contact us to clarify questions about III CIVENI 2025 - We are here to help you participate in this unique worldwide learning experience",
+      register: "Register Now",
+      directEmail: "Direct Email",
+      talkToUs: "Talk to Us",
+      chooseContactMethod: "Choose the best way to contact us. We are ready to assist you!",
       description: "We're here to help. Contact us for questions, information, or suggestions.",
       formTitle: "Contact Form",
       contactInfo: "Contact Information",
