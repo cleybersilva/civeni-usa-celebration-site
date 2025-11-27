@@ -423,16 +423,16 @@ const TemplatesArtigosSlides = () => {
             </div>
 
             <Tabs defaultValue="artigos" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
-                <TabsTrigger value="artigos" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-gray-100 rounded-lg">
+                <TabsTrigger value="artigos" className="flex items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">
                   <FileText className="h-4 w-4" />
                   Templates Artigos
                 </TabsTrigger>
-                <TabsTrigger value="slides" className="flex items-center gap-2">
+                <TabsTrigger value="slides" className="flex items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">
                   <FileIcon className="h-4 w-4" />
                   Templates Slides
                 </TabsTrigger>
-                <TabsTrigger value="gerenciado" className="flex items-center gap-2">
+                <TabsTrigger value="gerenciado" className="flex items-center gap-2 py-3 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white rounded-md transition-all duration-300 data-[state=active]:shadow-md font-semibold">
                   <BookOpen className="h-4 w-4" />
                   Conteúdo Gerenciado
                 </TabsTrigger>
@@ -515,7 +515,9 @@ const TemplatesArtigosSlides = () => {
                 ) : (
                   <Card>
                     <CardContent className="p-8 text-center">
-                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full flex items-center justify-center">
+                        <FileText className="h-8 w-8 text-white" />
+                      </div>
                       <h3 className="text-lg font-semibold mb-2">
                         Conteúdo em breve
                       </h3>
