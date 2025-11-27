@@ -285,7 +285,7 @@ const Header = () => {
                       {item.title === t('header.speakers') ? (
                         <Link
                           to="/palestrantes"
-                          className="flex items-center px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                          className="flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -294,7 +294,7 @@ const Header = () => {
                       ) : item.title === t('header.thematicAreas') ? (
                         <Link
                           to="/area-tematica"
-                          className="flex items-center px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                          className="flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -303,7 +303,7 @@ const Header = () => {
                       ) : item.title === t('header.events') ? (
                         <Link
                           to="/eventos"
-                          className="flex items-center px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                          className="flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -313,7 +313,7 @@ const Header = () => {
                         <>
                           <button
                             onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === item.title ? null : item.title)}
-                            className="flex items-center justify-between w-full px-4 py-2.5 text-white font-semibold text-sm hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                            className="flex items-center justify-between w-full px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
                           >
                             <span className="flex items-center">
                               <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
@@ -373,38 +373,38 @@ const Header = () => {
                   {/* Social Links */}
                   <div className="mt-3 pt-3 border-t border-white/20 pb-4">
                     <p className="text-white/60 text-xs text-center mb-3 font-medium">Siga-nos nas redes sociais</p>
-                    <div className="flex justify-center space-x-3">
+                    <div className="flex justify-center space-x-4">
                       <a 
                         href="https://www.instagram.com/veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Instagram size={16} />
+                        <Instagram size={20} />
                       </a>
                       <a 
                         href="https://www.facebook.com/veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Facebook size={16} />
+                        <Facebook size={20} />
                       </a>
                       <a 
                         href="https://www.youtube.com/@veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Youtube size={16} />
+                        <Youtube size={20} />
                       </a>
                       <a 
                         href="https://www.linkedin.com/company/veniuniversity/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
+                        className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
-                        <Linkedin size={16} />
+                        <Linkedin size={20} />
                       </a>
                     </div>
                   </div>
