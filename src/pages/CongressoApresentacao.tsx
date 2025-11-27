@@ -143,7 +143,7 @@ const CongressoApresentacao = () => {
               {pageData?.hero_title || 'III CIVENI 2025'}
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-3xl mx-auto text-blue-100 px-2">
-              {pageData?.hero_subtitle || t('presentationPage.heroSubtitle')}
+              {t('presentationPage.heroSubtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
