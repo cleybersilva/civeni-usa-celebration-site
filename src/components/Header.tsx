@@ -269,7 +269,7 @@ const Header = () => {
                     <img 
                       src={resolveAssetUrl("/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png")} 
                       alt="III Civeni 2025 Logo" 
-                      className="h-10 w-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.9)] drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]"
+                      className="h-12 w-auto drop-shadow-[0_0_8px_rgba(255,255,255,0.9)] drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]"
                       style={{ filter: 'drop-shadow(0 0 6px white) drop-shadow(0 0 12px rgba(255,255,255,0.7))' }}
                     />
                   </div>
