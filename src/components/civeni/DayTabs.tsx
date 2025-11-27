@@ -48,24 +48,39 @@ const DayTabs: React.FC<DayTabsProps> = ({ days, activeDay, onDayChange }) => {
 
   return (
     <Tabs value={activeDay} onValueChange={onDayChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-8">
-        {days.map((day) => (
-          <TabsTrigger 
-            key={day.id} 
-            value={day.id}
-            className="flex flex-col items-center gap-1 py-3"
-          >
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span className="font-semibold">
-                {t('schedule.day')} {days.findIndex(d => d.id === day.id) + 1}
-              </span>
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {translateWeekday(day.weekday_label)}, {formatDate(day.date)}
-            </div>
-          </TabsTrigger>
-        ))}
+      <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-2 bg-gradient-to-r from-slate-100 to-slate-50 rounded-xl shadow-sm">
+        {days.map((day, index) => {
+          const isActive = activeDay === day.id;
+          const gradientColors = [
+            'from-civeni-blue/90 to-civeni-blue/70',
+            'from-civeni-red/90 to-civeni-red/70', 
+            'from-purple-600/90 to-purple-500/70'
+          ];
+          
+          return (
+            <TabsTrigger 
+              key={day.id} 
+              value={day.id}
+              className={`
+                flex flex-col items-center gap-1 py-4 px-3 rounded-lg transition-all duration-300
+                ${isActive 
+                  ? `bg-gradient-to-br ${gradientColors[index % 3]} text-white shadow-lg scale-[1.02]` 
+                  : 'bg-white/60 hover:bg-white hover:shadow-md text-foreground'
+                }
+              `}
+            >
+              <div className="flex items-center gap-2">
+                <Calendar className={`w-4 h-4 ${isActive ? 'text-white' : 'text-civeni-blue'}`} />
+                <span className="font-semibold">
+                  {t('schedule.day')} {index + 1}
+                </span>
+              </div>
+              <div className={`text-xs ${isActive ? 'text-white/90' : 'text-muted-foreground'}`}>
+                {translateWeekday(day.weekday_label)}, {formatDate(day.date)}
+              </div>
+            </TabsTrigger>
+          );
+        })}
       </TabsList>
     </Tabs>
   );
