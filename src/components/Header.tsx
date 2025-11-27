@@ -206,28 +206,30 @@ const Header = () => {
                   )}
                   
                   {item.items.length > 0 && openDropdown === item.title && (
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-lg border z-50">
-                      {item.items.map((subItem) => (
-                        subItem.href.startsWith('#') ? (
-                          <a
-                            key={subItem.name}
-                            href={subItem.href}
-                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-civeni-red transition-colors"
-                            onClick={() => setOpenDropdown(null)}
-                          >
-                            {subItem.name}
-                          </a>
-                        ) : (
-                          <Link
-                            key={subItem.name}
-                            to={subItem.href}
-                            className="block px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-civeni-red transition-colors"
-                            onClick={() => setOpenDropdown(null)}
-                          >
-                            {subItem.name}
-                          </Link>
-                        )
-                      ))}
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-gradient-to-br from-civeni-blue via-civeni-red to-civeni-blue rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden backdrop-blur-sm">
+                      <div className="py-2">
+                        {item.items.map((subItem, index) => (
+                          subItem.href.startsWith('#') ? (
+                            <a
+                              key={subItem.name}
+                              href={subItem.href}
+                              className="block px-5 py-3 text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              {subItem.name}
+                            </a>
+                          ) : (
+                            <Link
+                              key={subItem.name}
+                              to={subItem.href}
+                              className="block px-5 py-3 text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              {subItem.name}
+                            </Link>
+                          )
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -304,17 +306,19 @@ const Header = () => {
                             </svg>
                           </button>
                           {item.items.length > 0 && mobileSubmenuOpen === item.title && (
-                            <div className="mt-2 ml-3 space-y-1.5">
-                              {item.items.map((subItem) => (
-                                <Link
-                                  key={subItem.name}
-                                  to={subItem.href}
-                                  className="block py-1.5 text-sm text-gray-700 hover:text-civeni-red transition-colors"
-                                  onClick={() => setMobileMenuOpen(false)}
-                                >
-                                  {subItem.name}
-                                </Link>
-                              ))}
+                            <div className="mt-3 ml-0 overflow-hidden rounded-xl bg-gradient-to-br from-civeni-blue via-civeni-red to-civeni-blue shadow-lg">
+                              <div className="py-2">
+                                {item.items.map((subItem) => (
+                                  <Link
+                                    key={subItem.name}
+                                    to={subItem.href}
+                                    className="block px-4 py-3 text-sm text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                  >
+                                    {subItem.name}
+                                  </Link>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </>
