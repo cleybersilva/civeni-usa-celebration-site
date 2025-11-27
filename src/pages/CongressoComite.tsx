@@ -314,19 +314,19 @@ const CongressoComite = () => {
         </section>
 
         {/* Acknowledgment Section */}
-        <section className="py-12 md:py-16 bg-gradient-to-r from-primary/10 to-secondary/10">
+        <section className="py-12 md:py-16 bg-gradient-to-br from-civeni-blue to-civeni-red text-white">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 md:mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 md:mb-6">
               {t('congress.committee.acknowledgment.title', 'Agradecimento Especial')}
             </h2>
             
-            <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-2">
+            <p className="text-sm sm:text-base md:text-lg text-white/90 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed px-2">
               {t('congress.committee.acknowledgment.description', 'Nosso sincero agradecimento a todos os membros da comissão organizadora que dedicam seu tempo e expertise para tornar o CIVENI um evento de referência no universo da educação mundial. Seu comprometimento e dedicação são fundamentais para o sucesso do congresso.')}
             </p>
             
             <div className="flex items-center justify-center">
-              <Users className="w-5 h-5 md:w-6 md:h-6 mr-2 text-primary" />
-              <p className="text-sm md:text-base text-muted-foreground">
+              <Users className="w-5 h-5 md:w-6 md:h-6 mr-2 text-white" />
+              <p className="text-sm md:text-base text-white/80">
                 {t('congress.committee.acknowledgment.contact', 'Para mais informações, entre em contato conosco')}
               </p>
             </div>
