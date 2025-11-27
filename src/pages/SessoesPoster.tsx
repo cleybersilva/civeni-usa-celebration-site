@@ -228,7 +228,9 @@ const SessoesPoster = () => {
           ) : (
             <Card>
               <CardContent className="p-8 text-center">
-                <Presentation className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-full flex items-center justify-center">
+                  <Presentation className="h-8 w-8 text-white" />
+                </div>
                 <h3 className="text-lg font-semibold mb-2">
                   {t('works.poster.noContent', 'Conteúdo em breve')}
                 </h3>
