@@ -67,7 +67,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
       </div>
       
       <div className="relative z-10">
-        <div className="flex justify-center items-center py-6 px-4 bg-gradient-to-br from-gray-50 to-gray-100 transition-colors duration-500 group-hover:from-civeni-blue/5 group-hover:to-civeni-red/5">
+        <div className="flex justify-center items-center py-6 px-4 transition-all duration-500" style={{ background: 'linear-gradient(90deg, #0A2A43 0%, #C8105A 100%)' }}>
           <div className="w-40 h-40 rounded-full overflow-hidden relative bg-white shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110 ring-0 group-hover:ring-4 group-hover:ring-civeni-blue/20">
             {hasError ? (
               <SpeakerImagePlaceholder
