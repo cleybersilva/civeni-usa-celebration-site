@@ -149,6 +149,8 @@ export const esTranslations = {
         sunday: 'Domingo',
       },
       noSessionsForDay: 'Aún no hay sesiones publicadas para este día.',
+      pdfGenerated: '¡PDF generado con éxito!',
+      pdfError: 'Error al generar el PDF. Inténtalo de nuevo.',
     },
     scheduleSection: {
       title: "Elige Tu Experiencia"
