@@ -296,7 +296,7 @@ const ApresentacaoOral = () => {
                           <a
                             href={template.file}
                             download
-                            className="flex-1 bg-civeni-blue text-white px-4 py-2 rounded-md hover:bg-civeni-blue/90 transition-colors flex items-center justify-center gap-2"
+                            className="flex-1 bg-gradient-to-r from-civeni-blue to-civeni-red text-white px-4 py-2 rounded-md hover:opacity-90 transition-colors flex items-center justify-center gap-2"
                           >
                             <Download className="h-4 w-4" />
                             Download
@@ -324,7 +324,7 @@ const ApresentacaoOral = () => {
                 
                 <Card className="mt-6">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center justify-center gap-2">
                       <BookOpen className="h-5 w-5 text-civeni-blue" />
                       Instruções de Uso
                     </CardTitle>
