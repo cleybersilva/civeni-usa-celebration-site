@@ -236,9 +236,13 @@ const CongressoComite = () => {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-12">
+              <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-12 h-auto p-1 bg-gray-100 rounded-xl">
                 {Object.entries(committeesData).map(([key, committee]) => (
-                  <TabsTrigger key={key} value={key} className="text-sm flex items-center gap-2">
+                  <TabsTrigger 
+                    key={key} 
+                    value={key} 
+                    className="text-sm flex items-center gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-civeni-blue data-[state=active]:to-civeni-red data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+                  >
                     <committee.icon className="w-4 h-4" />
                     {committee.name}
                   </TabsTrigger>
@@ -248,7 +252,7 @@ const CongressoComite = () => {
               {Object.entries(committeesData).map(([key, committee]) => (
                 <TabsContent key={key} value={key}>
                   <div className="text-center mb-12">
-                    <Badge className="bg-primary text-primary-foreground text-lg px-6 py-2 mb-4 flex items-center gap-2 justify-center w-fit mx-auto">
+                    <Badge className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white text-lg px-6 py-2 mb-4 flex items-center gap-2 justify-center w-fit mx-auto">
                       <committee.icon className="w-5 h-5" />
                       {committee.name}
                     </Badge>
@@ -277,8 +281,8 @@ const CongressoComite = () => {
                       {committee.members.map((member) => (
                         <Card key={member.id} className="group hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
                           <CardContent className="p-0">
-                            {/* Photo Section */}
-                            <div className="relative aspect-square overflow-hidden bg-primary">
+                            {/* Photo Section with Gradient Background */}
+                            <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-civeni-blue to-civeni-red">
                               <MemberPhoto 
                                 member={member} 
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
