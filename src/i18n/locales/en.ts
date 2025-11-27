@@ -139,6 +139,16 @@ export const enTranslations = {
         online: 'ONLINE',
         hibrido: 'HYBRID',
       },
+      weekdays: {
+        monday: 'Monday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday',
+        saturday: 'Saturday',
+        sunday: 'Sunday',
+      },
+      noSessionsForDay: 'No sessions published for this day yet.',
     },
     scheduleSection: {
       title: "Choose Your Experience"
