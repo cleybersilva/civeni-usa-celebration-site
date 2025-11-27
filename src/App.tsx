@@ -9,6 +9,7 @@ import i18n from './i18n/config';
 import { CMSProvider } from './contexts/CMSContext';
 import { SecurityProvider } from './components/SecurityProvider';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppButton from './components/WhatsAppButton';
 
 // Pages
 import Index from "./pages/Index";
@@ -106,6 +107,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
+              <WhatsAppButton />
               <ScrollToTop />
             </Router>
           </CMSProvider>
