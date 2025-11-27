@@ -66,7 +66,7 @@ const UserInfo: React.FC = () => {
       <CardHeader 
         className="pb-3"
         style={{
-          background: 'linear-gradient(to bottom right, hsl(200 48% 21%), hsl(200 35% 27%), hsl(300 35% 28%))'
+          background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)'
         }}
       >
         <CardTitle className="text-lg flex items-center gap-2 text-white drop-shadow-md">

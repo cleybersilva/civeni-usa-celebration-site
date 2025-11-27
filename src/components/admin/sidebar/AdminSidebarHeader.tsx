@@ -10,7 +10,7 @@ const AdminSidebarHeader = () => {
     <SidebarHeader 
       className="border-b px-6 py-3 h-16"
       style={{
-        background: 'linear-gradient(to bottom right, hsl(200 48% 21%), hsl(200 35% 27%), hsl(300 35% 28%))'
+        background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)'
       }}
     >
       <div className="flex items-center justify-center h-full">
