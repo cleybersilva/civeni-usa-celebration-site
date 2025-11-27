@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, Facebook, Youtube, Settings, Linkedin, Menu, X } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Settings, Linkedin, Menu, X, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { resolveAssetUrl } from '@/utils/assetUrl';
@@ -405,6 +405,18 @@ const Header = () => {
                         className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-all duration-200"
                       >
                         <Linkedin size={20} />
+                      </a>
+                    </div>
+                    
+                    {/* WhatsApp Button */}
+                    <div className="flex justify-center mt-4">
+                      <a 
+                        href={`https://wa.me/14073388661?text=${encodeURIComponent("Hello! 👋😊\nI just visited the III CIVENI 2025 website and I'm very interested in the event. I have a few questions regarding registration, the schedule, and the online/in-person participation.\nCould you please help me with more information? 🙏✨")}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center text-white hover:bg-[#20BD5A] transition-all duration-200 shadow-lg"
+                      >
+                        <MessageCircle size={24} fill="white" />
                       </a>
                     </div>
                   </div>
