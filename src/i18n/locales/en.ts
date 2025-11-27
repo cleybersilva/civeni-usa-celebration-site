@@ -356,6 +356,33 @@ export const enTranslations = {
       expectedImpactNetwork: "global network",
       learnMore: "Learn more",
     },
+
+    congress: {
+      presentation: {
+        why_participate: "Why Participate in III Civeni 2025?",
+        why_description: "Discover the main reasons to be part of the largest Multidisciplinary International Congress in the WORLD"
+      },
+      features: {
+        networking: {
+          title: "Quality Networking",
+          description: "Connect with professionals, researchers and students from around the WORLD"
+        },
+        knowledge: {
+          title: "Updated Knowledge",
+          description: "Lectures and workshops with the latest trends in education, innovation, justice, humanity, religiosity and technology"
+        },
+        format: {
+          title: "Hybrid Format",
+          description: "Participate in person or online, with total flexibility and interaction"
+        }
+      },
+      cta: {
+        title: "Don't Miss This Opportunity!",
+        description: "Join hundreds of professionals and students who are shaping the future of education with innovation, justice, humanity, religiosity and technology",
+        register_now: "Register Now",
+        view_schedule: "View Schedule"
+      }
+    },
     
     videos: {
       title: "Videos from I and II Civeni 2023/2024",
