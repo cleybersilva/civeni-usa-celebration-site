@@ -29,7 +29,9 @@ export const esTranslations = {
       speakers: "Ponentes",
       registration: "Inscripciones",
       contact: "Contacto",
-      adminArea: "Área Restringida"
+      adminArea: "Área Restringida",
+      navigationMenu: "Menú de Navegación",
+      followUs: "Síguenos en las redes sociales"
     },
     contact: {
       title: "Contáctanos",

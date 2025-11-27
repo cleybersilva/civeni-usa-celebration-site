@@ -29,7 +29,9 @@ export const ptTranslations = {
       speakers: "Palestrantes",
       registration: "Inscrições",
       contact: "Contato",
-      adminArea: "Área Restrita"
+      adminArea: "Área Restrita",
+      navigationMenu: "Menu de Navegação",
+      followUs: "Siga-nos nas redes sociais"
     },
     contact: {
       title: "Entre em Contato",

@@ -29,7 +29,9 @@ export const trTranslations = {
       speakers: "Konuşmacılar",
       registration: "Kayıt",
       contact: "İletişim",
-      adminArea: "Kısıtlı Alan"
+      adminArea: "Kısıtlı Alan",
+      navigationMenu: "Gezinme Menüsü",
+      followUs: "Sosyal medyada bizi takip edin"
     },
     contact: {
       title: "Bizimle İletişime Geçin",

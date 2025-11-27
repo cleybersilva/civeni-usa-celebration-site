@@ -29,7 +29,9 @@ export const enTranslations = {
       speakers: "Speakers",
       registration: "Registration",
       contact: "Contact",
-      adminArea: "Restricted Area"
+      adminArea: "Restricted Area",
+      navigationMenu: "Navigation Menu",
+      followUs: "Follow us on social media"
     },
     contact: {
       title: "Contact Us",
