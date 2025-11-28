@@ -205,12 +205,12 @@ const CiveniII2024ImagesManager = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-civeni-blue">II CIVENI 2024 - Imagens</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue text-center sm:text-left">II CIVENI 2024 - Imagens</h2>
         <Button
           onClick={() => setIsCreating(true)}
-          className="bg-civeni-blue hover:bg-blue-700"
+          className="bg-civeni-blue hover:bg-blue-700 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nova Imagem
