@@ -262,11 +262,11 @@ const AdminDashboardContent = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-gray-100 flex w-full">
+      <div className="civeni-admin min-h-screen bg-gray-100 flex w-full" data-admin="true">
         <AdminSidebar />
-        <SidebarInset className="flex-1">
+        <SidebarInset className="flex-1 min-w-0">
           <AdminHeader />
-          <main className="flex-1 space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6">
+          <main className="flex-1 space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 overflow-x-hidden">
             <UserInfo />
             <div className="space-y-4 md:space-y-6">
               {renderTabContent()}
