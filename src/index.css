@@ -376,18 +376,21 @@
     justify-content: center;
   }
 
-  /* Linha de botões principais (Exportar PDF, Exportar Excel, etc.) */
+  /* Linha de botões principais - CENTRALIZADOS ABAIXO DOS TEXTOS */
   .civeni-admin .actions-row,
   .civeni-admin .button-row,
   .civeni-admin .header-actions,
   .civeni-admin .admin-action-buttons,
-  .civeni-admin .admin-button-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
+  .civeni-admin .admin-button-group,
+  .civeni-admin .flex.gap-2,
+  .civeni-admin .flex.gap-3,
+  .civeni-admin .flex.gap-4 {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
   }
 
   .civeni-admin .actions-row button,
@@ -395,26 +398,34 @@
   .civeni-admin .header-actions button,
   .civeni-admin .admin-action-buttons button,
   .civeni-admin .admin-button-group button {
-    width: 100%;
-    max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
-  /* Grid de botões 2x2 no mobile */
+  /* Botões do header - centralizados em linha */
+  .civeni-admin header .flex.gap-2,
+  .civeni-admin header .flex.items-center {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+
+  /* Grid de botões 2x2 no mobile - CENTRALIZADO */
   .civeni-admin .grid.grid-cols-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    width: 100%;
-    max-width: 340px;
-    margin-left: auto;
-    margin-right: auto;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
   .civeni-admin .grid.grid-cols-2 button {
-    width: 100%;
-    max-width: none;
+    width: 100% !important;
+    max-width: none !important;
   }
 
   /* Sessões/boxes principais do dashboard */
