@@ -723,7 +723,10 @@
   /* Títulos - CENTRALIZADOS e sem corte */
   .civeni-admin h1,
   .civeni-admin h2,
-  .civeni-admin h3 {
+  .civeni-admin h3,
+  .civeni-admin h4,
+  .civeni-admin h5,
+  .civeni-admin h6 {
     text-align: center !important;
     font-size: 0.9rem !important;
     word-wrap: break-word !important;
@@ -736,12 +739,20 @@
     font-size: 1rem !important;
   }
   
-  /* Parágrafos - centralizados */
-  .civeni-admin p {
+  /* Parágrafos e spans - CENTRALIZADOS */
+  .civeni-admin p,
+  .civeni-admin span {
     text-align: center !important;
     font-size: 0.8125rem !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  
+  /* Textos dentro de divs - CENTRALIZADOS */
+  .civeni-admin main div {
+    text-align: center !important;
   }
   
   /* Cards - largura total, centralizados */
@@ -750,6 +761,7 @@
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto 0.5rem auto !important;
+    text-align: center !important;
   }
   
   /* Card content centralizado */
