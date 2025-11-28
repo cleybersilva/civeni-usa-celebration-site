@@ -301,17 +301,17 @@ const UsersManager = () => {
   // Remover verificação restritiva aqui - deixar que os dados sejam carregados primeiro
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-civeni-blue">{t('admin.users.title')}</h2>
-          <p className="text-gray-600">{t('admin.users.description')}</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="text-center sm:text-left">
+          <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue">{t('admin.users.title')}</h2>
+          <p className="text-sm sm:text-base text-gray-600">{t('admin.users.description')}</p>
         </div>
         
         {canManageUsers && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-civeni-blue hover:bg-blue-700">
+              <Button className="bg-civeni-blue hover:bg-blue-700 w-full sm:w-auto">
                 <UserPlus className="w-4 h-4 mr-2" />
                 {t('admin.users.newUser')}
               </Button>
@@ -437,7 +437,7 @@ const UsersManager = () => {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center justify-center sm:justify-start gap-2 text-base sm:text-lg">
               <Users className="w-5 h-5" />
               Administração de Usuários ({users.length})
             </CardTitle>
@@ -448,72 +448,131 @@ const UsersManager = () => {
               {t('admin.users.noUsersFound')}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-3 font-semibold">Email</th>
-                    <th className="text-left p-3 font-semibold">Tipo de Usuário</th>
-                    <th className="text-left p-3 font-semibold">Criado em</th>
-                    <th className="text-left p-3 font-semibold">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((adminUser) => (
-                    <tr key={adminUser.user_id} className="border-b hover:bg-gray-50">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{adminUser.email}</span>
-                          {adminUser.email === user?.email && (
-                            <Badge variant="outline" className="text-xs">Você</Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        <Badge className={getUserTypeColor(adminUser.user_type)}>
-                          {getUserTypeLabel(adminUser.user_type)}
-                          {adminUser.is_admin_root && <Shield className="w-3 h-3 ml-1" />}
-                        </Badge>
-                      </td>
-                      <td className="p-3 text-sm text-gray-600">
+            <>
+              {/* Mobile: Card layout */}
+              <div className="sm:hidden space-y-3">
+                {users.map((adminUser) => (
+                  <div key={adminUser.user_id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="font-medium text-sm truncate">{adminUser.email}</span>
+                        {adminUser.email === user?.email && (
+                          <Badge variant="outline" className="text-xs shrink-0">Você</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className={getUserTypeColor(adminUser.user_type)}>
+                        {getUserTypeLabel(adminUser.user_type)}
+                        {adminUser.is_admin_root && <Shield className="w-3 h-3 ml-1" />}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
                         {new Date(adminUser.created_at).toLocaleDateString('pt-BR')}
-                      </td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditUser(adminUser)}
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              {canDeleteUsers && (
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 pt-2 border-t">
+                      {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditUser(adminUser)}
+                            className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Editar
+                          </Button>
+                          {canDeleteUsers && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Excluir
+                            </Button>
+                          )}
+                        </>
+                      )}
+                      {adminUser.email === 'cleyber.silva@live.com' && (
+                        <Badge variant="outline" className="text-xs">
+                          Protegido
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: Table layout */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-3 font-semibold">Email</th>
+                      <th className="text-left p-3 font-semibold">Tipo de Usuário</th>
+                      <th className="text-left p-3 font-semibold">Criado em</th>
+                      <th className="text-left p-3 font-semibold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((adminUser) => (
+                      <tr key={adminUser.user_id} className="border-b hover:bg-gray-50">
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{adminUser.email}</span>
+                            {adminUser.email === user?.email && (
+                              <Badge variant="outline" className="text-xs">Você</Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <Badge className={getUserTypeColor(adminUser.user_type)}>
+                            {getUserTypeLabel(adminUser.user_type)}
+                            {adminUser.is_admin_root && <Shield className="w-3 h-3 ml-1" />}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-sm text-gray-600">
+                          {new Date(adminUser.created_at).toLocaleDateString('pt-BR')}
+                        </td>
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
+                              <>
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => handleEditUser(adminUser)}
+                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Edit className="w-4 h-4" />
                                 </Button>
-                              )}
-                            </>
-                          )}
-                          {adminUser.email === 'cleyber.silva@live.com' && (
-                            <Badge variant="outline" className="text-xs">
-                              Protegido
-                            </Badge>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                                {canDeleteUsers && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                            {adminUser.email === 'cleyber.silva@live.com' && (
+                              <Badge variant="outline" className="text-xs">
+                                Protegido
+                              </Badge>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
         </Card>
