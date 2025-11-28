@@ -151,6 +151,19 @@ export const trTranslations = {
         online: 'ÇEVRİMİÇİ',
         hibrido: 'HİBRİT',
       },
+      dayHeadlines: {
+        'Dia 1 - Abertura e Conferências': 'Gün 1 - Açılış ve Konferanslar',
+        'Dia 2 - Palestras e Painéis': 'Gün 2 - Sunumlar ve Paneller',
+        'Dia 3 - Encerramento': 'Gün 3 - Kapanış',
+        'Abertura e Conferências': 'Açılış ve Konferanslar',
+        'Palestras e Painéis': 'Sunumlar ve Paneller',
+        'Encerramento': 'Kapanış',
+      },
+      dayThemes: {
+        'Credenciamento, Cerimônia de Abertura e Palestras Magistrais': 'Kayıt, Açılış Töreni ve Ana Sunumlar',
+        'Palestras Magistrais, Painéis e Sessões Simultâneas': 'Ana Sunumlar, Paneller ve Eş Zamanlı Oturumlar',
+        'Sessões de Encerramento e Confraternização': 'Kapanış Oturumları ve Sosyal Etkinlikler',
+      },
       weekdays: {
         monday: 'Pazartesi',
         tuesday: 'Salı',

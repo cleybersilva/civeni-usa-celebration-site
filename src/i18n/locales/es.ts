@@ -148,8 +148,21 @@ export const esTranslations = {
       },
       modality: {
         presencial: 'PRESENCIAL',
-        online: 'ONLINE',
+        online: 'EN LÍNEA',
         hibrido: 'HÍBRIDO',
+      },
+      dayHeadlines: {
+        'Dia 1 - Abertura e Conferências': 'Día 1 - Apertura y Conferencias',
+        'Dia 2 - Palestras e Painéis': 'Día 2 - Ponencias y Paneles',
+        'Dia 3 - Encerramento': 'Día 3 - Clausura',
+        'Abertura e Conferências': 'Apertura y Conferencias',
+        'Palestras e Painéis': 'Ponencias y Paneles',
+        'Encerramento': 'Clausura',
+      },
+      dayThemes: {
+        'Credenciamento, Cerimônia de Abertura e Palestras Magistrais': 'Acreditación, Ceremonia de Apertura y Conferencias Magistrales',
+        'Palestras Magistrais, Painéis e Sessões Simultâneas': 'Conferencias Magistrales, Paneles y Sesiones Simultáneas',
+        'Sessões de Encerramento e Confraternização': 'Sesiones de Clausura y Confraternización',
       },
       weekdays: {
         monday: 'Lunes',

@@ -151,6 +151,19 @@ export const ptTranslations = {
         online: 'ONLINE',
         hibrido: 'HÍBRIDO',
       },
+      dayHeadlines: {
+        'Dia 1 - Abertura e Conferências': 'Dia 1 - Abertura e Conferências',
+        'Dia 2 - Palestras e Painéis': 'Dia 2 - Palestras e Painéis',
+        'Dia 3 - Encerramento': 'Dia 3 - Encerramento',
+        'Abertura e Conferências': 'Abertura e Conferências',
+        'Palestras e Painéis': 'Palestras e Painéis',
+        'Encerramento': 'Encerramento',
+      },
+      dayThemes: {
+        'Credenciamento, Cerimônia de Abertura e Palestras Magistrais': 'Credenciamento, Cerimônia de Abertura e Palestras Magistrais',
+        'Palestras Magistrais, Painéis e Sessões Simultâneas': 'Palestras Magistrais, Painéis e Sessões Simultâneas',
+        'Sessões de Encerramento e Confraternização': 'Sessões de Encerramento e Confraternização',
+      },
       weekdays: {
         monday: 'Segunda-feira',
         tuesday: 'Terça-feira',
@@ -1016,6 +1029,29 @@ export const ptTranslations = {
         online: 'ONLINE',
         hibrido: 'HÍBRIDO',
       },
+      dayHeadlines: {
+        'Dia 1 - Abertura e Conferências': 'Dia 1 - Abertura e Conferências',
+        'Dia 2 - Palestras e Painéis': 'Dia 2 - Palestras e Painéis',
+        'Dia 3 - Encerramento': 'Dia 3 - Encerramento',
+        'Abertura e Conferências': 'Abertura e Conferências',
+        'Palestras e Painéis': 'Palestras e Painéis',
+        'Encerramento': 'Encerramento',
+      },
+      dayThemes: {
+        'Credenciamento, Cerimônia de Abertura e Palestras Magistrais': 'Credenciamento, Cerimônia de Abertura e Palestras Magistrais',
+        'Palestras Magistrais, Painéis e Sessões Simultâneas': 'Palestras Magistrais, Painéis e Sessões Simultâneas',
+        'Sessões de Encerramento e Confraternização': 'Sessões de Encerramento e Confraternização',
+      },
+      weekdays: {
+        monday: 'Segunda-feira',
+        tuesday: 'Terça-feira',
+        wednesday: 'Quarta-feira',
+        thursday: 'Quinta-feira',
+        friday: 'Sexta-feira',
+        saturday: 'Sábado',
+        sunday: 'Domingo',
+      },
+      noSessionsForDay: 'Nenhuma sessão publicada para este dia ainda.',
     },
   }
 };
