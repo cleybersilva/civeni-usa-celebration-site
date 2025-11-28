@@ -174,8 +174,8 @@ const EventsManager = () => {
     >
       <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div>
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center gap-3">
+          <div className="text-center sm:text-left">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
               {t('admin.events.title', 'Gerenciar Eventos')}
             </h1>
