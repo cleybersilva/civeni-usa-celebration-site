@@ -271,12 +271,17 @@ const VideosManager = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Vídeos</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="text-center sm:text-left">
+          <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue">Gerenciar Vídeos</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Vídeos oficiais do II CIVENI 2024 e futuros eventos
+          </p>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600 w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Novo Vídeo
             </Button>
@@ -374,11 +379,11 @@ const VideosManager = () => {
                       onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 1})}
                     />
                   </div>
-                  <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <div className="flex flex-col sm:flex-row justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">
                       Cancelar
                     </Button>
-                    <Button type="submit" className="bg-civeni-blue hover:bg-blue-700">
+                    <Button type="submit" className="bg-civeni-blue hover:bg-blue-700 w-full sm:w-auto">
                       {editingVideo ? 'Atualizar' : 'Adicionar'}
                     </Button>
                   </div>
@@ -393,7 +398,7 @@ const VideosManager = () => {
         </Dialog>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
         {content.videos.sort((a, b) => a.order - b.order).map((video) => (
           <Card key={video.id} className={`${!video.id || video.id === 'new' ? 'opacity-50' : ''} hover:shadow-lg transition-all duration-300`}>
             <div className="relative">
@@ -429,24 +434,25 @@ const VideosManager = () => {
                 </div>
               </div>
             </div>
-            <CardContent className="p-4">
-              <div className="space-y-3">
+            <CardContent className="p-3 sm:p-4">
+              <div className="space-y-2 sm:space-y-3">
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">{video.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2 mt-1">{video.description}</p>
+                  <h3 className="font-semibold text-sm sm:text-lg text-gray-900 line-clamp-2">{video.title}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 mt-1">{video.description}</p>
                 </div>
                 <div className="text-xs text-gray-500">
                   <p className="truncate">
                     <strong>URL:</strong> {video.videoType === 'youtube' ? video.youtubeUrl : video.uploadedVideoUrl}
                   </p>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t">
+                <div className="flex flex-wrap justify-center sm:justify-between items-center gap-2 pt-2 border-t">
                   <div className="flex space-x-1">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handlePreview(video)}
                       title="Visualizar"
+                      className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -455,6 +461,7 @@ const VideosManager = () => {
                       variant="outline"
                       onClick={() => handleOpenVideo(video)}
                       title="Abrir vídeo"
+                      className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Button>
@@ -465,6 +472,7 @@ const VideosManager = () => {
                       variant="outline"
                       onClick={() => handleEdit(video)}
                       title="Editar"
+                      className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -473,6 +481,7 @@ const VideosManager = () => {
                       variant="destructive"
                       onClick={() => handleDelete(video.id)}
                       title="Excluir"
+                      className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
