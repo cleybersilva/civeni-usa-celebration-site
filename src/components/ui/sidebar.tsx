@@ -107,6 +107,22 @@ const SidebarProvider = React.forwardRef<
       }
     }, [setOpen, setOpenMobile])
 
+    // Auto-fechar Sheet mobile quando viewport >= 768px (tablet/desktop)
+    React.useEffect(() => {
+      const handleResize = () => {
+        if (typeof window !== 'undefined' && window.innerWidth >= 768 && openMobile) {
+          console.log('[Sidebar] Auto-closing mobile sheet on tablet/desktop')
+          setOpenMobile(false)
+        }
+      }
+      
+      window.addEventListener('resize', handleResize)
+      // Verificar imediatamente ao montar
+      handleResize()
+      
+      return () => window.removeEventListener('resize', handleResize)
+    }, [openMobile, setOpenMobile])
+
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
