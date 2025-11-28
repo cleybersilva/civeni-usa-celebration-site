@@ -151,6 +151,19 @@ export const enTranslations = {
         online: 'ONLINE',
         hibrido: 'HYBRID',
       },
+      dayHeadlines: {
+        'Dia 1 - Abertura e Conferências': 'Day 1 - Opening and Conferences',
+        'Dia 2 - Palestras e Painéis': 'Day 2 - Lectures and Panels',
+        'Dia 3 - Encerramento': 'Day 3 - Closing',
+        'Abertura e Conferências': 'Opening and Conferences',
+        'Palestras e Painéis': 'Lectures and Panels',
+        'Encerramento': 'Closing',
+      },
+      dayThemes: {
+        'Credenciamento, Cerimônia de Abertura e Palestras Magistrais': 'Check-in, Opening Ceremony and Keynote Lectures',
+        'Palestras Magistrais, Painéis e Sessões Simultâneas': 'Keynote Lectures, Panels and Simultaneous Sessions',
+        'Sessões de Encerramento e Confraternização': 'Closing Sessions and Fellowship',
+      },
       weekdays: {
         monday: 'Monday',
         tuesday: 'Tuesday',

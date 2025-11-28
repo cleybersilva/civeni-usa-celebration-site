@@ -71,6 +71,16 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
     return weekdayMap[weekdayLabel] || weekdayLabel;
   };
 
+  const translateHeadline = (headline: string) => {
+    const headlineTranslations: Record<string, string> = t('schedule.dayHeadlines', { returnObjects: true }) as Record<string, string>;
+    return headlineTranslations?.[headline] || headline;
+  };
+
+  const translateTheme = (theme: string) => {
+    const themeTranslations: Record<string, string> = t('schedule.dayThemes', { returnObjects: true }) as Record<string, string>;
+    return themeTranslations?.[theme] || theme;
+  };
+
   const getCurrentSessionStatus = (session: Session) => {
     if (!isToday) return null;
     
@@ -96,10 +106,10 @@ const DayTimeline: React.FC<DayTimelineProps> = ({ day, sessions }) => {
     <TabsContent value={day.id} className="space-y-6 mt-0">
       <div className="text-center py-6 bg-gradient-to-br from-civeni-blue to-civeni-red text-white">
         <h2 className="text-2xl font-bold text-white mb-2">
-          {day.headline}
+          {translateHeadline(day.headline)}
         </h2>
         <p className="text-white/90 text-lg">
-          {day.theme}
+          {translateTheme(day.theme)}
         </p>
         <div className="text-sm text-white/80 mt-2">
           {translateWeekday(day.weekday_label)}, {new Date(day.date + 'T00:00:00').toLocaleDateString(getLocale())}
