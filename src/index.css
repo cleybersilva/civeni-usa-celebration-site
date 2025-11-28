@@ -669,10 +669,10 @@
   }
   
   /* ============================================
-     SIDEBAR - MESMO ALINHAMENTO DAS OUTRAS TELAS
+     SIDEBAR - ALINHAMENTO À ESQUERDA (igual imagem 2)
      ============================================ */
   
-  /* Sidebar header - padding igual mobile/desktop */
+  /* Sidebar header - logo centralizado */
   .civeni-admin [data-sidebar="header"] {
     padding: 0.5rem 1rem !important;
     min-height: 56px !important;
@@ -684,19 +684,25 @@
     max-height: 32px !important;
   }
   
-  /* Sidebar content - padding igual outras telas */
+  /* Sidebar content - padding lateral */
   .civeni-admin [data-sidebar="content"] {
-    padding: 0.5rem 0.75rem !important;
+    padding: 0.5rem 0.5rem !important;
     text-align: left !important;
   }
   
-  /* Menu items - mesmo espaçamento das outras telas */
+  /* Menu items - ALINHADOS À ESQUERDA como na imagem 2 */
   .civeni-admin [data-sidebar="menu-button"] {
     padding: 0.5rem 0.75rem !important;
     font-size: 0.8125rem !important;
     text-align: left !important;
     justify-content: flex-start !important;
     width: 100% !important;
+  }
+  
+  .civeni-admin [data-sidebar="menu-button"] span {
+    text-align: left !important;
+    display: inline !important;
+    width: auto !important;
   }
   
   .civeni-admin [data-sidebar="menu-button"] svg {
@@ -706,7 +712,7 @@
     flex-shrink: 0 !important;
   }
   
-  /* Sidebar footer - padding igual outras telas */
+  /* Sidebar footer - logo centralizado */
   .civeni-admin [data-sidebar="footer"] {
     padding: 0.5rem 1rem !important;
     text-align: center !important;
@@ -739,18 +745,27 @@
     font-size: 1rem !important;
   }
   
-  /* Parágrafos e spans - CENTRALIZADOS */
-  .civeni-admin p,
-  .civeni-admin span {
+  /* Parágrafos - CENTRALIZADOS */
+  .civeni-admin main p {
     text-align: center !important;
     font-size: 0.8125rem !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
-    display: block !important;
+  }
+  
+  /* Spans do conteúdo principal - CENTRALIZADOS (exceto sidebar) */
+  .civeni-admin main span {
+    text-align: center !important;
+    font-size: 0.8125rem !important;
+  }
+  
+  /* Badge LIVE e textos inline - centralizar wrapper */
+  .civeni-admin main .flex.items-center {
+    justify-content: center !important;
     width: 100% !important;
   }
   
-  /* Textos dentro de divs - CENTRALIZADOS */
+  /* Textos dentro de divs do main - CENTRALIZADOS */
   .civeni-admin main div {
     text-align: center !important;
   }
