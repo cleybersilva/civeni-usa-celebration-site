@@ -10,30 +10,30 @@ const WorksManager = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5" />
-          {t('admin.works.title')}
+      <CardHeader className="px-3 sm:px-6">
+        <CardTitle className="flex items-center justify-center sm:justify-start gap-2 text-lg sm:text-xl">
+          <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+          <span>{t('admin.works.title')}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-2 sm:px-6">
         <Tabs defaultValue="apresentacao-oral" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="apresentacao-oral" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              {t('admin.works.oralPresentation')}
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1">
+            <TabsTrigger value="apresentacao-oral" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <Users className="h-4 w-4 shrink-0" />
+              <span className="text-center leading-tight">{t('admin.works.oralPresentation')}</span>
             </TabsTrigger>
-            <TabsTrigger value="sessoes-poster" className="flex items-center gap-2">
-              <Presentation className="h-4 w-4" />
-              {t('admin.works.posterSessions')}
+            <TabsTrigger value="sessoes-poster" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <Presentation className="h-4 w-4 shrink-0" />
+              <span className="text-center leading-tight">{t('admin.works.posterSessions')}</span>
             </TabsTrigger>
-            <TabsTrigger value="manuscritos" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              {t('admin.works.manuscripts')}
+            <TabsTrigger value="manuscritos" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <BookOpen className="h-4 w-4 shrink-0" />
+              <span className="text-center leading-tight">{t('admin.works.manuscripts')}</span>
             </TabsTrigger>
-            <TabsTrigger value="templates-artigos-slides" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Templates Artigos/Slides
+            <TabsTrigger value="templates-artigos-slides" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm py-2 px-1 sm:px-3">
+              <FileText className="h-4 w-4 shrink-0" />
+              <span className="text-center leading-tight">Templates Artigos/Slides</span>
             </TabsTrigger>
           </TabsList>
           

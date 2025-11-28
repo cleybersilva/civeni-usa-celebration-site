@@ -188,11 +188,11 @@ const WorkContentManager: React.FC<WorkContentManagerProps> = ({ workType, title
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{title}</CardTitle>
+      <CardHeader className="flex flex-col sm:flex-row items-center sm:justify-between gap-4 px-3 sm:px-6">
+        <CardTitle className="text-base sm:text-lg text-center sm:text-left">{title}</CardTitle>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { resetForm(); setEditingItem(null); }}>
+            <Button onClick={() => { resetForm(); setEditingItem(null); }} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Conteúdo
             </Button>
