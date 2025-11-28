@@ -62,31 +62,31 @@ const UserInfo: React.FC = () => {
   const userTypeInfo = getUserTypeInfo(user.user_type);
 
   return (
-    <Card className="mb-6 overflow-hidden border-none shadow-lg">
+    <Card className="mb-4 sm:mb-6 overflow-hidden border-none shadow-lg">
       <CardHeader 
-        className="pb-3"
+        className="pb-2 sm:pb-3 px-3 sm:px-6"
         style={{
           background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)'
         }}
       >
-        <CardTitle className="text-lg flex items-center gap-2 text-white drop-shadow-md">
+        <CardTitle className="text-sm sm:text-lg flex items-center gap-2 text-white drop-shadow-md">
           {userTypeInfo.icon}
           {t('admin.userInfo', 'Informações do Usuário')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-lg font-bold text-gray-900 dark:text-white">{user.email}</p>
-            <p className="text-base text-gray-600 dark:text-gray-300 font-medium mt-1">{userTypeInfo.description}</p>
+      <CardContent className="pt-3 sm:pt-4 px-3 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white truncate">{user.email}</p>
+            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 font-medium mt-1">{userTypeInfo.description}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={userTypeInfo.variant} className="flex items-center gap-1 px-3 py-1.5 text-sm">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant={userTypeInfo.variant} className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm">
               {userTypeInfo.icon}
               {userTypeInfo.label}
             </Badge>
             {isAdminRoot() && (
-              <Badge variant="destructive" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+              <Badge variant="destructive" className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm">
                 <Crown className="h-3 w-3" />
                 Root
               </Badge>

@@ -284,81 +284,85 @@ const VideoSubmissionsManager = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Gerenciar Envio de Vídeos</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Gerenciar Envio de Vídeos</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Total: {filteredSubmissions.length} submissões
             {showArchived && ' (incluindo excluídas)'}
           </p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={handleCreate} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+          <Plus className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
           Criar novo envio
         </Button>
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome, e-mail ou título..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
+            className="pl-9 text-sm"
           />
         </div>
         
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos Status</SelectItem>
-            <SelectItem value="pendente">Pendente</SelectItem>
-            <SelectItem value="aprovado">Aprovado</SelectItem>
-            <SelectItem value="reprovado">Reprovado</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-full text-xs sm:text-sm">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos Status</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+              <SelectItem value="aprovado">Aprovado</SelectItem>
+              <SelectItem value="reprovado">Reprovado</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select value={filterTipo} onValueChange={setFilterTipo}>
-          <SelectTrigger className="w-full md:w-[200px]">
-            <SelectValue placeholder="Tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos Tipos</SelectItem>
-            <SelectItem value="Aluno(a) VCCU">Aluno(a) VCCU</SelectItem>
-            <SelectItem value="Participante Externo">Participante Externo</SelectItem>
-            <SelectItem value="Convidado(a)">Convidado(a)</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select value={filterTipo} onValueChange={setFilterTipo}>
+            <SelectTrigger className="w-full text-xs sm:text-sm">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos Tipos</SelectItem>
+              <SelectItem value="Aluno(a) VCCU">Aluno(a) VCCU</SelectItem>
+              <SelectItem value="Participante Externo">Participante Externo</SelectItem>
+              <SelectItem value="Convidado(a)">Convidado(a)</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select value={filterOrigin} onValueChange={setFilterOrigin}>
-          <SelectTrigger className="w-full md:w-[150px]">
-            <SelectValue placeholder="Origem" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todas</SelectItem>
-            <SelectItem value="site">Site</SelectItem>
-            <SelectItem value="saas">SaaS</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select value={filterOrigin} onValueChange={setFilterOrigin}>
+            <SelectTrigger className="w-full text-xs sm:text-sm">
+              <SelectValue placeholder="Origem" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas</SelectItem>
+              <SelectItem value="site">Site</SelectItem>
+              <SelectItem value="saas">SaaS</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Button 
-          variant={showArchived ? "default" : "outline"}
-          onClick={() => setShowArchived(!showArchived)}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {showArchived ? 'Ocultar' : 'Mostrar'} Excluídas
-        </Button>
+          <Button 
+            variant={showArchived ? "default" : "outline"}
+            onClick={() => setShowArchived(!showArchived)}
+            size="sm"
+            className="w-full text-xs sm:text-sm"
+          >
+            <Trash2 className="mr-1 h-3 w-3" />
+            {showArchived ? 'Ocultar' : 'Excluídas'}
+          </Button>
+        </div>
       </div>
 
       {/* Tabela */}
-      <div className="border rounded-lg">
-        <Table>
+      <div className="border rounded-lg overflow-x-auto">
+        <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow>
               <TableHead>Data</TableHead>

@@ -983,52 +983,56 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard Financeiro Stripe</h2>
-          <p className="text-muted-foreground flex items-center gap-2">
-            <Badge variant="secondary" className="animate-pulse">LIVE</Badge>
-            Espelho em tempo real • Civeni 2025
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Dashboard Financeiro Stripe</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+            <Badge variant="secondary" className="animate-pulse text-[10px] sm:text-xs">LIVE</Badge>
+            <span className="truncate">Espelho em tempo real • Civeni 2025</span>
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
           <Button 
             onClick={handleExportPDF} 
             disabled={loading} 
-            className="text-white border-0"
+            size="sm"
+            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
-            <FileText className="h-4 w-4 mr-2" />
-            Exportar PDF
+            <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
+            <span className="truncate">PDF</span>
           </Button>
           <Button 
             onClick={handleExportExcel} 
             disabled={loading} 
-            className="text-white border-0"
+            size="sm"
+            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
-            <Download className="h-4 w-4 mr-2" />
-            Exportar Excel
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
+            <span className="truncate">Excel</span>
           </Button>
           <Button 
             onClick={handleSync} 
             disabled={syncing} 
-            className="text-white border-0"
+            size="sm"
+            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
-            <Database className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-            Sincronizar
+            <Database className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0 ${syncing ? 'animate-spin' : ''}`} />
+            <span className="truncate">Sync</span>
           </Button>
           <Button 
             onClick={refresh} 
             disabled={loading} 
-            className="text-white border-0"
+            size="sm"
+            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Atualizar
+            <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0 ${loading ? 'animate-spin' : ''}`} />
+            <span className="truncate">Atualizar</span>
           </Button>
         </div>
       </div>
@@ -1157,7 +1161,7 @@ const AdminDashboard = () => {
       )}
 
       {/* Gráficos */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
         <RevenueChart data={timeseries} loading={loading} />
         <BrandChart data={byBrand} loading={loading} />
       </div>
@@ -1166,10 +1170,13 @@ const AdminDashboard = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="tabela">
-        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20">
-          <TabsTrigger value="tabela" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">Transações Detalhadas</TabsTrigger>
-          <TabsTrigger value="customers" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white">Participantes</TabsTrigger>
-          <TabsTrigger value="analises" className="data-[state=active]:bg-pink-500 data-[state=active]:text-white">Análises</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 h-auto p-1">
+          <TabsTrigger value="tabela" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white text-[10px] sm:text-xs md:text-sm py-2 px-1 sm:px-3">
+            <span className="hidden sm:inline">Transações Detalhadas</span>
+            <span className="sm:hidden">Transações</span>
+          </TabsTrigger>
+          <TabsTrigger value="customers" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white text-[10px] sm:text-xs md:text-sm py-2 px-1 sm:px-3">Participantes</TabsTrigger>
+          <TabsTrigger value="analises" className="data-[state=active]:bg-pink-500 data-[state=active]:text-white text-[10px] sm:text-xs md:text-sm py-2 px-1 sm:px-3">Análises</TabsTrigger>
         </TabsList>
 
         <TabsContent value="tabela">

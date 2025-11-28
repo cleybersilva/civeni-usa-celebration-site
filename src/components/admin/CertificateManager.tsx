@@ -507,48 +507,58 @@ const CertificateManager = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gerenciamento de Certificados</h2>
-        <div className="flex items-center space-x-2">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold">Gerenciamento de Certificados</h2>
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             onClick={() => setIsTemplateDialogOpen(true)}
             disabled={!selectedEvent}
-            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white font-semibold"
+            size="sm"
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white font-semibold text-xs sm:text-sm"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Criar Certificado
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Criar Certificado</span>
+            <span className="sm:hidden">Novo</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={handleImportConfig}
+            className="text-xs sm:text-sm"
           >
-            <Upload className="h-4 w-4 mr-2" />
-            Importar
+            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Importar</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportConfig}
             disabled={!selectedEvent}
+            className="text-xs sm:text-sm"
           >
-            <Download className="h-4 w-4 mr-2" />
-            Exportar
+            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Exportar</span>
           </Button>
           <Button
             variant={tab === 'config' ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setTab('config')}
+            className="text-xs sm:text-sm"
           >
-            <Settings className="h-4 w-4 mr-2" />
-            Configurações
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Configurações</span>
+            <span className="sm:hidden">Config</span>
           </Button>
           <Button
             variant={tab === 'certificates' ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setTab('certificates')}
+            className="text-xs sm:text-sm"
           >
-            <Award className="h-4 w-4 mr-2" />
-            Certificados Emitidos
+            <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Certificados Emitidos</span>
+            <span className="sm:hidden">Emitidos</span>
           </Button>
         </div>
       </div>

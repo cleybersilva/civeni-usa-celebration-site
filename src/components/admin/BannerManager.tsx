@@ -196,14 +196,15 @@ const BannerManager = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Banner Principal</h2>
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue">Gerenciar Banner Principal</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600 w-full sm:w-auto text-sm sm:text-base">
               <Plus className="w-4 h-4 mr-2" />
-              Adicionar Slide
+              <span className="hidden sm:inline">Adicionar Slide</span>
+              <span className="sm:hidden">Novo Slide</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
