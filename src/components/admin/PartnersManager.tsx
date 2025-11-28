@@ -118,12 +118,12 @@ const PartnersManager = () => {
   const sponsors = content.partners.filter(p => p.type === 'sponsor');
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-civeni-blue">Gerenciar Parceiros</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue text-center sm:text-left">Gerenciar Parceiros</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600">
+            <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600 w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Adicionar Parceiro
             </Button>
