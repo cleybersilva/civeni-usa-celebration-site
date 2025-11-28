@@ -224,3 +224,79 @@
     overflow-y: auto !important;
   }
 }
+
+/* ============================================
+   AJUSTE CRÍTICO – PRIORIDADE TOTAL DO MOBILE NO ADMIN
+   ============================================ */
+
+/* Remover qualquer overflow horizontal residual */
+html, body, #root {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* Sidebar - prevenir largura fixa */
+[data-sidebar="sidebar"] {
+  min-width: 0 !important;
+}
+
+/* Forçar responsividade em mobile SEM EXCEÇÃO */
+@media (max-width: 768px) {
+  
+  /* Containers principais do admin */
+  .admin-container,
+  .admin-content,
+  [data-sidebar="inset"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  /* Flex containers - empilhar em coluna */
+  .admin-button-group,
+  .admin-filters {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  
+  /* Cards do admin */
+  .admin-card {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Grids - forçar coluna única */
+  .admin-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Inputs e selects - largura total */
+  .admin-filters input,
+  .admin-filters select,
+  .admin-filters [data-radix-select-trigger] {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  /* Botões - largura total em mobile */
+  .admin-button-group button,
+  .admin-button-group a {
+    width: 100% !important;
+  }
+  
+  /* Tabelas - scroll horizontal */
+  .admin-table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Prevenir texto estourando */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
