@@ -695,43 +695,56 @@
     max-height: 32px !important;
   }
   
-  /* Sidebar - FORÇAR ALINHAMENTO À ESQUERDA */
-  .civeni-admin [data-sidebar="sidebar"] * {
+  /* Sidebar - FORÇAR ALINHAMENTO À ESQUERDA (ULTRA ESPECÍFICO) */
+  .civeni-admin [data-sidebar="sidebar"],
+  .civeni-admin [data-sidebar="sidebar"] *,
+  .civeni-admin [data-sidebar="sidebar"] span,
+  .civeni-admin [data-sidebar="sidebar"] button,
+  .civeni-admin [data-sidebar="sidebar"] li,
+  .civeni-admin [data-sidebar="sidebar"] ul {
     text-align: left !important;
   }
   
+  /* Header e Footer - CENTRALIZADOS (exceção) */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="header"],
-  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="header"] * {
-    text-align: center !important;
-  }
-  
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="header"] *,
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="footer"],
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="footer"] * {
     text-align: center !important;
   }
   
-  /* Sidebar content - ALINHADO À ESQUERDA */
+  /* Sidebar content - sem scrollbar horizontal */
   .civeni-admin [data-sidebar="content"] {
     padding: 0.25rem 0 !important;
     text-align: left !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  .civeni-admin [data-sidebar="content"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
   }
   
   /* Menu group */
-  .civeni-admin [data-sidebar="group"] {
-    padding: 0 !important;
-  }
-  
+  .civeni-admin [data-sidebar="group"],
   .civeni-admin [data-sidebar="group-content"] {
     padding: 0 !important;
+    text-align: left !important;
   }
   
-  /* Menu items - FORÇAR ALINHAMENTO À ESQUERDA */
+  /* Menu items - ULTRA ESPECÍFICO ALINHAMENTO ESQUERDA */
+  .civeni-admin [data-sidebar="menu"],
+  .civeni-admin [data-sidebar="menu-item"],
+  .civeni-admin [data-sidebar="menu-button"] {
+    text-align: left !important;
+  }
+  
   .civeni-admin [data-sidebar="menu-button"] {
     padding: 0.5rem 1rem !important;
     font-size: 0.875rem !important;
-    text-align: left !important;
     justify-content: flex-start !important;
     width: 100% !important;
     display: flex !important;
@@ -739,7 +752,7 @@
   }
   
   .civeni-admin [data-sidebar="menu-button"] span,
-  .civeni-admin [data-sidebar="menu-button"] div {
+  .civeni-admin [data-sidebar="menu-button"] > span {
     text-align: left !important;
     display: inline !important;
     width: auto !important;
@@ -751,17 +764,6 @@
     height: 1.125rem !important;
     margin-right: 0.75rem !important;
     flex-shrink: 0 !important;
-  }
-  
-  /* Sidebar menu item */
-  .civeni-admin [data-sidebar="menu-item"] {
-    text-align: left !important;
-  }
-  
-  .civeni-admin [data-sidebar="menu-item"] a,
-  .civeni-admin [data-sidebar="menu-item"] button {
-    justify-content: flex-start !important;
-    text-align: left !important;
   }
   
   /* Sidebar footer - logo centralizado */
@@ -817,14 +819,6 @@
     font-size: 0.8125rem !important;
   }
   
-  /* SIDEBAR - FORÇAR ALINHAMENTO À ESQUERDA (override) */
-  .civeni-admin [data-sidebar="sidebar"] span,
-  .civeni-admin [data-sidebar="sidebar"] p,
-  .civeni-admin [data-sidebar="sidebar"] div,
-  .civeni-admin [data-sidebar="sidebar"] button,
-  .civeni-admin [data-sidebar="sidebar"] a {
-    text-align: left !important;
-  }
   
   /* Badge LIVE e textos inline - centralizar wrapper no MAIN */
   .civeni-admin main .flex.items-center,
