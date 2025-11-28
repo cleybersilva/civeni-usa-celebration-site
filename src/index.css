@@ -608,10 +608,27 @@
   
   /* Header do admin em tablet - colado */
   .civeni-admin header {
-    padding: 0 !important;
+    padding: 0.5rem !important;
     margin: 0 !important;
     min-height: auto !important;
     width: 100% !important;
+  }
+  
+  /* Header flex - botões abaixo do texto em tablet */
+  .civeni-admin header > div,
+  .civeni-admin header .flex {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+  
+  /* Grupo de botões do header - em linha, não cortar */
+  .civeni-admin header .flex.gap-2,
+  .civeni-admin header .flex.items-center {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.375rem !important;
   }
   
   /* Cards colados na tela */
