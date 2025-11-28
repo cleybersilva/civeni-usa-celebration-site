@@ -254,16 +254,16 @@ const CongressoComiteManager = () => {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Gerenciar Comissão Organizadora</CardTitle>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleRefreshData}>
+      <CardHeader className="flex flex-col sm:flex-row items-center sm:justify-between gap-4">
+        <CardTitle className="text-center sm:text-left">Gerenciar Comissão Organizadora</CardTitle>
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={handleRefreshData} className="w-full sm:w-auto">
             <RefreshCw className="w-4 h-4 mr-2" />
             Atualizar
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm}>
+              <Button onClick={resetForm} className="w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Membro
               </Button>
