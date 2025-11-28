@@ -196,7 +196,7 @@ const TransmissionStreamsManager = () => {
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
           <div className="flex items-center space-x-2">
             <Switch
               checked={formData.is_live}
@@ -219,18 +219,18 @@ const TransmissionStreamsManager = () => {
               type="number"
               value={formData.order_index}
               onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 1 })}
-              className="w-20"
+              className="w-full sm:w-20"
             />
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Button onClick={handleSave} className="gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={handleSave} className="gap-2 w-full sm:w-auto">
             <Save className="w-4 h-4" />
             {editingId ? 'Atualizar' : 'Criar'}
           </Button>
           {editingId && (
-            <Button onClick={resetForm} variant="outline">
+            <Button onClick={resetForm} variant="outline" className="w-full sm:w-auto">
               Cancelar
             </Button>
           )}
