@@ -216,10 +216,10 @@ const ProgramacaoImpressao = () => {
 
         .program-footer {
           text-align: center;
-          padding: 12px 16px 18px;
+          padding: 16px 16px 20px;
           font-size: 10px;
-          color: #6b7280;
-          background: #f3f4f6;
+          color: #ffffff;
+          background: linear-gradient(135deg, #021b3a 0%, #731b4c 50%, #c51d3b 100%);
         }
 
         @media (max-width: 768px) {
