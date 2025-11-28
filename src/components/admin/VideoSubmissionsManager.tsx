@@ -286,8 +286,8 @@ const VideoSubmissionsManager = () => {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
-        <div>
+      <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-3">
+        <div className="text-center sm:text-left">
           <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">Gerenciar Envio de Vídeos</h2>
           <p className="text-xs sm:text-sm text-muted-foreground">
             Total: {filteredSubmissions.length} submissões
