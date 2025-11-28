@@ -318,3 +318,128 @@
     overflow-y: auto !important;
   }
 }
+
+/* ==============================================
+   CENTRALIZAÇÃO MOBILE DO ADMIN CIVENI
+   ============================================== */
+
+@media (max-width: 768px) {
+
+  /* Cabeçalho da página (título + subtítulo + badges) */
+  .civeni-admin .page-header,
+  .civeni-admin .admin-header,
+  .civeni-admin .dashboard-header,
+  .civeni-admin [data-sidebar="inset"] > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Texto do título */
+  .civeni-admin .page-title,
+  .civeni-admin h1,
+  .civeni-admin h2,
+  .civeni-admin h3 {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Subtítulos / chips tipo LIVE + descrições */
+  .civeni-admin .page-subtitle,
+  .civeni-admin .tagline,
+  .civeni-admin .status-row,
+  .civeni-admin .flex.items-center.gap-2 {
+    text-align: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Card "Informações do Usuário" – centralizar tudo dentro */
+  .civeni-admin .user-info-card,
+  .civeni-admin .user-card,
+  .civeni-admin [class*="CardContent"] {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Badges dentro do card (Admin Root, Root) */
+  .civeni-admin .badges-row,
+  .civeni-admin .flex.flex-wrap.gap-2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  /* Linha de botões principais (Exportar PDF, Exportar Excel, etc.) */
+  .civeni-admin .actions-row,
+  .civeni-admin .button-row,
+  .civeni-admin .header-actions,
+  .civeni-admin .admin-action-buttons,
+  .civeni-admin .admin-button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .civeni-admin .actions-row button,
+  .civeni-admin .button-row button,
+  .civeni-admin .header-actions button,
+  .civeni-admin .admin-action-buttons button,
+  .civeni-admin .admin-button-group button {
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Grid de botões 2x2 no mobile */
+  .civeni-admin .grid.grid-cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .civeni-admin .grid.grid-cols-2 button {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Sessões/boxes principais do dashboard */
+  .civeni-admin .section,
+  .civeni-admin .dashboard-section,
+  .civeni-admin .card-section {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Títulos de seção dentro desses blocos */
+  .civeni-admin .section h3,
+  .civeni-admin .dashboard-section h3,
+  .civeni-admin .card-section h3 {
+    text-align: center;
+  }
+
+  /* Centralizar descrições e parágrafos */
+  .civeni-admin p {
+    text-align: center;
+  }
+
+  /* Cards principais centralizados */
+  .civeni-admin .admin-card {
+    text-align: center;
+  }
+}
