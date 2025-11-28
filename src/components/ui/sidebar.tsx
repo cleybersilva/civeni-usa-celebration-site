@@ -193,7 +193,7 @@ const Sidebar = React.forwardRef<
     // Mobile: usa Sheet
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+        <Sheet open={openMobile} onOpenChange={setOpenMobile} modal={false}>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
@@ -204,6 +204,8 @@ const Sidebar = React.forwardRef<
               } as React.CSSProperties
             }
             side={side}
+            onInteractOutside={(e) => e.preventDefault()}
+            onPointerDownOutside={(e) => e.preventDefault()}
           >
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
@@ -264,6 +266,22 @@ const SidebarTrigger = React.forwardRef<
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
+  const lastToggleRef = React.useRef(0)
+
+  const handleClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    event.preventDefault()
+    
+    // Previne duplo disparo em dispositivos touch (debounce de 300ms)
+    const now = Date.now()
+    if (now - lastToggleRef.current < 300) {
+      return
+    }
+    lastToggleRef.current = now
+    
+    onClick?.(event)
+    toggleSidebar()
+  }, [onClick, toggleSidebar])
 
   return (
     <Button
@@ -272,10 +290,7 @@ const SidebarTrigger = React.forwardRef<
       variant="ghost"
       size="icon"
       className={cn("h-7 w-7", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
+      onClick={handleClick}
       {...props}
     >
       <PanelLeft />
