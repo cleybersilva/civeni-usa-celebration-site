@@ -532,26 +532,34 @@
   
   /* Sidebar em tablet - largura fixa */
   .civeni-admin [data-sidebar="sidebar"] {
-    width: 240px !important;
-    min-width: 240px !important;
-    max-width: 240px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
     flex-shrink: 0 !important;
   }
   
   /* Área de conteúdo - ocupar espaço restante */
   .civeni-admin [data-sidebar="inset"],
   .civeni-admin main {
-    flex: 1 !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
-    width: calc(100% - 240px) !important;
-    max-width: calc(100vw - 240px) !important;
+    width: calc(100vw - 220px) !important;
+    max-width: calc(100vw - 220px) !important;
     overflow-x: hidden !important;
+    padding: 0 !important;
+  }
+  
+  /* Conteúdo principal em tablet - padding interno */
+  .civeni-admin main > div {
+    padding: 0.75rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   
   /* Header do admin em tablet */
   .civeni-admin header {
     padding-top: 0 !important;
-    min-height: 60px !important;
+    min-height: 56px !important;
   }
   
   /* Resetar posição absoluta do trigger em tablet */
@@ -569,145 +577,129 @@
   }
   
   .civeni-admin [data-sidebar="trigger"] svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
     color: white !important;
   }
   
   /* Sidebar header em tablet */
   .civeni-admin [data-sidebar="header"] {
-    padding: 0.75rem !important;
-    min-height: 56px !important;
+    padding: 0.5rem !important;
+    min-height: 48px !important;
   }
   
   .civeni-admin [data-sidebar="header"] img {
-    max-height: 32px !important;
+    max-height: 28px !important;
   }
   
   /* Sidebar content em tablet */
   .civeni-admin [data-sidebar="content"] {
-    padding: 0.5rem !important;
+    padding: 0.375rem !important;
   }
   
   /* Menu items em tablet - mais compactos */
   .civeni-admin [data-sidebar="menu-button"] {
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.8125rem !important;
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.75rem !important;
   }
   
   .civeni-admin [data-sidebar="menu-button"] svg {
-    width: 1rem !important;
-    height: 1rem !important;
-    margin-right: 0.5rem !important;
+    width: 0.875rem !important;
+    height: 0.875rem !important;
+    margin-right: 0.375rem !important;
   }
   
   /* Sidebar footer em tablet */
   .civeni-admin [data-sidebar="footer"] {
-    padding: 0.5rem !important;
+    padding: 0.375rem !important;
   }
   
   .civeni-admin [data-sidebar="footer"] img {
-    max-height: 24px !important;
+    max-height: 20px !important;
   }
   
-  /* Conteúdo principal em tablet */
-  .civeni-admin main > div {
-    padding: 1rem !important;
-  }
-  
-  /* Cards em tablet */
-  .civeni-admin .admin-card,
-  .civeni-admin [class*="Card"] {
-    padding: 1rem !important;
-  }
-  
-  /* Título do usuário info */
-  .civeni-admin .user-info-card h3,
-  .civeni-admin [class*="CardTitle"] {
-    font-size: 1rem !important;
+  /* Cards em tablet - padding menor */
+  .civeni-admin .admin-card {
+    padding: 0.75rem !important;
   }
   
   /* Grids - 2 colunas em tablet */
   .civeni-admin .grid.grid-cols-4,
-  .civeni-admin .grid.sm\\:grid-cols-4 {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
-  .civeni-admin .grid.grid-cols-3,
-  .civeni-admin .grid.sm\\:grid-cols-3 {
+  .civeni-admin .grid.lg\\:grid-cols-4 {
     grid-template-columns: repeat(2, 1fr) !important;
   }
   
   /* Botões em tablet */
   .civeni-admin button {
-    font-size: 0.75rem !important;
-    padding: 0.375rem 0.75rem !important;
+    font-size: 0.6875rem !important;
+    padding: 0.25rem 0.5rem !important;
   }
   
   .civeni-admin button svg {
-    width: 0.875rem !important;
-    height: 0.875rem !important;
+    width: 0.75rem !important;
+    height: 0.75rem !important;
   }
   
   /* Títulos de seção em tablet */
   .civeni-admin h1 {
-    font-size: 1.25rem !important;
-  }
-  
-  .civeni-admin h2 {
     font-size: 1.125rem !important;
   }
   
-  .civeni-admin h3 {
+  .civeni-admin h2 {
     font-size: 1rem !important;
+  }
+  
+  .civeni-admin h3 {
+    font-size: 0.875rem !important;
   }
   
   /* Texto responsivo em tablet */
   .civeni-admin p,
   .civeni-admin span {
-    font-size: 0.8125rem !important;
+    font-size: 0.75rem !important;
   }
   
   /* Tabelas em tablet */
   .civeni-admin table {
-    font-size: 0.75rem !important;
+    font-size: 0.6875rem !important;
   }
   
   .civeni-admin table th,
   .civeni-admin table td {
-    padding: 0.5rem !important;
+    padding: 0.375rem !important;
   }
   
   /* Form inputs em tablet */
   .civeni-admin input,
   .civeni-admin select,
   .civeni-admin textarea {
-    font-size: 0.8125rem !important;
-    padding: 0.5rem !important;
+    font-size: 0.75rem !important;
+    padding: 0.375rem 0.5rem !important;
   }
   
-  /* Select triggers em tablet */
+  /* Select triggers em tablet - NÃO truncar texto */
   .civeni-admin [data-radix-select-trigger] {
-    font-size: 0.8125rem !important;
-    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    padding: 0.375rem 0.5rem !important;
+    min-width: 80px !important;
   }
   
   /* Badge sizes em tablet */
   .civeni-admin [class*="Badge"] {
-    font-size: 0.625rem !important;
-    padding: 0.125rem 0.375rem !important;
+    font-size: 0.5625rem !important;
+    padding: 0.125rem 0.25rem !important;
   }
   
   /* Filtros em row em tablet */
   .civeni-admin .admin-filters {
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: 0.5rem !important;
+    gap: 0.375rem !important;
   }
   
   .civeni-admin .admin-filters > * {
     flex: 1 1 auto !important;
-    min-width: 140px !important;
+    min-width: 100px !important;
   }
   
   /* Action buttons em tablet - row */
@@ -715,7 +707,7 @@
   .civeni-admin .admin-button-group {
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: 0.5rem !important;
+    gap: 0.375rem !important;
   }
   
   .civeni-admin .admin-action-buttons button,
@@ -736,18 +728,16 @@
   }
   
   /* Gap e spacing em tablet */
-  .civeni-admin .space-y-6 {
-    --tw-space-y-reverse: 0 !important;
-    margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse))) !important;
-    margin-bottom: calc(1rem * var(--tw-space-y-reverse)) !important;
+  .civeni-admin .space-y-6 > * + * {
+    margin-top: 0.75rem !important;
   }
   
   .civeni-admin .gap-6 {
-    gap: 1rem !important;
+    gap: 0.75rem !important;
   }
   
   .civeni-admin .gap-4 {
-    gap: 0.75rem !important;
+    gap: 0.5rem !important;
   }
   
   /* Textos centralizados voltam ao normal em tablet */
@@ -764,5 +754,21 @@
   .civeni-admin .dashboard-header {
     align-items: flex-start !important;
     text-align: left !important;
+  }
+  
+  /* Tabs em tablet - melhor espaçamento */
+  .civeni-admin [role="tablist"] {
+    width: 100% !important;
+  }
+  
+  .civeni-admin [role="tab"] {
+    font-size: 0.6875rem !important;
+    padding: 0.375rem 0.5rem !important;
+  }
+  
+  /* Cards de estatísticas em tablet */
+  .civeni-admin .grid.sm\\:grid-cols-2.lg\\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
   }
 }
