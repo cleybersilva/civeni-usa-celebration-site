@@ -284,9 +284,9 @@ const CiveniScheduleManager = () => {
                   <div className="space-y-3">
                     {days.map((day) => (
                       <Card key={day.id} className="p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
-                          <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                        <div className="flex flex-col gap-3">
+                          <div className="text-center sm:text-left">
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-2 mb-2">
                               <h4 className="font-semibold text-sm sm:text-base">{day.weekday_label}</h4>
                               <Badge variant={day.is_published ? "default" : "secondary"} className="text-[10px] sm:text-xs">
                                 {day.is_published ? "Publicado" : "Rascunho"}
@@ -298,23 +298,23 @@ const CiveniScheduleManager = () => {
                             <p className="text-xs sm:text-sm text-muted-foreground mb-1">
                               {formatDate(day.date)}
                             </p>
-                            <p className="font-medium text-sm sm:text-base truncate">{day.headline}</p>
-                            <p className="text-xs sm:text-sm text-muted-foreground truncate">{day.theme}</p>
+                            <p className="font-medium text-sm sm:text-base">{day.headline}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{day.theme}</p>
                             {day.location && (
-                              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">📍 {day.location}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">📍 {day.location}</p>
                             )}
                             <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">
                               {getSessionsForDay(day.id).length} sessões
                             </p>
                           </div>
-                          <div className="flex gap-1 sm:gap-2 shrink-0">
+                          <div className="flex gap-2 justify-center sm:justify-start">
                             <Button
                               size="sm"
                               variant="ghost"
                               className="h-8 w-8 p-0"
                               onClick={() => handleTogglePublishDay(day.id, day.is_published)}
                             >
-                              {day.is_published ? <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> : <Eye className="h-3 w-3 sm:h-4 sm:w-4" />}
+                              {day.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </Button>
                             <Button
                               size="sm"
@@ -325,7 +325,7 @@ const CiveniScheduleManager = () => {
                                 setIsDayDialogOpen(true);
                               }}
                             >
-                              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               size="sm"
@@ -333,7 +333,7 @@ const CiveniScheduleManager = () => {
                               className="h-8 w-8 p-0"
                               onClick={() => setDeleteConfirm({ type: 'day', id: day.id })}
                             >
-                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
