@@ -75,11 +75,13 @@ const UserInfo: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-3 sm:pt-4 px-3 sm:px-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="min-w-0 flex-1">
+        <div className="flex flex-col gap-3">
+          {/* Email e descrição - sempre abaixo no desktop */}
+          <div className="min-w-0">
             <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white truncate">{user.email}</p>
             <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 font-medium mt-1">{userTypeInfo.description}</p>
           </div>
+          {/* Badges - abaixo no mobile, mantém posição */}
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant={userTypeInfo.variant} className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm">
               {userTypeInfo.icon}
