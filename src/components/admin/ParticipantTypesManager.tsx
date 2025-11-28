@@ -164,24 +164,24 @@ const ParticipantTypesManager = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Users className="w-6 h-6" />
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="text-center sm:text-left">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center justify-center sm:justify-start gap-2">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
             Tipos de Participante
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             Gerencie os tipos de participante disponíveis para inscrição
           </p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button 
             onClick={handleSetupSorteados} 
             disabled={setupLoading}
             variant="secondary"
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Wand2 className="w-4 h-4" />
             {setupLoading ? 'Configurando...' : 'Setup Sorteados'}
@@ -189,7 +189,7 @@ const ParticipantTypesManager = () => {
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
+            <Button onClick={() => handleOpenDialog()} className="flex items-center justify-center gap-2 w-full sm:w-auto">
               <Plus className="w-4 h-4" />
               Novo Tipo
             </Button>

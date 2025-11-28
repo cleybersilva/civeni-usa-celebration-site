@@ -48,19 +48,19 @@ const EventCategoriesManager = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Tag className="w-6 h-6" />
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="text-center sm:text-left">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center justify-center sm:justify-start gap-2">
+            <Tag className="w-5 h-5 sm:w-6 sm:h-6" />
             Categorias de Evento
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             Gerencie as categorias de evento com preços e configurações
           </p>
         </div>
         
-        <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
+        <Button onClick={() => handleOpenDialog()} className="flex items-center justify-center gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           Nova Categoria
         </Button>
