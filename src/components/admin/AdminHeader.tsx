@@ -30,12 +30,12 @@ const AdminHeader = () => {
 
   return (
     <header 
-      className="border-b h-auto min-h-[64px] md:h-16"
+      className="border-b min-h-[64px] md:min-h-[72px]"
       style={{
         background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)'
       }}
     >
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-3 sm:px-6 py-3 gap-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center h-full px-3 sm:px-6 py-3 sm:py-4 gap-3 sm:gap-0">
         <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
           <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80 shrink-0" />
           <div className="min-w-0 flex-1">
