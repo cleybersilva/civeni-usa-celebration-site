@@ -943,13 +943,26 @@
     text-align: inherit;
   }
   
+  /* Menu button - mesmo layout do desktop/mobile */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"],
   .civeni-admin [data-sidebar="sidebar"] button[data-sidebar="menu-button"] {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
     justify-content: flex-start !important;
+    gap: 0.5rem !important; /* gap-2 = 8px, igual desktop/mobile */
     text-align: left !important;
   }
   
+  /* Ícone - margem padrão */
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"] svg {
+    margin-right: 0 !important; /* gap já controla o espaçamento */
+    flex-shrink: 0 !important;
+  }
+  
+  /* Texto - sem margem extra */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"] span {
     text-align: left !important;
+    margin-left: 0 !important;
   }
 }
