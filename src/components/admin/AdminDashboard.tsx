@@ -988,10 +988,10 @@ const AdminDashboard = () => {
       <div className="flex flex-col gap-3 sm:gap-4">
         <div className="min-w-0">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Dashboard Financeiro Stripe</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+          <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
             <Badge variant="secondary" className="animate-pulse text-[10px] sm:text-xs">LIVE</Badge>
             <span className="truncate">Espelho em tempo real • Civeni 2025</span>
-          </p>
+          </div>
         </div>
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
           <Button 
