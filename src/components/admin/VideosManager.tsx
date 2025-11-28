@@ -272,13 +272,7 @@ const VideosManager = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div className="text-center sm:text-left">
-          <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue">Gerenciar Vídeos</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Vídeos oficiais do II CIVENI 2024 e futuros eventos
-          </p>
-        </div>
+      <div className="flex justify-center sm:justify-end">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={handleAdd} className="bg-civeni-green hover:bg-green-600 w-full sm:w-auto">
