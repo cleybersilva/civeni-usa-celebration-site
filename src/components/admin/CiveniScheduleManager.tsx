@@ -216,42 +216,43 @@ const CiveniScheduleManager = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       <Card>
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Gerenciar Programação CIVENI
+        <CardHeader className="px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+            <div className="min-w-0">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+                <span className="truncate">Gerenciar Programação CIVENI</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm mt-1">
                 Gerencie dias e sessões da programação presencial e online do III CIVENI 2025
               </CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" asChild>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none text-xs sm:text-sm">
                 <a 
                   href={selectedType === 'presencial' ? '/programacao-presencial' : '/programacao-online'} 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Ver no Site
+                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Ver no Site</span>
+                  <span className="sm:hidden">Site</span>
                 </a>
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           <Tabs value={selectedType} onValueChange={(value) => setSelectedType(value as EventType)}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="presencial" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+            <TabsList className="mb-4 w-full grid grid-cols-2 h-auto">
+              <TabsTrigger value="presencial" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
                 Presencial
               </TabsTrigger>
-              <TabsTrigger value="online" className="flex items-center gap-2">
-                <Video className="h-4 w-4" />
+              <TabsTrigger value="online" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <Video className="h-3 w-3 sm:h-4 sm:w-4" />
                 Online
               </TabsTrigger>
             </TabsList>
@@ -282,54 +283,57 @@ const CiveniScheduleManager = () => {
                 ) : (
                   <div className="space-y-3">
                     {days.map((day) => (
-                      <Card key={day.id} className="p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
-                          <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-semibold">{day.weekday_label}</h4>
-                              <Badge variant={day.is_published ? "default" : "secondary"}>
+                      <Card key={day.id} className="p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
+                          <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                              <h4 className="font-semibold text-sm sm:text-base">{day.weekday_label}</h4>
+                              <Badge variant={day.is_published ? "default" : "secondary"} className="text-[10px] sm:text-xs">
                                 {day.is_published ? "Publicado" : "Rascunho"}
                               </Badge>
-                              <Badge className={selectedType === 'presencial' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}>
+                              <Badge className={`text-[10px] sm:text-xs ${selectedType === 'presencial' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
                                 {selectedType}
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground mb-1">
+                            <p className="text-xs sm:text-sm text-muted-foreground mb-1">
                               {formatDate(day.date)}
                             </p>
-                            <p className="font-medium">{day.headline}</p>
-                            <p className="text-sm text-muted-foreground">{day.theme}</p>
+                            <p className="font-medium text-sm sm:text-base truncate">{day.headline}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate">{day.theme}</p>
                             {day.location && (
-                              <p className="text-xs text-muted-foreground mt-1">📍 {day.location}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">📍 {day.location}</p>
                             )}
-                            <p className="text-xs text-muted-foreground mt-2">
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">
                               {getSessionsForDay(day.id).length} sessões
                             </p>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1 sm:gap-2 shrink-0">
                             <Button
                               size="sm"
                               variant="ghost"
+                              className="h-8 w-8 p-0"
                               onClick={() => handleTogglePublishDay(day.id, day.is_published)}
                             >
-                              {day.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              {day.is_published ? <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> : <Eye className="h-3 w-3 sm:h-4 sm:w-4" />}
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
+                              className="h-8 w-8 p-0"
                               onClick={() => {
                                 setEditingDay(day);
                                 setIsDayDialogOpen(true);
                               }}
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
+                              className="h-8 w-8 p-0"
                               onClick={() => setDeleteConfirm({ type: 'day', id: day.id })}
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
                         </div>
