@@ -174,6 +174,28 @@ export const trTranslations = {
         sunday: 'Pazar',
       },
       noSessionsForDay: 'Bu gün için henüz yayınlanmış oturum yok.',
+      sessionTitles: {
+        'Credenciamento e Cerimônia de Abertura': 'Kayıt ve Açılış Töreni',
+        'Dr. Chai Ching Tan': 'Dr. Chai Ching Tan',
+        'Dr. Pankaj Srivastava': 'Dr. Pankaj Srivastava',
+        'Dr. Ramesh Chandra Rath': 'Dr. Ramesh Chandra Rath',
+        'Dr. Ampu Harikrishnan': 'Dr. Ampu Harikrishnan',
+        'Convergence of career knowledge and career transition': 'Kariyer bilgisi ve kariyer geçişinin birleşimi',
+        'Intervalo': 'Ara',
+        'Enabling Collaboration Through e-Science Environments': 'e-Bilim Ortamları Aracılığıyla İşbirliğini Sağlama',
+        'Tecnologias na Educação na Área da Saúde': 'Sağlık Alanında Eğitim Teknolojileri',
+        'From environmental to digital challenges: an attempt to understand today\'s society': 'Çevresel zorluklardan dijital zorluklara: günümüz toplumunu anlamaya yönelik bir girişim',
+        'Dos desafios ambientais: Uma tentativa de compreender a sociedade atual.': 'Çevresel zorluklardan: Günümüz toplumunu anlama girişimi.',
+        'Credenciamento presencial e teste de conexão (online)': 'Yüz yüze kayıt ve bağlantı testi (çevrimiçi)',
+        'Das coisas às não coisas: Inteligência artificial aplicada as decisões judiciais': 'Şeylerden şey olmayanlara: Yargı kararlarına uygulanan yapay zeka',
+      },
+      sessionDescriptions: {
+        'Credenciamento presencial e teste de conexão para participantes online. Cerimônia de Abertura oficial – Mensagens institucionais e boas-vindas.': 'Çevrimiçi katılımcılar için yüz yüze kayıt ve bağlantı testi. Resmi Açılış Töreni – Kurumsal mesajlar ve hoş geldiniz.',
+        'Palestra Magistral': 'Ana Sunum',
+        'Palestra magistral': 'Ana sunum',
+        'Pausa para almoço/descanso': 'Öğle yemeği/dinlenme molası',
+        'Dra. Dani Pividori Lopez - Challenges and interdisciplinary strategies for professional development in the technological future of the United States.': 'Dr. Dani Pividori Lopez - Amerika Birleşik Devletleri\'nin teknolojik geleceğinde mesleki gelişim için zorluklar ve disiplinlerarası stratejiler.',
+      },
     },
     scheduleSection: {
       title: "Deneyiminizi Seçin"

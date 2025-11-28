@@ -174,6 +174,28 @@ export const enTranslations = {
         sunday: 'Sunday',
       },
       noSessionsForDay: 'No sessions published for this day yet.',
+      sessionTitles: {
+        'Credenciamento e Cerimônia de Abertura': 'Check-in and Opening Ceremony',
+        'Dr. Chai Ching Tan': 'Dr. Chai Ching Tan',
+        'Dr. Pankaj Srivastava': 'Dr. Pankaj Srivastava',
+        'Dr. Ramesh Chandra Rath': 'Dr. Ramesh Chandra Rath',
+        'Dr. Ampu Harikrishnan': 'Dr. Ampu Harikrishnan',
+        'Convergence of career knowledge and career transition': 'Convergence of career knowledge and career transition',
+        'Intervalo': 'Break',
+        'Enabling Collaboration Through e-Science Environments': 'Enabling Collaboration Through e-Science Environments',
+        'Tecnologias na Educação na Área da Saúde': 'Technologies in Health Education',
+        'From environmental to digital challenges: an attempt to understand today\'s society': 'From environmental to digital challenges: an attempt to understand today\'s society',
+        'Dos desafios ambientais: Uma tentativa de compreender a sociedade atual.': 'From environmental challenges: An attempt to understand today\'s society.',
+        'Credenciamento presencial e teste de conexão (online)': 'In-person check-in and connection test (online)',
+        'Das coisas às não coisas: Inteligência artificial aplicada as decisões judiciais': 'From things to non-things: Artificial intelligence applied to judicial decisions',
+      },
+      sessionDescriptions: {
+        'Credenciamento presencial e teste de conexão para participantes online. Cerimônia de Abertura oficial – Mensagens institucionais e boas-vindas.': 'In-person check-in and connection test for online participants. Official Opening Ceremony – Institutional messages and welcome.',
+        'Palestra Magistral': 'Keynote Lecture',
+        'Palestra magistral': 'Keynote lecture',
+        'Pausa para almoço/descanso': 'Lunch/rest break',
+        'Dra. Dani Pividori Lopez - Challenges and interdisciplinary strategies for professional development in the technological future of the United States.': 'Dr. Dani Pividori Lopez - Challenges and interdisciplinary strategies for professional development in the technological future of the United States.',
+      },
     },
     scheduleSection: {
       title: "Choose Your Experience"
