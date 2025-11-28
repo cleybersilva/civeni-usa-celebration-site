@@ -174,6 +174,28 @@ export const ptTranslations = {
         sunday: 'Domingo',
       },
       noSessionsForDay: 'Nenhuma sessão publicada para este dia ainda.',
+      sessionTitles: {
+        'Credenciamento e Cerimônia de Abertura': 'Credenciamento e Cerimônia de Abertura',
+        'Dr. Chai Ching Tan': 'Dr. Chai Ching Tan',
+        'Dr. Pankaj Srivastava': 'Dr. Pankaj Srivastava',
+        'Dr. Ramesh Chandra Rath': 'Dr. Ramesh Chandra Rath',
+        'Dr. Ampu Harikrishnan': 'Dr. Ampu Harikrishnan',
+        'Convergence of career knowledge and career transition': 'Convergência do conhecimento de carreira e transição de carreira',
+        'Intervalo': 'Intervalo',
+        'Enabling Collaboration Through e-Science Environments': 'Possibilitando Colaboração Através de Ambientes de e-Science',
+        'Tecnologias na Educação na Área da Saúde': 'Tecnologias na Educação na Área da Saúde',
+        'From environmental to digital challenges: an attempt to understand today\'s society': 'Dos desafios ambientais aos digitais: uma tentativa de compreender a sociedade atual',
+        'Dos desafios ambientais: Uma tentativa de compreender a sociedade atual.': 'Dos desafios ambientais: Uma tentativa de compreender a sociedade atual.',
+        'Credenciamento presencial e teste de conexão (online)': 'Credenciamento presencial e teste de conexão (online)',
+        'Das coisas às não coisas: Inteligência artificial aplicada as decisões judiciais': 'Das coisas às não coisas: Inteligência artificial aplicada às decisões judiciais',
+      },
+      sessionDescriptions: {
+        'Credenciamento presencial e teste de conexão para participantes online. Cerimônia de Abertura oficial – Mensagens institucionais e boas-vindas.': 'Credenciamento presencial e teste de conexão para participantes online. Cerimônia de Abertura oficial – Mensagens institucionais e boas-vindas.',
+        'Palestra Magistral': 'Palestra Magistral',
+        'Palestra magistral': 'Palestra magistral',
+        'Pausa para almoço/descanso': 'Pausa para almoço/descanso',
+        'Dra. Dani Pividori Lopez - Challenges and interdisciplinary strategies for professional development in the technological future of the United States.': 'Dra. Dani Pividori Lopez - Desafios e estratégias interdisciplinares para o desenvolvimento profissional no futuro tecnológico dos Estados Unidos.',
+      },
     },
     scheduleSection: {
       title: "Escolha Sua Experiência"

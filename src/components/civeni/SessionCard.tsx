@@ -28,14 +28,25 @@ interface SessionCardProps {
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showTimezones, setShowTimezones] = useState(false);
   
   const formatTime = (timeString: string) => {
     if (!timeString) return '';
     const match = timeString.match(/T(\d{2}:\d{2})| (\d{2}:\d{2})/);
     if (match) {
-      return match[1] || match[2];
+      const time = match[1] || match[2];
+      const [hours, minutes] = time.split(':').map(Number);
+      
+      // For English, use 12-hour format with AM/PM
+      if (i18n.language === 'en') {
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const hour12 = hours % 12 || 12;
+        return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
+      }
+      
+      // For other languages (PT, ES, TR), use 24-hour format
+      return time;
     }
     return timeString;
   };
@@ -87,6 +98,24 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
 
   const getTranslatedModality = (modality: string) => {
     return t(`schedule.modality.${modality}`) || modality.toUpperCase();
+  };
+
+  const getTranslatedSessionTitle = (title: string) => {
+    const sessionTitles = t('schedule.sessionTitles', { returnObjects: true }) as Record<string, string>;
+    return sessionTitles?.[title] || title;
+  };
+
+  const getTranslatedSessionDescription = (description: string) => {
+    // Remove HTML tags for lookup
+    const cleanDesc = description.replace(/<[^>]*>/g, '').trim();
+    const sessionDescriptions = t('schedule.sessionDescriptions', { returnObjects: true }) as Record<string, string>;
+    // Try to find a matching description
+    for (const [key, value] of Object.entries(sessionDescriptions || {})) {
+      if (cleanDesc.includes(key) || key.includes(cleanDesc)) {
+        return description.replace(cleanDesc, value);
+      }
+    }
+    return sessionDescriptions?.[cleanDesc] || description;
   };
 
   const generateICS = () => {
@@ -177,13 +206,13 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
             </div>
 
             <h3 className="text-lg font-semibold mb-2 text-foreground">
-              {session.title}
+              {getTranslatedSessionTitle(session.title)}
             </h3>
 
             {session.description && (
               <div 
                 className="text-muted-foreground text-sm mb-3 leading-relaxed prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: session.description }}
+                dangerouslySetInnerHTML={{ __html: getTranslatedSessionDescription(session.description) }}
               />
             )}
 
