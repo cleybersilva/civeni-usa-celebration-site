@@ -218,6 +218,7 @@ export const enTranslations = {
         'Enabling Collaboration Through e-Science Environments': 'Enabling Collaboration Through e-Science Environments',
         'From environmental to digital challenges: an attempt to understand today\'s society': 'From Environmental to Digital Challenges: An Attempt to Understand Today\'s Society',
         'Tecnologias na Educação na Área da Saúde': 'Technologies in Health Education',
+        'Tecnologias na Educação na Área da Saúde ': 'Technologies in Health Education',
         'Dr. Chai Ching Tan': 'Dr. Chai Ching Tan',
         'Dr. Pankaj Srivastava': 'Dr. Pankaj Srivastava',
         'Dr. Ramesh Chandra Rath': 'Dr. Ramesh Chandra Rath',
@@ -238,7 +239,7 @@ export const enTranslations = {
         'Encerramento do primeiro dia': 'First Day Closing',
         'Des. Alexandre Freire Pimentel': 'Justice Alexandre Freire Pimentel',
         'Dra.  Maria Priscila Miranda dos Santos': 'Dr. Maria Priscila Miranda dos Santos',
-        'Dr Ronnie Figueiredo': 'Dr Ronnie Figueiredo',
+        'Dr Ronnie Figueiredo': 'Dr. Ronnie Figueiredo',
       },
       sessionDescriptions: {
         'Credenciamento presencial e teste de conexão para participantes online. Cerimônia de Abertura oficial – Mensagens institucionais e boas-vindas.': 'In-person check-in and connection test for online participants. Official Opening Ceremony – Institutional messages and welcome.',
