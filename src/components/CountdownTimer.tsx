@@ -115,7 +115,7 @@ const CountdownTimer = () => {
         {/* Logo + 1º dia do evento */}
         <div className="mb-6 flex flex-col items-center justify-center">
           <img
-            src={"/lovable-uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png"}
+            src={"/uploads/0f616daa-6e2b-4e06-95c9-f2caa84c32d6.png"}
             alt="Logo do evento"
             className="h-16 w-auto mb-3"
           />

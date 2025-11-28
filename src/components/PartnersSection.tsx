@@ -16,7 +16,7 @@ const PartnersSection = () => {
   // Add VCCU as main organizer with the new logo
   const mainOrganizer = {
     name: 'VCCU',
-    logo: '/lovable-uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png',
+    logo: '/uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png',
     type: 'organizer'
   };
 

@@ -29,7 +29,7 @@ const AdminSidebarHeader = () => {
       
       <div className="flex items-center justify-center h-full">
         <img 
-          src="/lovable-uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png" 
+          src="/uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png" 
           alt="CIVENI" 
           className="h-8 tablet:h-8 md:h-9 lg:h-10 w-auto object-contain"
         />

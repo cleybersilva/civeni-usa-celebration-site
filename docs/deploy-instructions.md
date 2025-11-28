@@ -71,7 +71,7 @@ public_html/
 ├── robots.txt
 ├── sitemap.xml
 ├── assets/ (pasta com CSS, JS, imagens)
-└── lovable-uploads/ (pasta com imagens)
+└── uploads/ (pasta com imagens e arquivos)
 ```
 
 ### 5. Configurar Permissões

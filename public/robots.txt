@@ -23,7 +23,7 @@ Disallow: /yarn.lock
 
 # Permitir apenas recursos públicos necessários
 Allow: /assets/
-Allow: /lovable-uploads/
+Allow: /uploads/
 Allow: /favicon.ico
 Allow: /manifest.webmanifest
 Allow: /sitemap.xml

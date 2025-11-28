@@ -158,7 +158,7 @@ const AdminLoginForm = () => {
           {/* Logo above login area - always visible */}
           <div className="mb-8 text-center">
             <img 
-              src="/lovable-uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
+              src="/uploads/d8e1ac06-1b50-4838-b9b9-f0803a553602.png" 
               alt="III Civeni 2025 Logo" 
               className="h-16 w-auto mx-auto mb-4"
             />

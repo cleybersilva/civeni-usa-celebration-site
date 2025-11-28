@@ -4,7 +4,7 @@ const STATIC_CACHE_URLS = [
   '/',
   '/offline.html',
   '/manifest.webmanifest',
-  '/lovable-uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png'
+  '/uploads/d2cf60ac-a7a6-4538-88d6-ab40f772400e.png'
 ];
 
 // Install event
@@ -78,7 +78,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Cache-first strategy ONLY for known static assets
-  if (event.request.url.includes('/lovable-uploads/') ||
+  if (event.request.url.includes('/uploads/') ||
       event.request.url.includes('/manifest.webmanifest') ||
       event.request.url.includes('favicon')) {
     event.respondWith(
