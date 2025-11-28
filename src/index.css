@@ -539,8 +539,6 @@
   .civeni-admin > div:first-child:has([data-sidebar="sidebar"]) {
     margin: 0 !important;
     padding: 0 !important;
-    margin-right: 0 !important;
-    padding-right: 0 !important;
   }
   
   /* Sidebar em tablet - largura fixa, COLADO à esquerda */
@@ -550,9 +548,13 @@
     max-width: 260px !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
-    margin-right: 0 !important;
-    padding-right: 0 !important;
     border-right: none !important;
+  }
+  
+  /* ESCONDER botão X de fechar em tablet */
+  .civeni-admin [data-sidebar="header"] button,
+  .civeni-admin [data-sidebar="trigger"] {
+    display: none !important;
   }
   
   /* Sidebar colapsado em tablet */
@@ -566,7 +568,7 @@
     border: none !important;
   }
   
-  /* Área de conteúdo (SidebarInset) - COLADA no sidebar, sem margin-left */
+  /* Área de conteúdo (SidebarInset) - COLADA no sidebar */
   .civeni-admin [data-sidebar="inset"] {
     flex: 1 1 0% !important;
     min-width: 0 !important;
@@ -574,94 +576,63 @@
     max-width: none !important;
     overflow-x: hidden !important;
     margin: 0 !important;
-    margin-left: 0 !important;
     padding: 0 !important;
-    padding-left: 0 !important;
   }
   
-  /* Quando sidebar colapsado, conteúdo ocupa 100% */
-  .civeni-admin [data-state="collapsed"] + [data-sidebar="inset"],
-  .civeni-admin:has([data-state="collapsed"]) [data-sidebar="inset"] {
-    width: 100% !important;
-  }
-  
-  /* Main interno - padding adequado SEM margin-left */
+  /* Main interno - padding compacto */
   .civeni-admin main {
     flex: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: hidden !important;
-    padding: 1rem 1.5rem !important;
+    padding: 0.75rem !important;
     margin: 0 !important;
-    margin-left: 0 !important;
   }
   
-  /* Conteúdo principal em tablet - SEM mx-auto ou max-w estreito */
+  /* Conteúdo principal - SEM espaços em branco excessivos */
   .civeni-admin main > div {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    margin-left: 0 !important;
     padding: 0 !important;
   }
   
   /* Header do admin em tablet */
   .civeni-admin header {
     padding-top: 0 !important;
-    min-height: 52px !important;
+    min-height: 48px !important;
     width: 100% !important;
-    text-align: center !important;
   }
   
-  /* Trigger do sidebar em tablet - visível e funcional */
-  .civeni-admin [data-sidebar="trigger"] {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-  }
+  /* ============================================
+     SIDEBAR - ALINHAMENTO À ESQUERDA
+     ============================================ */
   
-  .civeni-admin [data-sidebar="trigger"]:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-  }
-  
-  .civeni-admin [data-sidebar="trigger"] svg {
-    width: 18px !important;
-    height: 18px !important;
-    color: white !important;
-  }
-  
-  /* Sidebar header em tablet */
+  /* Sidebar header - alinhado à esquerda */
   .civeni-admin [data-sidebar="header"] {
     padding: 0.5rem !important;
     min-height: 48px !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
   }
   
   .civeni-admin [data-sidebar="header"] img {
     max-height: 28px !important;
   }
   
-  /* Sidebar content em tablet */
+  /* Sidebar content - alinhado à esquerda */
   .civeni-admin [data-sidebar="content"] {
     padding: 0.375rem !important;
+    text-align: left !important;
   }
   
-  /* Menu items em tablet - mais compactos */
+  /* Menu items - alinhados à esquerda */
   .civeni-admin [data-sidebar="menu-button"] {
     padding: 0.375rem 0.5rem !important;
     font-size: 0.75rem !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
   }
   
   .civeni-admin [data-sidebar="menu-button"] svg {
@@ -670,9 +641,10 @@
     margin-right: 0.375rem !important;
   }
   
-  /* Sidebar footer em tablet */
+  /* Sidebar footer - alinhado à esquerda */
   .civeni-admin [data-sidebar="footer"] {
     padding: 0.375rem !important;
+    text-align: left !important;
   }
   
   .civeni-admin [data-sidebar="footer"] img {
@@ -680,36 +652,54 @@
   }
   
   /* ============================================
-     CENTRALIZAÇÃO EM TABLET
+     CONTEÚDO - SEM CENTRALIZAÇÃO EXCESSIVA
      ============================================ */
   
-  /* Títulos da página - centralizados */
+  /* Títulos - alinhados à esquerda */
   .civeni-admin h1,
-  .civeni-admin h2 {
-    text-align: center !important;
-    width: 100% !important;
-  }
-  
+  .civeni-admin h2,
   .civeni-admin h3 {
-    text-align: center !important;
+    text-align: left !important;
+    font-size: 0.9rem !important;
+    word-wrap: break-word !important;
   }
   
-  /* Cards do admin - centralizados e largura total */
+  .civeni-admin h1 {
+    font-size: 1rem !important;
+  }
+  
+  /* Parágrafos - alinhados à esquerda */
+  .civeni-admin p {
+    text-align: left !important;
+    font-size: 0.8125rem !important;
+  }
+  
+  /* Cards - largura total sem espaços */
   .civeni-admin .admin-card,
   .civeni-admin [class*="Card"] {
     width: 100% !important;
     max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 0 !important;
   }
   
-  /* Grids - 2 colunas em tablet */
+  /* Grids - 2 colunas compactas */
   .civeni-admin .grid.grid-cols-4,
   .civeni-admin .grid.lg\\:grid-cols-4 {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
   }
   
-  /* Botões em tablet - não cortar texto */
+  /* Dashboard grid 2x2 - largura total */
+  .civeni-admin .grid.grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  /* Botões - tamanho compacto */
   .civeni-admin button {
     font-size: 0.75rem !important;
     padding: 0.375rem 0.75rem !important;
@@ -722,36 +712,53 @@
     flex-shrink: 0 !important;
   }
   
-  /* Títulos de seção em tablet - centralizados e não cortar */
-  .civeni-admin h1 {
-    font-size: 1.125rem !important;
-    word-wrap: break-word !important;
+  /* Action buttons - flex start */
+  .civeni-admin .admin-action-buttons,
+  .civeni-admin .admin-button-group {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
   }
   
-  .civeni-admin h2 {
-    font-size: 1rem !important;
-    word-wrap: break-word !important;
+  /* Filtros - grid compacto */
+  .civeni-admin .admin-filters {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
   }
   
-  .civeni-admin h3 {
-    font-size: 0.875rem !important;
-    word-wrap: break-word !important;
+  .civeni-admin .admin-filters > * {
+    width: 100% !important;
   }
   
-  /* Texto responsivo em tablet - centralizado */
-  .civeni-admin p,
-  .civeni-admin span {
+  /* Form inputs */
+  .civeni-admin input,
+  .civeni-admin select,
+  .civeni-admin textarea {
     font-size: 0.8125rem !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
+    padding: 0.5rem !important;
+    width: 100% !important;
   }
   
-  /* Parágrafos centralizados */
-  .civeni-admin p {
-    text-align: center !important;
+  /* Select triggers */
+  .civeni-admin [data-radix-select-trigger] {
+    font-size: 0.8125rem !important;
+    padding: 0.5rem 0.75rem !important;
+    min-width: 100px !important;
+    width: 100% !important;
   }
   
-  /* Tabelas em tablet */
+  /* Badge sizes */
+  .civeni-admin [class*="Badge"] {
+    font-size: 0.6875rem !important;
+    padding: 0.25rem 0.5rem !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Tabelas */
   .civeni-admin table {
     font-size: 0.75rem !important;
   }
@@ -761,109 +768,40 @@
     padding: 0.5rem !important;
   }
   
-  /* Form inputs em tablet */
-  .civeni-admin input,
-  .civeni-admin select,
-  .civeni-admin textarea {
-    font-size: 0.8125rem !important;
-    padding: 0.5rem !important;
-    width: 100% !important;
-  }
-  
-  /* Select triggers em tablet - largura adequada */
-  .civeni-admin [data-radix-select-trigger] {
-    font-size: 0.8125rem !important;
-    padding: 0.5rem 0.75rem !important;
-    min-width: 120px !important;
-    width: 100% !important;
-  }
-  
-  /* Badge sizes em tablet */
-  .civeni-admin [class*="Badge"] {
-    font-size: 0.6875rem !important;
-    padding: 0.25rem 0.5rem !important;
-    white-space: nowrap !important;
-  }
-  
-  /* Filtros em tablet - grid 2 colunas, centralizado */
-  .civeni-admin .admin-filters {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
-    width: 100% !important;
-    justify-items: center !important;
-  }
-  
-  .civeni-admin .admin-filters > * {
-    width: 100% !important;
-  }
-  
-  /* Action buttons em tablet - CENTRALIZADOS */
-  .civeni-admin .admin-action-buttons,
-  .civeni-admin .admin-button-group {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    width: 100% !important;
-  }
-  
-  .civeni-admin .admin-action-buttons button,
-  .civeni-admin .admin-button-group button {
-    flex: 0 1 auto !important;
-    max-width: 180px !important;
-  }
-  
-  /* Dashboard actions - grid 2x2 centralizado */
-  .civeni-admin .grid.grid-cols-2 {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.5rem !important;
-    width: 100% !important;
-    max-width: 400px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  
-  /* Charts responsivos em tablet */
+  /* Charts responsivos */
   .civeni-admin [class*="recharts"] {
     max-width: 100% !important;
   }
   
-  /* Dialog/Modal em tablet */
+  /* Dialog/Modal */
   .civeni-admin [role="dialog"] {
     max-width: 90vw !important;
     max-height: 85vh !important;
   }
   
-  /* Gap e spacing em tablet */
+  /* Spacing compacto */
   .civeni-admin .space-y-6 > * + * {
-    margin-top: 0.75rem !important;
+    margin-top: 0.5rem !important;
   }
   
   .civeni-admin .gap-6 {
-    gap: 0.75rem !important;
-  }
-  
-  .civeni-admin .gap-4 {
     gap: 0.5rem !important;
   }
   
-  /* Header e seções centralizadas */
+  .civeni-admin .gap-4 {
+    gap: 0.375rem !important;
+  }
+  
+  /* Headers - alinhados à esquerda */
   .civeni-admin .page-header,
   .civeni-admin .admin-header,
   .civeni-admin .dashboard-header {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    width: 100% !important;
+    text-align: left !important;
   }
   
-  /* Tabs em tablet - melhor espaçamento */
+  /* Tabs */
   .civeni-admin [role="tablist"] {
     width: 100% !important;
-    justify-content: center !important;
   }
   
   .civeni-admin [role="tab"] {
@@ -871,47 +809,19 @@
     padding: 0.5rem 0.75rem !important;
   }
   
-  /* Cards de estatísticas em tablet */
+  /* Cards de estatísticas */
   .civeni-admin .grid.sm\\:grid-cols-2.lg\\:grid-cols-4 {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.5rem !important;
   }
   
-  /* Quando sidebar está colapsada - expandir conteúdo */
-  .civeni-admin [data-sidebar="sidebar"][data-state="collapsed"] + [data-sidebar="inset"],
-  .civeni-admin [data-sidebar="sidebar"][data-state="collapsed"] ~ main {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  
-  /* Centralizar conteúdo em tablet quando sidebar colapsada */
-  .civeni-admin [data-state="collapsed"] ~ main > div {
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    padding: 1rem !important;
-  }
-  
-  /* Garantir que títulos não sejam cortados */
-  .civeni-admin h1,
-  .civeni-admin h2,
-  .civeni-admin h3 {
-    overflow-wrap: break-word !important;
-    word-wrap: break-word !important;
-    hyphens: auto !important;
-  }
-  
-  /* Email e textos longos */
-  .civeni-admin .break-words {
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-  }
-  
-  /* Flex containers - centralizados */
+  /* Flex containers - flex-start */
   .civeni-admin .flex.items-center.gap-2,
   .civeni-admin .flex.gap-2,
   .civeni-admin .flex.gap-3,
   .civeni-admin .flex.gap-4 {
-    justify-content: center !important;
+    justify-content: flex-start !important;
     flex-wrap: wrap !important;
+    gap: 0.375rem !important;
   }
 }
