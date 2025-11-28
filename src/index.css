@@ -775,16 +775,19 @@
   }
   
   /* ============================================
-     CONTEÚDO - CENTRALIZADO E SEM CORTE DE TEXTO
+     CONTEÚDO MAIN - CENTRALIZADO (EXCETO SIDEBAR)
      ============================================ */
   
-  /* Títulos - CENTRALIZADOS e sem corte */
-  .civeni-admin h1,
-  .civeni-admin h2,
-  .civeni-admin h3,
-  .civeni-admin h4,
-  .civeni-admin h5,
-  .civeni-admin h6 {
+  /* Títulos - CENTRALIZADOS apenas no MAIN */
+  .civeni-admin main h1,
+  .civeni-admin main h2,
+  .civeni-admin main h3,
+  .civeni-admin main h4,
+  .civeni-admin main h5,
+  .civeni-admin main h6,
+  .civeni-admin [data-sidebar="inset"] h1,
+  .civeni-admin [data-sidebar="inset"] h2,
+  .civeni-admin [data-sidebar="inset"] h3 {
     text-align: center !important;
     font-size: 0.9rem !important;
     word-wrap: break-word !important;
@@ -793,38 +796,54 @@
     width: 100% !important;
   }
   
-  .civeni-admin h1 {
+  .civeni-admin main h1,
+  .civeni-admin [data-sidebar="inset"] h1 {
     font-size: 1rem !important;
   }
   
-  /* Parágrafos - CENTRALIZADOS */
-  .civeni-admin main p {
+  /* Parágrafos do MAIN - CENTRALIZADOS */
+  .civeni-admin main p,
+  .civeni-admin [data-sidebar="inset"] p {
     text-align: center !important;
     font-size: 0.8125rem !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
   }
   
-  /* Spans do conteúdo principal - CENTRALIZADOS (exceto sidebar) */
-  .civeni-admin main span {
+  /* Spans do MAIN - CENTRALIZADOS */
+  .civeni-admin main span,
+  .civeni-admin [data-sidebar="inset"] span {
     text-align: center !important;
     font-size: 0.8125rem !important;
   }
   
-  /* Badge LIVE e textos inline - centralizar wrapper */
-  .civeni-admin main .flex.items-center {
+  /* SIDEBAR - FORÇAR ALINHAMENTO À ESQUERDA (override) */
+  .civeni-admin [data-sidebar="sidebar"] span,
+  .civeni-admin [data-sidebar="sidebar"] p,
+  .civeni-admin [data-sidebar="sidebar"] div,
+  .civeni-admin [data-sidebar="sidebar"] button,
+  .civeni-admin [data-sidebar="sidebar"] a {
+    text-align: left !important;
+  }
+  
+  /* Badge LIVE e textos inline - centralizar wrapper no MAIN */
+  .civeni-admin main .flex.items-center,
+  .civeni-admin [data-sidebar="inset"] .flex.items-center {
     justify-content: center !important;
     width: 100% !important;
   }
   
-  /* Textos dentro de divs do main - CENTRALIZADOS */
-  .civeni-admin main div {
+  /* Textos dentro de divs do MAIN - CENTRALIZADOS */
+  .civeni-admin main > div,
+  .civeni-admin [data-sidebar="inset"] > div {
     text-align: center !important;
   }
   
   /* Cards - largura total, centralizados */
-  .civeni-admin .admin-card,
-  .civeni-admin [class*="Card"] {
+  .civeni-admin main .admin-card,
+  .civeni-admin main [class*="Card"],
+  .civeni-admin [data-sidebar="inset"] .admin-card,
+  .civeni-admin [data-sidebar="inset"] [class*="Card"] {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto 0.5rem auto !important;
@@ -832,8 +851,10 @@
   }
   
   /* Card content centralizado */
-  .civeni-admin [class*="CardContent"],
-  .civeni-admin [class*="CardHeader"] {
+  .civeni-admin main [class*="CardContent"],
+  .civeni-admin main [class*="CardHeader"],
+  .civeni-admin [data-sidebar="inset"] [class*="CardContent"],
+  .civeni-admin [data-sidebar="inset"] [class*="CardHeader"] {
     text-align: center !important;
   }
   
