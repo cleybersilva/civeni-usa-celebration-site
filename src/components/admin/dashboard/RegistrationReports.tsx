@@ -292,97 +292,97 @@ const RegistrationReports = () => {
     <div className="space-y-6" data-registration-reports>
       {/* Summary Cards */}
       {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
-            <CardContent className="p-4">
+            <CardContent className="p-2 sm:p-3 md:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600 font-medium">Total de Inscrições</p>
-                  <p className="text-2xl font-bold text-blue-900">{summary.totalRegistrations}</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-blue-600 font-medium">Total Inscrições</p>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-900">{summary.totalRegistrations}</p>
                 </div>
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-50 to-green-100">
-            <CardContent className="p-4">
+            <CardContent className="p-2 sm:p-3 md:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-600 font-medium">Receita Total</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-green-600 font-medium">Receita Total</p>
                   {canAccessFinancialData ? (
-                    <p className="text-2xl font-bold text-green-900">R$ {summary.totalRevenue.toFixed(2)}</p>
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-900">R$ {summary.totalRevenue.toFixed(2)}</p>
                   ) : (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                       <Shield className="h-3 w-3" />
                       Restrito
                     </div>
                   )}
                 </div>
-                <DollarSign className="h-8 w-8 text-green-600" />
+                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
-            <CardContent className="p-4">
+            <CardContent className="p-2 sm:p-3 md:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-purple-600 font-medium">Ticket Médio</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-purple-600 font-medium">Ticket Médio</p>
                   {canAccessFinancialData ? (
-                    <p className="text-2xl font-bold text-purple-900">R$ {summary.averageTicket.toFixed(2)}</p>
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-purple-900">R$ {summary.averageTicket.toFixed(2)}</p>
                   ) : (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                       <Shield className="h-3 w-3" />
                       Restrito
                     </div>
                   )}
                 </div>
-                <TrendingUp className="h-8 w-8 text-purple-600" />
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-orange-50 to-orange-100">
-            <CardContent className="p-4">
+            <CardContent className="p-2 sm:p-3 md:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-orange-600 font-medium">Taxa de Conversão</p>
-                  <p className="text-2xl font-bold text-orange-900">{summary.conversionRate.toFixed(1)}%</p>
+                  <p className="text-[10px] sm:text-xs md:text-sm text-orange-600 font-medium">Conversão</p>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-orange-900">{summary.conversionRate.toFixed(1)}%</p>
                 </div>
-                <Calendar className="h-8 w-8 text-orange-600" />
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-orange-600" />
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      <Tabs defaultValue="detailed" className="space-y-4">
-        <div className="flex justify-between items-center">
-          <TabsList>
-            <TabsTrigger value="detailed">Relatório Detalhado</TabsTrigger>
-            <TabsTrigger value="analytics">Análise de Performance</TabsTrigger>
+      <Tabs defaultValue="detailed" className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="detailed" className="text-xs sm:text-sm">Relatório Detalhado</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm">Análise</TabsTrigger>
           </TabsList>
           
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-wrap gap-2 items-center w-full sm:w-auto">
             <select 
               value={selectedPeriod} 
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3 py-1 border rounded-md text-sm"
+              className="px-2 sm:px-3 py-1 border rounded-md text-xs sm:text-sm flex-1 sm:flex-none"
             >
-              <option value="all">Todos os períodos</option>
+              <option value="all">Todos</option>
               <option value="today">Hoje</option>
-              <option value="week">Última semana</option>
-              <option value="month">Este mês</option>
+              <option value="week">Semana</option>
+              <option value="month">Mês</option>
             </select>
             
-            <Button onClick={exportToCSV} variant="outline" size="sm" data-export-csv>
-              <FileSpreadsheet className="w-4 h-4 mr-2" />
-              Exportar CSV
+            <Button onClick={exportToCSV} variant="outline" size="sm" data-export-csv className="flex-1 sm:flex-none text-xs">
+              <FileSpreadsheet className="w-3 h-3 mr-1" />
+              CSV
             </Button>
-            <Button onClick={exportToPDF} variant="outline" size="sm" data-export-pdf>
-              <FileText className="w-4 h-4 mr-2" />
-              Exportar PDF
+            <Button onClick={exportToPDF} variant="outline" size="sm" data-export-pdf className="flex-1 sm:flex-none text-xs">
+              <FileText className="w-3 h-3 mr-1" />
+              PDF
             </Button>
           </div>
         </div>

@@ -796,16 +796,16 @@ const FinancialDashboard = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-shrink-0 space-y-4 sm:space-y-6 p-3 sm:p-6">
+      <div className="flex-shrink-0 space-y-4 md:space-y-5 lg:space-y-6 p-3 sm:p-4 md:p-5 lg:p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-          <div>
-            <h3 className="text-base sm:text-lg font-semibold">Dashboard Financeiro em Tempo Real</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+          <div className="text-center sm:text-left">
+            <h3 className="text-base sm:text-lg md:text-xl font-semibold">Dashboard Financeiro em Tempo Real</h3>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
               Dados sincronizados com Stripe • Atualização automática
             </p>
           </div>
           <Select value={range} onValueChange={setRange}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-[160px] md:w-[180px]">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -829,26 +829,26 @@ const FinancialDashboard = () => {
       
       <div className="flex-1 min-h-0">
         <Tabs defaultValue="graficos" className="h-full flex flex-col">
-          <div className="flex-shrink-0 px-3 sm:px-6">
-            <TabsList className="grid w-full grid-cols-3 h-auto">
-              <TabsTrigger value="graficos" className="text-xs sm:text-sm py-2">{t('admin.dashboard.charts', 'Gráficos')}</TabsTrigger>
-              <TabsTrigger value="relatorios" className="text-xs sm:text-sm py-2">{t('admin.dashboard.reports', 'Relatórios')}</TabsTrigger>
-              <TabsTrigger value="alertas" className="text-xs sm:text-sm py-2">{t('admin.dashboard.alerts', 'Alertas')}</TabsTrigger>
+          <div className="flex-shrink-0 px-3 sm:px-4 md:px-6">
+            <TabsList className="grid w-full grid-cols-3 h-auto max-w-full">
+              <TabsTrigger value="graficos" className="text-xs sm:text-sm md:text-base py-2 md:py-2.5">{t('admin.dashboard.charts', 'Gráficos')}</TabsTrigger>
+              <TabsTrigger value="relatorios" className="text-xs sm:text-sm md:text-base py-2 md:py-2.5">{t('admin.dashboard.reports', 'Relatórios')}</TabsTrigger>
+              <TabsTrigger value="alertas" className="text-xs sm:text-sm md:text-base py-2 md:py-2.5">{t('admin.dashboard.alerts', 'Alertas')}</TabsTrigger>
             </TabsList>
           </div>
           
           <div className="flex-1 min-h-0">
             <TabsContent value="graficos" className="h-full m-0">
               <ScrollArea className="h-full">
-                <div className="p-3 sm:p-6 space-y-6 sm:space-y-8">
-                  <div className="flex flex-col sm:flex-row justify-end gap-2 mb-3 sm:mb-4">
-                    <Button onClick={exportGraficosPDF} variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                      <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      Exportar PDF
+                <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-5 md:space-y-6 lg:space-y-8">
+                  <div className="flex flex-row justify-center sm:justify-end gap-2 mb-3 md:mb-4">
+                    <Button onClick={exportGraficosPDF} variant="outline" size="sm" className="flex-1 sm:flex-none sm:w-auto text-xs sm:text-sm">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      PDF
                     </Button>
-                    <Button onClick={exportGraficosExcel} variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                      <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                      Exportar Excel
+                    <Button onClick={exportGraficosExcel} variant="outline" size="sm" className="flex-1 sm:flex-none sm:w-auto text-xs sm:text-sm">
+                      <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      Excel
                     </Button>
                   </div>
                   <div className="w-full">

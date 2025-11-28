@@ -45,57 +45,57 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
       <Card className="border-blue-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(214 100% 97%), hsl(214 100% 92%))' }}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium text-blue-800">{t('admin.dashboard.totalRegistrations', 'Total de Inscrições')}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
+          <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-blue-800">{t('admin.dashboard.totalRegistrations', 'Total de Inscrições')}</CardTitle>
           <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 shrink-0" />
         </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold text-blue-900">{stats.total_registrations}</div>
-          <p className="text-[10px] sm:text-xs text-blue-700 bg-blue-200 px-2 py-1 rounded-full inline-block mt-2">
+        <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 md:pb-6">
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-900">{stats.total_registrations}</div>
+          <p className="text-[9px] sm:text-[10px] md:text-xs text-blue-700 bg-blue-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full inline-block mt-1 sm:mt-2">
             {t('admin.dashboard.today', 'Hoje')}: +{stats.today_registrations}
           </p>
         </CardContent>
       </Card>
 
       <Card className="border-green-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(138 76% 97%), hsl(142 76% 91%))' }}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium text-green-800">{t('admin.dashboard.confirmedPayments', 'Pagamentos Confirmados')}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
+          <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-green-800">{t('admin.dashboard.confirmedPayments', 'Pagamentos Confirmados')}</CardTitle>
           <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 shrink-0" />
         </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold text-green-900">{stats.completed_payments}</div>
-          <p className="text-[10px] sm:text-xs text-orange-700 bg-orange-200 px-2 py-1 rounded-full inline-block mt-2">
+        <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 md:pb-6">
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-900">{stats.completed_payments}</div>
+          <p className="text-[9px] sm:text-[10px] md:text-xs text-orange-700 bg-orange-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full inline-block mt-1 sm:mt-2">
             {t('admin.dashboard.pending', 'Pendentes')}: {stats.pending_payments}
           </p>
         </CardContent>
       </Card>
 
       <Card className="border-purple-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(270 100% 98%), hsl(270 100% 95%))' }}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium text-purple-800">{t('admin.dashboard.totalRevenue', 'Receita Total')}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
+          <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-purple-800">{t('admin.dashboard.totalRevenue', 'Receita Total')}</CardTitle>
           <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600 shrink-0" />
         </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold text-purple-900">{formatCurrency(stats.total_revenue || 0)}</div>
-          <p className="text-[10px] sm:text-xs text-purple-700 bg-purple-200 px-2 py-1 rounded-full inline-block mt-2">
+        <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 md:pb-6">
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-900">{formatCurrency(stats.total_revenue || 0)}</div>
+          <p className="text-[9px] sm:text-[10px] md:text-xs text-purple-700 bg-purple-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full inline-block mt-1 sm:mt-2">
             {t('admin.dashboard.today', 'Hoje')}: {formatCurrency(stats.today_revenue || 0)}
           </p>
         </CardContent>
       </Card>
 
       <Card className="border-amber-200 shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ background: 'linear-gradient(to bottom right, hsl(48 100% 96%), hsl(48 96% 89%))' }}>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium text-amber-800">{t('admin.dashboard.conversionRate', 'Taxa de Conversão')}</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
+          <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-amber-800">{t('admin.dashboard.conversionRate', 'Taxa de Conversão')}</CardTitle>
           <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-amber-600 shrink-0" />
         </CardHeader>
-        <CardContent>
-          <div className="text-xl sm:text-2xl font-bold text-amber-900">
+        <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 md:pb-6">
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-900">
             {stats.total_registrations ? 
               Math.round((stats.completed_payments / stats.total_registrations) * 100) : 0}%
           </div>
-          <p className="text-[10px] sm:text-xs text-amber-700 bg-amber-200 px-2 py-1 rounded-full inline-block mt-2">
+          <p className="text-[9px] sm:text-[10px] md:text-xs text-amber-700 bg-amber-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full inline-block mt-1 sm:mt-2">
             {t('admin.dashboard.paymentsRegistrations', 'Pagamentos/Inscrições')}
           </p>
         </CardContent>
