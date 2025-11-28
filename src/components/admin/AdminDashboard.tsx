@@ -983,56 +983,56 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden px-1">
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4 text-center md:text-left">
         <div className="min-w-0">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Dashboard Financeiro Stripe</h2>
-          <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight break-words">Dashboard Financeiro Stripe</h2>
+          <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-1 sm:gap-2 mt-1">
             <Badge variant="secondary" className="animate-pulse text-[10px] sm:text-xs">LIVE</Badge>
-            <span className="truncate">Espelho em tempo real • Civeni 2025</span>
+            <span className="break-words">Espelho em tempo real • Civeni 2025</span>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 max-w-md mx-auto md:mx-0 md:max-w-none md:flex md:flex-wrap">
           <Button 
             onClick={handleExportPDF} 
             disabled={loading} 
             size="sm"
-            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
+            className="text-white border-0 text-xs sm:text-sm px-3 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
-            <span className="truncate">PDF</span>
+            PDF
           </Button>
           <Button 
             onClick={handleExportExcel} 
             disabled={loading} 
             size="sm"
-            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
+            className="text-white border-0 text-xs sm:text-sm px-3 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
-            <span className="truncate">Excel</span>
+            Excel
           </Button>
           <Button 
             onClick={handleSync} 
             disabled={syncing} 
             size="sm"
-            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
+            className="text-white border-0 text-xs sm:text-sm px-3 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <Database className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0 ${syncing ? 'animate-spin' : ''}`} />
-            <span className="truncate">Sync</span>
+            Sync
           </Button>
           <Button 
             onClick={refresh} 
             disabled={loading} 
             size="sm"
-            className="text-white border-0 text-xs sm:text-sm px-2 sm:px-4"
+            className="text-white border-0 text-xs sm:text-sm px-3 sm:px-4"
             style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
           >
             <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0 ${loading ? 'animate-spin' : ''}`} />
-            <span className="truncate">Atualizar</span>
+            Atualizar
           </Button>
         </div>
       </div>

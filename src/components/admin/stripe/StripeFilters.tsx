@@ -26,14 +26,14 @@ interface StripeFiltersProps {
 
 export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterChange, onClearFilters }) => {
   return (
-    <Card className="border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/10 dark:to-cyan-950/10">
-      <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
+    <Card className="border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/10 dark:to-cyan-950/10 w-full">
+      <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
           {/* Período */}
-          <div className="space-y-2">
-            <Label className="text-blue-700 dark:text-blue-300 font-semibold">Período</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-blue-700 dark:text-blue-300 font-semibold text-xs sm:text-sm">Período</Label>
             <Select value={filters.range} onValueChange={(v) => onFilterChange('range', v)}>
-              <SelectTrigger className="border-blue-300 dark:border-blue-700 focus:ring-blue-500">
+              <SelectTrigger className="border-blue-300 dark:border-blue-700 focus:ring-blue-500 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -47,12 +47,12 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
 
           {/* Data início (custom) */}
           {filters.range === 'custom' && (
-            <div className="space-y-2">
-              <Label className="text-purple-700 dark:text-purple-300 font-semibold">De</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-purple-700 dark:text-purple-300 font-semibold text-xs sm:text-sm">De</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/30">
-                    <CalendarIcon className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <Button variant="outline" className="w-full justify-start text-left font-normal border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/30 text-xs sm:text-sm">
+                    <CalendarIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-purple-600 dark:text-purple-400" />
                     {filters.customFrom ? format(filters.customFrom, 'dd/MM/yyyy') : 'Selecione'}
                   </Button>
                 </PopoverTrigger>
@@ -70,12 +70,12 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
 
           {/* Data fim (custom) */}
           {filters.range === 'custom' && (
-            <div className="space-y-2">
-              <Label className="text-purple-700 dark:text-purple-300 font-semibold">Até</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-purple-700 dark:text-purple-300 font-semibold text-xs sm:text-sm">Até</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/30">
-                    <CalendarIcon className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <Button variant="outline" className="w-full justify-start text-left font-normal border-purple-300 dark:border-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/30 text-xs sm:text-sm">
+                    <CalendarIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-purple-600 dark:text-purple-400" />
                     {filters.customTo ? format(filters.customTo, 'dd/MM/yyyy') : 'Selecione'}
                   </Button>
                 </PopoverTrigger>
@@ -92,10 +92,10 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
           )}
 
           {/* Status */}
-          <div className="space-y-2">
-            <Label className="text-green-700 dark:text-green-300 font-semibold">Status</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-green-700 dark:text-green-300 font-semibold text-xs sm:text-sm">Status</Label>
             <Select value={filters.status} onValueChange={(v) => onFilterChange('status', v)}>
-              <SelectTrigger className="border-green-300 dark:border-green-700 focus:ring-green-500">
+              <SelectTrigger className="border-green-300 dark:border-green-700 focus:ring-green-500 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -109,32 +109,32 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
           </div>
 
           {/* Lote */}
-          <div className="space-y-2">
-            <Label className="text-orange-700 dark:text-orange-300 font-semibold">Lote</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-orange-700 dark:text-orange-300 font-semibold text-xs sm:text-sm">Lote</Label>
             <Input
               placeholder="Filtrar por lote"
               value={filters.lote}
               onChange={(e) => onFilterChange('lote', e.target.value)}
-              className="border-orange-300 dark:border-orange-700 focus:ring-orange-500"
+              className="border-orange-300 dark:border-orange-700 focus:ring-orange-500 text-xs sm:text-sm"
             />
           </div>
 
           {/* Cupom */}
-          <div className="space-y-2">
-            <Label className="text-pink-700 dark:text-pink-300 font-semibold">Cupom</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-pink-700 dark:text-pink-300 font-semibold text-xs sm:text-sm">Cupom</Label>
             <Input
               placeholder="Filtrar por cupom"
               value={filters.cupom}
               onChange={(e) => onFilterChange('cupom', e.target.value)}
-              className="border-pink-300 dark:border-pink-700 focus:ring-pink-500"
+              className="border-pink-300 dark:border-pink-700 focus:ring-pink-500 text-xs sm:text-sm"
             />
           </div>
 
           {/* Bandeira */}
-          <div className="space-y-2">
-            <Label className="text-indigo-700 dark:text-indigo-300 font-semibold">Bandeira</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm">Bandeira</Label>
             <Select value={filters.brand} onValueChange={(v) => onFilterChange('brand', v)}>
-              <SelectTrigger className="border-indigo-300 dark:border-indigo-700 focus:ring-indigo-500">
+              <SelectTrigger className="border-indigo-300 dark:border-indigo-700 focus:ring-indigo-500 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -152,7 +152,7 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
           <div className="flex items-end col-span-2 md:col-span-1">
             <Button 
               onClick={onClearFilters} 
-              className="w-full text-white border-0 text-xs sm:text-sm md:text-base"
+              className="w-full text-white border-0 text-xs sm:text-sm"
               style={{ background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b)' }}
             >
               <X className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
