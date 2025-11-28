@@ -521,37 +521,73 @@
 
 @media (min-width: 768px) and (max-width: 1024px) {
   
-  /* Layout principal tablet - sidebar + conteúdo */
+  /* Layout principal tablet - sidebar + conteúdo SEM gap */
   .civeni-admin {
     display: flex !important;
     flex-direction: row !important;
     width: 100% !important;
     max-width: 100vw !important;
     overflow-x: hidden !important;
+    gap: 0 !important;
   }
   
-  /* Sidebar em tablet - largura fixa */
-  .civeni-admin [data-sidebar="sidebar"] {
-    width: 200px !important;
-    min-width: 200px !important;
-    max-width: 200px !important;
-    flex-shrink: 0 !important;
-  }
-  
-  /* Área de conteúdo - ocupar espaço restante */
-  .civeni-admin [data-sidebar="inset"],
-  .civeni-admin main {
-    flex: 1 1 0% !important;
-    min-width: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
+  /* Wrapper do sidebar - sem margin/padding extra */
+  .civeni-admin > [data-slot="sidebar"],
+  .civeni-admin > aside,
+  .civeni-admin > div:first-child:has([data-sidebar="sidebar"]) {
+    margin: 0 !important;
     padding: 0 !important;
   }
   
-  /* Conteúdo principal em tablet - padding e centralização */
+  /* Sidebar em tablet - largura fixa, colado à esquerda */
+  .civeni-admin [data-sidebar="sidebar"] {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  /* Sidebar colapsado em tablet */
+  .civeni-admin [data-state="collapsed"] [data-sidebar="sidebar"],
+  .civeni-admin [data-sidebar="sidebar"][data-state="collapsed"] {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  
+  /* Área de conteúdo (SidebarInset) - ocupar TODO espaço restante */
+  .civeni-admin [data-sidebar="inset"] {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: calc(100% - 220px) !important;
+    max-width: none !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Quando sidebar colapsado, conteúdo ocupa 100% */
+  .civeni-admin [data-state="collapsed"] + [data-sidebar="inset"],
+  .civeni-admin:has([data-state="collapsed"]) [data-sidebar="inset"] {
+    width: 100% !important;
+  }
+  
+  /* Main interno - padding adequado */
+  .civeni-admin main {
+    flex: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 0.75rem !important;
+  }
+  
+  /* Conteúdo principal em tablet */
   .civeni-admin main > div {
-    padding: 1rem !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -560,11 +596,11 @@
   /* Header do admin em tablet */
   .civeni-admin header {
     padding-top: 0 !important;
-    min-height: 56px !important;
+    min-height: 52px !important;
     width: 100% !important;
   }
   
-  /* Resetar posição absoluta do trigger em tablet */
+  /* Trigger do sidebar em tablet - visível e funcional */
   .civeni-admin [data-sidebar="trigger"] {
     position: relative !important;
     top: auto !important;
@@ -573,9 +609,18 @@
     height: 36px !important;
     min-width: 36px !important;
     min-height: 36px !important;
-    background: transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: none !important;
-    border: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+  }
+  
+  .civeni-admin [data-sidebar="trigger"]:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
   }
   
   .civeni-admin [data-sidebar="trigger"] svg {
