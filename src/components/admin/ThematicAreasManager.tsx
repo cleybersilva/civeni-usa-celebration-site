@@ -170,9 +170,9 @@ const ThematicAreasManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Áreas Temáticas</h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-bold">Áreas Temáticas</h1>
           <p className="text-muted-foreground mt-2">
             Gerencie as áreas temáticas do evento
           </p>
@@ -180,7 +180,7 @@ const ThematicAreasManager = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreateDialog}>
+            <Button onClick={openCreateDialog} className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Nova Área Temática
             </Button>
