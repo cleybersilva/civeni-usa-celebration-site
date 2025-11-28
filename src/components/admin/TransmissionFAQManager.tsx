@@ -107,10 +107,10 @@ const TransmissionFAQManager = () => {
   if (isLoading) return <div>Carregando...</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gerenciar FAQ da Transmissão</h2>
-        <Button onClick={resetForm} className="gap-2">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-center sm:text-left">Gerenciar FAQ da Transmissão</h2>
+        <Button onClick={resetForm} className="gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           Nova Pergunta
         </Button>
