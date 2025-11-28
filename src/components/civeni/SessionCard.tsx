@@ -106,16 +106,26 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
   };
 
   const getTranslatedSessionDescription = (description: string) => {
-    // Remove HTML tags for lookup
-    const cleanDesc = description.replace(/<[^>]*>/g, '').trim();
+    if (!description) return description;
+    
     const sessionDescriptions = t('schedule.sessionDescriptions', { returnObjects: true }) as Record<string, string>;
-    // Try to find a matching description
-    for (const [key, value] of Object.entries(sessionDescriptions || {})) {
-      if (cleanDesc.includes(key) || key.includes(cleanDesc)) {
-        return description.replace(cleanDesc, value);
+    if (!sessionDescriptions || Object.keys(sessionDescriptions).length === 0) return description;
+    
+    // First try exact match with cleaned description
+    const cleanDesc = description.replace(/<[^>]*>/g, '').trim();
+    if (sessionDescriptions[cleanDesc]) {
+      return description.replace(cleanDesc, sessionDescriptions[cleanDesc]);
+    }
+    
+    // Try to translate parts of the description
+    let translatedDesc = description;
+    for (const [key, value] of Object.entries(sessionDescriptions)) {
+      if (key && value && translatedDesc.includes(key)) {
+        translatedDesc = translatedDesc.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), value);
       }
     }
-    return sessionDescriptions?.[cleanDesc] || description;
+    
+    return translatedDesc;
   };
 
   const generateICS = () => {
