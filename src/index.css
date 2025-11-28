@@ -902,21 +902,29 @@
     gap: 0.5rem !important;
   }
   
-  /* Flex containers - CENTRALIZADOS */
-  .civeni-admin .flex.items-center.gap-2,
-  .civeni-admin .flex.gap-2,
-  .civeni-admin .flex.gap-3,
-  .civeni-admin .flex.gap-4 {
+  /* Flex containers - CENTRALIZADOS (EXCETO SIDEBAR) */
+  .civeni-admin main .flex.items-center.gap-2,
+  .civeni-admin main .flex.gap-2,
+  .civeni-admin main .flex.gap-3,
+  .civeni-admin main .flex.gap-4,
+  .civeni-admin [data-sidebar="inset"] .flex.items-center.gap-2,
+  .civeni-admin [data-sidebar="inset"] .flex.gap-2,
+  .civeni-admin [data-sidebar="inset"] .flex.gap-3,
+  .civeni-admin [data-sidebar="inset"] .flex.gap-4 {
     justify-content: center !important;
     flex-wrap: wrap !important;
     gap: 0.375rem !important;
   }
   
-  /* Sessões de dias do evento - CENTRALIZADAS */
-  .civeni-admin [class*="session"],
-  .civeni-admin [class*="Session"],
-  .civeni-admin [class*="day"],
-  .civeni-admin [class*="Day"] {
+  /* Sessões de dias do evento - CENTRALIZADAS (EXCETO SIDEBAR) */
+  .civeni-admin main [class*="session"],
+  .civeni-admin main [class*="Session"],
+  .civeni-admin main [class*="day"],
+  .civeni-admin main [class*="Day"],
+  .civeni-admin [data-sidebar="inset"] [class*="session"],
+  .civeni-admin [data-sidebar="inset"] [class*="Session"],
+  .civeni-admin [data-sidebar="inset"] [class*="day"],
+  .civeni-admin [data-sidebar="inset"] [class*="Day"] {
     text-align: center !important;
   }
   
@@ -924,5 +932,24 @@
   .civeni-admin * {
     overflow-wrap: break-word !important;
     word-wrap: break-word !important;
+  }
+  
+  /* ============================================
+     SIDEBAR TABLET - RESET TOTAL (última regra para máxima prioridade)
+     O sidebar deve usar o mesmo estilo do desktop/mobile
+     ============================================ */
+  .civeni-admin [data-sidebar="sidebar"],
+  .civeni-admin [data-sidebar="sidebar"] * {
+    text-align: inherit;
+  }
+  
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"],
+  .civeni-admin [data-sidebar="sidebar"] button[data-sidebar="menu-button"] {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+  
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"] span {
+    text-align: left !important;
   }
 }
