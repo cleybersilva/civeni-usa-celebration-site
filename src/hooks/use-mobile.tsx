@@ -2,27 +2,28 @@ import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
 
-// Função para obter valor inicial de forma segura (SSR-safe)
-function getInitialMobileState(): boolean {
-  if (typeof window !== 'undefined') {
-    return window.innerWidth < MOBILE_BREAKPOINT
-  }
-  return false
-}
-
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean>(() => getInitialMobileState())
+  // Começar com null para indicar "não determinado ainda"
+  const [isMobile, setIsMobile] = React.useState<boolean | null>(null)
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
+    // Só atualiza após o componente estar montado no cliente
+    const checkMobile = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
-    mql.addEventListener("change", onChange)
-    // Sincronizar com o valor atual
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
+    
+    // Define o valor inicial
+    checkMobile()
+    
+    // Escuta mudanças de tamanho
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    mql.addEventListener("change", checkMobile)
+    
+    return () => mql.removeEventListener("change", checkMobile)
   }, [])
 
-  return isMobile
+  // Retorna false se ainda não determinado (evita flicker)
+  // Isso garante que no primeiro render sempre retorna false (desktop layout)
+  // e só muda para true após o useEffect rodar no cliente
+  return isMobile ?? false
 }
