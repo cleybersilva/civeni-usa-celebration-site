@@ -39,10 +39,10 @@ const AdminHeader = () => {
         <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
           <SidebarTrigger className="h-8 w-8 text-white hover:text-white/80 shrink-0" />
           <div className="min-w-0 flex-1">
-            <h1 className="text-base sm:text-xl font-bold text-white drop-shadow-md truncate">
+            <h1 className="text-xl sm:text-2xl font-bold text-white drop-shadow-md truncate">
               Dashboard
             </h1>
-            <p className="text-[10px] sm:text-xs text-white/90 drop-shadow-sm truncate">
+            <p className="text-sm sm:text-base text-white/90 drop-shadow-sm truncate">
               <span className="hidden sm:inline">{user?.email}</span>
               <span className="sm:hidden">{user?.email?.split('@')[0]}</span>
               <span className="hidden md:inline"> ({getUserTypeLabel(user?.user_type || '')})</span>
