@@ -943,26 +943,67 @@
     text-align: inherit;
   }
   
-  /* Menu button - mesmo layout do desktop/mobile */
+  /* Sidebar - remover scrollbar e ajustar altura */
+  .civeni-admin [data-sidebar="sidebar"] {
+    overflow: hidden !important;
+  }
+  
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="content"] {
+    overflow: hidden !important;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+  
+  /* Menu - espaçamento compacto entre itens */
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu"] {
+    gap: 0 !important;
+  }
+  
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-item"] {
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  
+  /* Menu button - mesmo layout do desktop/mobile, mais compacto */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"],
   .civeni-admin [data-sidebar="sidebar"] button[data-sidebar="menu-button"] {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 0.5rem !important; /* gap-2 = 8px, igual desktop/mobile */
+    gap: 0.5rem !important;
     text-align: left !important;
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+    min-height: auto !important;
   }
   
   /* Ícone - margem padrão */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"] svg {
-    margin-right: 0 !important; /* gap já controla o espaçamento */
+    margin-right: 0 !important;
     flex-shrink: 0 !important;
+    width: 1rem !important;
+    height: 1rem !important;
   }
   
-  /* Texto - sem margem extra */
+  /* Texto - sem margem extra, fonte menor */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"] span {
     text-align: left !important;
     margin-left: 0 !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.25 !important;
+  }
+  
+  /* Header do sidebar - mais compacto */
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="header"] {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  /* Footer do sidebar - mais compacto */
+  .civeni-admin [data-sidebar="sidebar"] [data-sidebar="footer"] {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
   }
 }
