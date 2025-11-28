@@ -301,17 +301,17 @@ const UsersManager = () => {
   // Remover verificação restritiva aqui - deixar que os dados sejam carregados primeiro
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div className="space-y-4 md:space-y-5 lg:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 md:gap-4">
         <div className="text-center sm:text-left">
-          <h2 className="text-xl sm:text-2xl font-bold text-civeni-blue">{t('admin.users.title')}</h2>
-          <p className="text-sm sm:text-base text-gray-600">{t('admin.users.description')}</p>
+          <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-civeni-blue">{t('admin.users.title')}</h2>
+          <p className="text-xs md:text-sm lg:text-base text-gray-600">{t('admin.users.description')}</p>
         </div>
         
         {canManageUsers && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-civeni-blue hover:bg-blue-700 w-full sm:w-auto">
+              <Button className="bg-civeni-blue hover:bg-blue-700 w-full sm:w-auto text-xs md:text-sm">
                 <UserPlus className="w-4 h-4 mr-2" />
                 {t('admin.users.newUser')}
               </Button>
