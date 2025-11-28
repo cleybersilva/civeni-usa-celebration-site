@@ -11,7 +11,7 @@ const AdminSidebarHeader = () => {
 
   return (
     <SidebarHeader 
-      className="border-b px-4 md:px-5 lg:px-6 py-2 md:py-3 h-14 md:h-16 relative"
+      className="border-b px-4 tablet:px-4 md:px-5 lg:px-6 py-2 tablet:py-2 md:py-3 h-14 tablet:h-14 md:h-16 relative"
       style={{
         background: 'linear-gradient(to right, #021b3a, #731b4c, #c51d3b, #731b4c, #021b3a)'
       }}
@@ -31,7 +31,7 @@ const AdminSidebarHeader = () => {
         <img 
           src="/lovable-uploads/d7a1c7d2-c77d-46ae-b1d0-a882c59b41fd.png" 
           alt="CIVENI" 
-          className="h-8 md:h-9 lg:h-10 w-auto object-contain"
+          className="h-8 tablet:h-8 md:h-9 lg:h-10 w-auto object-contain"
         />
       </div>
     </SidebarHeader>

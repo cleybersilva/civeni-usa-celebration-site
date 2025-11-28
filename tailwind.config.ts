@@ -18,6 +18,14 @@ export default {
 				'2xl': '1400px'
 			}
 		},
+		screens: {
+			'sm': '640px',
+			'md': '768px',
+			'tablet': '769px',   // Tablet portrait
+			'lg': '1024px',      // Tablet landscape / Desktop
+			'xl': '1280px',
+			'2xl': '1536px',
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',
