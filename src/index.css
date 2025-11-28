@@ -551,17 +551,36 @@
     border-right: none !important;
   }
   
-  /* ESCONDER botão X de fechar em tablet - FORÇA MÁXIMA */
-  .civeni-admin [data-sidebar="header"] button {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+  /* MOSTRAR botão de esconder sidebar em tablet */
+  .civeni-admin [data-sidebar="trigger"] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    width: 32px !important;
+    height: 32px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 6px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
   }
   
-  .civeni-admin [data-sidebar="trigger"],
-  .civeni-admin button[aria-label*="Fechar"],
-  .civeni-admin button[aria-label*="menu"] {
+  .civeni-admin [data-sidebar="trigger"]:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+  }
+  
+  .civeni-admin [data-sidebar="trigger"] svg {
+    width: 16px !important;
+    height: 16px !important;
+    color: white !important;
+  }
+  
+  /* ESCONDER botão X de fechar do header do sidebar */
+  .civeni-admin [data-sidebar="header"] button[aria-label*="Fechar"],
+  .civeni-admin [data-sidebar="header"] button:has(svg.lucide-x) {
     display: none !important;
   }
   
@@ -574,6 +593,11 @@
     overflow: hidden !important;
     padding: 0 !important;
     border: none !important;
+  }
+  
+  /* Quando sidebar colapsado, conteúdo ocupa 100% */
+  .civeni-admin:has([data-state="collapsed"]) [data-sidebar="inset"] {
+    width: 100% !important;
   }
   
   /* Área de conteúdo (SidebarInset) - COLADA no sidebar, SEM espaços */
@@ -693,34 +717,45 @@
   }
   
   /* ============================================
-     CONTEÚDO - SEM CENTRALIZAÇÃO EXCESSIVA
+     CONTEÚDO - CENTRALIZADO E SEM CORTE DE TEXTO
      ============================================ */
   
-  /* Títulos - alinhados à esquerda */
+  /* Títulos - CENTRALIZADOS e sem corte */
   .civeni-admin h1,
   .civeni-admin h2,
   .civeni-admin h3 {
-    text-align: left !important;
+    text-align: center !important;
     font-size: 0.9rem !important;
     word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    width: 100% !important;
   }
   
   .civeni-admin h1 {
     font-size: 1rem !important;
   }
   
-  /* Parágrafos - alinhados à esquerda */
+  /* Parágrafos - centralizados */
   .civeni-admin p {
-    text-align: left !important;
+    text-align: center !important;
     font-size: 0.8125rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
   }
   
-  /* Cards - largura total sem espaços */
+  /* Cards - largura total, centralizados */
   .civeni-admin .admin-card,
   .civeni-admin [class*="Card"] {
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 !important;
+    margin: 0 auto 0.5rem auto !important;
+  }
+  
+  /* Card content centralizado */
+  .civeni-admin [class*="CardContent"],
+  .civeni-admin [class*="CardHeader"] {
+    text-align: center !important;
   }
   
   /* Grids - 2 colunas compactas */
@@ -730,21 +765,23 @@
     gap: 0.5rem !important;
   }
   
-  /* Dashboard grid 2x2 - largura total */
+  /* Dashboard grid 2x2 - largura total, CENTRALIZADO */
   .civeni-admin .grid.grid-cols-2 {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 0.5rem !important;
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
+    justify-items: center !important;
   }
   
-  /* Botões - tamanho compacto */
+  /* Botões - tamanho compacto, texto não corta */
   .civeni-admin button {
     font-size: 0.75rem !important;
     padding: 0.375rem 0.75rem !important;
-    white-space: nowrap !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
   }
   
   .civeni-admin button svg {
@@ -753,12 +790,12 @@
     flex-shrink: 0 !important;
   }
   
-  /* Action buttons - flex start */
+  /* Action buttons - CENTRALIZADOS */
   .civeni-admin .admin-action-buttons,
   .civeni-admin .admin-button-group {
     display: flex !important;
     flex-wrap: wrap !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
     gap: 0.5rem !important;
     width: 100% !important;
   }
@@ -833,21 +870,28 @@
     gap: 0.375rem !important;
   }
   
-  /* Headers - alinhados à esquerda */
+  /* Headers - CENTRALIZADOS */
   .civeni-admin .page-header,
   .civeni-admin .admin-header,
   .civeni-admin .dashboard-header {
-    text-align: left !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
   
-  /* Tabs */
+  /* Tabs - CENTRALIZADAS */
   .civeni-admin [role="tablist"] {
     width: 100% !important;
+    justify-content: center !important;
   }
   
   .civeni-admin [role="tab"] {
     font-size: 0.75rem !important;
     padding: 0.5rem 0.75rem !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    text-align: center !important;
   }
   
   /* Cards de estatísticas */
@@ -856,13 +900,27 @@
     gap: 0.5rem !important;
   }
   
-  /* Flex containers - flex-start */
+  /* Flex containers - CENTRALIZADOS */
   .civeni-admin .flex.items-center.gap-2,
   .civeni-admin .flex.gap-2,
   .civeni-admin .flex.gap-3,
   .civeni-admin .flex.gap-4 {
-    justify-content: flex-start !important;
+    justify-content: center !important;
     flex-wrap: wrap !important;
     gap: 0.375rem !important;
+  }
+  
+  /* Sessões de dias do evento - CENTRALIZADAS */
+  .civeni-admin [class*="session"],
+  .civeni-admin [class*="Session"],
+  .civeni-admin [class*="day"],
+  .civeni-admin [class*="Day"] {
+    text-align: center !important;
+  }
+  
+  /* Todos os textos não devem cortar */
+  .civeni-admin * {
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
   }
 }
