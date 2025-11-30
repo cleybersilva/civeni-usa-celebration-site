@@ -31,7 +31,6 @@ const AdminDashboard = () => {
   const [timeseriesPage, setTimeseriesPage] = useState(1);
   const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
   const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
-  const [totalPayoutsData, setTotalPayoutsData] = useState<{ total: number; count: number } | null>(null);
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
@@ -110,49 +109,7 @@ const AdminDashboard = () => {
     fetchAllTimeseries();
   }, [fetchAllTimeseries]);
 
-  // Função para buscar total de payouts depositados na conta
-  const fetchTotalPayouts = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('stripe_payouts')
-        .select('amount')
-        .eq('status', 'paid');
-
-      if (error) {
-        console.error('Erro ao buscar payouts:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const totalCents = data.reduce((sum, payout) => sum + (payout.amount || 0), 0);
-        setTotalPayoutsData({ 
-          total: totalCents / 100, 
-          count: data.length 
-        });
-      } else {
-        setTotalPayoutsData({ total: 0, count: 0 });
-      }
-    } catch (err) {
-      console.error('Erro ao buscar payouts:', err);
-    }
-  }, []);
-
-  // Buscar total de payouts depositados
-  useEffect(() => {
-    fetchTotalPayouts();
-    
-    // Realtime subscription para atualizar em tempo real
-    const channel = supabase
-      .channel('stripe_payouts_revenue')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'stripe_payouts' }, () => {
-        fetchTotalPayouts();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchTotalPayouts]);
+  // O total de payouts agora vem do summary via edge function (sem RLS)
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -205,8 +162,7 @@ const AdminDashboard = () => {
       // Atualizar TODOS os dados após sync
       await Promise.all([
         refresh(),
-        fetchAllTimeseries(),
-        fetchTotalPayouts()
+        fetchAllTimeseries()
       ]);
     } catch (error) {
       console.error('Sync error:', error);
@@ -1100,13 +1056,13 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-              {formatCurrency(totalPayoutsData?.total || 0)}
+              {formatCurrency(summary?.totalPayouts || 0)}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
               Depositado na conta bancária
             </p>
             <p className="text-[10px] sm:text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-1">
-              {totalPayoutsData?.count || 0} transferências realizadas
+              {summary?.totalPayoutsCount || 0} transferências realizadas
             </p>
           </CardContent>
         </Card>

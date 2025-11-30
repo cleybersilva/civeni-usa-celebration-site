@@ -14,6 +14,8 @@ interface StripeSummary {
   ticketMedio: number;
   taxaConversao: string;
   proximoPayout: any;
+  totalPayouts: number;
+  totalPayoutsCount: number;
 }
 
 interface StripeDashboardFilters {

@@ -141,6 +141,15 @@ serve(async (req) => {
       }
     }
 
+    // Buscar TOTAL de payouts depositados (status = 'paid')
+    const { data: paidPayouts } = await supabaseClient
+      .from('stripe_payouts')
+      .select('amount')
+      .eq('status', 'paid');
+    
+    const totalPayoutsCents = paidPayouts?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+    const totalPayoutsCount = paidPayouts?.length || 0;
+
     const ticketMedio = pagos > 0 ? bruto / pagos : 0;
     const taxaConversao = (pagos + naoPagos) > 0 ? (pagos / (pagos + naoPagos)) * 100 : 0;
 
@@ -162,6 +171,8 @@ serve(async (req) => {
         status: nextPayout.status,
         isLastPaid: nextPayout.isLastPaid || false
       } : null,
+      totalPayouts: totalPayoutsCents / 100,
+      totalPayoutsCount,
       currency,
       periodo: { from, to }
     };
