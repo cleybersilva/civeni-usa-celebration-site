@@ -148,7 +148,7 @@ serve(async (req) => {
 
     // Criar map de reembolsos por charge_id
     const refundsMap = new Map();
-    refunds?.forEach(refund => {
+    refunds?.forEach((refund: { charge_id: string; amount: number }) => {
       if (!refundsMap.has(refund.charge_id)) {
         refundsMap.set(refund.charge_id, []);
       }
@@ -222,7 +222,7 @@ serve(async (req) => {
           const chargeRefunds = refundsMap.get(latestCharge.id);
           if (chargeRefunds && chargeRefunds.length > 0) {
             customer.reembolsos += chargeRefunds.length;
-            chargeRefunds.forEach(refund => {
+            chargeRefunds.forEach((refund: { charge_id: string; amount: number }) => {
               customer.reembolsos_valor += refund.amount / 100;
             });
           }
