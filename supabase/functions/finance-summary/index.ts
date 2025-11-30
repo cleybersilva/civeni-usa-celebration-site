@@ -111,12 +111,15 @@ serve(async (req) => {
     
     disputasTotal = disputes?.length || 0;
 
-    // Buscar próximo payout (in_transit ou pending)
+    // Buscar próximo payout - verificar se é realmente futuro
     let nextPayout = null;
+    const now = new Date();
+    
     const { data: transitPayout } = await supabaseClient
       .from('stripe_payouts')
       .select('arrival_date_utc, amount, currency, status')
       .in('status', ['in_transit', 'pending'])
+      .gte('arrival_date_utc', now.toISOString()) // Apenas payouts futuros
       .order('arrival_date_utc', { ascending: true })
       .limit(1)
       .maybeSingle();
@@ -124,7 +127,7 @@ serve(async (req) => {
     if (transitPayout) {
       nextPayout = transitPayout;
     } else {
-      // Se não há payouts pendentes, buscar o último payout realizado
+      // Se não há payouts pendentes/futuros, buscar o último payout realizado
       const { data: lastPaidPayout } = await supabaseClient
         .from('stripe_payouts')
         .select('arrival_date_utc, amount, currency, status')
