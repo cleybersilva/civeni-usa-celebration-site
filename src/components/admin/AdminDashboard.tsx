@@ -146,18 +146,19 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchTotalRevenue = async () => {
       try {
-        const { data, error } = await supabase
-          .from('event_registrations')
-          .select('amount_paid')
-          .eq('payment_status', 'completed');
+        const { data, error } = await supabase.rpc('get_total_registration_revenue');
 
         if (error) {
           console.error('Erro ao buscar receita total:', error);
           return;
         }
 
-        const total = data?.reduce((sum, reg) => sum + (reg.amount_paid || 0), 0) || 0;
-        setTotalRevenueData({ total, count: data?.length || 0 });
+        if (data && data.length > 0) {
+          setTotalRevenueData({ 
+            total: Number(data[0].total_revenue) || 0, 
+            count: Number(data[0].total_count) || 0 
+          });
+        }
       } catch (err) {
         console.error('Erro ao buscar receita total:', err);
       }
