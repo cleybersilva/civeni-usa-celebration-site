@@ -132,10 +132,10 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
           </div>
 
           {/* Bandeira */}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label className="text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm">Bandeira</Label>
+          <div className="space-y-1.5 sm:space-y-2 col-span-2 sm:col-span-1 flex flex-col items-center sm:items-stretch">
+            <Label className="text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm text-center sm:text-left">Bandeira</Label>
             <Select value={filters.brand} onValueChange={(v) => onFilterChange('brand', v)}>
-              <SelectTrigger className="border-indigo-300 dark:border-indigo-700 focus:ring-indigo-500 text-xs sm:text-sm">
+              <SelectTrigger className="border-indigo-300 dark:border-indigo-700 focus:ring-indigo-500 text-xs sm:text-sm w-full max-w-[200px] sm:max-w-none">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
