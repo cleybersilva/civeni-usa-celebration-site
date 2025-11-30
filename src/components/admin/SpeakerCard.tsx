@@ -49,7 +49,7 @@ const SpeakerCard = ({ speaker, onEdit, onDelete }: SpeakerCardProps) => {
             speaker.image
           }
           alt={speaker.name}
-          className="w-full h-32 object-cover rounded-lg"
+          className="w-full h-40 object-contain rounded-lg bg-gray-100"
         />
       </CardHeader>
       <CardContent className="space-y-2">
