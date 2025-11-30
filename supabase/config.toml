@@ -1,5 +1,8 @@
 project_id = "wdkeqxfglmritghmakma"
 
+[functions.list-admin-users]
+verify_jwt = false
+
 [functions.upload-and-register]
 verify_jwt = false
 
