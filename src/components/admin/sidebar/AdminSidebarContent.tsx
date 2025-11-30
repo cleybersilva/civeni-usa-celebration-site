@@ -21,7 +21,7 @@ const AdminSidebarContent = ({ visibleItems, activeTab, onTabChange }: AdminSide
               className="w-full justify-start px-3 md:px-4 py-2 md:py-2.5 lg:py-3 text-xs md:text-sm font-medium transition-all duration-300 hover:bg-civeni-blue/10 hover:text-civeni-blue data-[active=true]:bg-civeni-blue data-[active=true]:text-white data-[active=true]:shadow-md rounded-lg group"
             >
               <item.icon className="h-4 w-4 md:h-5 md:w-5 mr-2 md:mr-3 transition-transform duration-200 group-hover:scale-110 shrink-0" />
-              <span className="transition-all duration-200 truncate">{item.label}</span>
+              <span className="transition-all duration-200 truncate lg:overflow-visible lg:whitespace-normal">{item.label}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
