@@ -59,3 +59,24 @@ verify_jwt = false
 
 [functions.translate-certificate]
 verify_jwt = false
+
+[functions.stripe-sync]
+verify_jwt = false
+
+[functions.finance-summary]
+verify_jwt = false
+
+[functions.finance-timeseries]
+verify_jwt = false
+
+[functions.finance-by-brand]
+verify_jwt = false
+
+[functions.finance-funnel]
+verify_jwt = false
+
+[functions.finance-charges]
+verify_jwt = false
+
+[functions.finance-customers]
+verify_jwt = false
