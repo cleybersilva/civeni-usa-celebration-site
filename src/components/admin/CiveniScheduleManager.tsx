@@ -285,8 +285,8 @@ const CiveniScheduleManager = () => {
                     {days.map((day) => (
                       <Card key={day.id} className="p-3 sm:p-4 hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in">
                         <div className="flex flex-col gap-3">
-                          <div className="text-center sm:text-left">
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-2 mb-2">
+                          <div className="text-center">
+                            <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 mb-2">
                               <h4 className="font-semibold text-sm sm:text-base">{day.weekday_label}</h4>
                               <Badge variant={day.is_published ? "default" : "secondary"} className="text-[10px] sm:text-xs">
                                 {day.is_published ? "Publicado" : "Rascunho"}
@@ -307,7 +307,7 @@ const CiveniScheduleManager = () => {
                               {getSessionsForDay(day.id).length} sessões
                             </p>
                           </div>
-                          <div className="flex gap-2 justify-center sm:justify-start">
+                          <div className="flex gap-2 justify-center">
                             <Button
                               size="sm"
                               variant="ghost"
@@ -345,7 +345,7 @@ const CiveniScheduleManager = () => {
 
               {/* Sessões Section */}
               <div>
-                <div className="mb-4">
+                <div className="mb-4 text-center">
                   <h3 className="text-lg font-semibold">Sessões</h3>
                 </div>
 
