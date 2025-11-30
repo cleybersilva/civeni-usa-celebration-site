@@ -1046,10 +1046,10 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Card Receita Recebida Inter - Total de Payouts depositados */}
+        {/* Card Repasse Recebido - Total de Payouts depositados */}
         <Card className="border-l-4 border-l-cyan-500 bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/20 dark:to-sky-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Receita Recebida Inter</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">Repasse Recebido</CardTitle>
             <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
               <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-600 dark:text-cyan-400" />
             </div>
