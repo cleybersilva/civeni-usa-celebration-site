@@ -25,14 +25,21 @@ serve(async (req) => {
 
     console.log(`📈 Finance timeseries requested: granularity=${granularity}, from=${from}, to=${to}`);
 
+    // Calcular data de hoje no timezone de Brasília (UTC-3)
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    console.log(`📅 Today is: ${todayStr}`);
+
     // Query view otimizada
     const { data, error } = await supabaseClient
       .from('v_fin_receita_diaria')
       .select('*')
       .eq('currency', currency.toUpperCase())
       .gte('dia', from || '2024-01-01')
-      .lte('dia', to || new Date().toISOString())
+      .lte('dia', to || todayStr + 'T23:59:59.999Z')
       .order('dia', { ascending: true });
+
+    console.log(`📊 Query result: ${data?.length || 0} records, last record: ${data?.[data.length - 1]?.dia || 'N/A'}`);
 
     if (error) throw error;
 
