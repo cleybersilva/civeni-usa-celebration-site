@@ -1,0 +1,90 @@
+name: "🔧 Feature Branch CI"
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+  pull_request:
+    branches: [dev, staging, main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # Stage 1: Security Scan
+  # ============================================================================
+  security-scan:
+    name: "🔒 Security Scan"
+    uses: ./.github/workflows/01-security-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 2: Backend Tests
+  # ============================================================================
+  backend-tests:
+    name: "🧪 Backend Tests"
+    needs: security-scan
+    uses: ./.github/workflows/02-backend-tests.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 3: Frontend Tests
+  # ============================================================================
+  frontend-tests:
+    name: "🎨 Frontend Tests"
+    needs: backend-tests
+    uses: ./.github/workflows/03-frontend-tests.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 4: Container Scan
+  # ============================================================================
+  container-scan:
+    name: "🐳 Container Scan"
+    needs: frontend-tests
+    uses: ./.github/workflows/04-container-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Final: PR Status
+  # ============================================================================
+  pr-status:
+    name: "✅ Feature Branch Status"
+    runs-on: ubuntu-latest
+    needs: [security-scan, backend-tests, frontend-tests, container-scan]
+    if: always()
+
+    steps:
+      - name: Check PR readiness
+        run: |
+          echo "🔧 Feature Branch CI Report"
+          echo "========================================"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Target: ${{ github.base_ref || 'N/A' }}"
+          echo ""
+          echo "Stage 1: Security Scan - ${{ needs.security-scan.result }}"
+          echo "Stage 2: Backend Tests - ${{ needs.backend-tests.result }}"
+          echo "Stage 3: Frontend Tests - ${{ needs.frontend-tests.result }}"
+          echo "Stage 4: Container Scan - ${{ needs.container-scan.result }}"
+          echo ""
+          
+          if [ "${{ needs.security-scan.result }}" == "success" ] && \
+             [ "${{ needs.backend-tests.result }}" == "success" ] && \
+             [ "${{ needs.frontend-tests.result }}" == "success" ] && \
+             [ "${{ needs.container-scan.result }}" == "success" ]; then
+            echo "✅ All checks passed - Ready for PR merge"
+            exit 0
+          else
+            echo "❌ Some checks failed - Fix issues before merge"
+            exit 1
+          fi

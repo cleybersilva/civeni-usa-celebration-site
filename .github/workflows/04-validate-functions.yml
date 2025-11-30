@@ -1,0 +1,30 @@
+name: "04 - Validate Supabase Functions"
+
+on:
+  workflow_call:
+
+jobs:
+  validate:
+    name: Deno Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Validate all functions
+        run: |
+          FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
+          for func in $FUNCTIONS; do
+            echo "Validating $func..."
+            deno check supabase/functions/$func/index.ts
+          done
+
+      - run: |
+          COUNT=$(ls -d supabase/functions/*/ | wc -l)
+          echo "## 🔧 Functions Validated" >> $GITHUB_STEP_SUMMARY
+          echo "Functions: $COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Stage 5 - Create Package" >> $GITHUB_STEP_SUMMARY

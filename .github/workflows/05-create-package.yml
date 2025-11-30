@@ -1,0 +1,41 @@
+name: "05 - Create cPanel Package"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  package:
+    name: Create ZIP
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+      - name: Create package
+        run: |
+          mkdir cpanel-package
+          cp -r dist/* cpanel-package/
+          [ -f .htaccess ] && cp .htaccess cpanel-package/
+          cd cpanel-package && zip -r ../civeni-cpanel.zip .
+          cd .. && sha256sum civeni-cpanel.zip > civeni-cpanel.zip.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cpanel-package-${{ github.sha }}
+          path: |
+            civeni-cpanel.zip
+            civeni-cpanel.zip.sha256
+          retention-days: 30
+
+      - run: |
+          echo "## 📦 Package Created" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Stage 6 - Deploy Functions" >> $GITHUB_STEP_SUMMARY

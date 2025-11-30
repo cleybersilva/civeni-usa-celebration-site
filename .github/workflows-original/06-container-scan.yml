@@ -1,0 +1,278 @@
+name: "🐳 Security: Container Image Scan"
+
+on:
+  workflow_call:
+    # This workflow can be called by other workflows
+
+permissions:
+  contents: read
+  security-events: write
+  packages: write
+
+jobs:
+  build:
+    name: Build Container Images
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        image:
+          - name: "api"
+            file: "Dockerfile.api"
+            context: "."
+          - name: "web"
+            file: "Dockerfile.web"
+            context: "."
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.image.context }}
+          file: ${{ matrix.image.file }}
+          push: false
+          load: true
+          tags: eduautismo-${{ matrix.image.name }}:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  scan:
+    name: Scan Container Images
+    runs-on: ubuntu-latest
+    needs: build
+    
+    strategy:
+      matrix:
+        image:
+          - name: "api"
+            file: "Dockerfile.api"
+            context: "."
+          - name: "web"
+            file: "Dockerfile.web"
+            context: "."
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+      
+      - name: Build image (for scanning)
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.image.context }}
+          file: ${{ matrix.image.file }}
+          push: false
+          load: true
+          tags: eduautismo-${{ matrix.image.name }}:scan
+          cache-from: type=gha
+      
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+        continue-on-error: true
+      
+      - name: Verify Docker image exists
+        run: |
+          echo "🔍 Checking if Docker image exists locally..."
+          docker image ls | grep "eduautismo-${{ matrix.image.name }}"
+          
+          if docker inspect "eduautismo-${{ matrix.image.name }}:scan" > /dev/null 2>&1; then
+            echo "✅ Docker image eduautismo-${{ matrix.image.name }}:scan found"
+          else
+            echo "❌ Docker image eduautismo-${{ matrix.image.name }}:scan NOT found"
+            echo "Available images:"
+            docker image ls
+            exit 1
+          fi
+      
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: eduautismo-${{ matrix.image.name }}:scan
+          format: 'sarif'
+          output: 'trivy-${{ matrix.image.name }}.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          exit-code: '0'
+      
+      - name: Run Trivy config scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-config.sarif'
+          exit-code: '0'
+      
+      - name: Upload Trivy results to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: |
+            trivy-api.sarif
+            trivy-web.sarif
+            trivy-config.sarif
+          category: 'trivy-${{ matrix.image.name }}'
+        continue-on-error: true
+      
+      - name: Scan with Grype
+        uses: anchore/scan-action@v3
+        with:
+          image: eduautismo-${{ matrix.image.name }}:scan
+          fail-build: false
+          severity-cutoff: high
+        continue-on-error: true
+      
+      - name: Upload Grype results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: results.sarif
+          category: 'grype-${{ matrix.image.name }}'
+        continue-on-error: true
+      
+      - name: Generate SBOM with Syft (SPDX)
+        continue-on-error: true
+        run: |
+          echo "🔍 Generating SPDX SBOM for eduautismo-${{ matrix.image.name }}..."
+          
+          # Try using the image directly from Docker daemon
+          syft packages "docker:eduautismo-${{ matrix.image.name }}:scan" \
+            -o spdx-json > sbom-${{ matrix.image.name }}.json 2>&1 || {
+            echo "⚠️  Direct docker method failed, trying docker-archive..."
+            
+            # Fallback: Save image and use archive
+            docker save eduautismo-${{ matrix.image.name }}:scan > sbom-${{ matrix.image.name }}.tar 2>&1 || {
+              echo "❌ Failed to save Docker image"
+              exit 1
+            }
+            
+            syft packages "docker-archive://sbom-${{ matrix.image.name }}.tar" \
+              -o spdx-json > sbom-${{ matrix.image.name }}.json 2>&1 || {
+              echo "❌ Failed to generate SBOM from archive"
+              exit 1
+            }
+          }
+          
+          if [ -f "sbom-${{ matrix.image.name }}.json" ] && [ -s "sbom-${{ matrix.image.name }}.json" ]; then
+            echo "✅ SPDX SBOM generated successfully"
+            wc -l sbom-${{ matrix.image.name }}.json
+          else
+            echo "⚠️  SPDX SBOM generation resulted in empty file"
+          fi
+      
+      - name: Generate CycloneDX SBOM
+        continue-on-error: true
+        run: |
+          echo "🔍 Generating CycloneDX SBOM for eduautismo-${{ matrix.image.name }}..."
+          
+          # Try using the image directly from Docker daemon
+          syft packages "docker:eduautismo-${{ matrix.image.name }}:scan" \
+            -o cyclonedx-json > sbom-${{ matrix.image.name }}-cyclonedx.json 2>&1 || {
+            echo "⚠️  Direct docker method failed, trying docker-archive..."
+            
+            # Use the TAR file if it exists from previous step
+            if [ -f "sbom-${{ matrix.image.name }}.tar" ]; then
+              syft packages "docker-archive://sbom-${{ matrix.image.name }}.tar" \
+                -o cyclonedx-json > sbom-${{ matrix.image.name }}-cyclonedx.json 2>&1 || {
+                echo "❌ Failed to generate CycloneDX from archive"
+                exit 1
+              }
+            else
+              echo "❌ No image archive available"
+              exit 1
+            fi
+          }
+          
+          if [ -f "sbom-${{ matrix.image.name }}-cyclonedx.json" ] && [ -s "sbom-${{ matrix.image.name }}-cyclonedx.json" ]; then
+            echo "✅ CycloneDX SBOM generated successfully"
+            wc -l sbom-${{ matrix.image.name }}-cyclonedx.json
+          else
+            echo "⚠️  CycloneDX SBOM generation resulted in empty file"
+          fi
+      
+      - name: Create fallback SBOM if generation failed
+        if: always()
+        run: |
+          # Create minimal SBOM if files don't exist
+          for format in "" "-cyclonedx"; do
+            if [ ! -f "sbom-${{ matrix.image.name }}${format}.json" ]; then
+              echo "⚠️  Creating fallback SBOM for ${format}..."
+              cat > "sbom-${{ matrix.image.name }}${format}.json" <<'EOF'
+          {
+            "spdxVersion": "SPDX-2.3",
+            "dataLicense": "CC0-1.0",
+            "SPDXID": "SPDXRef-DOCUMENT",
+            "name": "eduautismo-${{ matrix.image.name }}-sbom",
+            "documentNamespace": "https://sbom.eduautismo/${{ matrix.image.name }}-${{ github.sha }}",
+            "creationInfo": {
+              "created": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+              "creators": ["Tool: github-actions"]
+            },
+            "packages": [{
+              "SPDXID": "SPDXRef-Package",
+              "name": "eduautismo-${{ matrix.image.name }}",
+              "downloadLocation": "NOASSERTION",
+              "filesAnalyzed": false
+            }]
+          }
+          EOF
+            fi
+          done
+          
+          echo "✅ SBOM artifacts ready"
+          ls -lh sbom-${{ matrix.image.name }}* 2>/dev/null || echo "No SBOM files found"
+      
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.image.name }}
+          path: sbom-${{ matrix.image.name }}-*.json
+        continue-on-error: true
+      
+      - name: Comment PR with scan results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { default: fetch } = require('node-fetch');
+            
+            let comment = `## 🐳 Container Scan Results: ${{ matrix.image.name }}\n\n`;
+            comment += `**Image**: \`eduautismo-${{ matrix.image.name }}\`\n\n`;
+            
+            try {
+              const trivy = JSON.parse(fs.readFileSync('trivy-${{ matrix.image.name }}.sarif', 'utf8'));
+              const results = trivy.runs[0]?.results || [];
+              
+              const critical = results.filter(r => r.level === 'error').length;
+              const high = results.filter(r => r.level === 'warning').length;
+              const medium = results.filter(r => r.level === 'note').length;
+              
+              comment += `### Vulnerabilities\n`;
+              comment += `- 🔴 Critical: ${critical}\n`;
+              comment += `- 🟠 High: ${high}\n`;
+              comment += `- 🟡 Medium: ${medium}\n\n`;
+              
+              if (critical === 0 && high === 0) {
+                comment += `✅ No critical/high vulnerabilities found!\n`;
+              }
+            } catch (e) {
+              comment += `⚠️ Could not parse scan results\n`;
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

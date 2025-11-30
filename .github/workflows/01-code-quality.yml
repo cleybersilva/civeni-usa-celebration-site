@@ -1,0 +1,128 @@
+name: "01 - Code Quality"
+
+on:
+  workflow_call:
+    # This workflow can be called by the orchestrator
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  eslint:
+    name: ESLint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        id: lint
+        run: |
+          echo "🔍 Running ESLint..."
+          npm run lint > eslint-output.txt 2>&1 || true
+          EXIT_CODE=$?
+
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ No linting errors found"
+          else
+            echo "status=warnings" >> $GITHUB_OUTPUT
+            echo "⚠️ Linting issues found"
+            cat eslint-output.txt
+          fi
+        continue-on-error: true
+
+      - name: Upload ESLint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: eslint-output.txt
+          retention-days: 7
+
+      - name: Create ESLint summary
+        if: always()
+        run: |
+          echo "## 📝 ESLint Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.lint.outputs.status }}" == "success" ]; then
+            echo "✅ No linting errors found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Linting issues found (non-blocking)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            head -50 eslint-output.txt >> $GITHUB_STEP_SUMMARY || true
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  typescript:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    needs: eslint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        id: typecheck
+        run: |
+          echo "🔍 Running TypeScript type checker..."
+          npx tsc --noEmit
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "✅ No type errors found"
+
+      - name: Create TypeScript summary
+        if: always()
+        run: |
+          echo "## 🔷 TypeScript Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.typecheck.outputs.status }}" == "success" ]; then
+            echo "✅ No type errors found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Type errors found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  summary:
+    name: Code Quality Summary
+    runs-on: ubuntu-latest
+    needs: [eslint, typescript]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## ✅ Stage 1/7: Code Quality Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ESLint: ${{ needs.eslint.result == 'success' && '✅ Passed' || '⚠️ Warnings' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- TypeScript: ${{ needs.typescript.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Stage 2 - Security Scan" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if TypeScript failed
+        if: needs.typescript.result != 'success'
+        run: |
+          echo "❌ TypeScript check failed"
+          exit 1

@@ -1,0 +1,46 @@
+name: "03 - Build Frontend"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build React/Vite
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Build
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            npm run build
+          else
+            npm run build:dev
+          fi
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+      - run: |
+          SIZE=$(du -sh dist/ | cut -f1)
+          echo "## 🏗️ Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "Size: $SIZE" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Stage 4 - Validate Functions" >> $GITHUB_STEP_SUMMARY

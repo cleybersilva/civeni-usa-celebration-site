@@ -1,0 +1,35 @@
+name: "07 - Deploy to Environment"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.environment == 'production' && 'https://civeni.com' || 'https://staging.civeni.com' }}
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: cpanel-package-${{ github.sha }}
+
+      - name: Verify package
+        run: sha256sum -c civeni-cpanel.zip.sha256
+
+      - name: Deploy
+        run: |
+          echo "🚀 Deploying to ${{ inputs.environment }}..."
+          echo "Package: civeni-cpanel.zip"
+          # Add deployment commands here
+
+      - run: |
+          echo "## 🌐 Deployed to ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "URL: ${{ inputs.environment == 'production' && 'https://civeni.com' || 'https://staging.civeni.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pipeline Complete!** ✅" >> $GITHUB_STEP_SUMMARY

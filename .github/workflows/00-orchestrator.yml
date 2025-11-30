@@ -1,0 +1,159 @@
+name: "🎼 CIVENI Sequential CI/CD Pipeline"
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+  packages: write
+  actions: write
+  checks: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/develop' && 'staging' || 'development' }}
+  NODE_VERSION: '20'
+
+jobs:
+  # ============================================================================
+  # STAGE 1: Code Quality (Lint + TypeScript)
+  # ============================================================================
+  stage-01-code-quality:
+    name: "📝 Stage 1/7: Code Quality"
+    uses: ./.github/workflows/01-code-quality.yml
+    secrets: inherit
+
+  # ============================================================================
+  # STAGE 2: Security Scan
+  # ============================================================================
+  stage-02-security-scan:
+    name: "🔒 Stage 2/7: Security Scan"
+    needs: stage-01-code-quality
+    uses: ./.github/workflows/02-security-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # STAGE 3: Build Frontend
+  # ============================================================================
+  stage-03-build-frontend:
+    name: "🏗️ Stage 3/7: Build Frontend"
+    needs: stage-02-security-scan
+    uses: ./.github/workflows/03-build-frontend.yml
+    secrets: inherit
+    with:
+      environment: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/develop' && 'staging' || 'development' }}
+
+  # ============================================================================
+  # STAGE 4: Validate Supabase Functions
+  # ============================================================================
+  stage-04-validate-functions:
+    name: "🔧 Stage 4/7: Validate Supabase Functions"
+    needs: stage-03-build-frontend
+    uses: ./.github/workflows/04-validate-functions.yml
+    secrets: inherit
+
+  # ============================================================================
+  # STAGE 5: Create Deployment Package
+  # ============================================================================
+  stage-05-create-package:
+    name: "📦 Stage 5/7: Create cPanel Package"
+    needs: stage-04-validate-functions
+    if: success() && github.event_name == 'push'
+    uses: ./.github/workflows/05-create-package.yml
+    secrets: inherit
+    with:
+      environment: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/develop' && 'staging' || 'development' }}
+
+  # ============================================================================
+  # STAGE 6: Deploy Supabase Functions (staging/production only)
+  # ============================================================================
+  stage-06-deploy-functions:
+    name: "🚀 Stage 6/7: Deploy Supabase Functions"
+    needs: stage-05-create-package
+    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    uses: ./.github/workflows/06-deploy-functions.yml
+    secrets: inherit
+    with:
+      environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+  # ============================================================================
+  # STAGE 7: Deploy to Environment (staging/production only)
+  # ============================================================================
+  stage-07-deploy-environment:
+    name: "🌐 Stage 7/7: Deploy to ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}"
+    needs: stage-06-deploy-functions
+    if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    uses: ./.github/workflows/07-deploy-environment.yml
+    secrets: inherit
+    with:
+      environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+  # ============================================================================
+  # FINAL: Pipeline Status Report
+  # ============================================================================
+  pipeline-status:
+    name: "✅ Pipeline Complete"
+    runs-on: ubuntu-latest
+    needs:
+      - stage-01-code-quality
+      - stage-02-security-scan
+      - stage-03-build-frontend
+      - stage-04-validate-functions
+      - stage-05-create-package
+      - stage-06-deploy-functions
+      - stage-07-deploy-environment
+    if: always()
+
+    steps:
+      - name: Generate pipeline report
+        run: |
+          ENVIRONMENT="${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/develop' && 'staging' || 'development' }}"
+
+          echo "# 🎼 CIVENI Pipeline Execution Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** \`$ENVIRONMENT\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Event:** \`${{ github.event_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Stage Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Name | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 1/7 | Code Quality | ${{ needs.stage-01-code-quality.result == 'success' && '✅ Passed' || needs.stage-01-code-quality.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2/7 | Security Scan | ${{ needs.stage-02-security-scan.result == 'success' && '✅ Passed' || needs.stage-02-security-scan.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3/7 | Build Frontend | ${{ needs.stage-03-build-frontend.result == 'success' && '✅ Passed' || needs.stage-03-build-frontend.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 4/7 | Validate Functions | ${{ needs.stage-04-validate-functions.result == 'success' && '✅ Passed' || needs.stage-04-validate-functions.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 5/7 | Create Package | ${{ needs.stage-05-create-package.result == 'success' && '✅ Passed' || needs.stage-05-create-package.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 6/7 | Deploy Functions | ${{ needs.stage-06-deploy-functions.result == 'success' && '✅ Passed' || needs.stage-06-deploy-functions.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 7/7 | Deploy Environment | ${{ needs.stage-07-deploy-environment.result == 'success' && '✅ Passed' || needs.stage-07-deploy-environment.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for failures
+        run: |
+          if [ "${{ needs.stage-01-code-quality.result }}" == "failure" ] || \
+             [ "${{ needs.stage-02-security-scan.result }}" == "failure" ] || \
+             [ "${{ needs.stage-03-build-frontend.result }}" == "failure" ] || \
+             [ "${{ needs.stage-04-validate-functions.result }}" == "failure" ] || \
+             [ "${{ needs.stage-05-create-package.result }}" == "failure" ] || \
+             [ "${{ needs.stage-06-deploy-functions.result }}" == "failure" ] || \
+             [ "${{ needs.stage-07-deploy-environment.result }}" == "failure" ]; then
+            echo "❌ Pipeline failed at one or more stages" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Report success
+        if: success()
+        run: |
+          echo "## 🎉 Pipeline Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All stages executed successfully." >> $GITHUB_STEP_SUMMARY

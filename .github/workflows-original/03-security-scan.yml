@@ -1,0 +1,236 @@
+name: "🔒 Security: Secrets Scanning"
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # Daily at 2 AM UTC
+  workflow_call:
+    # This workflow can be called by other workflows
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  gitleaks:
+    name: Gitleaks Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config: .gitleaks.toml
+          enable-comments: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      
+      - name: Upload Gitleaks report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: report.json
+        continue-on-error: true
+
+  trufflehog:
+    name: TruffleHog Scan
+    runs-on: ubuntu-latest
+    needs: gitleaks
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --json
+        continue-on-error: true
+
+  dependency-check:
+    name: Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+    needs: trufflehog
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Run Safety (Python dependencies)
+        run: |
+          pip install safety
+          safety check --json --continue-on-error > safety-report.json || true
+          safety check || echo "Safety check completed with warnings"
+        continue-on-error: true
+      
+      - name: Run pip-audit (Python dependencies)
+        run: |
+          pip install pip-audit
+          pip-audit --desc > pip-audit-report.txt || true
+        continue-on-error: true
+      
+      - name: Check NPM dependencies
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package-lock.json" ]; then
+            cd frontend
+            npm ci
+            npm audit --json > npm-audit.json || true
+            npm audit --audit-level=moderate || echo "NPM audit completed with warnings"
+          else
+            echo "Frontend directory or package-lock.json not found, skipping NPM audit"
+          fi
+      
+      - name: Upload dependency reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-reports
+          path: |
+            safety-report.json
+            pip-audit-report.txt
+            frontend/npm-audit.json
+
+  license-scan:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    needs: dependency-check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Check Python licenses
+        run: |
+          pip install pip-licenses
+          echo "Installing backend dependencies..."
+          cd backend
+          pip install -r requirements.txt --no-deps || echo "Warning: Some dependencies failed to install"
+          cd ..
+          echo "Generating license reports..."
+          pip-licenses --format=json --output-file=python-licenses.json || true
+          pip-licenses --format=markdown > python-licenses.md || true
+        continue-on-error: true
+        timeout-minutes: 10
+      
+      - name: Check Node licenses
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package-lock.json" ]; then
+            cd frontend
+            npm ci
+            npx license-report --output=json > node-licenses.json || true
+          else
+            echo "Frontend directory or package-lock.json not found, skipping license check"
+          fi
+      
+      - name: Upload license reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-reports
+          path: |
+            python-licenses.*
+            frontend/node-licenses.json
+
+  sast-python:
+    name: SAST - Python Security (Bandit)
+    runs-on: ubuntu-latest
+    needs: license-scan
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Run Bandit
+        run: |
+          pip install bandit
+          bandit -r backend/app -f json -o bandit-report.json -ll || true
+          bandit -r backend/app -f txt || true
+        continue-on-error: true
+      
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+      
+      - name: Check Bandit findings
+        run: |
+          pip install bandit
+          if bandit -r backend/app -q -ll; then
+            echo "✅ No critical security issues found"
+          else
+            echo "⚠️ Security findings detected"
+          fi
+        continue-on-error: true
+
+  sast-javascript:
+    name: SAST - JavaScript Security (ESLint)
+    runs-on: ubuntu-latest
+    needs: sast-python
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend
+            npm ci
+            npm install --save-dev eslint-plugin-security
+          else
+            echo "Frontend directory not found, skipping ESLint"
+            exit 0
+          fi
+      
+      - name: Run ESLint with security plugin
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend
+            npx eslint . --ext js,jsx --plugin security --format json --output-file eslint-report.json || true
+            npx eslint . --ext js,jsx --plugin security || echo "ESLint completed with warnings"
+          else
+            echo "Frontend directory not found, skipping ESLint"
+          fi
+      
+      - name: Upload ESLint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: frontend/eslint-report.json

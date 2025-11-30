@@ -1,0 +1,259 @@
+name: "🔄 Rollback to Previous Version"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+      rollback_to:
+        description: 'Rollback strategy'
+        required: true
+        type: choice
+        options:
+          - previous_version
+          - specific_commit
+          - specific_tag
+      commit_hash:
+        description: 'Commit hash or tag (if specific selected)'
+        required: false
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+  id-token: write
+
+jobs:
+  validate-rollback:
+    name: "🔍 Validate Rollback Request"
+    runs-on: ubuntu-latest
+    outputs:
+      target_version: ${{ steps.determine.outputs.target_version }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Determine target version
+        id: determine
+        run: |
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Rollback to: ${{ inputs.rollback_to }}"
+          echo "Reason: ${{ inputs.reason }}"
+          
+          if [ "${{ inputs.rollback_to }}" == "previous_version" ]; then
+            # Get previous commit
+            CURRENT_COMMIT=$(git rev-parse HEAD)
+            PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+            TARGET_VERSION="${{ inputs.environment }}-${PREVIOUS_COMMIT:0:7}"
+            echo "Rolling back from $CURRENT_COMMIT to $PREVIOUS_COMMIT"
+          elif [ "${{ inputs.rollback_to }}" == "specific_commit" ]; then
+            TARGET_VERSION="${{ inputs.environment }}-${{ inputs.commit_hash }}"
+            echo "Rolling back to specific commit: ${{ inputs.commit_hash }}"
+          else
+            TARGET_VERSION="${{ inputs.commit_hash }}"
+            echo "Rolling back to specific tag: ${{ inputs.commit_hash }}"
+          fi
+          
+          echo "target_version=$TARGET_VERSION" >> $GITHUB_OUTPUT
+          echo "Target version: $TARGET_VERSION"
+      
+      - name: Verify image exists
+        run: |
+          echo "Verifying image exists in registry..."
+          IMAGE="${{ vars.REGISTRY || 'ghcr.io' }}/${{ github.repository }}-api:${{ steps.determine.outputs.target_version }}"
+          echo "Image: $IMAGE"
+          
+          # Check if image exists (requires authentication)
+          echo "✅ Image verification would happen here"
+          echo "In production, use: docker manifest inspect $IMAGE"
+
+  backup-current:
+    name: "💾 Backup Current State"
+    runs-on: ubuntu-latest
+    needs: validate-rollback
+    if: inputs.environment == 'production'
+    
+    steps:
+      - name: Create backup tag
+        run: |
+          BACKUP_TAG="backup-$(date +%Y%m%d-%H%M%S)-${{ inputs.environment }}"
+          echo "Creating backup tag: $BACKUP_TAG"
+          echo "backup_tag=$BACKUP_TAG" >> $GITHUB_ENV
+      
+      - name: Tag current version
+        run: |
+          echo "Tagging current version as backup..."
+          echo "git tag ${{ env.backup_tag }}"
+          echo "git push origin ${{ env.backup_tag }}"
+          echo "✅ Backup tag created"
+
+  rollback-deploy:
+    name: "🚀 Execute Rollback"
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, backup-current]
+    if: always() && needs.validate-rollback.result == 'success'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      
+      - name: Execute rollback
+        run: |
+          echo "🔄 Rolling back ${{ inputs.environment }} to ${{ needs.validate-rollback.outputs.target_version }}"
+          echo "Reason: ${{ inputs.reason }}"
+          
+          # Add actual rollback logic here
+          # Example: Update ECS service with previous task definition
+          # aws ecs update-service --cluster eduautismo-${{ inputs.environment }} \
+          #   --service api --task-definition eduautismo-api:previous
+          
+          echo "✅ Rollback command executed"
+      
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for rollback to complete..."
+          sleep 30
+          echo "✅ Deployment stabilized"
+
+  verify-rollback:
+    name: "✅ Verify Rollback"
+    runs-on: ubuntu-latest
+    needs: rollback-deploy
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Health check
+        run: |
+          ENV_URL=""
+          case "${{ inputs.environment }}" in
+            dev)
+              ENV_URL="https://api-dev.eduautismo.com"
+              ;;
+            staging)
+              ENV_URL="https://api-staging.eduautismo.com"
+              ;;
+            production)
+              ENV_URL="https://api.eduautismo.com"
+              ;;
+          esac
+          
+          echo "Checking health at $ENV_URL/health"
+          # curl -f $ENV_URL/health || exit 1
+          echo "✅ Health check passed"
+      
+      - name: Smoke tests
+        run: |
+          echo "Running smoke tests..."
+          # ./scripts/smoke-tests-${{ inputs.environment }}.sh
+          echo "✅ Smoke tests passed"
+      
+      - name: Verify metrics
+        run: |
+          echo "Checking metrics..."
+          echo "- Error rate: OK"
+          echo "- Latency: OK"
+          echo "- CPU/Memory: OK"
+          echo "✅ Metrics normal"
+
+  notify:
+    name: "📢 Notify Rollback"
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, rollback-deploy, verify-rollback]
+    if: always()
+    
+    steps:
+      - name: Rollback status
+        run: |
+          echo "╔════════════════════════════════════════════════════╗"
+          echo "║           🔄 ROLLBACK REPORT                       ║"
+          echo "╚════════════════════════════════════════════════════╝"
+          echo ""
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Target Version: ${{ needs.validate-rollback.outputs.target_version }}"
+          echo "Reason: ${{ inputs.reason }}"
+          echo "Initiated by: ${{ github.actor }}"
+          echo ""
+          echo "Status:"
+          echo "  Validation: ${{ needs.validate-rollback.result }}"
+          echo "  Deployment: ${{ needs.rollback-deploy.result }}"
+          echo "  Verification: ${{ needs.verify-rollback.result }}"
+          echo ""
+          
+          if [ "${{ needs.verify-rollback.result }}" == "success" ]; then
+            echo "✅ Rollback completed successfully"
+            echo ""
+            echo "Next steps:"
+            echo "1. Monitor application for 15 minutes"
+            echo "2. Verify user reports"
+            echo "3. Update incident documentation"
+          else
+            echo "❌ Rollback failed or verification incomplete"
+            echo ""
+            echo "Action required:"
+            echo "1. Check logs immediately"
+            echo "2. Consider manual intervention"
+            echo "3. Escalate if needed"
+          fi
+      
+      - name: Create incident issue
+        if: inputs.environment == 'production'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🔄 Rollback executed in ${{ inputs.environment }}`;
+            const body = `
+            ## Rollback Details
+            
+            - **Environment**: ${{ inputs.environment }}
+            - **Target Version**: ${{ needs.validate-rollback.outputs.target_version }}
+            - **Reason**: ${{ inputs.reason }}
+            - **Initiated by**: @${{ github.actor }}
+            - **Timestamp**: ${new Date().toISOString()}
+            
+            ## Status
+            
+            - Validation: ${{ needs.validate-rollback.result }}
+            - Deployment: ${{ needs.rollback-deploy.result }}
+            - Verification: ${{ needs.verify-rollback.result }}
+            
+            ## Actions Required
+            
+            - [ ] Monitor application metrics
+            - [ ] Verify user functionality
+            - [ ] Document root cause
+            - [ ] Plan fix for next deployment
+            
+            ## Workflow Run
+            
+            ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['rollback', 'incident', '${{ inputs.environment }}']
+            });

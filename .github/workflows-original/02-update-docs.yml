@@ -1,0 +1,82 @@
+name: 02 - Auto Update Documentation
+
+on:
+  workflow_call:
+    # This workflow can be called by other workflows
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force documentation update'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-docs:
+    name: Update Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check for documentation changes needed
+        id: check
+        run: |
+          python scripts/update_docs.py --check-only
+          echo "needs_update=$?" >> $GITHUB_OUTPUT
+
+      - name: Update documentation
+        if: steps.check.outputs.needs_update != '0' || github.event.inputs.force_update == 'true'
+        run: |
+          python scripts/update_docs.py
+
+      - name: Check if there are changes
+        id: changes
+        run: |
+          git diff --quiet README.md CLAUDE.md || echo "has_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git add README.md CLAUDE.md
+
+          git commit -m "docs: atualização automática de documentação [skip ci]
+
+          - README.md e CLAUDE.md atualizados automaticamente
+          - Versão e data atualizadas
+          - Verificações de consistência executadas
+
+          🤖 Atualizado por GitHub Actions"
+
+          git push
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## 📚 Atualização de Documentação" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
+            echo "✅ Documentação atualizada automaticamente" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Arquivos atualizados:" >> $GITHUB_STEP_SUMMARY
+            echo "- README.md" >> $GITHUB_STEP_SUMMARY
+            echo "- CLAUDE.md" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Documentação já está atualizada" >> $GITHUB_STEP_SUMMARY
+          fi
