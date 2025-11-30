@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText, Wallet } from 'lucide-react';
+import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText, Wallet, Barcode } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StripeFilters } from './stripe/StripeFilters';
 import { RevenueChart } from './stripe/RevenueChart';
@@ -1324,28 +1324,60 @@ const AdminDashboard = () => {
               <CardContent className="pt-6">
                 <div className="space-y-3">
                   {byBrand && byBrand.length > 0 ? (
-                    byBrand.map((brand, idx) => (
-                      <div key={`${brand.bandeira}-${brand.funding}-${idx}`} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div className="flex items-center gap-3">
+                    byBrand.map((brand, idx) => {
+                      const normalizedBrand = brand.bandeira?.toLowerCase() === 'unknown' ? 'Boleto' : brand.bandeira;
+                      const brandLower = normalizedBrand?.toLowerCase() || '';
+                      
+                      const renderBrandIcon = () => {
+                        if (brandLower === 'visa') {
+                          return (
+                            <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-white tracking-tight">VISA</span>
+                            </div>
+                          );
+                        }
+                        if (brandLower === 'mastercard') {
+                          return (
+                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-red-500 to-yellow-500 flex items-center justify-center">
+                              <span className="text-[8px] font-bold text-white">MC</span>
+                            </div>
+                          );
+                        }
+                        if (brandLower === 'boleto') {
+                          return (
+                            <div className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
+                              <Barcode className="h-5 w-5 text-white" />
+                            </div>
+                          );
+                        }
+                        return (
                           <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-xs font-bold text-primary">{(brand.bandeira || 'NN').substring(0, 2).toUpperCase()}</span>
+                            <CreditCard className="h-5 w-5 text-primary" />
                           </div>
-                          <div>
-                            <p className="font-medium capitalize">{brand.bandeira || 'Não especificado'} {brand.funding ? `(${brand.funding})` : ''}</p>
-                            <p className="text-xs text-muted-foreground">{brand.qtd || 0} transações</p>
+                        );
+                      };
+                      
+                      return (
+                        <div key={`${brand.bandeira}-${brand.funding}-${idx}`} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            {renderBrandIcon()}
+                            <div>
+                              <p className="font-medium capitalize">{normalizedBrand || 'Não especificado'} {brand.funding ? `(${brand.funding})` : ''}</p>
+                              <p className="text-xs text-muted-foreground">{brand.qtd || 0} transações</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-green-600 dark:text-green-400">{formatCurrency(brand.receita_liquida || 0)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {summary?.bruto && summary.bruto > 0 
+                                ? `${(((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)}% do total`
+                                : '0% do total'
+                              }
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-green-600 dark:text-green-400">{formatCurrency(brand.receita_liquida || 0)}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {summary?.bruto && summary.bruto > 0 
-                              ? `${(((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)}% do total`
-                              : '0% do total'
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <p className="text-center text-muted-foreground py-8">Nenhum dado disponível</p>
                   )}
