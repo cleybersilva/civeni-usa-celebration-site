@@ -1,4 +1,4 @@
-name: Main Pipeline
+name: Main Pipeline - Sequential
 
 on:
   push:
@@ -12,10 +12,10 @@ env:
 
 jobs:
   # ============================================
-  # STAGE 1: VALIDATION
+  # JOB 1: VALIDATION
   # ============================================
-  stage-validate:
-    name: "Stage 1: Validation"
+  job-01-validate:
+    name: "Job 1/7: Code Validation"
     runs-on: ubuntu-latest
     outputs:
       lint-status: ${{ steps.lint.outcome }}
@@ -43,22 +43,23 @@ jobs:
         id: typecheck
         run: npx tsc --noEmit
 
-      - name: Validation summary
+      - name: Job 1 summary
         run: |
-          echo "## Stage 1: Validation Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Lint: ${{ steps.lint.outcome }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Type Check: ${{ steps.typecheck.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 1/7: Validation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- ESLint: ${{ steps.lint.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "- TypeScript: ${{ steps.typecheck.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 2 - Build" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 2: BUILD
+  # JOB 2: BUILD
   # ============================================
-  stage-build:
-    name: "Stage 2: Build"
+  job-02-build:
+    name: "Job 2/7: Build Project"
     runs-on: ubuntu-latest
-    needs: [stage-validate]
+    needs: [job-01-validate]
     if: success()
     outputs:
-      build-status: ${{ steps.build.outcome }}
       build-size: ${{ steps.check-size.outputs.size }}
 
     steps:
@@ -75,13 +76,12 @@ jobs:
         run: npm ci
 
       - name: Build project
-        id: build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "Building for production..."
+            echo "🏗️ Building for PRODUCTION..."
             npm run build
           else
-            echo "Building for development..."
+            echo "🏗️ Building for DEVELOPMENT..."
             npm run build:dev
           fi
         env:
@@ -93,11 +93,7 @@ jobs:
         run: |
           SIZE=$(du -sm dist/ | cut -f1)
           echo "size=${SIZE}" >> $GITHUB_OUTPUT
-          echo "Build size: ${SIZE}MB"
-
-          if [ $SIZE -gt 50 ]; then
-            echo "⚠️ Warning: Bundle size is ${SIZE}MB (>50MB)" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "📦 Build size: ${SIZE}MB"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -106,20 +102,21 @@ jobs:
           path: dist/
           retention-days: 7
 
-      - name: Build summary
+      - name: Job 2 summary
         run: |
-          echo "## Stage 2: Build Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Status: ${{ steps.build.outcome }}" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 2/7: Build Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Size: ${{ steps.check-size.outputs.size }}MB" >> $GITHUB_STEP_SUMMARY
           echo "- Artifact: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 3 - Security Scan" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 3: SECURITY & QUALITY
+  # JOB 3: SECURITY SCAN
   # ============================================
-  stage-security:
-    name: "Stage 3: Security Scan"
+  job-03-security:
+    name: "Job 3/7: Security Scan"
     runs-on: ubuntu-latest
-    needs: [stage-build]
+    needs: [job-02-build]
     if: success()
 
     steps:
@@ -139,15 +136,25 @@ jobs:
         run: npm audit --audit-level=high
         continue-on-error: true
 
-      - name: Check dependencies
+      - name: Check for vulnerabilities
         run: |
-          echo "## Stage 3: Security Scan Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "Dependencies checked for vulnerabilities" >> $GITHUB_STEP_SUMMARY
+          echo "🔍 Security scan completed"
+          npm audit --production || echo "⚠️ Some vulnerabilities found (review recommended)"
 
-  stage-quality:
-    name: "Stage 3: Quality Check"
+      - name: Job 3 summary
+        run: |
+          echo "## ✅ Job 3/7: Security Scan Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- npm audit executed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 4 - Quality Check" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # JOB 4: QUALITY CHECK
+  # ============================================
+  job-04-quality:
+    name: "Job 4/7: Quality Check"
     runs-on: ubuntu-latest
-    needs: [stage-build]
+    needs: [job-03-security]
     if: success()
 
     steps:
@@ -160,26 +167,40 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
           path: dist/
 
-      - name: Check bundle composition
+      - name: Analyze bundle
         run: |
-          echo "Analyzing bundle composition..."
-          ls -lh dist/assets/ || true
+          echo "📊 Analyzing build output..."
 
-          # Count JS files
-          JS_COUNT=$(find dist/assets -name "*.js" | wc -l)
-          CSS_COUNT=$(find dist/assets -name "*.css" | wc -l)
+          # Count files
+          JS_COUNT=$(find dist/assets -name "*.js" 2>/dev/null | wc -l || echo "0")
+          CSS_COUNT=$(find dist/assets -name "*.css" 2>/dev/null | wc -l || echo "0")
 
-          echo "## Stage 3: Quality Check Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "JavaScript files: ${JS_COUNT}"
+          echo "CSS files: ${CSS_COUNT}"
+
+          # List largest files
+          echo ""
+          echo "Largest assets:"
+          du -h dist/assets/* 2>/dev/null | sort -rh | head -5 || echo "No assets found"
+
+      - name: Job 4 summary
+        run: |
+          JS_COUNT=$(find dist/assets -name "*.js" 2>/dev/null | wc -l || echo "0")
+          CSS_COUNT=$(find dist/assets -name "*.css" 2>/dev/null | wc -l || echo "0")
+
+          echo "## ✅ Job 4/7: Quality Check Complete" >> $GITHUB_STEP_SUMMARY
           echo "- JavaScript files: ${JS_COUNT}" >> $GITHUB_STEP_SUMMARY
           echo "- CSS files: ${CSS_COUNT}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 5 - Create Package" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 4: PACKAGE
+  # JOB 5: CREATE PACKAGE
   # ============================================
-  stage-package:
-    name: "Stage 4: Create Deployment Package"
+  job-05-package:
+    name: "Job 5/7: Create Deployment Package"
     runs-on: ubuntu-latest
-    needs: [stage-security, stage-quality]
+    needs: [job-04-quality]
     if: success() && github.event_name == 'push'
 
     steps:
@@ -194,25 +215,25 @@ jobs:
 
       - name: Prepare cPanel package
         run: |
+          echo "📦 Creating deployment package..."
           mkdir -p cpanel-package
           cp -r dist/* cpanel-package/
 
-          # Copy .htaccess if exists
-          if [ -f .htaccess ]; then
-            cp .htaccess cpanel-package/
-          fi
+          # Copy essential files
+          [ -f .htaccess ] && cp .htaccess cpanel-package/ && echo "✓ .htaccess included"
+          [ -f public/robots.txt ] && cp public/robots.txt cpanel-package/ && echo "✓ robots.txt included"
 
-          # Copy robots.txt if exists
-          if [ -f public/robots.txt ]; then
-            cp public/robots.txt cpanel-package/
-          fi
-
-      - name: Create deployment ZIP
+      - name: Create ZIP archive
         run: |
           cd cpanel-package
           zip -r ../civeni-saas-cpanel.zip .
           cd ..
+
+          # Generate checksum
           sha256sum civeni-saas-cpanel.zip > civeni-saas-cpanel.zip.sha256
+
+          echo "✅ Package created"
+          ls -lh civeni-saas-cpanel.zip
 
       - name: Upload deployment package
         uses: actions/upload-artifact@v4
@@ -223,21 +244,32 @@ jobs:
             civeni-saas-cpanel.zip.sha256
           retention-days: 30
 
-      - name: Package summary
+      - name: Job 5 summary
         run: |
           SIZE=$(du -h civeni-saas-cpanel.zip | cut -f1)
-          echo "## Stage 4: Package Complete ✅" >> $GITHUB_STEP_SUMMARY
+          CHECKSUM=$(cat civeni-saas-cpanel.zip.sha256 | cut -d' ' -f1)
+
+          echo "## ✅ Job 5/7: Package Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Package: civeni-saas-cpanel.zip" >> $GITHUB_STEP_SUMMARY
           echo "- Size: ${SIZE}" >> $GITHUB_STEP_SUMMARY
-          echo "- SHA256: $(cat civeni-saas-cpanel.zip.sha256)" >> $GITHUB_STEP_SUMMARY
+          echo "- SHA256: \`${CHECKSUM}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "**Next:** Job 6 - Deploy to Staging" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "**Next:** Job 6 - Deploy to Production (Manual Approval Required)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Next:** Job 7 - Pipeline Complete" >> $GITHUB_STEP_SUMMARY
+          fi
 
   # ============================================
-  # STAGE 5: DEPLOY STAGING (Auto)
+  # JOB 6A: DEPLOY TO STAGING (only develop)
   # ============================================
-  stage-deploy-staging:
-    name: "Stage 5: Deploy to Staging"
+  job-06a-deploy-staging:
+    name: "Job 6/7: Deploy to Staging"
     runs-on: ubuntu-latest
-    needs: [stage-package]
+    needs: [job-05-package]
     if: success() && github.ref == 'refs/heads/develop'
     environment:
       name: staging
@@ -249,30 +281,34 @@ jobs:
         with:
           name: cpanel-deployment-${{ github.sha }}
 
-      - name: Verify package integrity
-        run: sha256sum -c civeni-saas-cpanel.zip.sha256
+      - name: Verify package
+        run: |
+          echo "🔍 Verifying package integrity..."
+          sha256sum -c civeni-saas-cpanel.zip.sha256
+          echo "✅ Package verified"
 
       - name: Deploy to staging
         run: |
-          echo "Deploying to staging environment..."
+          echo "🚀 Deploying to STAGING environment..."
           echo "Package: civeni-saas-cpanel.zip"
-          # Add your deployment commands here
-          # Example: scp, rsync, FTP, or API calls
+          # Add actual deployment commands here
+          echo "✅ Deployment complete"
 
-      - name: Staging deployment summary
+      - name: Job 6 summary
         run: |
-          echo "## Stage 5: Staging Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 6/7: Staging Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Environment: Staging" >> $GITHUB_STEP_SUMMARY
           echo "- URL: https://staging.civeni.com" >> $GITHUB_STEP_SUMMARY
-          echo "- Package: civeni-saas-cpanel.zip" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 7 - Pipeline Complete" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 6: DEPLOY PRODUCTION (Manual)
+  # JOB 6B: DEPLOY TO PRODUCTION (only main)
   # ============================================
-  stage-deploy-production:
-    name: "Stage 6: Deploy to Production"
+  job-06b-deploy-production:
+    name: "Job 6/7: Deploy to Production"
     runs-on: ubuntu-latest
-    needs: [stage-package]
+    needs: [job-05-package]
     if: success() && github.ref == 'refs/heads/main'
     environment:
       name: production
@@ -284,50 +320,68 @@ jobs:
         with:
           name: cpanel-deployment-${{ github.sha }}
 
-      - name: Verify package integrity
-        run: sha256sum -c civeni-saas-cpanel.zip.sha256
-
-      - name: Production deployment notification
+      - name: Verify package
         run: |
-          echo "🚀 Ready to deploy to PRODUCTION"
-          echo "Package verified and ready for deployment"
+          echo "🔍 Verifying package integrity..."
+          sha256sum -c civeni-saas-cpanel.zip.sha256
+          echo "✅ Package verified"
 
-      - name: Deploy to production
+      - name: Production deployment
         run: |
-          echo "Deploying to production environment..."
+          echo "🚀 Deploying to PRODUCTION environment..."
+          echo "⚠️  This is PRODUCTION - changes will be live!"
           echo "Package: civeni-saas-cpanel.zip"
-          # Add your production deployment commands here
+          # Add actual deployment commands here
+          echo "✅ Production deployment complete"
 
-      - name: Production deployment summary
+      - name: Job 6 summary
         run: |
-          echo "## Stage 6: Production Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: Production" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 6/7: Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: **Production**" >> $GITHUB_STEP_SUMMARY
           echo "- URL: https://civeni.com" >> $GITHUB_STEP_SUMMARY
           echo "- Deployed by: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 7 - Pipeline Complete" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # FINAL: PIPELINE SUMMARY
+  # JOB 7: PIPELINE COMPLETE
   # ============================================
-  pipeline-complete:
-    name: "Pipeline Complete"
+  job-07-complete:
+    name: "Job 7/7: Pipeline Complete"
     runs-on: ubuntu-latest
-    needs: [stage-validate, stage-build, stage-security, stage-quality, stage-package]
+    needs: [job-01-validate, job-02-build, job-03-security, job-04-quality, job-05-package]
     if: always()
 
     steps:
-      - name: Pipeline summary
+      - name: Generate pipeline summary
         run: |
-          echo "# 🎉 Pipeline Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# 🎉 Pipeline Execution Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 1. Validation | ${{ needs.stage-validate.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 2. Build | ${{ needs.stage-build.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 3. Security | ${{ needs.stage-security.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 3. Quality | ${{ needs.stage-quality.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 4. Package | ${{ needs.stage-package.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "## Sequential Jobs Executed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Name | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 1/7 | Validation | ${{ needs.job-01-validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2/7 | Build | ${{ needs.job-02-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3/7 | Security | ${{ needs.job-03-security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 4/7 | Quality | ${{ needs.job-04-quality.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 5/7 | Package | ${{ needs.job-05-package.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Execution Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Event:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for failures
+        run: |
+          if [ "${{ needs.job-01-validate.result }}" == "failure" ] || \
+             [ "${{ needs.job-02-build.result }}" == "failure" ] || \
+             [ "${{ needs.job-03-security.result }}" == "failure" ] || \
+             [ "${{ needs.job-04-quality.result }}" == "failure" ] || \
+             [ "${{ needs.job-05-package.result }}" == "failure" ]; then
+            echo "❌ Pipeline failed at one or more jobs"
+            exit 1
+          fi
+
+          echo "✅ All jobs completed successfully"

@@ -1,4 +1,4 @@
-name: Supabase Functions Pipeline
+name: Supabase Functions Pipeline - Sequential
 
 on:
   workflow_dispatch:
@@ -22,10 +22,10 @@ env:
 
 jobs:
   # ============================================
-  # STAGE 1: VALIDATE FUNCTIONS
+  # JOB 1: VALIDATE FUNCTIONS
   # ============================================
-  stage-validate-functions:
-    name: "Stage 1: Validate Functions"
+  job-01-validate:
+    name: "Job 1/5: Validate Functions"
     runs-on: ubuntu-latest
     outputs:
       functions-list: ${{ steps.list-functions.outputs.functions }}
@@ -35,12 +35,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Deno (for Edge Functions)
+      - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
 
-      - name: List functions to deploy
+      - name: List functions
         id: list-functions
         run: |
           if [ -n "${{ github.event.inputs.function_name }}" ]; then
@@ -53,13 +53,12 @@ jobs:
 
           echo "functions=${FUNCTIONS}" >> $GITHUB_OUTPUT
           echo "count=${COUNT}" >> $GITHUB_OUTPUT
+          echo "📋 Functions to deploy: ${FUNCTIONS}"
+          echo "📊 Total count: ${COUNT}"
 
-          echo "Functions to deploy: ${FUNCTIONS}"
-          echo "Total count: ${COUNT}"
-
-      - name: Validate function syntax
+      - name: Validate syntax
         run: |
-          echo "Validating Edge Functions..."
+          echo "🔍 Validating Edge Functions..."
 
           if [ -n "${{ github.event.inputs.function_name }}" ]; then
             FUNCTIONS="${{ github.event.inputs.function_name }}"
@@ -72,31 +71,40 @@ jobs:
           for func in $FUNCTIONS; do
             echo "Checking $func..."
             if [ -f "supabase/functions/$func/index.ts" ]; then
-              deno check supabase/functions/$func/index.ts || ERROR_COUNT=$((ERROR_COUNT+1))
+              if deno check supabase/functions/$func/index.ts; then
+                echo "  ✅ $func"
+              else
+                echo "  ❌ $func"
+                ERROR_COUNT=$((ERROR_COUNT+1))
+              fi
             else
-              echo "⚠️ No index.ts found for $func"
+              echo "  ⚠️  No index.ts found for $func"
               ERROR_COUNT=$((ERROR_COUNT+1))
             fi
           done
 
           if [ $ERROR_COUNT -gt 0 ]; then
-            echo "❌ Found $ERROR_COUNT error(s) in functions"
+            echo "❌ Found $ERROR_COUNT error(s)"
             exit 1
           fi
 
-      - name: Validation summary
+          echo "✅ All functions validated"
+
+      - name: Job 1 summary
         run: |
-          echo "## Stage 1: Validation Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 1/5: Validation Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Functions to deploy: ${{ steps.list-functions.outputs.count }}" >> $GITHUB_STEP_SUMMARY
           echo "- All syntax checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 2 - Lint Functions" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 2: LINT FUNCTIONS
+  # JOB 2: LINT FUNCTIONS
   # ============================================
-  stage-lint-functions:
-    name: "Stage 2: Lint Functions"
+  job-02-lint:
+    name: "Job 2/5: Lint Functions"
     runs-on: ubuntu-latest
-    needs: [stage-validate-functions]
+    needs: [job-01-validate]
     if: success()
 
     steps:
@@ -108,9 +116,9 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Lint Edge Functions
+      - name: Lint functions
         run: |
-          echo "Linting Edge Functions..."
+          echo "🔍 Linting Edge Functions..."
 
           if [ -n "${{ github.event.inputs.function_name }}" ]; then
             FUNCTIONS="${{ github.event.inputs.function_name }}"
@@ -121,26 +129,35 @@ jobs:
           for func in $FUNCTIONS; do
             if [ -f "supabase/functions/$func/index.ts" ]; then
               echo "Linting $func..."
-              deno lint supabase/functions/$func/index.ts || true
+              deno lint supabase/functions/$func/index.ts || echo "  ⚠️ Lint warnings in $func"
             fi
           done
 
-      - name: Lint summary
+          echo "✅ Lint complete"
+
+      - name: Job 2 summary
         run: |
-          echo "## Stage 2: Lint Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 2/5: Lint Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Functions linted successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ github.event.inputs.skip_staging }}" == "true" ]; then
+            echo "**Next:** Job 4 - Deploy to Production (Staging skipped)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Next:** Job 3 - Deploy to Staging" >> $GITHUB_STEP_SUMMARY
+          fi
 
   # ============================================
-  # STAGE 3: DEPLOY TO STAGING
+  # JOB 3: DEPLOY TO STAGING
   # ============================================
-  stage-deploy-staging:
-    name: "Stage 3: Deploy to Staging"
+  job-03-deploy-staging:
+    name: "Job 3/5: Deploy to Staging"
     runs-on: ubuntu-latest
-    needs: [stage-validate-functions, stage-lint-functions]
+    needs: [job-01-validate, job-02-lint]
     if: |
       success() &&
-      (github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch') &&
-      github.event.inputs.skip_staging != 'true'
+      github.event.inputs.skip_staging != 'true' &&
+      (github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch')
     environment:
       name: supabase-staging
 
@@ -153,67 +170,81 @@ jobs:
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
 
-      - name: Link Supabase Staging Project
+      - name: Link Supabase staging
         run: |
+          echo "🔗 Linking to Supabase staging project..."
           supabase link --project-ref ${{ secrets.SUPABASE_STAGING_PROJECT_REF || secrets.SUPABASE_PROJECT_REF }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Deploy functions to staging
+      - name: Deploy to staging
         run: |
+          echo "🚀 Deploying to STAGING..."
+
           if [ -n "${{ github.event.inputs.function_name }}" ]; then
             echo "Deploying single function: ${{ github.event.inputs.function_name }}"
             supabase functions deploy ${{ github.event.inputs.function_name }} --no-verify-jwt
           else
-            echo "Deploying all functions to staging..."
             FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
+            SUCCESS=0
+            FAILED=0
 
             for func in $FUNCTIONS; do
               echo "Deploying $func to staging..."
-              supabase functions deploy $func --no-verify-jwt || echo "⚠️ Failed to deploy $func"
+              if supabase functions deploy $func --no-verify-jwt; then
+                SUCCESS=$((SUCCESS+1))
+              else
+                FAILED=$((FAILED+1))
+              fi
             done
+
+            echo "✅ Deployed: $SUCCESS functions"
+            [ $FAILED -gt 0 ] && echo "⚠️ Failed: $FAILED functions"
           fi
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Staging deployment summary
+      - name: Job 3 summary
         run: |
-          echo "## Stage 3: Staging Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 3/5: Staging Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Environment: Staging" >> $GITHUB_STEP_SUMMARY
-          echo "- Functions deployed: ${{ needs.stage-validate-functions.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Functions deployed: ${{ needs.job-01-validate.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 4 - Test Staging" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 4: SMOKE TEST STAGING
+  # JOB 4: TEST STAGING
   # ============================================
-  stage-test-staging:
-    name: "Stage 4: Test Staging Functions"
+  job-04-test-staging:
+    name: "Job 4/5: Test Staging"
     runs-on: ubuntu-latest
-    needs: [stage-deploy-staging]
+    needs: [job-03-deploy-staging]
     if: success()
 
     steps:
       - name: Run smoke tests
         run: |
-          echo "Running smoke tests on staging functions..."
+          echo "🧪 Running smoke tests on staging functions..."
           echo "✅ Staging functions are responsive"
           # Add actual smoke tests here if needed
 
-      - name: Test summary
+      - name: Job 4 summary
         run: |
-          echo "## Stage 4: Staging Tests Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 4/5: Staging Tests Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Smoke tests passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 5 - Deploy to Production (Requires Approval)" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 5: DEPLOY TO PRODUCTION
+  # JOB 5: DEPLOY TO PRODUCTION
   # ============================================
-  stage-deploy-production:
-    name: "Stage 5: Deploy to Production"
+  job-05-deploy-production:
+    name: "Job 5/5: Deploy to Production"
     runs-on: ubuntu-latest
-    needs: [stage-validate-functions, stage-lint-functions, stage-test-staging]
+    needs: [job-01-validate, job-02-lint, job-04-test-staging]
     if: |
       success() &&
-      (github.ref == 'refs/heads/main' ||
-       (github.event_name == 'workflow_dispatch' && github.event.inputs.skip_staging == 'true'))
+      (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
     environment:
       name: supabase-production
 
@@ -226,74 +257,50 @@ jobs:
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
 
-      - name: Link Supabase Production Project
+      - name: Link Supabase production
         run: |
+          echo "🔗 Linking to Supabase PRODUCTION project..."
           supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Deploy functions to production
+      - name: Deploy to production
         run: |
+          echo "🚀 Deploying to PRODUCTION..."
+          echo "⚠️  This will update live functions!"
+
           if [ -n "${{ github.event.inputs.function_name }}" ]; then
-            echo "🚀 Deploying single function to PRODUCTION: ${{ github.event.inputs.function_name }}"
+            echo "Deploying single function: ${{ github.event.inputs.function_name }}"
             supabase functions deploy ${{ github.event.inputs.function_name }} --no-verify-jwt
           else
-            echo "🚀 Deploying all functions to PRODUCTION..."
             FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
-
-            SUCCESS_COUNT=0
-            FAIL_COUNT=0
+            SUCCESS=0
+            FAILED=0
 
             for func in $FUNCTIONS; do
               echo "Deploying $func to production..."
               if supabase functions deploy $func --no-verify-jwt; then
-                SUCCESS_COUNT=$((SUCCESS_COUNT+1))
+                SUCCESS=$((SUCCESS+1))
               else
-                FAIL_COUNT=$((FAIL_COUNT+1))
+                FAILED=$((FAILED+1))
                 echo "❌ Failed to deploy $func"
               fi
             done
 
-            echo "Deployment complete: $SUCCESS_COUNT succeeded, $FAIL_COUNT failed"
+            echo "✅ Successfully deployed: $SUCCESS functions"
+            if [ $FAILED -gt 0 ]; then
+              echo "❌ Failed: $FAILED functions"
+              exit 1
+            fi
           fi
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Set function secrets
+      - name: Job 5 summary
         run: |
-          echo "Setting production function secrets..."
-          # Uncomment and configure as needed:
-          # supabase secrets set STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}" --env-file .env.production
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Production deployment summary
-        run: |
-          echo "## Stage 5: Production Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Environment: Production" >> $GITHUB_STEP_SUMMARY
-          echo "- Functions deployed: ${{ needs.stage-validate-functions.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 5/5: Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: **Production**" >> $GITHUB_STEP_SUMMARY
+          echo "- Functions deployed: ${{ needs.job-01-validate.outputs.count }}" >> $GITHUB_STEP_SUMMARY
           echo "- Deployed by: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-
-  # ============================================
-  # FINAL: PIPELINE SUMMARY
-  # ============================================
-  pipeline-complete:
-    name: "Pipeline Complete"
-    runs-on: ubuntu-latest
-    needs: [stage-validate-functions, stage-lint-functions, stage-deploy-staging, stage-test-staging]
-    if: always()
-
-    steps:
-      - name: Pipeline summary
-        run: |
-          echo "# 🎉 Supabase Functions Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 1. Validate | ${{ needs.stage-validate-functions.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 2. Lint | ${{ needs.stage-lint-functions.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 3. Deploy Staging | ${{ needs.stage-deploy-staging.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 4. Test Staging | ${{ needs.stage-test-staging.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Functions:** ${{ needs.stage-validate-functions.outputs.count }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pipeline Complete** ✅" >> $GITHUB_STEP_SUMMARY

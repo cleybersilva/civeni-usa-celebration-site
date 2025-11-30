@@ -1,4 +1,4 @@
-name: Release Pipeline
+name: Release Pipeline - Sequential
 
 on:
   push:
@@ -13,10 +13,10 @@ env:
 
 jobs:
   # ============================================
-  # STAGE 1: VALIDATE RELEASE
+  # JOB 1: VALIDATE RELEASE
   # ============================================
-  stage-validate-release:
-    name: "Stage 1: Validate Release"
+  job-01-validate:
+    name: "Job 1/6: Validate Release"
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get-version.outputs.version }}
@@ -34,24 +34,23 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "Release version: ${VERSION}"
+          echo "📦 Release version: ${VERSION}"
 
       - name: Check if pre-release
         id: check-prerelease
         run: |
           VERSION="${{ steps.get-version.outputs.version }}"
-          if [[ "$VERSION" =~ (rc|beta|alpha) ]]; then
+          if [[ "$VERSION" =~ (rc|beta|alpha|test) ]]; then
             echo "prerelease=true" >> $GITHUB_OUTPUT
-            echo "This is a pre-release"
+            echo "🔶 This is a PRE-RELEASE"
           else
             echo "prerelease=false" >> $GITHUB_OUTPUT
-            echo "This is a stable release"
+            echo "✅ This is a STABLE release"
           fi
 
       - name: Get changelog
         id: get-changelog
         run: |
-          # Get commits since last tag
           LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
 
           if [ -z "$LAST_TAG" ]; then
@@ -64,19 +63,21 @@ jobs:
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Validation summary
+      - name: Job 1 summary
         run: |
-          echo "## Stage 1: Release Validation ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 1/6: Release Validation Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Version: ${{ steps.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- Pre-release: ${{ steps.check-prerelease.outputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 2 - Build Frontend" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 2: BUILD & TEST
+  # JOB 2: BUILD FRONTEND
   # ============================================
-  stage-build-frontend:
-    name: "Stage 2: Build Frontend"
+  job-02-build-frontend:
+    name: "Job 2/6: Build Frontend"
     runs-on: ubuntu-latest
-    needs: [stage-validate-release]
+    needs: [job-01-validate]
     if: success()
 
     steps:
@@ -99,29 +100,35 @@ jobs:
       - name: TypeScript check
         run: npx tsc --noEmit
 
-      - name: Build production bundle
+      - name: Build production
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
-      - name: Upload build artifacts
+      - name: Upload build
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-build-${{ needs.stage-validate-release.outputs.version }}
+          name: frontend-build-${{ needs.job-01-validate.outputs.version }}
           path: dist/
           retention-days: 90
 
-      - name: Build summary
+      - name: Job 2 summary
         run: |
           SIZE=$(du -sh dist/ | cut -f1)
-          echo "## Stage 2: Frontend Build Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 2/6: Frontend Build Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Build size: ${SIZE}" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.job-01-validate.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 3 - Validate Supabase Functions" >> $GITHUB_STEP_SUMMARY
 
-  stage-validate-functions:
-    name: "Stage 2: Validate Supabase Functions"
+  # ============================================
+  # JOB 3: VALIDATE SUPABASE FUNCTIONS
+  # ============================================
+  job-03-validate-functions:
+    name: "Job 3/6: Validate Functions"
     runs-on: ubuntu-latest
-    needs: [stage-validate-release]
+    needs: [job-01-validate, job-02-build-frontend]
     if: success()
 
     steps:
@@ -135,13 +142,19 @@ jobs:
 
       - name: Validate all functions
         run: |
+          echo "🔍 Validating all Edge Functions..."
           FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
           ERROR_COUNT=0
 
           for func in $FUNCTIONS; do
             if [ -f "supabase/functions/$func/index.ts" ]; then
               echo "Validating $func..."
-              deno check supabase/functions/$func/index.ts || ERROR_COUNT=$((ERROR_COUNT+1))
+              if deno check supabase/functions/$func/index.ts; then
+                echo "  ✅ $func"
+              else
+                echo "  ❌ $func"
+                ERROR_COUNT=$((ERROR_COUNT+1))
+              fi
             fi
           done
 
@@ -150,19 +163,23 @@ jobs:
             exit 1
           fi
 
-      - name: Functions validation summary
+          echo "✅ All functions validated"
+
+      - name: Job 3 summary
         run: |
           COUNT=$(ls -d supabase/functions/*/ | wc -l)
-          echo "## Stage 2: Functions Validation Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 3/6: Functions Validation Complete" >> $GITHUB_STEP_SUMMARY
           echo "- Functions validated: ${COUNT}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 4 - Create Package" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 3: CREATE DEPLOYMENT PACKAGES
+  # JOB 4: CREATE DEPLOYMENT PACKAGE
   # ============================================
-  stage-package:
-    name: "Stage 3: Create Deployment Packages"
+  job-04-package:
+    name: "Job 4/6: Create Package"
     runs-on: ubuntu-latest
-    needs: [stage-validate-release, stage-build-frontend, stage-validate-functions]
+    needs: [job-01-validate, job-02-build-frontend, job-03-validate-functions]
     if: success()
 
     steps:
@@ -172,49 +189,67 @@ jobs:
       - name: Download frontend build
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build-${{ needs.stage-validate-release.outputs.version }}
+          name: frontend-build-${{ needs.job-01-validate.outputs.version }}
           path: dist/
 
       - name: Create cPanel package
         run: |
+          VERSION="${{ needs.job-01-validate.outputs.version }}"
+          echo "📦 Creating deployment package for ${VERSION}..."
+
           mkdir -p cpanel-package
           cp -r dist/* cpanel-package/
 
           # Copy essential files
-          [ -f .htaccess ] && cp .htaccess cpanel-package/
-          [ -f public/robots.txt ] && cp public/robots.txt cpanel-package/
+          [ -f .htaccess ] && cp .htaccess cpanel-package/ && echo "✓ .htaccess"
+          [ -f public/robots.txt ] && cp public/robots.txt cpanel-package/ && echo "✓ robots.txt"
 
+          # Create versioned ZIP
           cd cpanel-package
-          zip -r ../civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip .
+          zip -r ../civeni-saas-cpanel-${VERSION}.zip .
           cd ..
 
-          sha256sum civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip > \
-            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256
+          # Generate checksum
+          sha256sum civeni-saas-cpanel-${VERSION}.zip > civeni-saas-cpanel-${VERSION}.zip.sha256
+
+          echo "✅ Package created"
+          ls -lh civeni-saas-cpanel-${VERSION}.zip
 
       - name: Upload deployment package
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-package-${{ needs.stage-validate-release.outputs.version }}
+          name: deployment-package-${{ needs.job-01-validate.outputs.version }}
           path: |
-            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip
-            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256
+            civeni-saas-cpanel-${{ needs.job-01-validate.outputs.version }}.zip
+            civeni-saas-cpanel-${{ needs.job-01-validate.outputs.version }}.zip.sha256
           retention-days: 365
 
-      - name: Package summary
+      - name: Job 4 summary
         run: |
-          SIZE=$(du -h civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip | cut -f1)
-          echo "## Stage 3: Package Complete ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Package size: ${SIZE}" >> $GITHUB_STEP_SUMMARY
-          echo "- Version: ${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          VERSION="${{ needs.job-01-validate.outputs.version }}"
+          SIZE=$(du -h civeni-saas-cpanel-${VERSION}.zip | cut -f1)
+          CHECKSUM=$(cat civeni-saas-cpanel-${VERSION}.zip.sha256 | cut -d' ' -f1)
+
+          echo "## ✅ Job 4/6: Package Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- Package: civeni-saas-cpanel-${VERSION}.zip" >> $GITHUB_STEP_SUMMARY
+          echo "- Size: ${SIZE}" >> $GITHUB_STEP_SUMMARY
+          echo "- SHA256: \`${CHECKSUM}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.job-01-validate.outputs.is-prerelease }}" == "true" ]; then
+            echo "**Next:** Job 6 - Create GitHub Release (Deploy skipped for pre-release)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Next:** Job 5 - Deploy Functions (Requires Approval)" >> $GITHUB_STEP_SUMMARY
+          fi
 
   # ============================================
-  # STAGE 4: DEPLOY SUPABASE FUNCTIONS
+  # JOB 5: DEPLOY SUPABASE FUNCTIONS (stable only)
   # ============================================
-  stage-deploy-functions:
-    name: "Stage 4: Deploy Supabase Functions"
+  job-05-deploy-functions:
+    name: "Job 5/6: Deploy Functions"
     runs-on: ubuntu-latest
-    needs: [stage-validate-release, stage-package]
-    if: success() && needs.stage-validate-release.outputs.is-prerelease == 'false'
+    needs: [job-01-validate, job-04-package]
+    if: success() && needs.job-01-validate.outputs.is-prerelease == 'false'
     environment:
       name: supabase-production
 
@@ -228,12 +263,15 @@ jobs:
           version: ${{ env.SUPABASE_CLI_VERSION }}
 
       - name: Link Supabase project
-        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          echo "🔗 Linking to Supabase production..."
+          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy all functions
         run: |
+          echo "🚀 Deploying all functions to PRODUCTION..."
           FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
           SUCCESS=0
           FAILED=0
@@ -247,24 +285,29 @@ jobs:
             fi
           done
 
-          echo "Deployment complete: $SUCCESS succeeded, $FAILED failed"
-          [ $FAILED -eq 0 ] || exit 1
+          echo "✅ Deployed: $SUCCESS functions"
+          if [ $FAILED -gt 0 ]; then
+            echo "❌ Failed: $FAILED functions"
+            exit 1
+          fi
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Functions deployment summary
+      - name: Job 5 summary
         run: |
-          echo "## Stage 4: Functions Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 5/6: Functions Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "- All functions deployed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next:** Job 6 - Create GitHub Release (Requires Approval)" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # STAGE 5: CREATE GITHUB RELEASE
+  # JOB 6: CREATE GITHUB RELEASE
   # ============================================
-  stage-create-release:
-    name: "Stage 5: Create GitHub Release"
+  job-06-create-release:
+    name: "Job 6/6: Create Release"
     runs-on: ubuntu-latest
-    needs: [stage-validate-release, stage-package, stage-deploy-functions]
-    if: success()
+    needs: [job-01-validate, job-04-package, job-05-deploy-functions]
+    if: success() || (success() && needs.job-01-validate.outputs.is-prerelease == 'true')
     environment:
       name: github-release
 
@@ -275,38 +318,42 @@ jobs:
       - name: Download deployment package
         uses: actions/download-artifact@v4
         with:
-          name: deployment-package-${{ needs.stage-validate-release.outputs.version }}
+          name: deployment-package-${{ needs.job-01-validate.outputs.version }}
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: Release ${{ needs.stage-validate-release.outputs.version }}
-          tag_name: ${{ needs.stage-validate-release.outputs.version }}
-          prerelease: ${{ needs.stage-validate-release.outputs.is-prerelease }}
+          name: Release ${{ needs.job-01-validate.outputs.version }}
+          tag_name: ${{ needs.job-01-validate.outputs.version }}
+          prerelease: ${{ needs.job-01-validate.outputs.is-prerelease }}
           generate_release_notes: true
           body: |
-            # 🚀 Release ${{ needs.stage-validate-release.outputs.version }}
+            # 🚀 Release ${{ needs.job-01-validate.outputs.version }}
 
             ## 📦 Deployment Package
 
-            This release includes the complete cPanel deployment package.
+            Download the cPanel deployment package below.
 
             ### Installation Instructions
 
-            1. Download `civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip`
-            2. Verify integrity: `sha256sum -c civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256`
+            1. Download `civeni-saas-cpanel-${{ needs.job-01-validate.outputs.version }}.zip`
+            2. Verify integrity:
+               ```bash
+               sha256sum -c civeni-saas-cpanel-${{ needs.job-01-validate.outputs.version }}.zip.sha256
+               ```
             3. Upload to cPanel File Manager
-            4. Extract to `public_html/` or your domain root
+            4. Extract to `public_html/` or domain root
             5. Verify `.htaccess` is present
             6. Test the deployment
 
             ## 📝 Changes
 
-            ${{ needs.stage-validate-release.outputs.changelog }}
+            ${{ needs.job-01-validate.outputs.changelog }}
 
             ## 🔧 Technical Details
 
             - **Node Version:** ${{ env.NODE_VERSION }}
+            - **Release Type:** ${{ needs.job-01-validate.outputs.is-prerelease == 'true' && 'Pre-release' || 'Stable' }}
             - **Build Date:** ${{ github.event.head_commit.timestamp }}
             - **Commit:** ${{ github.sha }}
             - **Released by:** ${{ github.actor }}
@@ -315,63 +362,16 @@ jobs:
 
             🤖 Generated with [Claude Code](https://claude.com/claude-code)
           files: |
-            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip
-            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256
+            civeni-saas-cpanel-${{ needs.job-01-validate.outputs.version }}.zip
+            civeni-saas-cpanel-${{ needs.job-01-validate.outputs.version }}.zip.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Release summary
+      - name: Job 6 summary
         run: |
-          echo "## Stage 5: GitHub Release Created ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Version: ${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Pre-release: ${{ needs.stage-validate-release.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-
-  # ============================================
-  # FINAL: RELEASE COMPLETE
-  # ============================================
-  release-complete:
-    name: "Release Complete"
-    runs-on: ubuntu-latest
-    needs:
-      - stage-validate-release
-      - stage-build-frontend
-      - stage-validate-functions
-      - stage-package
-      - stage-deploy-functions
-      - stage-create-release
-    if: always()
-
-    steps:
-      - name: Release pipeline summary
-        run: |
-          echo "# 🎉 Release Pipeline Complete" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Job 6/6: GitHub Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.job-01-validate.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Pre-release: ${{ needs.job-01-validate.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.job-01-validate.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Pipeline Stages" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 1. Validate Release | ${{ needs.stage-validate-release.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 2. Build Frontend | ${{ needs.stage-build-frontend.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 2. Validate Functions | ${{ needs.stage-validate-functions.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 3. Package | ${{ needs.stage-package.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 4. Deploy Functions | ${{ needs.stage-deploy-functions.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 5. Create Release | ${{ needs.stage-create-release.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Release Details" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Pre-release:** ${{ needs.stage-validate-release.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Released by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-
-      - name: Notify on failure
-        if: |
-          needs.stage-validate-release.result == 'failure' ||
-          needs.stage-build-frontend.result == 'failure' ||
-          needs.stage-validate-functions.result == 'failure' ||
-          needs.stage-package.result == 'failure' ||
-          needs.stage-deploy-functions.result == 'failure' ||
-          needs.stage-create-release.result == 'failure'
-        run: |
-          echo "❌ Release pipeline failed!" >> $GITHUB_STEP_SUMMARY
-          echo "Please check the failed stages above" >> $GITHUB_STEP_SUMMARY
-          exit 1
+          echo "**Pipeline Complete** ✅" >> $GITHUB_STEP_SUMMARY
