@@ -1025,4 +1025,12 @@
     width: 280px !important;
     flex-shrink: 0 !important;
   }
+  
+  /* Área de conteúdo principal - ajustar para sidebar maior */
+  .civeni-admin [data-sidebar="inset"],
+  .civeni-admin main {
+    margin-left: 0 !important;
+    width: calc(100% - 280px) !important;
+    max-width: none !important;
+  }
 }
