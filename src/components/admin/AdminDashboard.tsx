@@ -1237,8 +1237,29 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Card Alertas & Disputas - primeiro na linha 3 tablet */}
-        <Card className="border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 md:order-4 lg:order-none">
+        {/* Card Ticket Médio - primeiro na linha 3 tablet */}
+        <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 md:order-4 lg:order-none">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Ticket Médio</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary?.ticketMedio || 0)}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              Por transação confirmada
+            </p>
+            {summary && summary.pagos > 0 && (
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                Baseado em {summary.pagos} {summary.pagos === 1 ? 'transação' : 'transações'}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Card Alertas & Disputas - segundo na linha 3 tablet */}
+        <Card className="border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 md:order-5 lg:order-none">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium">Alertas & Disputas</CardTitle>
             <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
@@ -1256,27 +1277,6 @@ const AdminDashboard = () => {
             {summary && (summary.disputas > 0 || summary.falhas > 0) && (
               <p className="text-[10px] sm:text-xs text-orange-500 dark:text-orange-400 mt-1 font-medium">
                 ⚠️ Requer atenção
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Card Ticket Médio - segundo na linha 3 tablet */}
-        <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 md:order-5 lg:order-none">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Ticket Médio</CardTitle>
-            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary?.ticketMedio || 0)}</div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Por transação confirmada
-            </p>
-            {summary && summary.pagos > 0 && (
-              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-                Baseado em {summary.pagos} {summary.pagos === 1 ? 'transação' : 'transações'}
               </p>
             )}
           </CardContent>
