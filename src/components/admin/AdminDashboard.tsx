@@ -31,6 +31,7 @@ const AdminDashboard = () => {
   const [timeseriesPage, setTimeseriesPage] = useState(1);
   const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
   const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
+  const [inscricoesPorLote, setInscricoesPorLote] = useState<{nome: string; quantidade: number; price_cents: number; dt_inicio: string; dt_fim: string}[]>([]);
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
@@ -108,6 +109,63 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchAllTimeseries();
   }, [fetchAllTimeseries]);
+
+  // Buscar inscrições por lote
+  const fetchInscricoesPorLote = useCallback(async () => {
+    try {
+      // Buscar todos os lotes
+      const { data: lotes, error: lotesError } = await supabase
+        .from('lotes')
+        .select('id, nome, price_cents, dt_inicio, dt_fim')
+        .order('dt_inicio', { ascending: true });
+
+      if (lotesError) {
+        console.error('Erro ao buscar lotes:', lotesError);
+        return;
+      }
+
+      if (!lotes || lotes.length === 0) {
+        setInscricoesPorLote([]);
+        return;
+      }
+
+      // Buscar contagem de inscrições por lote
+      const { data: registrations, error: regError } = await supabase
+        .from('event_registrations')
+        .select('batch_id, payment_status')
+        .eq('payment_status', 'completed');
+
+      if (regError) {
+        console.error('Erro ao buscar inscrições:', regError);
+        return;
+      }
+
+      // Contar inscrições por lote
+      const countByLote: Record<string, number> = {};
+      (registrations || []).forEach((reg: any) => {
+        if (reg.batch_id) {
+          countByLote[reg.batch_id] = (countByLote[reg.batch_id] || 0) + 1;
+        }
+      });
+
+      // Montar dados para exibição
+      const lotesComQtd = lotes.map(lote => ({
+        nome: lote.nome,
+        quantidade: countByLote[lote.id] || 0,
+        price_cents: lote.price_cents,
+        dt_inicio: lote.dt_inicio,
+        dt_fim: lote.dt_fim
+      }));
+
+      setInscricoesPorLote(lotesComQtd);
+    } catch (err) {
+      console.error('Erro ao buscar inscrições por lote:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchInscricoesPorLote();
+  }, [fetchInscricoesPorLote]);
 
   // O total de payouts agora vem do summary via edge function (sem RLS)
 
@@ -1198,6 +1256,64 @@ const AdminDashboard = () => {
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-2 italic">
                 Nenhum pagamento confirmado ainda
               </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Card Inscrições por Lote */}
+        <Card className="border-l-4 border-l-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Inscrições por Lote</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+              <Barcode className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {inscricoesPorLote.length > 0 ? (
+              <div className="space-y-2">
+                {inscricoesPorLote.map((lote, idx) => {
+                  const isCurrentLote = new Date() >= new Date(lote.dt_inicio) && new Date() <= new Date(lote.dt_fim);
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`flex items-center justify-between p-2 rounded-lg ${
+                        isCurrentLote 
+                          ? 'bg-indigo-100 dark:bg-indigo-900/40 border border-indigo-300 dark:border-indigo-700' 
+                          : 'bg-white/50 dark:bg-black/20'
+                      }`}
+                    >
+                      <div className="flex-1">
+                        <p className={`text-xs sm:text-sm font-medium ${isCurrentLote ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300'}`}>
+                          {lote.nome}
+                          {isCurrentLote && <span className="ml-2 text-[9px] bg-indigo-500 text-white px-1.5 py-0.5 rounded">ATUAL</span>}
+                        </p>
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                          {new Date(lote.dt_inicio).toLocaleDateString('pt-BR')} - {new Date(lote.dt_fim).toLocaleDateString('pt-BR')}
+                        </p>
+                        <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                          R$ {(lote.price_cents / 100).toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-lg sm:text-xl font-bold ${isCurrentLote ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                          {lote.quantidade}
+                        </p>
+                        <p className="text-[9px] text-muted-foreground">inscrições</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="pt-2 border-t border-indigo-200 dark:border-indigo-800">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">Total</span>
+                    <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                      {inscricoesPorLote.reduce((sum, l) => sum + l.quantidade, 0)} inscrições
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Nenhum lote cadastrado</p>
             )}
           </CardContent>
         </Card>
