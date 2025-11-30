@@ -100,7 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Email enviado com sucesso:', emailResponse);
 
     return new Response(
-      JSON.stringify({ success: true, messageId: emailResponse.id }),
+      JSON.stringify({ success: true, emailResponse }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
 
