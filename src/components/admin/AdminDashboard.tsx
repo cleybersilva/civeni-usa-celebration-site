@@ -31,6 +31,7 @@ const AdminDashboard = () => {
   const [timeseriesPage, setTimeseriesPage] = useState(1);
   const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
   const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
+  const [totalRevenueData, setTotalRevenueData] = useState<{ total: number; count: number } | null>(null);
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
@@ -139,6 +140,42 @@ const AdminDashboard = () => {
     };
 
     fetchAllTimeseries();
+  }, []);
+
+  // Buscar receita total de todas as inscrições pagas (event_registrations)
+  useEffect(() => {
+    const fetchTotalRevenue = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('event_registrations')
+          .select('amount_paid')
+          .eq('payment_status', 'completed');
+
+        if (error) {
+          console.error('Erro ao buscar receita total:', error);
+          return;
+        }
+
+        const total = data?.reduce((sum, reg) => sum + (reg.amount_paid || 0), 0) || 0;
+        setTotalRevenueData({ total, count: data?.length || 0 });
+      } catch (err) {
+        console.error('Erro ao buscar receita total:', err);
+      }
+    };
+
+    fetchTotalRevenue();
+    
+    // Realtime subscription para atualizar em tempo real
+    const channel = supabase
+      .channel('event_registrations_revenue')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'event_registrations' }, () => {
+        fetchTotalRevenue();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const formatCurrency = (value: number) => {
@@ -1056,13 +1093,13 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-              {formatCurrency((summary?.bruto || 0) + ((summary?.naoPagos || 0) * (summary?.ticketMedio || 0)))}
+              {formatCurrency(totalRevenueData?.total || 0)}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              Todas as inscrições recebidas
+              Todas as inscrições pagas
             </p>
             <p className="text-[10px] sm:text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-1">
-              {(summary?.pagos || 0) + (summary?.naoPagos || 0)} inscrições no total
+              {totalRevenueData?.count || 0} inscrições confirmadas
             </p>
           </CardContent>
         </Card>
