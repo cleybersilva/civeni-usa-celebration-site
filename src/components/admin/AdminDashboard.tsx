@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStripeDashboard } from '@/hooks/useStripeDashboard';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,103 +67,101 @@ const AdminDashboard = () => {
     refresh 
   } = useStripeDashboard(filters);
 
+  // Função reutilizável para buscar timeseries
+  const fetchAllTimeseries = useCallback(async () => {
+    setLoadingAllTimeseries(true);
+    try {
+      const { data, error } = await supabase
+        .from('stripe_charges')
+        .select('created_utc, amount, fee_amount, net_amount')
+        .eq('currency', 'BRL')
+        .eq('status', 'succeeded')
+        .eq('paid', true)
+        .order('created_utc', { ascending: false });
+
+      if (error) {
+        console.error('Erro:', error);
+        setAllTimeseriesData([]);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setAllTimeseriesData([]);
+        return;
+      }
+
+      // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
+      const groupedByDay = new Map<string, any>();
+      
+      data.forEach(charge => {
+        const utcDate = new Date(charge.created_utc);
+        const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
+        const year = brasilDate.getUTCFullYear();
+        const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(brasilDate.getUTCDate()).padStart(2, '0');
+        const dayKey = `${year}-${month}-${day}`;
+        
+        if (!groupedByDay.has(dayKey)) {
+          groupedByDay.set(dayKey, {
+            dia: dayKey,
+            receita_bruta: 0,
+            receita_liquida: 0,
+            taxas: 0,
+            transacoes: 0
+          });
+        }
+        
+        const bucket = groupedByDay.get(dayKey)!;
+        const amount = charge.amount / 100;
+        const fee = (charge.fee_amount || 0) / 100;
+        const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
+        
+        bucket.receita_bruta += amount;
+        bucket.taxas += fee;
+        bucket.receita_liquida += net;
+        bucket.transacoes += 1;
+      });
+      
+      const timeseriesData = Array.from(groupedByDay.values())
+        .sort((a, b) => b.dia.localeCompare(a.dia));
+      
+      setAllTimeseriesData(timeseriesData);
+    } catch (err) {
+      console.error('Exceção:', err);
+      setAllTimeseriesData([]);
+    } finally {
+      setLoadingAllTimeseries(false);
+    }
+  }, []);
+
   // Buscar TODOS os dados históricos de receitas para a seção Tendências Temporais
   useEffect(() => {
-    const fetchAllTimeseries = async () => {
-      setLoadingAllTimeseries(true);
-      try {
-        const { data, error } = await supabase
-          .from('stripe_charges')
-          .select('created_utc, amount, fee_amount, net_amount')
-          .eq('currency', 'BRL')
-          .eq('status', 'succeeded')
-          .eq('paid', true)
-          .order('created_utc', { ascending: false });
-
-        if (error) {
-          console.error('Erro:', error);
-          setAllTimeseriesData([]);
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          setAllTimeseriesData([]);
-          return;
-        }
-
-        // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
-        const groupedByDay = new Map<string, any>();
-        
-        data.forEach(charge => {
-          const utcDate = new Date(charge.created_utc);
-          // Subtrair 3 horas para converter para horário de Brasília
-          const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-          
-          // Extrair ano, mês e dia da data do Brasil
-          const year = brasilDate.getUTCFullYear();
-          const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
-          const day = String(brasilDate.getUTCDate()).padStart(2, '0');
-          const dayKey = `${year}-${month}-${day}`;
-          
-          if (!groupedByDay.has(dayKey)) {
-            groupedByDay.set(dayKey, {
-              dia: dayKey,
-              receita_bruta: 0,
-              receita_liquida: 0,
-              taxas: 0,
-              transacoes: 0
-            });
-          }
-          
-          const bucket = groupedByDay.get(dayKey)!;
-          const amount = charge.amount / 100;
-          const fee = (charge.fee_amount || 0) / 100;
-          const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
-          
-          bucket.receita_bruta += amount;
-          bucket.taxas += fee;
-          bucket.receita_liquida += net;
-          bucket.transacoes += 1;
-        });
-        
-        // Ordenar por data mais recente primeiro
-        const timeseriesData = Array.from(groupedByDay.values())
-          .sort((a, b) => b.dia.localeCompare(a.dia));
-        
-        setAllTimeseriesData(timeseriesData);
-      } catch (err) {
-        console.error('Exceção:', err);
-        setAllTimeseriesData([]);
-      } finally {
-        setLoadingAllTimeseries(false);
-      }
-    };
-
     fetchAllTimeseries();
+  }, [fetchAllTimeseries]);
+
+  // Função reutilizável para buscar receita total
+  const fetchTotalRevenue = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_total_registration_revenue');
+
+      if (error) {
+        console.error('Erro ao buscar receita total:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setTotalRevenueData({ 
+          total: Number(data[0].total_revenue) || 0, 
+          count: Number(data[0].total_count) || 0 
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao buscar receita total:', err);
+    }
   }, []);
 
   // Buscar receita total de todas as inscrições pagas (event_registrations)
   useEffect(() => {
-    const fetchTotalRevenue = async () => {
-      try {
-        const { data, error } = await supabase.rpc('get_total_registration_revenue');
-
-        if (error) {
-          console.error('Erro ao buscar receita total:', error);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          setTotalRevenueData({ 
-            total: Number(data[0].total_revenue) || 0, 
-            count: Number(data[0].total_count) || 0 
-          });
-        }
-      } catch (err) {
-        console.error('Erro ao buscar receita total:', err);
-      }
-    };
-
     fetchTotalRevenue();
     
     // Realtime subscription para atualizar em tempo real
@@ -177,7 +175,7 @@ const AdminDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchTotalRevenue]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -227,7 +225,12 @@ const AdminDashboard = () => {
         description: `${data.synced} registros sincronizados do Stripe`,
       });
 
-      refresh();
+      // Atualizar TODOS os dados após sync
+      await Promise.all([
+        refresh(),
+        fetchAllTimeseries(),
+        fetchTotalRevenue()
+      ]);
     } catch (error) {
       console.error('Sync error:', error);
       toast({
