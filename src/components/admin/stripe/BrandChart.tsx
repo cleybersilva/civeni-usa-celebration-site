@@ -35,6 +35,12 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
     }).format(value);
   };
 
+  // Normalizar nome da bandeira (unknown -> Boleto)
+  const normalizeBrandName = (brand: string) => {
+    if (brand.toLowerCase() === 'unknown') return 'Boleto';
+    return brand;
+  };
+
   const brandColors: Record<string, string> = {
     visa: '#1434CB',
     mastercard: '#EB001B',
@@ -80,6 +86,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
               dataKey="bandeira" 
               width={100}
               className="text-xs font-medium"
+              tickFormatter={normalizeBrandName}
             />
             <Tooltip 
               formatter={(value: any) => formatCurrency(value)}
@@ -113,7 +120,7 @@ export const BrandChart: React.FC<BrandChartProps> = ({ data, loading }) => {
                 className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-sm flex-shrink-0" 
                 style={{ backgroundColor: getBrandColor(item.bandeira) }}
               />
-              <span className="font-semibold capitalize whitespace-nowrap">{item.bandeira}</span>
+              <span className="font-semibold capitalize whitespace-nowrap">{normalizeBrandName(item.bandeira)}</span>
               <span className="text-muted-foreground font-medium hidden sm:inline">({item.funding})</span>
               <span className="font-bold text-gray-900 dark:text-gray-100">{item.qtd}</span>
             </div>
