@@ -101,7 +101,9 @@ serve(async (req) => {
     if (to) refundsQuery = refundsQuery.lte('created_utc', to);
     
     const { data: refunds } = await refundsQuery;
-    const reembolsosTotal = refunds?.filter(r => r.status === 'succeeded').length || 0;
+    const succeededRefunds = refunds?.filter(r => r.status === 'succeeded') || [];
+    const reembolsosTotal = succeededRefunds.length;
+    const reembolsosValor = succeededRefunds.reduce((sum, r) => sum + (r.amount || 0), 0);
 
     // Buscar disputas
     const { data: disputes } = await supabaseClient
@@ -153,14 +155,18 @@ serve(async (req) => {
     const ticketMedio = pagos > 0 ? bruto / pagos : 0;
     const taxaConversao = (pagos + naoPagos) > 0 ? (pagos / (pagos + naoPagos)) * 100 : 0;
 
+    // Calcular líquido real = bruto - taxas - reembolsos
+    const liquidoReal = liquido - reembolsosValor;
+
     const summary = {
       bruto: bruto / 100,
       taxas: taxas / 100,
-      liquido: liquido / 100,
+      liquido: liquidoReal / 100,
       pagos,
       naoPagos,
       falhas,
       reembolsos: reembolsosTotal,
+      reembolsosValor: reembolsosValor / 100,
       disputas: disputasTotal,
       ticketMedio: ticketMedio / 100,
       taxaConversao: taxaConversao.toFixed(2),
