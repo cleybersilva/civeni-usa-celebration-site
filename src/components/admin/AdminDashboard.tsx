@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const [timeseriesPage, setTimeseriesPage] = useState(1);
   const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
   const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
-  const [totalRevenueData, setTotalRevenueData] = useState<{ total: number; count: number } | null>(null);
+  const [totalPayoutsData, setTotalPayoutsData] = useState<{ total: number; count: number } | null>(null);
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
@@ -110,43 +110,49 @@ const AdminDashboard = () => {
     fetchAllTimeseries();
   }, [fetchAllTimeseries]);
 
-  // Função reutilizável para buscar receita total
-  const fetchTotalRevenue = useCallback(async () => {
+  // Função para buscar total de payouts depositados na conta
+  const fetchTotalPayouts = useCallback(async () => {
     try {
-      const { data, error } = await supabase.rpc('get_total_registration_revenue');
+      const { data, error } = await supabase
+        .from('stripe_payouts')
+        .select('amount')
+        .eq('status', 'paid');
 
       if (error) {
-        console.error('Erro ao buscar receita total:', error);
+        console.error('Erro ao buscar payouts:', error);
         return;
       }
 
       if (data && data.length > 0) {
-        setTotalRevenueData({ 
-          total: Number(data[0].total_revenue) || 0, 
-          count: Number(data[0].total_count) || 0 
+        const totalCents = data.reduce((sum, payout) => sum + (payout.amount || 0), 0);
+        setTotalPayoutsData({ 
+          total: totalCents / 100, 
+          count: data.length 
         });
+      } else {
+        setTotalPayoutsData({ total: 0, count: 0 });
       }
     } catch (err) {
-      console.error('Erro ao buscar receita total:', err);
+      console.error('Erro ao buscar payouts:', err);
     }
   }, []);
 
-  // Buscar receita total de todas as inscrições pagas (event_registrations)
+  // Buscar total de payouts depositados
   useEffect(() => {
-    fetchTotalRevenue();
+    fetchTotalPayouts();
     
     // Realtime subscription para atualizar em tempo real
     const channel = supabase
-      .channel('event_registrations_revenue')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'event_registrations' }, () => {
-        fetchTotalRevenue();
+      .channel('stripe_payouts_revenue')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'stripe_payouts' }, () => {
+        fetchTotalPayouts();
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchTotalRevenue]);
+  }, [fetchTotalPayouts]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -200,7 +206,7 @@ const AdminDashboard = () => {
       await Promise.all([
         refresh(),
         fetchAllTimeseries(),
-        fetchTotalRevenue()
+        fetchTotalPayouts()
       ]);
     } catch (error) {
       console.error('Sync error:', error);
@@ -1058,27 +1064,6 @@ const AdminDashboard = () => {
 
       {/* KPI Cards */}
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {/* Card Receita Total */}
-        <Card className="border-l-4 border-l-cyan-500 bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/20 dark:to-sky-950/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Receita Total</CardTitle>
-            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-              <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-600 dark:text-cyan-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-              {formatCurrency(totalRevenueData?.total || 0)}
-            </div>
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-              Todas as inscrições pagas
-            </p>
-            <p className="text-[10px] sm:text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-1">
-              {totalRevenueData?.count || 0} inscrições confirmadas
-            </p>
-          </CardContent>
-        </Card>
-
         {/* Card Receita Líquida */}
         <Card className="border-l-4 border-l-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -1102,6 +1087,27 @@ const AdminDashboard = () => {
                 Aguardando dados do Stripe...
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Card Receita Recebida Inter - Total de Payouts depositados */}
+        <Card className="border-l-4 border-l-cyan-500 bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/20 dark:to-sky-950/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Receita Recebida Inter</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+              <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-600 dark:text-cyan-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+              {formatCurrency(totalPayoutsData?.total || 0)}
+            </div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              Depositado na conta bancária
+            </p>
+            <p className="text-[10px] sm:text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-1">
+              {totalPayoutsData?.count || 0} transferências realizadas
+            </p>
           </CardContent>
         </Card>
 
