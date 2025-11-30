@@ -28,7 +28,7 @@ jobs:
           cd cpanel-package && zip -r ../civeni-cpanel.zip .
           cd .. && sha256sum civeni-cpanel.zip > civeni-cpanel.zip.sha256
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: cpanel-package-${{ github.sha }}
           path: |
