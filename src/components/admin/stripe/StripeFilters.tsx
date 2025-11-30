@@ -37,6 +37,7 @@ export const StripeFilters: React.FC<StripeFiltersProps> = ({ filters, onFilterC
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="7d">Últimos 7 dias</SelectItem>
                 <SelectItem value="30d">Últimos 30 dias</SelectItem>
                 <SelectItem value="90d">Últimos 90 dias</SelectItem>
