@@ -1237,83 +1237,6 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Card Inscrições por Lote */}
-        <Card className="border-l-4 border-l-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Inscrições por Lote</CardTitle>
-            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-              <Barcode className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {inscricoesPorLote.length > 0 ? (
-              <div className="space-y-2">
-                {inscricoesPorLote.map((lote, idx) => {
-                  const isCurrentLote = new Date() >= new Date(lote.dt_inicio) && new Date() <= new Date(lote.dt_fim);
-                  return (
-                    <div 
-                      key={idx} 
-                      className={`flex items-center justify-between p-2 rounded-lg ${
-                        isCurrentLote 
-                          ? 'bg-indigo-100 dark:bg-indigo-900/40 border border-indigo-300 dark:border-indigo-700' 
-                          : 'bg-white/50 dark:bg-black/20'
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <p className={`text-xs sm:text-sm font-medium ${isCurrentLote ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300'}`}>
-                          {lote.nome}
-                          {isCurrentLote && <span className="ml-2 text-[9px] bg-indigo-500 text-white px-1.5 py-0.5 rounded">ATUAL</span>}
-                        </p>
-                        <p className="text-[9px] sm:text-[10px] text-muted-foreground">
-                          {new Date(lote.dt_inicio).toLocaleDateString('pt-BR')} - {new Date(lote.dt_fim).toLocaleDateString('pt-BR')}
-                        </p>
-                        <p className="text-[9px] sm:text-[10px] text-muted-foreground">
-                          R$ {(lote.price_cents / 100).toFixed(2)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-lg sm:text-xl font-bold ${isCurrentLote ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-600 dark:text-gray-400'}`}>
-                          {lote.quantidade}
-                        </p>
-                        <p className="text-[9px] text-muted-foreground">inscrições</p>
-                      </div>
-                    </div>
-                  );
-                })}
-                {/* Mostrar inscrições não vinculadas ao lote se houver */}
-                {inscricoesNaoVinculadas > 0 && (
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                    <div className="flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300">
-                        Não vinculadas ao lote
-                      </p>
-                      <p className="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400">
-                        Pagamentos Stripe sem registro
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400">
-                        {inscricoesNaoVinculadas}
-                      </p>
-                      <p className="text-[9px] text-muted-foreground">inscrições</p>
-                    </div>
-                  </div>
-                )}
-                <div className="pt-2 border-t border-indigo-200 dark:border-indigo-800">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">Total</span>
-                    <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                      {inscricoesPorLote.reduce((sum, l) => sum + l.quantidade, 0) + inscricoesNaoVinculadas} inscrições
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-xs text-muted-foreground">Nenhum lote cadastrado</p>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Card Ticket Médio */}
         <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -1359,6 +1282,82 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Card Inscrições por Lote - Full width */}
+      <Card className="border-l-4 border-l-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm sm:text-base font-medium">Inscrições por Lote</CardTitle>
+          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+            <Barcode className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {inscricoesPorLote.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+              {inscricoesPorLote.map((lote, idx) => {
+                const isCurrentLote = new Date() >= new Date(lote.dt_inicio) && new Date() <= new Date(lote.dt_fim);
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center justify-between p-3 rounded-lg ${
+                      isCurrentLote 
+                        ? 'bg-indigo-100 dark:bg-indigo-900/40 border border-indigo-300 dark:border-indigo-700' 
+                        : 'bg-white/50 dark:bg-black/20 border border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <p className={`text-xs sm:text-sm font-medium ${isCurrentLote ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300'}`}>
+                        {lote.nome}
+                        {isCurrentLote && <span className="ml-2 text-[9px] bg-indigo-500 text-white px-1.5 py-0.5 rounded">ATUAL</span>}
+                      </p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                        {new Date(lote.dt_inicio).toLocaleDateString('pt-BR')} - {new Date(lote.dt_fim).toLocaleDateString('pt-BR')}
+                      </p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                        R$ {(lote.price_cents / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-lg sm:text-xl font-bold ${isCurrentLote ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                        {lote.quantidade}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground">inscrições</p>
+                    </div>
+                  </div>
+                );
+              })}
+              {/* Mostrar inscrições não vinculadas ao lote se houver */}
+              {inscricoesNaoVinculadas > 0 && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                  <div className="flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300">
+                      Não vinculadas ao lote
+                    </p>
+                    <p className="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400">
+                      Pagamentos Stripe sem registro
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400">
+                      {inscricoesNaoVinculadas}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground">inscrições</p>
+                  </div>
+                </div>
+              )}
+              {/* Total */}
+              <div className="flex items-center justify-between p-3 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-300 dark:border-indigo-700 sm:col-span-2 lg:col-span-3 xl:col-span-6">
+                <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Total Geral</span>
+                <span className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                  {inscricoesPorLote.reduce((sum, l) => sum + l.quantidade, 0) + inscricoesNaoVinculadas} inscrições
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Nenhum lote cadastrado</p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Próximo Payout */}
       {summary?.proximoPayout && (
