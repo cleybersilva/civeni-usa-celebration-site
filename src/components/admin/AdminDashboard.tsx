@@ -32,6 +32,7 @@ const AdminDashboard = () => {
   const [allTimeseriesData, setAllTimeseriesData] = useState<any[]>([]);
   const [loadingAllTimeseries, setLoadingAllTimeseries] = useState(false);
   const [inscricoesPorLote, setInscricoesPorLote] = useState<{nome: string; quantidade: number; price_cents: number; dt_inicio: string; dt_fim: string}[]>([]);
+  const [inscricoesNaoVinculadas, setInscricoesNaoVinculadas] = useState(0);
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
@@ -121,17 +122,21 @@ const AdminDashboard = () => {
       if (error) {
         console.error('Erro ao buscar inscrições por lote:', error);
         setInscricoesPorLote([]);
+        setInscricoesNaoVinculadas(0);
         return;
       }
 
       if (data?.lotes) {
         setInscricoesPorLote(data.lotes);
+        setInscricoesNaoVinculadas(data.diferenca || 0);
       } else {
         setInscricoesPorLote([]);
+        setInscricoesNaoVinculadas(0);
       }
     } catch (err) {
       console.error('Erro ao buscar inscrições por lote:', err);
       setInscricoesPorLote([]);
+      setInscricoesNaoVinculadas(0);
     }
   }, []);
 
@@ -1275,11 +1280,30 @@ const AdminDashboard = () => {
                     </div>
                   );
                 })}
+                {/* Mostrar inscrições não vinculadas ao lote se houver */}
+                {inscricoesNaoVinculadas > 0 && (
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300">
+                        Não vinculadas ao lote
+                      </p>
+                      <p className="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400">
+                        Pagamentos Stripe sem registro
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-400">
+                        {inscricoesNaoVinculadas}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground">inscrições</p>
+                    </div>
+                  </div>
+                )}
                 <div className="pt-2 border-t border-indigo-200 dark:border-indigo-800">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">Total</span>
                     <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                      {inscricoesPorLote.reduce((sum, l) => sum + l.quantidade, 0)} inscrições
+                      {inscricoesPorLote.reduce((sum, l) => sum + l.quantidade, 0) + inscricoesNaoVinculadas} inscrições
                     </span>
                   </div>
                 </div>
