@@ -4757,6 +4757,13 @@ export type Database = {
         Args: { bucket_name: string; file_path: string }
         Returns: string
       }
+      get_total_registration_revenue: {
+        Args: never
+        Returns: {
+          total_count: number
+          total_revenue: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
