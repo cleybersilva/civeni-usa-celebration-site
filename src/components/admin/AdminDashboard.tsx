@@ -110,56 +110,28 @@ const AdminDashboard = () => {
     fetchAllTimeseries();
   }, [fetchAllTimeseries]);
 
-  // Buscar inscrições por lote
+  // Buscar inscrições por lote usando edge function para contornar RLS
   const fetchInscricoesPorLote = useCallback(async () => {
     try {
-      // Buscar todos os lotes
-      const { data: lotes, error: lotesError } = await supabase
-        .from('lotes')
-        .select('id, nome, price_cents, dt_inicio, dt_fim')
-        .order('dt_inicio', { ascending: true });
+      // Usar edge function específica para buscar inscrições por lote (contorna RLS)
+      const { data, error } = await supabase.functions.invoke('inscricoes-por-lote', {
+        method: 'GET'
+      });
 
-      if (lotesError) {
-        console.error('Erro ao buscar lotes:', lotesError);
-        return;
-      }
-
-      if (!lotes || lotes.length === 0) {
+      if (error) {
+        console.error('Erro ao buscar inscrições por lote:', error);
         setInscricoesPorLote([]);
         return;
       }
 
-      // Buscar contagem de inscrições por lote
-      const { data: registrations, error: regError } = await supabase
-        .from('event_registrations')
-        .select('batch_id, payment_status')
-        .eq('payment_status', 'completed');
-
-      if (regError) {
-        console.error('Erro ao buscar inscrições:', regError);
-        return;
+      if (data?.lotes) {
+        setInscricoesPorLote(data.lotes);
+      } else {
+        setInscricoesPorLote([]);
       }
-
-      // Contar inscrições por lote
-      const countByLote: Record<string, number> = {};
-      (registrations || []).forEach((reg: any) => {
-        if (reg.batch_id) {
-          countByLote[reg.batch_id] = (countByLote[reg.batch_id] || 0) + 1;
-        }
-      });
-
-      // Montar dados para exibição
-      const lotesComQtd = lotes.map(lote => ({
-        nome: lote.nome,
-        quantidade: countByLote[lote.id] || 0,
-        price_cents: lote.price_cents,
-        dt_inicio: lote.dt_inicio,
-        dt_fim: lote.dt_fim
-      }));
-
-      setInscricoesPorLote(lotesComQtd);
     } catch (err) {
       console.error('Erro ao buscar inscrições por lote:', err);
+      setInscricoesPorLote([]);
     }
   }, []);
 
