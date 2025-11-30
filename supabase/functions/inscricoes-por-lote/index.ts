@@ -105,32 +105,8 @@ serve(async (req) => {
     // Calcular diferença entre Stripe e event_registrations
     const totalStripe = stripeCharges?.length || 0;
     const totalRegistrations = registrations?.length || 0;
-    const stripeVsRegDiff = totalStripe - totalRegistrations;
 
-    console.log(`📊 Stripe: ${totalStripe}, Registrations: ${totalRegistrations}, Diferença: ${stripeVsRegDiff}`);
-
-    // Se há diferença, tentar distribuir pelos lotes baseado na data dos pagamentos Stripe
-    if (diferenca > 0 && stripeCharges) {
-      // Criar set de IDs já contados (para não duplicar)
-      const registrationDates = new Set(
-        (registrations || []).map((r: any) => r.created_at?.split('T')[0])
-      );
-      
-      // Para cada charge do Stripe, verificar se já foi contado
-      // Como não temos link direto, vamos adicionar a diferença ao primeiro lote sem inscrições ou distribuir
-      console.log(`📊 Adicionando ${diferenca} inscrições do Stripe sem correspondência em event_registrations`);
-      
-      // Distribuir pelos lotes baseado na data do pagamento
-      stripeCharges.forEach((charge: any) => {
-        if (charge.created_utc) {
-          const loteId = getLoteByDate(charge.created_utc);
-          if (loteId) {
-            // Só adicionar se ainda não foi contado por event_registrations
-            // Como não podemos verificar exatamente, vamos confiar nos dados de event_registrations
-          }
-        }
-      });
-    }
+    console.log(`📊 Stripe: ${totalStripe}, Registrations: ${totalRegistrations}`);
 
     console.log('📊 Contagem por batch_id:', countByLote);
     console.log(`📊 Sem lote definido: ${semLote}`);
