@@ -163,22 +163,25 @@ serve(async (req) => {
       console.log(`✅ Synced ${refundCount} refunds`);
     }
 
-    // Sync Payouts
+    // Sync Payouts - SEMPRE busca TODO o histórico (sem filtro de data)
     if (resources.includes('payouts')) {
-      console.log('💰 Syncing payouts...');
+      console.log('💰 Syncing ALL historical payouts...');
       let hasMore = true;
       let startingAfter: string | undefined;
       let payoutCount = 0;
 
       while (hasMore) {
+        // NÃO aplicar filtro de data para payouts - buscar TODOS
         const params: any = { limit: 100 };
-        if (sinceTimestamp) params.created = { gte: sinceTimestamp };
-        if (untilTimestamp) params.created = { ...params.created, lte: untilTimestamp };
         if (startingAfter) params.starting_after = startingAfter;
 
+        console.log(`📥 Fetching payouts page... (after: ${startingAfter || 'start'})`);
         const payouts = await stripe.payouts.list(params);
+        console.log(`📊 Got ${payouts.data.length} payouts, has_more: ${payouts.has_more}`);
 
         for (const payout of payouts.data) {
+          console.log(`💸 Payout: ${payout.id} | ${payout.amount/100} ${payout.currency} | status: ${payout.status} | arrival: ${new Date(payout.arrival_date * 1000).toISOString()}`);
+          
           await supabaseClient.from('stripe_payouts').upsert({
             id: payout.id,
             amount: payout.amount,
@@ -200,7 +203,7 @@ serve(async (req) => {
 
       results.resources.payouts = payoutCount;
       results.synced += payoutCount;
-      console.log(`✅ Synced ${payoutCount} payouts`);
+      console.log(`✅ Synced ${payoutCount} total payouts from Stripe`);
     }
 
     // Sync Customers
