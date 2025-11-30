@@ -184,29 +184,20 @@ const UsersManager = () => {
     }
 
     try {
-      // Atualizar tipo de usuário
-      const { data: userTypeData, error: userTypeError } = await (supabase as any).rpc('update_admin_user_type_secure', {
-        user_id: editingUser.user_id,
-        new_user_type: editFormData.user_type,
-        admin_email: user?.email,
-        session_token: sessionToken
+      // Usar edge function para atualizar usuário
+      const response = await supabase.functions.invoke('update-admin-user', {
+        body: {
+          user_id: editingUser.user_id,
+          user_type: editFormData.user_type,
+          new_password: editFormData.newPassword || null
+        }
       });
 
-      if (userTypeError) throw userTypeError;
-
-      // Se uma nova senha foi fornecida, atualizar a senha
-      if (editFormData.newPassword) {
-        const { data: passwordData, error: passwordError } = await (supabase as any).rpc('update_admin_user_password_secure', {
-          user_id: editingUser.user_id,
-          new_password: editFormData.newPassword,
-          admin_email: user?.email,
-          session_token: sessionToken
-        });
-
-        if (passwordError) throw passwordError;
+      if (response.error) {
+        throw new Error(response.error.message || 'Erro ao atualizar usuário');
       }
 
-      const result = userTypeData as any;
+      const result = response.data;
       if (result.success) {
         setSuccess(editFormData.newPassword ? 
           'Usuário e senha atualizados com sucesso' : 
@@ -221,10 +212,10 @@ const UsersManager = () => {
         });
         fetchUsers();
       } else {
-        setError(result.error);
+        setError(result.error || 'Erro ao atualizar usuário');
       }
-    } catch (error) {
-      setError('Erro ao atualizar usuário');
+    } catch (error: any) {
+      setError(error.message || 'Erro ao atualizar usuário');
       console.error('Error updating user:', error);
     }
   };
@@ -246,23 +237,23 @@ const UsersManager = () => {
     }
 
     try {
-      const { data, error } = await (supabase as any).rpc('delete_admin_user_secure', {
-        user_id: userId,
-        admin_email: user?.email,
-        session_token: sessionToken
+      const response = await supabase.functions.invoke('delete-admin-user', {
+        body: { user_id: userId }
       });
 
-      if (error) throw error;
+      if (response.error) {
+        throw new Error(response.error.message || 'Erro ao deletar usuário');
+      }
 
-      const result = data as any;
+      const result = response.data;
       if (result.success) {
         setSuccess(result.message);
         fetchUsers();
       } else {
-        setError(result.error);
+        setError(result.error || 'Erro ao deletar usuário');
       }
-    } catch (error) {
-      setError('Erro ao deletar usuário');
+    } catch (error: any) {
+      setError(error.message || 'Erro ao deletar usuário');
       console.error('Error deleting user:', error);
     }
   };
