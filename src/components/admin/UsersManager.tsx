@@ -73,76 +73,21 @@ const UsersManager = () => {
         return;
       }
 
-      // Tentar RPC primeiro, com fallback para consulta direta
-      let usersData: AdminUser[] = [];
-      let fetchError: string | null = null;
+      // Usar edge function para listar usuários (bypass RLS)
+      const { data, error } = await supabase.functions.invoke('list-admin-users');
 
-      try {
-        // Tentar função RPC se sessionToken disponível
-        if (sessionToken) {
-          const { data, error } = await (supabase as any).rpc('list_admin_users_secure', {
-            user_email: user.email,
-            session_token: sessionToken
-          });
-
-          if (!error && data) {
-            usersData = data;
-          } else if (error) {
-            console.warn('RPC error, falling back to direct query:', error.message);
-            fetchError = error.message;
-          }
-        }
-
-        // Fallback: consulta direta se RPC falhou
-        if (usersData.length === 0) {
-          const { data: directData, error: directError } = await supabase
-            .from('admin_users')
-            .select('id, email, user_type, is_admin_root, created_at')
-            .order('created_at', { ascending: true });
-
-          if (directError) {
-            console.error('Direct query error:', directError);
-            setError('Erro ao carregar usuários: ' + (fetchError || directError.message));
-            return;
-          }
-
-          if (directData) {
-            usersData = directData.map(u => ({
-              user_id: u.id,
-              email: u.email,
-              user_type: u.user_type,
-              is_admin_root: u.is_admin_root || false,
-              created_at: u.created_at
-            }));
-          }
-        }
-      } catch (rpcError: any) {
-        console.warn('RPC call failed, trying direct query:', rpcError);
-        
-        // Fallback final: consulta direta
-        const { data: directData, error: directError } = await supabase
-          .from('admin_users')
-          .select('id, email, user_type, is_admin_root, created_at')
-          .order('created_at', { ascending: true });
-
-        if (directError) {
-          setError('Erro ao carregar usuários: ' + directError.message);
-          return;
-        }
-
-        if (directData) {
-          usersData = directData.map(u => ({
-            user_id: u.id,
-            email: u.email,
-            user_type: u.user_type,
-            is_admin_root: u.is_admin_root || false,
-            created_at: u.created_at
-          }));
-        }
+      if (error) {
+        console.error('Edge function error:', error);
+        setError('Erro ao carregar usuários: ' + error.message);
+        return;
       }
 
-      console.log('Users loaded:', usersData.length);
-      setUsers(usersData);
+      if (data) {
+        console.log('Users loaded:', data.length);
+        setUsers(data);
+      } else {
+        setUsers([]);
+      }
       
     } catch (error: any) {
       const errorMessage = error?.message || 'Erro ao carregar usuários';
@@ -152,7 +97,6 @@ const UsersManager = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     console.log('UsersManager useEffect - User:', user?.email);
     
