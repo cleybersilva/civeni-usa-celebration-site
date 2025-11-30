@@ -35,7 +35,7 @@ const AdminDashboard = () => {
   const ITEMS_PER_PAGE = 10;
 
   const [filters, setFilters] = useState({
-    range: 'all',
+    range: '30d',
     status: 'all',
     lote: '',
     cupom: '',
@@ -158,7 +158,7 @@ const AdminDashboard = () => {
 
   const handleClearFilters = () => {
     setFilters({
-      range: 'all',
+      range: '30d',
       status: 'all',
       lote: '',
       cupom: '',
