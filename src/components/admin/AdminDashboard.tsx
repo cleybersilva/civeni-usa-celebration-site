@@ -1213,6 +1213,12 @@ const AdminDashboard = () => {
                 <p className={`text-3xl font-bold ${summary.proximoPayout.isLastPaid ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'} mt-1`}>
                   {formatCurrency(summary.proximoPayout.valor)}
                 </p>
+                {/* Aviso se dados parecem desatualizados */}
+                {new Date(summary.proximoPayout.data) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
+                  <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1">
+                    ⚠️ Dados podem estar desatualizados - Execute "Sincronizar Stripe"
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <p className={`text-sm ${summary.proximoPayout.isLastPaid ? 'text-blue-700 dark:text-blue-300' : 'text-emerald-700 dark:text-emerald-300'} font-medium`}>
