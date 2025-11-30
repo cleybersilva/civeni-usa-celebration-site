@@ -96,7 +96,7 @@ export const useStripeDashboard = (filters: StripeDashboardFilters = {}) => {
           fromISO: from,
           toISO: to
         });
-      } else if (stableFilters.range && stableFilters.range !== 'custom') {
+      } else if (stableFilters.range && stableFilters.range !== 'custom' && stableFilters.range !== 'all') {
         const now = new Date();
         const days = parseInt(stableFilters.range) || 30;
         const fromDate = new Date(now.getTime());

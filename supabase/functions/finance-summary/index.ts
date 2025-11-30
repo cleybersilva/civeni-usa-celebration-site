@@ -72,7 +72,7 @@ serve(async (req) => {
     // Calcular KPIs
     let bruto = 0, taxas = 0, liquido = 0;
     let pagos = 0, naoPagos = 0, falhas = 0;
-    let reembolsosTotal = 0, disputasTotal = 0;
+    let disputasTotal = 0;
 
     filteredCharges.forEach(charge => {
       const bt = charge.stripe_balance_transactions;
@@ -90,9 +90,18 @@ serve(async (req) => {
         naoPagos++;
         if (charge.failure_code) falhas++;
       }
-
-      if (charge.refunded) reembolsosTotal++;
     });
+
+    // Buscar reembolsos da tabela stripe_refunds
+    let refundsQuery = supabaseClient
+      .from('stripe_refunds')
+      .select('id, amount, status');
+    
+    if (from) refundsQuery = refundsQuery.gte('created_utc', from);
+    if (to) refundsQuery = refundsQuery.lte('created_utc', to);
+    
+    const { data: refunds } = await refundsQuery;
+    const reembolsosTotal = refunds?.filter(r => r.status === 'succeeded').length || 0;
 
     // Buscar disputas
     const { data: disputes } = await supabaseClient
