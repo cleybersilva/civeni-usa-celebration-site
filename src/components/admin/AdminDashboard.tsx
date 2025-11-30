@@ -1359,14 +1359,14 @@ const AdminDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Próximo Payout */}
+      {/* Próximo Repasse */}
       {summary?.proximoPayout && (
         <Card className={`border-l-4 ${summary.proximoPayout.isLastPaid ? 'border-l-blue-500 bg-gradient-to-r from-blue-50 via-sky-50 to-cyan-50 dark:from-blue-950/30 dark:via-sky-950/30 dark:to-cyan-950/30' : 'border-l-emerald-500 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 dark:from-green-950/30 dark:via-emerald-950/30 dark:to-teal-950/30'} shadow-lg`}>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-sm ${summary.proximoPayout.isLastPaid ? 'text-blue-700 dark:text-blue-300' : 'text-emerald-700 dark:text-emerald-300'} font-medium`}>
-                  {summary.proximoPayout.isLastPaid ? '✅ Último Payout Realizado' : '🔄 Próximo Payout'}
+                  {summary.proximoPayout.isLastPaid ? '✅ Último Repasse Realizado' : '🔄 Próximo Repasse'}
                 </p>
                 <p className={`text-3xl font-bold ${summary.proximoPayout.isLastPaid ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'} mt-1`}>
                   {formatCurrency(summary.proximoPayout.valorTotal || 0)}
