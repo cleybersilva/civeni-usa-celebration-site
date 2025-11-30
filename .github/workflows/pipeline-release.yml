@@ -1,0 +1,377 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-rc.*'
+      - 'v*.*.*-beta.*'
+
+env:
+  NODE_VERSION: '20'
+  SUPABASE_CLI_VERSION: 'latest'
+
+jobs:
+  # ============================================
+  # STAGE 1: VALIDATE RELEASE
+  # ============================================
+  stage-validate-release:
+    name: "Stage 1: Validate Release"
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      is-prerelease: ${{ steps.check-prerelease.outputs.prerelease }}
+      changelog: ${{ steps.get-changelog.outputs.changelog }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: get-version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Release version: ${VERSION}"
+
+      - name: Check if pre-release
+        id: check-prerelease
+        run: |
+          VERSION="${{ steps.get-version.outputs.version }}"
+          if [[ "$VERSION" =~ (rc|beta|alpha) ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+            echo "This is a pre-release"
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+            echo "This is a stable release"
+          fi
+
+      - name: Get changelog
+        id: get-changelog
+        run: |
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s" HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s" ${LAST_TAG}..HEAD)
+          fi
+
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Validation summary
+        run: |
+          echo "## Stage 1: Release Validation ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ steps.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Pre-release: ${{ steps.check-prerelease.outputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # STAGE 2: BUILD & TEST
+  # ============================================
+  stage-build-frontend:
+    name: "Stage 2: Build Frontend"
+    runs-on: ubuntu-latest
+    needs: [stage-validate-release]
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: true
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ needs.stage-validate-release.outputs.version }}
+          path: dist/
+          retention-days: 90
+
+      - name: Build summary
+        run: |
+          SIZE=$(du -sh dist/ | cut -f1)
+          echo "## Stage 2: Frontend Build Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Build size: ${SIZE}" >> $GITHUB_STEP_SUMMARY
+
+  stage-validate-functions:
+    name: "Stage 2: Validate Supabase Functions"
+    runs-on: ubuntu-latest
+    needs: [stage-validate-release]
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Validate all functions
+        run: |
+          FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
+          ERROR_COUNT=0
+
+          for func in $FUNCTIONS; do
+            if [ -f "supabase/functions/$func/index.ts" ]; then
+              echo "Validating $func..."
+              deno check supabase/functions/$func/index.ts || ERROR_COUNT=$((ERROR_COUNT+1))
+            fi
+          done
+
+          if [ $ERROR_COUNT -gt 0 ]; then
+            echo "❌ Found $ERROR_COUNT error(s)"
+            exit 1
+          fi
+
+      - name: Functions validation summary
+        run: |
+          COUNT=$(ls -d supabase/functions/*/ | wc -l)
+          echo "## Stage 2: Functions Validation Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Functions validated: ${COUNT}" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # STAGE 3: CREATE DEPLOYMENT PACKAGES
+  # ============================================
+  stage-package:
+    name: "Stage 3: Create Deployment Packages"
+    runs-on: ubuntu-latest
+    needs: [stage-validate-release, stage-build-frontend, stage-validate-functions]
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build-${{ needs.stage-validate-release.outputs.version }}
+          path: dist/
+
+      - name: Create cPanel package
+        run: |
+          mkdir -p cpanel-package
+          cp -r dist/* cpanel-package/
+
+          # Copy essential files
+          [ -f .htaccess ] && cp .htaccess cpanel-package/
+          [ -f public/robots.txt ] && cp public/robots.txt cpanel-package/
+
+          cd cpanel-package
+          zip -r ../civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip .
+          cd ..
+
+          sha256sum civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip > \
+            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256
+
+      - name: Upload deployment package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package-${{ needs.stage-validate-release.outputs.version }}
+          path: |
+            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip
+            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256
+          retention-days: 365
+
+      - name: Package summary
+        run: |
+          SIZE=$(du -h civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip | cut -f1)
+          echo "## Stage 3: Package Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Package size: ${SIZE}" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # STAGE 4: DEPLOY SUPABASE FUNCTIONS
+  # ============================================
+  stage-deploy-functions:
+    name: "Stage 4: Deploy Supabase Functions"
+    runs-on: ubuntu-latest
+    needs: [stage-validate-release, stage-package]
+    if: success() && needs.stage-validate-release.outputs.is-prerelease == 'false'
+    environment:
+      name: supabase-production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Link Supabase project
+        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy all functions
+        run: |
+          FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
+          SUCCESS=0
+          FAILED=0
+
+          for func in $FUNCTIONS; do
+            echo "Deploying $func..."
+            if supabase functions deploy $func --no-verify-jwt; then
+              SUCCESS=$((SUCCESS+1))
+            else
+              FAILED=$((FAILED+1))
+            fi
+          done
+
+          echo "Deployment complete: $SUCCESS succeeded, $FAILED failed"
+          [ $FAILED -eq 0 ] || exit 1
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Functions deployment summary
+        run: |
+          echo "## Stage 4: Functions Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- All functions deployed successfully" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # STAGE 5: CREATE GITHUB RELEASE
+  # ============================================
+  stage-create-release:
+    name: "Stage 5: Create GitHub Release"
+    runs-on: ubuntu-latest
+    needs: [stage-validate-release, stage-package, stage-deploy-functions]
+    if: success()
+    environment:
+      name: github-release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download deployment package
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-package-${{ needs.stage-validate-release.outputs.version }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ needs.stage-validate-release.outputs.version }}
+          tag_name: ${{ needs.stage-validate-release.outputs.version }}
+          prerelease: ${{ needs.stage-validate-release.outputs.is-prerelease }}
+          generate_release_notes: true
+          body: |
+            # 🚀 Release ${{ needs.stage-validate-release.outputs.version }}
+
+            ## 📦 Deployment Package
+
+            This release includes the complete cPanel deployment package.
+
+            ### Installation Instructions
+
+            1. Download `civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip`
+            2. Verify integrity: `sha256sum -c civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256`
+            3. Upload to cPanel File Manager
+            4. Extract to `public_html/` or your domain root
+            5. Verify `.htaccess` is present
+            6. Test the deployment
+
+            ## 📝 Changes
+
+            ${{ needs.stage-validate-release.outputs.changelog }}
+
+            ## 🔧 Technical Details
+
+            - **Node Version:** ${{ env.NODE_VERSION }}
+            - **Build Date:** ${{ github.event.head_commit.timestamp }}
+            - **Commit:** ${{ github.sha }}
+            - **Released by:** ${{ github.actor }}
+
+            ---
+
+            🤖 Generated with [Claude Code](https://claude.com/claude-code)
+          files: |
+            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip
+            civeni-saas-cpanel-${{ needs.stage-validate-release.outputs.version }}.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release summary
+        run: |
+          echo "## Stage 5: GitHub Release Created ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Pre-release: ${{ needs.stage-validate-release.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # FINAL: RELEASE COMPLETE
+  # ============================================
+  release-complete:
+    name: "Release Complete"
+    runs-on: ubuntu-latest
+    needs:
+      - stage-validate-release
+      - stage-build-frontend
+      - stage-validate-functions
+      - stage-package
+      - stage-deploy-functions
+      - stage-create-release
+    if: always()
+
+    steps:
+      - name: Release pipeline summary
+        run: |
+          echo "# 🎉 Release Pipeline Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Pipeline Stages" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 1. Validate Release | ${{ needs.stage-validate-release.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2. Build Frontend | ${{ needs.stage-build-frontend.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2. Validate Functions | ${{ needs.stage-validate-functions.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3. Package | ${{ needs.stage-package.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 4. Deploy Functions | ${{ needs.stage-deploy-functions.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 5. Create Release | ${{ needs.stage-create-release.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Release Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ needs.stage-validate-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pre-release:** ${{ needs.stage-validate-release.outputs.is-prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Released by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: |
+          needs.stage-validate-release.result == 'failure' ||
+          needs.stage-build-frontend.result == 'failure' ||
+          needs.stage-validate-functions.result == 'failure' ||
+          needs.stage-package.result == 'failure' ||
+          needs.stage-deploy-functions.result == 'failure' ||
+          needs.stage-create-release.result == 'failure'
+        run: |
+          echo "❌ Release pipeline failed!" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the failed stages above" >> $GITHUB_STEP_SUMMARY
+          exit 1
