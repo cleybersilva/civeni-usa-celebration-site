@@ -462,33 +462,31 @@ const UsersManager = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 pt-2 border-t">
-                      {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditUser(adminUser)}
-                            className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                          >
-                            <Edit className="w-4 h-4 mr-1" />
-                            Editar
-                          </Button>
-                          {canDeleteUsers && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
-                              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Excluir
-                            </Button>
-                          )}
-                        </>
+                      {canManageUsers && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditUser(adminUser)}
+                          className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Editar
+                        </Button>
+                      )}
+                      {adminUser.email !== 'cleyber.silva@live.com' && canDeleteUsers && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                          className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Excluir
+                        </Button>
                       )}
                       {adminUser.email === 'cleyber.silva@live.com' && (
                         <Badge variant="outline" className="text-xs">
-                          Protegido
+                          Protegido (exclusão)
                         </Badge>
                       )}
                     </div>
@@ -529,27 +527,25 @@ const UsersManager = () => {
                         </td>
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            {adminUser.email !== 'cleyber.silva@live.com' && canManageUsers && (
-                              <>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleEditUser(adminUser)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                {canDeleteUsers && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                )}
-                              </>
+                            {canManageUsers && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditUser(adminUser)}
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            )}
+                            {adminUser.email !== 'cleyber.silva@live.com' && canDeleteUsers && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteUser(adminUser.user_id, adminUser.email)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             )}
                             {adminUser.email === 'cleyber.silva@live.com' && (
                               <Badge variant="outline" className="text-xs">
