@@ -33,6 +33,14 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data, loading }) => 
   };
 
   const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    // Garantir que a data seja interpretada como horário local, não UTC
+    const parts = dateStr.split('T')[0].split('-');
+    if (parts.length === 3) {
+      const day = parts[2];
+      const month = parts[1];
+      return `${day}/${month}`;
+    }
     const date = new Date(dateStr);
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   };
