@@ -67,63 +67,34 @@ const AdminDashboard = () => {
     refresh 
   } = useStripeDashboard(filters);
 
-  // Função reutilizável para buscar timeseries
+  // Função reutilizável para buscar timeseries usando edge function (sem RLS)
   const fetchAllTimeseries = useCallback(async () => {
     setLoadingAllTimeseries(true);
     try {
-      const { data, error } = await supabase
-        .from('stripe_charges')
-        .select('created_utc, amount, fee_amount, net_amount')
-        .eq('currency', 'BRL')
-        .eq('status', 'succeeded')
-        .eq('paid', true)
-        .order('created_utc', { ascending: false });
+      // Usar edge function para evitar problemas de RLS
+      const { data, error } = await supabase.functions.invoke('finance-timeseries', {
+        method: 'GET'
+      });
 
       if (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao buscar timeseries:', error);
         setAllTimeseriesData([]);
         return;
       }
 
-      if (!data || data.length === 0) {
+      if (!data || !data.data || data.data.length === 0) {
         setAllTimeseriesData([]);
         return;
       }
 
-      // Agrupar por dia - converter UTC para Brasil (America/Fortaleza = UTC-3)
-      const groupedByDay = new Map<string, any>();
-      
-      data.forEach(charge => {
-        const utcDate = new Date(charge.created_utc);
-        const brasilDate = new Date(utcDate.getTime() - (3 * 60 * 60 * 1000));
-        const year = brasilDate.getUTCFullYear();
-        const month = String(brasilDate.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(brasilDate.getUTCDate()).padStart(2, '0');
-        const dayKey = `${year}-${month}-${day}`;
-        
-        if (!groupedByDay.has(dayKey)) {
-          groupedByDay.set(dayKey, {
-            dia: dayKey,
-            receita_bruta: 0,
-            receita_liquida: 0,
-            taxas: 0,
-            transacoes: 0
-          });
-        }
-        
-        const bucket = groupedByDay.get(dayKey)!;
-        const amount = charge.amount / 100;
-        const fee = (charge.fee_amount || 0) / 100;
-        const net = (charge.net_amount || (charge.amount - (charge.fee_amount || 0))) / 100;
-        
-        bucket.receita_bruta += amount;
-        bucket.taxas += fee;
-        bucket.receita_liquida += net;
-        bucket.transacoes += 1;
-      });
-      
-      const timeseriesData = Array.from(groupedByDay.values())
-        .sort((a, b) => b.dia.localeCompare(a.dia));
+      // Converter formato da edge function para o formato esperado pelo componente
+      const timeseriesData = data.data.map((item: any) => ({
+        dia: item.dia,
+        receita_bruta: item.receita_bruta,
+        receita_liquida: item.receita_liquida,
+        taxas: item.taxas,
+        transacoes: item.transacoes
+      })).sort((a: any, b: any) => b.dia.localeCompare(a.dia));
       
       setAllTimeseriesData(timeseriesData);
     } catch (err) {
