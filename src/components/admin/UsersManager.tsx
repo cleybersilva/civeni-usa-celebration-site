@@ -74,18 +74,24 @@ const UsersManager = () => {
       }
 
       // Usar edge function para listar usuários (bypass RLS)
-      const { data, error } = await supabase.functions.invoke('list-admin-users');
+      const response = await supabase.functions.invoke('list-admin-users');
+      
+      console.log('Edge function response:', response);
 
-      if (error) {
-        console.error('Edge function error:', error);
-        setError('Erro ao carregar usuários: ' + error.message);
+      if (response.error) {
+        console.error('Edge function error:', response.error);
+        setError('Erro ao carregar usuários: ' + (response.error.message || 'Erro desconhecido'));
         return;
       }
 
-      if (data) {
-        console.log('Users loaded:', data.length);
-        setUsers(data);
+      // A resposta pode estar em response.data ou diretamente no objeto
+      const usersData = response.data;
+      
+      if (usersData && Array.isArray(usersData)) {
+        console.log('Users loaded:', usersData.length);
+        setUsers(usersData);
       } else {
+        console.warn('Unexpected response format:', usersData);
         setUsers([]);
       }
       
