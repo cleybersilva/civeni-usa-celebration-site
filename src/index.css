@@ -1012,15 +1012,16 @@
    DESKTOP - Sidebar texto completo (sem truncar)
    ============================================ */
 @media (min-width: 1025px) {
-  /* Sidebar - texto visível por completo no desktop */
+  /* Sidebar - texto visível por completo no desktop, uma linha só */
   .civeni-admin [data-sidebar="sidebar"] [data-sidebar="menu-button"] span {
     overflow: visible !important;
     text-overflow: clip !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
   }
   
-  /* Garantir largura suficiente para o sidebar */
+  /* Garantir largura suficiente para o sidebar - mais largo */
   .civeni-admin [data-sidebar="sidebar"] {
-    min-width: 240px !important;
+    min-width: 280px !important;
+    width: 280px !important;
   }
 }
