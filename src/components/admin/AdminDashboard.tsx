@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText } from 'lucide-react';
+import { RefreshCw, TrendingUp, CreditCard, DollarSign, Users, AlertTriangle, Download, Database, Trash2, FileText, Wallet } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StripeFilters } from './stripe/StripeFilters';
 import { RevenueChart } from './stripe/RevenueChart';
@@ -1045,92 +1045,117 @@ const AdminDashboard = () => {
       />
 
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-l-4 border-l-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {/* Card Receita Bruta - NOVO */}
+        <Card className="border-l-4 border-l-cyan-500 bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-950/20 dark:to-sky-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Receita Líquida</CardTitle>
-            <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Receita Bruta</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+              <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-600 dark:text-cyan-400" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-xl sm:text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+              {formatCurrency(summary?.bruto || 0)}
+            </div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              Total de vendas antes das taxas
+            </p>
+            <p className="text-[10px] sm:text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-1">
+              {summary?.pagos || 0} {(summary?.pagos || 0) === 1 ? 'pagamento' : 'pagamentos'} confirmados
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Card Receita Líquida */}
+        <Card className="border-l-4 border-l-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Receita Líquida</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
               {formatCurrency(summary?.liquido || 0)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
               Bruto: {formatCurrency(summary?.bruto || 0)}
             </p>
-            <p className="text-xs text-red-500 dark:text-red-400">
+            <p className="text-[10px] sm:text-xs text-red-500 dark:text-red-400">
               Taxas: -{formatCurrency(summary?.taxas || 0)}
             </p>
             {!summary && (
-              <p className="text-xs text-muted-foreground mt-2 italic">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-2 italic">
                 Aguardando dados do Stripe...
               </p>
             )}
           </CardContent>
         </Card>
 
+        {/* Card Inscrições Pagas */}
         <Card className="border-l-4 border-l-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Inscrições Pagas</CardTitle>
-            <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-              <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Inscrições Pagas</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summary?.pagos || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{summary?.pagos || 0}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               Não pagas: {summary?.naoPagos || 0}
             </p>
-            <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+            <p className="text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-medium">
               Conversão: {summary?.taxaConversao || '0.00'}%
             </p>
             {summary && summary.pagos === 0 && (
-              <p className="text-xs text-muted-foreground mt-2 italic">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-2 italic">
                 Nenhum pagamento confirmado ainda
               </p>
             )}
           </CardContent>
         </Card>
 
+        {/* Card Ticket Médio */}
         <Card className="border-l-4 border-l-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Ticket Médio</CardTitle>
-            <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Ticket Médio</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary?.ticketMedio || 0)}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{formatCurrency(summary?.ticketMedio || 0)}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               Por transação confirmada
             </p>
             {summary && summary.pagos > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 Baseado em {summary.pagos} {summary.pagos === 1 ? 'transação' : 'transações'}
               </p>
             )}
           </CardContent>
         </Card>
 
+        {/* Card Alertas & Disputas */}
         <Card className="border-l-4 border-l-orange-500 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Alertas & Disputas</CardTitle>
-            <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            <CardTitle className="text-xs sm:text-sm font-medium">Alertas & Disputas</CardTitle>
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 dark:text-orange-400" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{summary?.disputas || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{summary?.disputas || 0}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               Reembolsos: {summary?.reembolsos || 0}
             </p>
-            <p className="text-xs text-red-500 dark:text-red-400">
+            <p className="text-[10px] sm:text-xs text-red-500 dark:text-red-400">
               Falhas: {summary?.falhas || 0}
             </p>
             {summary && (summary.disputas > 0 || summary.falhas > 0) && (
-              <p className="text-xs text-orange-500 dark:text-orange-400 mt-1 font-medium">
+              <p className="text-[10px] sm:text-xs text-orange-500 dark:text-orange-400 mt-1 font-medium">
                 ⚠️ Requer atenção
               </p>
             )}
