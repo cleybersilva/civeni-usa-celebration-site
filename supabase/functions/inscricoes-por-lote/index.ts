@@ -105,9 +105,9 @@ serve(async (req) => {
     // Calcular diferença entre Stripe e event_registrations
     const totalStripe = stripeCharges?.length || 0;
     const totalRegistrations = registrations?.length || 0;
-    const diferenca = totalStripe - totalRegistrations;
+    const stripeVsRegDiff = totalStripe - totalRegistrations;
 
-    console.log(`📊 Stripe: ${totalStripe}, Registrations: ${totalRegistrations}, Diferença: ${diferenca}`);
+    console.log(`📊 Stripe: ${totalStripe}, Registrations: ${totalRegistrations}, Diferença: ${stripeVsRegDiff}`);
 
     // Se há diferença, tentar distribuir pelos lotes baseado na data dos pagamentos Stripe
     if (diferenca > 0 && stripeCharges) {
