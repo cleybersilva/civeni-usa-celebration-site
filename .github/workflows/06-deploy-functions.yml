@@ -23,9 +23,12 @@ jobs:
 
       - name: Deploy functions
         run: |
-          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+          PROJECT_REF=$(grep 'project_id' supabase/config.toml | head -1 | cut -d'"' -f2)
+          echo "Conectando ao projeto Supabase: $PROJECT_REF"
+          supabase link --project-ref "$PROJECT_REF"
           FUNCTIONS=$(ls -d supabase/functions/*/ | xargs -n 1 basename)
           for func in $FUNCTIONS; do
+            echo "Implantando função: $func"
             supabase functions deploy $func --no-verify-jwt
           done
         env:
