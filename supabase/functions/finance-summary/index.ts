@@ -102,14 +102,32 @@ serve(async (req) => {
     
     disputasTotal = disputes?.length || 0;
 
-    // Buscar próximo payout
-    const { data: nextPayout } = await supabaseClient
+    // Buscar próximo payout (in_transit ou pending)
+    let nextPayout = null;
+    const { data: transitPayout } = await supabaseClient
       .from('stripe_payouts')
-      .select('arrival_date_utc, amount, currency')
-      .eq('status', 'in_transit')
+      .select('arrival_date_utc, amount, currency, status')
+      .in('status', ['in_transit', 'pending'])
       .order('arrival_date_utc', { ascending: true })
       .limit(1)
       .maybeSingle();
+    
+    if (transitPayout) {
+      nextPayout = transitPayout;
+    } else {
+      // Se não há payouts pendentes, buscar o último payout realizado
+      const { data: lastPaidPayout } = await supabaseClient
+        .from('stripe_payouts')
+        .select('arrival_date_utc, amount, currency, status')
+        .eq('status', 'paid')
+        .order('arrival_date_utc', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (lastPaidPayout) {
+        nextPayout = { ...lastPaidPayout, isLastPaid: true };
+      }
+    }
 
     const ticketMedio = pagos > 0 ? bruto / pagos : 0;
     const taxaConversao = (pagos + naoPagos) > 0 ? (pagos / (pagos + naoPagos)) * 100 : 0;
@@ -128,7 +146,9 @@ serve(async (req) => {
       proximoPayout: nextPayout ? {
         data: nextPayout.arrival_date_utc,
         valor: nextPayout.amount / 100,
-        moeda: nextPayout.currency
+        moeda: nextPayout.currency,
+        status: nextPayout.status,
+        isLastPaid: nextPayout.isLastPaid || false
       } : null,
       currency,
       periodo: { from, to }
