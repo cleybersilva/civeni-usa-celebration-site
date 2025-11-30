@@ -127,27 +127,32 @@ const UsersManager = () => {
     }
 
     try {
-      const { data, error } = await (supabase as any).rpc('create_admin_user_secure', {
-        user_email: formData.email,
-        user_password: formData.password,
-        user_type: formData.user_type,
-        admin_email: user?.email,
-        session_token: sessionToken
+      // Usar edge function para criar usuário
+      const response = await supabase.functions.invoke('create-admin-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
+          user_type: formData.user_type
+        }
       });
 
-      if (error) throw error;
+      console.log('Create user response:', response);
 
-      const result = data as any;
-      if (result.success) {
-        setSuccess(result.message);
+      if (response.error) {
+        throw new Error(response.error.message || 'Erro ao criar usuário');
+      }
+
+      const result = response.data;
+      if (result?.success) {
+        setSuccess(result.message || 'Usuário criado com sucesso');
         setFormData({ email: '', password: '', confirmPassword: '', user_type: 'viewer' });
         setIsDialogOpen(false);
         fetchUsers();
       } else {
-        setError(result.error);
+        setError(result?.error || 'Erro ao criar usuário');
       }
-    } catch (error) {
-      setError('Erro ao criar usuário');
+    } catch (error: any) {
+      setError(error.message || 'Erro ao criar usuário');
       console.error('Error creating user:', error);
     }
   };
