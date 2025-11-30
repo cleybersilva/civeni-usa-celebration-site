@@ -1038,6 +1038,11 @@ const AdminDashboard = () => {
             <p className="text-[10px] sm:text-xs text-red-500 dark:text-red-400">
               Taxas: -{formatCurrency(summary?.taxas || 0)}
             </p>
+            {(summary?.reembolsosValor ?? 0) > 0 && (
+              <p className="text-[10px] sm:text-xs text-orange-500 dark:text-orange-400">
+                Reembolsos: -{formatCurrency(summary?.reembolsosValor || 0)}
+              </p>
+            )}
             {!summary && (
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-2 italic">
                 Aguardando dados do Stripe...
@@ -1123,7 +1128,7 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{summary?.disputas || 0}</div>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Reembolsos: {summary?.reembolsos || 0}
+              Reembolsos: {summary?.reembolsos || 0} ({formatCurrency(summary?.reembolsosValor || 0)})
             </p>
             <p className="text-[10px] sm:text-xs text-red-500 dark:text-red-400">
               Falhas: {summary?.falhas || 0}

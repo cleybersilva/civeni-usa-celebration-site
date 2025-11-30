@@ -10,6 +10,7 @@ interface StripeSummary {
   naoPagos: number;
   falhas: number;
   reembolsos: number;
+  reembolsosValor: number;
   disputas: number;
   ticketMedio: number;
   taxaConversao: string;
