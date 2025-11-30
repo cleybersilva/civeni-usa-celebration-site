@@ -75,7 +75,7 @@ serve(async (req) => {
     let disputasTotal = 0;
 
     filteredCharges.forEach(charge => {
-      const bt = charge.stripe_balance_transactions;
+      const bt = charge.stripe_balance_transactions?.[0];
       const amount = charge.amount || 0;
       const fee = bt?.fee || charge.fee_amount || 0;
       const net = bt?.net || charge.net_amount || (amount - fee);

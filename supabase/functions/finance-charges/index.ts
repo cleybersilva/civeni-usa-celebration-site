@@ -102,7 +102,7 @@ serve(async (req) => {
 
     // Formatar dados
     const formatted = charges.map(charge => {
-      const bt = charge.stripe_balance_transactions;
+      const bt = charge.stripe_balance_transactions?.[0];
       const pi = charge.stripe_payment_intents;
       const customer = charge.stripe_customers;
       

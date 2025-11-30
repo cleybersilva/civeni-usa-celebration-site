@@ -79,7 +79,7 @@ serve(async (req) => {
         }
         
         const bucket = hourlyMap.get(hourKey);
-        const bt = charge.stripe_balance_transactions;
+        const bt = charge.stripe_balance_transactions?.[0];
         const fee = bt?.fee || charge.fee_amount || 0;
         const net = bt?.net || charge.net_amount || (charge.amount - fee);
         
