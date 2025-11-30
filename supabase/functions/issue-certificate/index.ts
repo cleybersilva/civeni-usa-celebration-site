@@ -385,7 +385,6 @@ const createCertificatePdf = async (
       width: 140,
       height: 25,
       color: rgb(badgeBg.r, badgeBg.g, badgeBg.b),
-      borderRadius: 12,
     });
     
     // Texto do badge
