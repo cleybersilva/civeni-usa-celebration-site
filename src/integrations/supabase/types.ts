@@ -4706,6 +4706,14 @@ export type Database = {
         }
         Returns: Json
       }
+      create_admin_user_with_crypt: {
+        Args: {
+          p_email: string
+          p_password: string
+          p_user_type: Database["public"]["Enums"]["admin_user_type"]
+        }
+        Returns: Json
+      }
       create_event_category_secure: {
         Args: { category: Json; session_token: string; user_email: string }
         Returns: Json
