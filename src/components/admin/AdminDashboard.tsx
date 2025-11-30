@@ -1152,8 +1152,23 @@ const AdminDashboard = () => {
                   {summary.proximoPayout.isLastPaid ? '✅ Último Payout Realizado' : '🔄 Próximo Payout'}
                 </p>
                 <p className={`text-3xl font-bold ${summary.proximoPayout.isLastPaid ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'} mt-1`}>
-                  {formatCurrency(summary.proximoPayout.valor)}
+                  {formatCurrency(summary.proximoPayout.valorTotal || 0)}
                 </p>
+                {/* Mostrar quantidade e detalhes dos payouts */}
+                {summary.proximoPayout.quantidade > 1 && (
+                  <div className="mt-2 space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      {summary.proximoPayout.quantidade} pagamentos na data:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {summary.proximoPayout.payouts?.map((p: any, idx: number) => (
+                        <span key={idx} className="text-xs bg-white/50 dark:bg-black/20 px-2 py-1 rounded">
+                          {formatCurrency(p.valor)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {/* Aviso se dados parecem desatualizados */}
                 {new Date(summary.proximoPayout.data) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
                   <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1">
@@ -1168,6 +1183,11 @@ const AdminDashboard = () => {
                 <p className={`text-xl font-bold ${summary.proximoPayout.isLastPaid ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400'} mt-1`}>
                   {new Date(summary.proximoPayout.data).toLocaleDateString('pt-BR')}
                 </p>
+                {summary.proximoPayout.quantidade > 1 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {summary.proximoPayout.quantidade} transferências
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
