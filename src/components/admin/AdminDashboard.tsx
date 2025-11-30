@@ -444,91 +444,183 @@ const AdminDashboard = () => {
   const handleExportAnalysisPDF = () => {
     try {
       const doc = new jsPDF();
-      let yPos = 20;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       
-      // Header
-      doc.setFontSize(18);
-      doc.setTextColor(219, 39, 119);
-      doc.text('Relatorio de Analises Avancadas - CIVENI 2025', 105, yPos, { align: 'center' });
-      yPos += 10;
+      // Helper function to draw gradient header
+      const drawHeader = (doc: jsPDF) => {
+        // Draw gradient-like header with multiple colored rectangles
+        const headerHeight = 35;
+        const gradientSteps = 50;
+        const stepWidth = pageWidth / gradientSteps;
+        
+        for (let i = 0; i < gradientSteps; i++) {
+          const progress = i / gradientSteps;
+          // Gradient from civeni-blue (#021b3a) through civeni-red (#c51d3b) to civeni-blue
+          let r, g, b;
+          if (progress < 0.5) {
+            const p = progress * 2;
+            r = Math.round(2 + (197 - 2) * p);
+            g = Math.round(27 + (29 - 27) * p);
+            b = Math.round(58 + (59 - 58) * p);
+          } else {
+            const p = (progress - 0.5) * 2;
+            r = Math.round(197 + (2 - 197) * p);
+            g = Math.round(29 + (27 - 29) * p);
+            b = Math.round(59 + (58 - 59) * p);
+          }
+          doc.setFillColor(r, g, b);
+          doc.rect(i * stepWidth, 0, stepWidth + 1, headerHeight, 'F');
+        }
+        
+        // Add title in header
+        doc.setFontSize(18);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.text('III CIVENI 2025 – ANÁLISES FINANCEIRAS', pageWidth / 2, 15, { align: 'center' });
+        
+        // Add subtitle
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Dashboard Financeiro Stripe - Relatório Completo', pageWidth / 2, 23, { align: 'center' });
+        
+        // Add period info
+        doc.setFontSize(9);
+        let periodo = '';
+        if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
+          periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
+        } else if (filters.range === 'all') {
+          periodo = 'Todos os períodos';
+        } else {
+          const days = parseInt(filters.range) || 30;
+          periodo = `Últimos ${days} dias`;
+        }
+        doc.text(`*Período: ${periodo} | Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, 30, { align: 'center' });
+      };
       
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      let periodo = '';
-      if (filters.range === 'custom' && filters.customFrom && filters.customTo) {
-        periodo = `${filters.customFrom.toLocaleDateString('pt-BR')} a ${filters.customTo.toLocaleDateString('pt-BR')}`;
-      } else {
-        const days = parseInt(filters.range) || 30;
-        periodo = `Ultimos ${days} dias`;
-      }
-      doc.text(`Periodo: ${periodo} | Data de Geracao: ${new Date().toLocaleString('pt-BR')}`, 105, yPos, { align: 'center' });
-      yPos += 15;
+      // Helper function to draw gradient footer
+      const drawFooter = (doc: jsPDF, pageNum: number, totalPages: number) => {
+        const footerHeight = 20;
+        const footerY = pageHeight - footerHeight;
+        const gradientSteps = 50;
+        const stepWidth = pageWidth / gradientSteps;
+        
+        for (let i = 0; i < gradientSteps; i++) {
+          const progress = i / gradientSteps;
+          let r, g, b;
+          if (progress < 0.5) {
+            const p = progress * 2;
+            r = Math.round(2 + (197 - 2) * p);
+            g = Math.round(27 + (29 - 27) * p);
+            b = Math.round(58 + (59 - 58) * p);
+          } else {
+            const p = (progress - 0.5) * 2;
+            r = Math.round(197 + (2 - 197) * p);
+            g = Math.round(29 + (27 - 29) * p);
+            b = Math.round(59 + (58 - 59) * p);
+          }
+          doc.setFillColor(r, g, b);
+          doc.rect(i * stepWidth, footerY, stepWidth + 1, footerHeight, 'F');
+        }
+        
+        doc.setFontSize(8);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'normal');
+        doc.text('III CIVENI 2025 – Congresso Internacional Virtual de Educação e Inovação', pageWidth / 2, footerY + 8, { align: 'center' });
+        doc.text(`Relatório financeiro gerado automaticamente – Página ${pageNum} de ${totalPages}`, pageWidth / 2, footerY + 14, { align: 'center' });
+      };
       
-      // Resumo Executivo - Cards
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Resumo Executivo', 14, yPos);
-      yPos += 8;
+      // Draw header on first page
+      drawHeader(doc);
+      
+      let yPos = 45;
+      
+      // Resumo Executivo Section with styled header
+      doc.setFillColor(2, 27, 58); // civeni-blue
+      doc.rect(14, yPos, pageWidth - 28, 8, 'F');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('RESUMO EXECUTIVO', 17, yPos + 5.5);
+      yPos += 12;
       
       const resumoData = [
-        ['Taxa de Conversao', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
-        ['Ticket Medio', formatCurrency(summary?.ticketMedio || 0), 'Por transacao paga'],
-        ['Receita Total', formatCurrency(summary?.liquido || 0), 'Liquido apos taxas'],
+        ['Taxa de Conversão', `${summary?.taxaConversao ? Number(summary.taxaConversao).toFixed(1) : '0'}%`, `${summary?.pagos || 0} pagos de ${(summary?.pagos || 0) + (summary?.naoPagos || 0)} total`],
+        ['Ticket Médio', formatCurrency(summary?.ticketMedio || 0), 'Por transação paga'],
+        ['Receita Líquida', formatCurrency(summary?.liquido || 0), 'Líquido após taxas'],
         ['Receita Bruta', formatCurrency(summary?.bruto || 0), 'Total antes das taxas'],
         ['Taxas Stripe', formatCurrency(summary?.taxas || 0), 'Total de taxas cobradas'],
       ];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Metrica', 'Valor', 'Descricao']],
+        head: [['Métrica', 'Valor', 'Descrição']],
         body: resumoData,
-        theme: 'grid',
-        headStyles: { fillColor: [219, 39, 119] },
+        theme: 'striped',
+        headStyles: { fillColor: [115, 27, 76], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [245, 245, 250] },
+        styles: { fontSize: 9, cellPadding: 3 },
+        margin: { left: 14, right: 14 },
       });
       
       yPos = (doc as any).lastAutoTable.finalY + 10;
       
-      // Análise por Bandeira
-      doc.setFontSize(14);
-      doc.text('Analise por Bandeira de Cartao', 14, yPos);
-      yPos += 8;
+      // Análise por Bandeira Section
+      doc.setFillColor(2, 27, 58);
+      doc.rect(14, yPos, pageWidth - 28, 8, 'F');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ANÁLISE POR BANDEIRA DE CARTÃO', 17, yPos + 5.5);
+      yPos += 12;
       
       const bandeiraData = byBrand && byBrand.length > 0 
         ? byBrand.map(brand => {
             const percentage = summary?.bruto && summary.bruto > 0 
               ? (((brand.receita_bruta || 0) / summary.bruto) * 100).toFixed(1)
               : '0';
+            // Map brand names
+            let brandName = brand.bandeira || 'Não especificado';
+            if (brandName === 'unknown') brandName = 'Boleto';
             return [
-              `${brand.bandeira || 'Nao especificado'} ${brand.funding ? `(${brand.funding})` : ''}`,
+              `${brandName} ${brand.funding ? `(${brand.funding})` : ''}`,
               `${brand.qtd || 0}`,
               formatCurrency(brand.receita_liquida || 0),
               formatCurrency(brand.receita_bruta || 0),
               `${percentage}%`
             ];
           })
-        : [['Nenhum dado disponivel', '', '', '', '']];
+        : [['Nenhum dado disponível', '', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Bandeira', 'Qtd', 'Receita Liquida', 'Receita Bruta', '% do Total']],
+        head: [['Bandeira', 'Qtd', 'Receita Líquida', 'Receita Bruta', '% do Total']],
         body: bandeiraData,
         theme: 'striped',
-        headStyles: { fillColor: [99, 102, 241] },
+        headStyles: { fillColor: [197, 29, 59], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [255, 245, 248] },
+        styles: { fontSize: 9, cellPadding: 3 },
+        margin: { left: 14, right: 14 },
       });
       
       yPos = (doc as any).lastAutoTable.finalY + 10;
       
-      // Tendências Temporais - Usar todos os dados históricos disponíveis
-      if (yPos > 250) {
+      // Check if we need a new page for tendências
+      if (yPos > 200) {
         doc.addPage();
-        yPos = 20;
+        drawHeader(doc);
+        yPos = 45;
       }
       
-      doc.setFontSize(14);
-      doc.text('Tendencias Temporais - Historico Completo', 14, yPos);
-      yPos += 8;
+      // Tendências Temporais Section
+      doc.setFillColor(2, 27, 58);
+      doc.rect(14, yPos, pageWidth - 28, 8, 'F');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TENDÊNCIAS TEMPORAIS - HISTÓRICO COMPLETO', 17, yPos + 5.5);
+      yPos += 12;
       
-      // Usar os dados de timeseries ou allTimeseriesData, o que tiver dados
       const dataParaTendencias = (allTimeseriesData && allTimeseriesData.length > 0) 
         ? allTimeseriesData 
         : (timeseries && timeseries.length > 0) 
@@ -548,22 +640,36 @@ const AdminDashboard = () => {
               formatCurrency(ticketMedio)
             ];
           })
-        : [['Nenhum dado temporal disponivel', '', '', '']];
+        : [['Nenhum dado temporal disponível', '', '', '']];
       
       autoTable(doc, {
         startY: yPos,
-        head: [['Data', 'Receita', 'Transacoes', 'Ticket Medio']],
+        head: [['Data', 'Receita', 'Transações', 'Ticket Médio']],
         body: tendenciasData,
         theme: 'striped',
-        headStyles: { fillColor: [16, 185, 129] },
+        headStyles: { fillColor: [16, 185, 129], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [240, 253, 244] },
+        styles: { fontSize: 9, cellPadding: 3 },
+        margin: { left: 14, right: 14 },
+        didDrawPage: () => {
+          // Redraw header on new pages created by autoTable
+          drawHeader(doc);
+        },
       });
+      
+      // Add footers to all pages
+      const totalPages = doc.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        drawFooter(doc, i, totalPages);
+      }
       
       // Save PDF
       doc.save(`analise-avancada-civeni-${new Date().toISOString().split('T')[0]}.pdf`);
       
       toast({
         title: "PDF exportado com sucesso!",
-        description: "O relatorio de analises foi gerado com sucesso.",
+        description: "O relatório de análises foi gerado com sucesso.",
       });
     } catch (error) {
       console.error('Erro ao exportar PDF:', error);
