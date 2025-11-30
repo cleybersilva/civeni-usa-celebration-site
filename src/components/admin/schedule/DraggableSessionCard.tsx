@@ -45,22 +45,22 @@ export const DraggableSessionCard: React.FC<DraggableSessionCardProps> = ({
       className="p-3 sm:p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-primary/50 hover:border-l-primary animate-fade-in"
     >
       <div className="flex flex-col gap-3">
-        <div className="flex items-start gap-2 sm:gap-3">
+        <div className="flex flex-col items-center gap-2 sm:gap-3">
           <button
-            className="cursor-grab active:cursor-grabbing mt-1 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
             {...attributes}
             {...listeners}
           >
             <GripVertical className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
-          <div className="flex-1 min-w-0 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+          <div className="flex-1 min-w-0 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
               <span className="font-mono text-xs sm:text-sm">
                 {formatTime(session.start_at)}
                 {session.end_at && ` - ${formatTime(session.end_at)}`}
               </span>
             </div>
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 mb-2">
+            <div className="flex flex-wrap items-center justify-center gap-1 mb-2">
               <Badge className={`text-[10px] sm:text-xs ${getSessionTypeColor(session.session_type)}`}>
                 {session.session_type}
               </Badge>
@@ -92,7 +92,7 @@ export const DraggableSessionCard: React.FC<DraggableSessionCardProps> = ({
             )}
           </div>
         </div>
-        <div className="flex gap-2 justify-center sm:justify-end">
+        <div className="flex gap-2 justify-center">
           <Button
             size="sm"
             variant="ghost"
