@@ -179,8 +179,11 @@ serve(async (req) => {
     const totalPayoutsCents = paidPayouts?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
     const totalPayoutsCount = paidPayouts?.length || 0;
 
-    const ticketMedio = pagos > 0 ? bruto / pagos : 0;
-    const taxaConversao = (pagos + naoPagos) > 0 ? (pagos / (pagos + naoPagos)) * 100 : 0;
+    // Calcular pagos líquidos = pagos - reembolsos
+    const pagosLiquidos = pagos - reembolsosTotal;
+    
+    const ticketMedio = pagosLiquidos > 0 ? bruto / pagosLiquidos : 0;
+    const taxaConversao = (pagosLiquidos + naoPagos) > 0 ? (pagosLiquidos / (pagosLiquidos + naoPagos)) * 100 : 0;
 
     // Calcular líquido real = bruto - taxas - reembolsos
     const liquidoReal = liquido - reembolsosValor;
@@ -189,7 +192,8 @@ serve(async (req) => {
       bruto: bruto / 100,
       taxas: taxas / 100,
       liquido: liquidoReal / 100,
-      pagos,
+      pagos: pagosLiquidos, // Agora retorna pagos - reembolsos
+      pagosBrutos: pagos, // Total bruto sem descontar reembolsos
       naoPagos,
       falhas,
       reembolsos: reembolsosTotal,
