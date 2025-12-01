@@ -182,21 +182,21 @@ const CertificadoEmissao = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red">
-      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
-        <div className="grid lg:grid-cols-2 gap-8 items-center max-w-7xl w-full">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid lg:grid-cols-2 gap-8 items-start max-w-7xl mx-auto">
           
-          {/* Coluna Esquerda - Conteúdo Congratulatório */}
-          <div className="text-white space-y-8">
+          {/* Coluna Esquerda - Conteúdo Congratulatório + Certificado */}
+          <div className="text-white space-y-6">
             <div>
-              <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+              <h1 className="text-3xl lg:text-4xl font-bold mb-3">
                 Parabéns por ter chegado ao final do evento!
               </h1>
-              <p className="text-xl text-white/90 mb-8">
+              <p className="text-lg text-white/90 mb-6">
                 Agora é hora de emitir seu certificado!
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
                 <span>Compartilhe no LinkedIn</span>
@@ -219,7 +219,7 @@ const CertificadoEmissao = () => {
             </div>
 
             {/* Preview do Certificado Real */}
-            <div className="mt-12 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+            <div className="mt-8 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
               <CertificatePreview
                 layoutConfig={{
                   background: {
@@ -290,24 +290,13 @@ const CertificadoEmissao = () => {
                   nome_reitor: 'Dra. Maria Silva',
                   nome_coordenador: 'Dr. João Santos'
                 }}
-                scale={0.5}
+                scale={0.7}
               />
             </div>
-               
-               {/* Botão Voltar para a Home */}
-               <div className="mt-8 text-center">
-                 <Button
-                   onClick={() => navigate('/')}
-                   className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white"
-                 >
-                   <ArrowLeft className="h-4 w-4 mr-2" />
-                   Voltar para a Home
-                 </Button>
-               </div>
-             </div>
+          </div>
 
           {/* Coluna Direita - Formulário */}
-          <div className="flex justify-center">
+          <div className="flex justify-center lg:justify-start">
             <Card className="w-full max-w-md bg-white shadow-2xl">
               <CardHeader className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white rounded-t-lg">
                 <div className="flex items-center justify-between">
@@ -455,6 +444,17 @@ const CertificadoEmissao = () => {
               </CardContent>
             </Card>
           </div>
+        </div>
+        
+        {/* Botão Voltar para a Home - Centralizado */}
+        <div className="mt-8 text-center pb-8">
+          <Button
+            onClick={() => navigate('/')}
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white px-8"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar para a Home
+          </Button>
         </div>
       </div>
     </div>
