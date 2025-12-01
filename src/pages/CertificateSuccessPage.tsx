@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Download, Share2, ArrowLeft, Mail } from 'lucide-react';
-import CertificatePreview from '@/components/admin/certificates/CertificatePreview';
 import civeniLogo from '@/assets/civeni-2025-logo.png';
 
 interface LocationState {
@@ -80,21 +79,21 @@ const CertificateSuccessPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-8 items-start max-w-7xl mx-auto">
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
+        <div className="grid lg:grid-cols-2 gap-8 items-center max-w-7xl w-full">
           
-          {/* Coluna Esquerda - Mensagem de sucesso + Certificado */}
-          <div className="text-white space-y-6">
+          {/* Coluna Esquerda - Mensagem de sucesso */}
+          <div className="text-white space-y-8">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-3">
+              <h1 className="text-4xl lg:text-5xl font-bold mb-4">
                 Parabéns por ter chegado ao final do evento!
               </h1>
-              <p className="text-lg text-white/90 mb-6">
+              <p className="text-xl text-white/90 mb-8">
                 Agora é hora de emitir seu certificado!
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
                 <span>Compartilhe no LinkedIn</span>
@@ -116,85 +115,51 @@ const CertificateSuccessPage = () => {
               </div>
             </div>
 
-          {/* Preview do Certificado Real */}
-          <div className="mt-8 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
-            <CertificatePreview
-              layoutConfig={{
-                background: {
-                  type: 'solid',
-                  color: '#ffffff'
-                },
-                border: {
-                  enabled: true,
-                  style: 'single',
-                  thickness: 2,
-                  gradient: {
-                    from: '#021b3a',
-                    to: '#c51d3b'
-                  }
-                },
-                header: {
-                  showLogo: true,
-                  title: 'CERTIFICADO',
-                  titleColor: '#021b3a',
-                  subtitle: 'III CIVENI 2025 – Celebration, Florida/EUA',
-                  subtitleColor: '#666666'
-                },
-                body: {
-                  certifyLabel: 'Certificamos que',
-                  certifyLabelColor: '#c51d3b',
-                  participantNamePlaceholder: '{{nome_participante}}',
-                  participantNameStyle: {
-                    fontSize: 32,
-                    fontWeight: 'bold',
-                    color: '#021b3a'
-                  },
-                  mainText: 'participou do {{nome_evento}}, realizado de {{data_evento}}, com carga horária de {{carga_horaria}}.',
-                  mainTextColor: '#333333',
-                  alignment: 'center'
-                },
-                footer: {
-                  locationDateText: 'Celebration, Florida, {{data_emissao}}',
-                  locationDateColor: '#666666',
-                  signatures: [
-                    {
-                      label: 'Coordenação do Evento',
-                      name: '{{nome_coordenador}}'
-                    },
-                    {
-                      label: 'Direção Acadêmica',
-                      name: '{{nome_reitor}}'
-                    }
-                  ]
-                },
-                badge: {
-                  enabled: false,
-                  position: 'top-right',
-                  text: '',
-                  backgroundGradient: {
-                    from: '#021b3a',
-                    to: '#c51d3b'
-                  },
-                  textColor: '#ffffff'
-                }
-              }}
-              sampleData={{
-                nome_participante: state.fullName || '[SEU NOME AQUI]',
-                tipo_participacao: 'Participante',
-                nome_evento: 'III CIVENI 2025',
-                data_evento: '11 a 13 de dezembro de 2025',
-                carga_horaria: '20 horas',
-                data_emissao: '14 de dezembro de 2025',
-                nome_reitor: 'Dra. Maria Silva',
-                nome_coordenador: 'Dr. João Santos'
-              }}
-              scale={0.7}
-            />
-          </div>
+            {/* Mock do Certificado */}
+            <div className="mt-12">
+              <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md mx-auto transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+                <div className="text-center">
+                  <img 
+                    src={civeniLogo} 
+                    alt="CIVENI 2025" 
+                    className="w-16 h-auto mx-auto mb-2"
+                  />
+                  <div className="text-civeni-blue font-bold text-lg mb-2">CIVENI 2025</div>
+                  <div className="text-sm text-gray-600 mb-4">CERTIFICADO DE PARTICIPAÇÃO</div>
+                  <div className="text-xs text-gray-500 mb-6">VCCU/Civeni</div>
+                  
+                  <div className="border-t border-b border-gray-200 py-4 mb-4">
+                    <div className="text-xs text-gray-600 mb-1">Certificamos que</div>
+                    <div className="font-bold text-gray-800">{state.fullName || '[SEU NOME]'}</div>
+                    <div className="text-xs text-gray-600 mt-1">participou do evento</div>
+                  </div>
+                  
+                  <div className="flex justify-between items-end text-xs">
+                    <div>
+                      <div className="w-16 h-8 bg-civeni-blue/10 rounded mb-1"></div>
+                      <div className="text-gray-500">Assinatura</div>
+                    </div>
+                    <div className="w-12 h-12 bg-civeni-blue/10 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Botão Voltar */}
+            <div className="mt-8 text-center">
+              <Button
+                onClick={() => navigate('/')}
+                size="lg"
+                className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white px-8"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar para a Home
+              </Button>
+            </div>
           </div>
 
           {/* Coluna Direita - Card de Sucesso */}
-          <div className="flex justify-center lg:justify-start">
+          <div className="flex justify-center">
             <Card className="w-full max-w-md bg-white shadow-2xl">
               <div className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white rounded-t-lg p-6">
                 <div className="flex items-center justify-between">
@@ -275,17 +240,6 @@ const CertificateSuccessPage = () => {
               </div>
             </Card>
           </div>
-        </div>
-        
-        {/* Botão Voltar para a Home - Centralizado */}
-        <div className="mt-8 text-center pb-8">
-          <Button
-            onClick={() => navigate('/')}
-            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white px-8"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para a Home
-          </Button>
         </div>
       </div>
     </div>
