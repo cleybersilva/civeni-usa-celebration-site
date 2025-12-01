@@ -828,7 +828,9 @@ export const enTranslations = {
         thematicAreas: "Thematic Areas",
         users: "Users",
         videos: "Videos",
-        digitalMedia: "Digital Media"
+        digitalMedia: "Digital Media",
+        participantTypes: "Participant Types",
+        eventCategories: "Event Categories"
       },
       digitalMedia: {
         title: "Digital Media",

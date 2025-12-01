@@ -789,7 +789,9 @@ export const trTranslations = {
         thematicAreas: "Tematik Alanlar",
         users: "Kullanıcılar",
         videos: "Videolar",
-        digitalMedia: "Dijital Medya"
+        digitalMedia: "Dijital Medya",
+        participantTypes: "Katılımcı Türleri",
+        eventCategories: "Etkinlik Kategorileri"
       },
       digitalMedia: {
         title: "Dijital Medya",
