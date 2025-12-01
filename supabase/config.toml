@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.setup-voluntarios]
 verify_jwt = false
+
+[functions.setup-voluntarios-category]
+verify_jwt = false
