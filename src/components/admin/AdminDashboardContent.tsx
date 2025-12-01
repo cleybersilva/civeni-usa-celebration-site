@@ -37,6 +37,8 @@ import { SubmissionsManager } from '@/components/admin/SubmissionsManager';
 import { PresentationRoomsManager } from '@/components/admin/PresentationRoomsManager';
 import CertificateManager from '@/components/admin/CertificateManager';
 import VideoSubmissionsManager from '@/components/admin/VideoSubmissionsManager';
+import ParticipantTypesManager from '@/components/admin/ParticipantTypesManager';
+import EventCategoriesManager from '@/components/admin/EventCategoriesManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -252,6 +254,20 @@ const AdminDashboardContent = () => {
         return (hasPermission('certificados') || isAdmin) ? (
           <PermissionGuard resource="certificados">
             <CertificateManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'tipos-participante':
+        return (hasPermission('inscricoes') || isAdminRoot()) ? (
+          <PermissionGuard resource="inscricoes">
+            <ParticipantTypesManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'categorias-evento':
+        return (hasPermission('inscricoes') || isAdminRoot()) ? (
+          <PermissionGuard resource="inscricoes">
+            <EventCategoriesManager />
           </PermissionGuard>
         ) : null;
       

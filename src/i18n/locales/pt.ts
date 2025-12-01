@@ -829,7 +829,9 @@ export const ptTranslations = {
         users: "Usuários",
         videos: "Vídeos",
         digitalMedia: "Mídia Digital",
-        events: "Eventos"
+        events: "Eventos",
+        participantTypes: "Tipos de Participante",
+        eventCategories: "Categorias de Evento"
       },
       digitalMedia: {
         title: "Mídia Digital",

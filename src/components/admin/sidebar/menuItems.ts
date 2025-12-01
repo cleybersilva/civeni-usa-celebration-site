@@ -190,6 +190,20 @@ export const createMenuItems = (
       icon: Settings,
       show: canViewUsuarios,
       isPriority: false
+    },
+    {
+      id: 'tipos-participante',
+      label: t('admin.menu.participantTypes', 'Tipos de Participante'),
+      icon: Users,
+      show: hasPermission('inscricoes') || isAdminRoot(),
+      isPriority: false
+    },
+    {
+      id: 'categorias-evento',
+      label: t('admin.menu.eventCategories', 'Categorias de Evento'),
+      icon: FileText,
+      show: hasPermission('inscricoes') || isAdminRoot(),
+      isPriority: false
     }
   ];
 
