@@ -95,9 +95,9 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         return category.is_free && category.slug === 'professor-vccu-gratuito';
       }
       
-      // Para voluntários, mostrar APENAS a categoria gratuita VCCU (mesmo comportamento que Professor e Sorteados)
+      // Para voluntários, mostrar APENAS a categoria gratuita específica de Voluntários
       if (formData.participantType === 'Voluntários') {
-        return category.is_free && category.slug === 'professor-vccu-gratuito';
+        return category.is_free && category.slug === 'voluntarios-vccu-gratuito';
       }
       
       // Para participante externo, mostrar APENAS a categoria específica de externo

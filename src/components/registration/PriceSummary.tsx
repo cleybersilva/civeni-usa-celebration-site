@@ -27,6 +27,10 @@ const PriceSummary = ({ selectedCategory, priceCents = 0, participantType }: Pri
       return 'Categoria gratuita para Palestrantes VCCU com cupom válido.';
     }
     
+    if (participantType === 'Voluntários') {
+      return 'Categoria gratuita para Voluntários VCCU com cupom válido.';
+    }
+    
     return 'Categoria gratuita para Professor(a) VCCU com cupom válido.';
   };
 
