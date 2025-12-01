@@ -95,3 +95,6 @@ verify_jwt = false
 
 [functions.inscricoes-por-lote]
 verify_jwt = false
+
+[functions.setup-voluntarios]
+verify_jwt = false

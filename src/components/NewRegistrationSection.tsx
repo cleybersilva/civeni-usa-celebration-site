@@ -95,6 +95,11 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
         return category.is_free && category.slug === 'professor-vccu-gratuito';
       }
       
+      // Para voluntários, mostrar APENAS a categoria gratuita VCCU (mesmo comportamento que Professor e Sorteados)
+      if (formData.participantType === 'Voluntários') {
+        return category.is_free && category.slug === 'professor-vccu-gratuito';
+      }
+      
       // Para participante externo, mostrar APENAS a categoria específica de externo
       if (formData.participantType === 'Participante Externo') {
         return category.slug === 'participante-externo';
@@ -312,7 +317,7 @@ const NewRegistrationSection = ({ registrationType }: NewRegistrationSectionProp
                       !formData.participantType || 
                       (isVCCUStudent && (!formData.cursoId || !formData.turmaId)) || 
                       (selectedCategory?.is_free && !formData.couponCode) ||
-                      ((formData.participantType === 'Professor(a)' || formData.participantType === 'Palestrantes' || formData.participantType === 'Sorteados') && !formData.couponCode)
+                      ((formData.participantType === 'Professor(a)' || formData.participantType === 'Palestrantes' || formData.participantType === 'Sorteados' || formData.participantType === 'Voluntários') && !formData.couponCode)
                     }
                 >
                   {loading ? t('registration.processing') : t('registration.registerNow')}
