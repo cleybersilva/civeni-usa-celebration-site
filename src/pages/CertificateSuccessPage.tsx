@@ -1,8 +1,11 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Download, Share2, ArrowLeft, Mail } from 'lucide-react';
+import LanguageSelector from '@/components/admin/LanguageSelector';
+import CertificateRenderer from '@/components/CertificateRenderer';
 import civeniLogo from '@/assets/civeni-2025-logo.png';
 
 interface LocationState {
@@ -19,6 +22,7 @@ interface LocationState {
 const CertificateSuccessPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const state = location.state as LocationState | null;
 
   // Se não há dados de estado válidos, exibe mensagem amigável em vez de tela em branco
@@ -26,15 +30,15 @@ const CertificateSuccessPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red flex items-center justify-center">
         <Card className="w-full max-w-md bg-white shadow-2xl p-8 text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">Nenhum certificado encontrado</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('certificateSuccess.noDataAvailable')}</h1>
           <p className="text-sm text-gray-600">
-            Para acessar esta página, primeiro valide sua participação na tela de emissão de certificados.
+            {t('certificateSuccess.noDataDesc')}
           </p>
           <Button
             onClick={() => navigate('/certificado-emissao')}
             className="w-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white font-semibold mt-2"
           >
-            Ir para emissão de certificado
+            {t('certificateSuccess.goToEmission')}
           </Button>
         </Card>
       </div>
@@ -70,15 +74,20 @@ const CertificateSuccessPage = () => {
   // Determinar mensagem baseada em palavras-chave
   const isComplete = state.matched === 3;
   const statusMessage = isComplete
-    ? '✓ Certificado aprovado com participação completa!'
-    : '✓ Certificado aprovado com participação parcial!';
+    ? t('certificateSuccess.approvedComplete')
+    : t('certificateSuccess.approvedPartial');
   
   const statusDetails = isComplete
-    ? 'Você acertou todas as palavras-chave e atingiu o mínimo necessário para receber o certificado.'
-    : `Você acertou ${state.matched} de 3 palavras-chave, atingindo o mínimo necessário para receber o certificado.`;
+    ? t('certificateSuccess.matchedAllKeywords')
+    : t('certificateSuccess.matchedKeywords', { matched: state.matched });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-civeni-blue to-civeni-red">
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageSelector />
+      </div>
+
       <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
         <div className="grid lg:grid-cols-2 gap-8 items-center max-w-7xl w-full">
           
@@ -86,63 +95,51 @@ const CertificateSuccessPage = () => {
           <div className="text-white space-y-8">
             <div>
               <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-                Parabéns por ter chegado ao final do evento!
+                {t('certificateSuccess.congratulations')}
               </h1>
               <p className="text-xl text-white/90 mb-8">
-                Agora é hora de emitir seu certificado!
+                {t('certificateSuccess.subtitle')}
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Compartilhe no LinkedIn</span>
+                <span>{t('certificateSuccess.shareLinkedIn')}</span>
               </div>
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Siga o CIVENI 2025 nas redes</span>
+                <span>{t('certificateSuccess.followCiveni')}</span>
               </div>
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Conheça nossos{' '}
+                <span>{t('certificateSuccess.knowOur')}{' '}
                   <button 
                     onClick={() => navigate('/eventos')} 
                     className="font-bold underline hover:text-white transition-colors cursor-pointer"
                   >
-                    próximos eventos
+                    {t('certificateSuccess.upcomingEvents')}
                   </button>
                 </span>
               </div>
             </div>
 
-            {/* Mock do Certificado */}
+            {/* Mock do Certificado com template do SaaS */}
             <div className="mt-12">
-              <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md mx-auto transform -rotate-2 hover:rotate-0 transition-transform duration-300">
-                <div className="text-center">
-                  <img 
-                    src={civeniLogo} 
-                    alt="CIVENI 2025" 
-                    className="w-16 h-auto mx-auto mb-2"
-                  />
-                  <div className="text-civeni-blue font-bold text-lg mb-2">CIVENI 2025</div>
-                  <div className="text-sm text-gray-600 mb-4">CERTIFICADO DE PARTICIPAÇÃO</div>
-                  <div className="text-xs text-gray-500 mb-6">VCCU/Civeni</div>
-                  
-                  <div className="border-t border-b border-gray-200 py-4 mb-4">
-                    <div className="text-xs text-gray-600 mb-1">Certificamos que</div>
-                    <div className="font-bold text-gray-800">{state.fullName || '[SEU NOME]'}</div>
-                    <div className="text-xs text-gray-600 mt-1">participou do evento</div>
-                  </div>
-                  
-                  <div className="flex justify-between items-end text-xs">
-                    <div>
-                      <div className="w-16 h-8 bg-civeni-blue/10 rounded mb-1"></div>
-                      <div className="text-gray-500">Assinatura</div>
-                    </div>
-                    <div className="w-12 h-12 bg-civeni-blue/10 rounded"></div>
-                  </div>
-                </div>
-              </div>
+              <CertificateRenderer
+                eventId="iii-civeni-2025"
+                participantData={{
+                  nome_participante: state.fullName || '',
+                  tipo_participacao: 'Participante',
+                  nome_evento: 'III CIVENI 2025 – Celebration/Florida/EUA',
+                  data_evento: '11 a 13 de dezembro de 2025',
+                  carga_horaria: '20',
+                  data_emissao: new Date().toLocaleDateString(),
+                  nome_reitor: 'Dra. Maria Emilia Camargo',
+                  nome_coordenador: 'Dra. Marcela Tarciana Martins'
+                }}
+                scale={0.8}
+              />
             </div>
 
             {/* Botão Voltar */}
@@ -153,7 +150,7 @@ const CertificateSuccessPage = () => {
                 className="bg-white/10 text-white border-white/20 hover:bg-white/20"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para a Home
+                {t('certificateSuccess.backToHome')}
               </Button>
             </div>
           </div>
@@ -179,11 +176,11 @@ const CertificateSuccessPage = () => {
                 {/* Título */}
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-gray-800 mb-1">
-                    Seu certificado está pronto!
+                    {t('certificateSuccess.pageTitle')}
                   </h2>
                   {state.code && (
                     <p className="text-xs text-gray-500 font-mono">
-                      Código: {state.code}
+                      {t('certificateSuccess.code')} {state.code}
                     </p>
                   )}
                 </div>
@@ -209,10 +206,10 @@ const CertificateSuccessPage = () => {
                     <Mail className="h-5 w-5 text-blue-600 flex-shrink-0" />
                     <div className="text-left">
                       <p className="text-sm font-semibold text-blue-900">
-                        📧 E-mail enviado com sucesso!
+                        {t('certificateSuccess.emailSentSuccess')}
                       </p>
                       <p className="text-xs text-blue-700 mt-1">
-                        Verifique sua caixa de entrada em <span className="font-semibold">{state.email}</span>
+                        {t('certificateSuccess.checkInbox')} <span className="font-semibold">{state.email}</span>
                       </p>
                     </div>
                   </div>
@@ -226,7 +223,7 @@ const CertificateSuccessPage = () => {
                     disabled={!state.pdfUrl}
                   >
                     <Download className="h-5 w-5 mr-2" />
-                    BAIXAR CERTIFICADO EM PDF
+                    {t('certificateSuccess.downloadPdf')}
                   </Button>
 
                   <Button
@@ -234,7 +231,7 @@ const CertificateSuccessPage = () => {
                     className="w-full bg-[#0077B5] hover:bg-[#006399] text-white font-semibold py-6 text-base shadow-md"
                   >
                     <Share2 className="h-5 w-5 mr-2" />
-                    ADICIONAR AO LINKEDIN
+                    {t('certificateSuccess.addToLinkedIn')}
                   </Button>
                 </div>
               </div>
