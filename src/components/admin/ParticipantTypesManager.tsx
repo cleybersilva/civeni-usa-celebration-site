@@ -88,6 +88,27 @@ const ParticipantTypesManager = () => {
     }
   };
 
+  const handleSetupVoluntarios = async () => {
+    setSetupLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('setup-voluntarios');
+
+      if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Erro ao configurar tipo Voluntários');
+      }
+
+      await refreshParticipantTypes();
+      toast.success(data.message || 'Tipo "Voluntários" configurado com sucesso');
+    } catch (error: any) {
+      console.error('Erro ao configurar Voluntários:', error);
+      toast.error(error.message || 'Erro ao configurar tipo Voluntários');
+    } finally {
+      setSetupLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       type_name: '',
@@ -185,6 +206,16 @@ const ParticipantTypesManager = () => {
           >
             <Wand2 className="w-4 h-4" />
             {setupLoading ? 'Configurando...' : 'Setup Sorteados'}
+          </Button>
+          
+          <Button 
+            onClick={handleSetupVoluntarios} 
+            disabled={setupLoading}
+            variant="secondary"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <Wand2 className="w-4 h-4" />
+            {setupLoading ? 'Configurando...' : 'Setup Voluntários'}
           </Button>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
