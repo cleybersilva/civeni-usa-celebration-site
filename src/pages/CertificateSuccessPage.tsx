@@ -149,8 +149,8 @@ const CertificateSuccessPage = () => {
             <div className="mt-8 text-center">
               <Button
                 onClick={() => navigate('/')}
-                variant="outline"
-                className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                size="lg"
+                className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white px-8"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar para a Home
