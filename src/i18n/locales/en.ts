@@ -350,6 +350,7 @@ export const enTranslations = {
       'Professor(a)': 'Professor',
       'Palestrantes': 'Speakers',
       'Sorteados': 'Scholarship Winners',
+      'Voluntários': 'Volunteers',
       'Participante Externo': 'External Participant',
       batch: 'Batch',
       categories: {

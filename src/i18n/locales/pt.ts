@@ -350,6 +350,7 @@ export const ptTranslations = {
       'Professor(a)': 'Professor(a)',
       'Palestrantes': 'Palestrantes',
       'Sorteados': 'Sorteados',
+      'Voluntários': 'Voluntários',
       'Participante Externo': 'Participante Externo',
       batch: 'Lote',
       categories: {
