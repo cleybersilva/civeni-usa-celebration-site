@@ -318,6 +318,7 @@ export const trTranslations = {
       'Professor(a)': 'Profesör',
       'Palestrantes': 'Konuşmacılar',
       'Sorteados': 'Burs Kazananlar',
+      'Voluntários': 'Gönüllüler',
       'Participante Externo': 'Harici Katılımcı',
       batch: 'Dönem',
       currentBatch: "Mevcut Dönem",
