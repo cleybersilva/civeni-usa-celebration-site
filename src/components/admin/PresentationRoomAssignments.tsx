@@ -110,7 +110,11 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
   });
 
   // Buscar submissões para atribuir
-  const { data: availableSubmissions } = useQuery({
+  const {
+    data: availableSubmissions,
+    refetch: refetchAvailableSubmissions,
+    isFetching: isFetchingSubmissions,
+  } = useQuery({
     queryKey: ['available-submissions', searchTerm],
     queryFn: async () => {
       const sessionOk = await setupAdminSession();
@@ -361,7 +365,12 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
-                      <Button type="button" variant="outline">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => refetchAvailableSubmissions()}
+                        disabled={isFetchingSubmissions}
+                      >
                         <Search className="w-4 h-4" />
                       </Button>
                     </div>
