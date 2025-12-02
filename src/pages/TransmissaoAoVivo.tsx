@@ -645,7 +645,15 @@ const TransmissaoAoVivo = () => {
                             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-civeni-blue" />
-                                {format(new Date(room.data_apresentacao), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale(i18n.language) })}
+                                {format(
+                                  new Date(
+                                    room.data_apresentacao?.includes('T')
+                                      ? room.data_apresentacao
+                                      : `${room.data_apresentacao}T00:00:00`
+                                  ),
+                                  "dd 'de' MMMM 'de' yyyy",
+                                  { locale: getDateLocale(i18n.language) }
+                                )}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-civeni-blue" />
