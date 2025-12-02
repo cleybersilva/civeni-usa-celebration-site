@@ -34,25 +34,52 @@ interface AssignmentFormData {
   observacoes: string;
 }
 
+interface RoomWorkFormData {
+  titulo_apresentacao: string;
+  autores: string;
+  ordem: number | null;
+}
+
 interface Props {
   roomId: string;
   onBack: () => void;
 }
 
+
 export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+  const [workForm, setWorkForm] = useState<RoomWorkFormData>({
+    titulo_apresentacao: '',
+    autores: '',
+    ordem: null,
+  });
   
-  const queryClient = useQueryClient();
-  const { data: roomDetails } = usePresentationRoomDetails(roomId);
-
   const [formData, setFormData] = useState<AssignmentFormData>({
     submission_id: '',
     ordem_apresentacao: 1,
     inicio_apresentacao: '',
     fim_apresentacao: '',
     observacoes: '',
+  });
+  
+  const queryClient = useQueryClient();
+  const { data: roomDetails } = usePresentationRoomDetails(roomId);
+
+  // Trabalhos manuais (título + autores)
+  const { data: manualWorks } = useQuery({
+    queryKey: ['room-works', roomId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('salas_apresentacao_trabalhos')
+        .select('*')
+        .eq('sala_id', roomId)
+        .order('ordem', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   // Buscar submissões para atribuir
@@ -89,12 +116,12 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
       if (!savedSession) {
         throw new Error('Sessão não encontrada');
       }
-
+ 
       const sessionData = JSON.parse(savedSession);
       if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
-
+ 
       const { data: result, error } = await supabase.rpc(
         'admin_upsert_presentation_assignment',
         {
@@ -131,12 +158,12 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
       if (!savedSession) {
         throw new Error('Sessão não encontrada');
       }
-
+ 
       const sessionData = JSON.parse(savedSession);
       if (!sessionData.session_token || !sessionData.user?.email) {
         throw new Error('Sessão inválida');
       }
-
+ 
       const { data: result, error } = await supabase.rpc(
         'admin_delete_presentation_assignment',
         {
@@ -158,6 +185,7 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
     },
   });
 
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSubmission) {
@@ -175,6 +203,88 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
       deleteAssignmentMutation.mutate(id);
     }
   };
+
+  const createWorkMutation = useMutation({
+    mutationFn: async (data: RoomWorkFormData) => {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_upsert_room_work',
+        {
+          work_data: {
+            sala_id: roomId,
+            titulo_apresentacao: data.titulo_apresentacao,
+            autores: data.autores,
+            ordem: data.ordem,
+          } as any,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
+        }
+      );
+
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['room-works', roomId] });
+      toast.success('Trabalho manual adicionado!');
+      setWorkForm({ titulo_apresentacao: '', autores: '', ordem: null });
+    },
+    onError: (error) => {
+      toast.error(`Erro ao adicionar trabalho manual: ${error.message}`);
+    },
+  });
+
+  const deleteWorkMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const savedSession = localStorage.getItem('adminSession');
+      if (!savedSession) {
+        throw new Error('Sessão não encontrada');
+      }
+
+      const sessionData = JSON.parse(savedSession);
+      if (!sessionData.session_token || !sessionData.user?.email) {
+        throw new Error('Sessão inválida');
+      }
+
+      const { data: result, error } = await supabase.rpc(
+        'admin_delete_room_work',
+        {
+          work_id: id,
+          user_email: sessionData.user.email,
+          session_token: sessionData.session_token,
+        }
+      );
+
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['room-works', roomId] });
+      toast.success('Trabalho manual removido!');
+    },
+    onError: (error) => {
+      toast.error(`Erro ao remover trabalho manual: ${error.message}`);
+    },
+  });
+
+  const handleWorkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workForm.titulo_apresentacao.trim() || !workForm.autores.trim()) {
+      toast.error('Informe título e autores do trabalho');
+      return;
+    }
+    createWorkMutation.mutate(workForm);
+  };
+
 
   return (
     <div className="space-y-6">
@@ -419,10 +529,108 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
             ))}
           </TableBody>
         </Table>
-
+ 
         {!roomDetails?.assignments?.length && (
           <div className="text-center py-8 text-muted-foreground">
             Nenhum trabalho atribuído a esta sala ainda.
+          </div>
+        )}
+      </Card>
+
+      <Card className="p-4 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 className="text-lg font-semibold">Lista manual (Título + Autores)</h3>
+            <p className="text-sm text-muted-foreground">
+              Use esta lista quando o trabalho não estiver cadastrado como submissão.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleWorkSubmit} className="grid gap-3 md:grid-cols-[minmax(0,0.12fr)_minmax(0,0.44fr)_minmax(0,0.32fr)_auto] items-end">
+          <div>
+            <Label htmlFor="ordem_manual">Ordem</Label>
+            <Input
+              id="ordem_manual"
+              type="number"
+              min="1"
+              value={workForm.ordem ?? ''}
+              onChange={(e) =>
+                setWorkForm({
+                  ...workForm,
+                  ordem: e.target.value ? Number(e.target.value) : null,
+                })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="titulo_manual">Título do Trabalho *</Label>
+            <Input
+              id="titulo_manual"
+              value={workForm.titulo_apresentacao}
+              onChange={(e) =>
+                setWorkForm({ ...workForm, titulo_apresentacao: e.target.value })
+              }
+              placeholder="Digite o título do trabalho"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="autores_manual">Autores *</Label>
+            <Input
+              id="autores_manual"
+              value={workForm.autores}
+              onChange={(e) =>
+                setWorkForm({ ...workForm, autores: e.target.value })
+              }
+              placeholder="Nome(s) dos autores"
+              required
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button type="submit" className="w-full md:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar
+            </Button>
+          </div>
+        </form>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Ordem</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Autores</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {manualWorks?.map((work: any) => (
+              <TableRow key={work.id}>
+                <TableCell>{work.ordem}</TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {work.titulo_apresentacao}
+                </TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {work.autores}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteWorkMutation.mutate(work.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {!manualWorks?.length && (
+          <div className="text-center py-4 text-muted-foreground text-sm">
+            Nenhum trabalho manual cadastrado para esta sala.
           </div>
         )}
       </Card>

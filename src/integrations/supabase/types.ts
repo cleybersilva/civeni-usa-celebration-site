@@ -4627,6 +4627,10 @@ export type Database = {
         Args: { room_id: string; session_token: string; user_email: string }
         Returns: Json
       }
+      admin_delete_room_work: {
+        Args: { session_token: string; user_email: string; work_id: string }
+        Returns: Json
+      }
       admin_delete_schedule: {
         Args: { schedule_id: string; session_token: string; user_email: string }
         Returns: Json
@@ -4674,6 +4678,10 @@ export type Database = {
       }
       admin_upsert_presentation_room: {
         Args: { room_data: Json; session_token: string; user_email: string }
+        Returns: Json
+      }
+      admin_upsert_room_work: {
+        Args: { session_token: string; user_email: string; work_data: Json }
         Returns: Json
       }
       admin_upsert_schedule: {
