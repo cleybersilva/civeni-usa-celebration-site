@@ -279,12 +279,14 @@ O deploy automático está **configurado e funcionando**. A cada push para `main
 
 Os seguintes secrets estão ativos no repositório GitHub:
 
-| Secret | Descrição | Status |
-|--------|-----------|:------:|
-| `FTP_SERVER` | Servidor FTP do cPanel | ✅ |
-| `FTP_USERNAME` | Usuário FTP | ✅ |
-| `FTP_PASSWORD` | Senha FTP | ✅ |
-| `FTP_SERVER_DIR` | Diretório de destino (`/public_html/`) | ✅ |
+| Secret | Descrição | Valor Exemplo | Status |
+|--------|-----------|---------------|:------:|
+| `FTP_SERVER` | Servidor FTP do cPanel | `ftp.seudominio.com` | ✅ |
+| `FTP_USERNAME` | Usuário FTP | `deploy-bot@seudominio.com` | ✅ |
+| `FTP_PASSWORD` | Senha FTP | `sua_senha_segura` | ✅ |
+| `FTP_SERVER_DIR` | Diretório de destino (**deve terminar com /**) | `/public_html/` | ✅ |
+
+> ⚠️ **IMPORTANTE:** O `FTP_SERVER_DIR` **deve terminar com `/`** (barra final). Exemplo: `/public_html/` ✅ (não `/public_html` ❌)
 
 #### 🔄 Como Funciona o Deploy Automático
 
@@ -582,6 +584,46 @@ supabase functions deploy function-name \
 ---
 
 ## 🐛 Solução de Problemas
+
+### ❌ Erro: "server-dir should be a folder (must end with /)"
+
+**Sintoma:**
+```
+Error: server-dir should be a folder (must end with /)
+Deploy via FTP falha no Stage 7
+```
+
+**Causa:** O secret `FTP_SERVER_DIR` não termina com `/` (barra final)
+
+**Soluções:**
+
+**Opção 1: Workflow agora corrige automaticamente** ✅
+- O workflow foi atualizado para adicionar `/` automaticamente
+- Apenas re-rode o workflow que falhou: **Actions → Re-run all jobs**
+
+**Opção 2: Atualizar o Secret (Recomendado)**
+```
+1. GitHub → Settings → Secrets and variables → Actions
+2. Clique em FTP_SERVER_DIR
+3. Clique em "Update secret"
+4. Valor correto: /public_html/  (com / no final)
+5. Salve
+6. Re-rode o workflow
+```
+
+**Formatos Corretos:**
+```
+✅ /public_html/
+✅ /home/usuario/public_html/
+✅ /
+✅ /domains/seudominio.com/public_html/
+
+❌ /public_html
+❌ /home/usuario/public_html
+❌ /domains/seudominio.com/public_html
+```
+
+---
 
 ### ❌ Erro: "Rotas retornam 404 ao atualizar"
 

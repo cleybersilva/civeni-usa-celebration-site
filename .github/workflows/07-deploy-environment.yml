@@ -40,13 +40,26 @@ jobs:
           test -f cpanel-package/.htaccess && echo "✅ .htaccess encontrado" || echo "⚠️ .htaccess não encontrado"
           test -d cpanel-package/assets && echo "✅ pasta assets/ encontrada" || (echo "❌ pasta assets/ não encontrada" && exit 1)
 
+      - name: Prepare FTP configuration
+        id: ftp-config
+        run: |
+          # Garantir que server-dir termine com /
+          SERVER_DIR="${{ secrets.FTP_SERVER_DIR }}"
+          if [ -z "$SERVER_DIR" ]; then
+            SERVER_DIR="/public_html/"
+          elif [[ "$SERVER_DIR" != */ ]]; then
+            SERVER_DIR="${SERVER_DIR}/"
+          fi
+          echo "server-dir=$SERVER_DIR" >> $GITHUB_OUTPUT
+          echo "📁 Diretório de destino: $SERVER_DIR"
+
       - name: Deploy to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
+          server-dir: ${{ steps.ftp-config.outputs.server-dir }}
           local-dir: ./cpanel-package/
           dangerous-clean-slate: false
           exclude: |
