@@ -87,8 +87,22 @@ jobs:
 
           echo "✅ Deploy via SFTP concluído!"
 
-      - name: Deploy via FTP/FTPS (Fallback)
-        if: steps.deploy-config.outputs.deploy-method == 'ftp'
+      - name: Deploy via SFTP (password-based)
+        if: steps.deploy-config.outputs.deploy-method == 'ftp' && secrets.FTP_PASSWORD != ''
+        id: sftp-deploy
+        continue-on-error: true
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          local_path: './cpanel-package/*'
+          remote_path: ${{ steps.deploy-config.outputs.server-dir }}
+          sftp_only: true
+
+      - name: Deploy via FTP/FTPS (Last Resort Fallback)
+        if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.sftp-deploy.outcome == 'failure'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -110,8 +124,18 @@ jobs:
 
       - name: Verify deployment
         run: |
-          echo "✅ Deploy via FTP concluído com sucesso!"
+          # Detectar método usado
+          if [ "${{ steps.deploy-config.outputs.deploy-method }}" == "ssh" ]; then
+            METHOD="SSH/SFTP (rsync)"
+          elif [ "${{ steps.sftp-deploy.outcome }}" == "success" ]; then
+            METHOD="SFTP (password)"
+          else
+            METHOD="FTP/FTPS"
+          fi
+
+          echo "✅ Deploy concluído via $METHOD!"
           echo "📊 Estatísticas do deploy:" >> $GITHUB_STEP_SUMMARY
+          echo "- Método: $METHOD" >> $GITHUB_STEP_SUMMARY
           echo "- Ambiente: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
           echo "- Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
           echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
