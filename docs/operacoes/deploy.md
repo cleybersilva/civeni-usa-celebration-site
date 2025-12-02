@@ -279,14 +279,18 @@ O deploy automático está **configurado e funcionando**. A cada push para `main
 
 Os seguintes secrets estão ativos no repositório GitHub:
 
-| Secret | Descrição | Valor Exemplo | Status |
-|--------|-----------|---------------|:------:|
-| `FTP_SERVER` | Servidor FTP do cPanel | `ftp.seudominio.com` | ✅ |
-| `FTP_USERNAME` | Usuário FTP | `deploy-bot@seudominio.com` | ✅ |
-| `FTP_PASSWORD` | Senha FTP | `sua_senha_segura` | ✅ |
-| `FTP_SERVER_DIR` | Diretório de destino (**deve terminar com /**) | `/public_html/` | ✅ |
+| Secret | Descrição | Valor Exemplo | Obrigatório | Status |
+|--------|-----------|---------------|:-----------:|:------:|
+| `FTP_SERVER` | Servidor FTP do cPanel | `ftp.seudominio.com` ou `seudominio.com` | ✅ | ✅ |
+| `FTP_USERNAME` | Usuário FTP | `deploy-bot@seudominio.com` | ✅ | ✅ |
+| `FTP_PASSWORD` | Senha FTP | `sua_senha_segura` | ✅ | ✅ |
+| `FTP_SERVER_DIR` | Diretório de destino (**deve terminar com /**) | `/public_html/` | ✅ | ✅ |
+| `FTP_PORT` | Porta FTP (padrão: 21) | `21` ou `22` (SFTP) | ❌ | ⚠️ |
+| `FTP_PROTOCOL` | Protocolo FTP (padrão: ftps) | `ftps`, `ftp`, ou `sftp` | ❌ | ⚠️ |
 
-> ⚠️ **IMPORTANTE:** O `FTP_SERVER_DIR` **deve terminar com `/`** (barra final). Exemplo: `/public_html/` ✅ (não `/public_html` ❌)
+> ⚠️ **IMPORTANTE:**
+> - O `FTP_SERVER_DIR` **deve terminar com `/`** (barra final). Exemplo: `/public_html/` ✅ (não `/public_html` ❌)
+> - Se tiver erro `ECONNREFUSED`, configure `FTP_PROTOCOL` e `FTP_PORT` (veja troubleshooting abaixo)
 
 #### 🔄 Como Funciona o Deploy Automático
 
@@ -298,13 +302,17 @@ Os seguintes secrets estão ativos no repositório GitHub:
     server: ${{ secrets.FTP_SERVER }}
     username: ${{ secrets.FTP_USERNAME }}
     password: ${{ secrets.FTP_PASSWORD }}
-    server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
+    port: ${{ secrets.FTP_PORT || 21 }}              # Porta (padrão: 21)
+    protocol: ${{ secrets.FTP_PROTOCOL || 'ftps' }}  # ftps, ftp, ou sftp
+    server-dir: ${{ secrets.FTP_SERVER_DIR }}
     local-dir: ./cpanel-package/
     dangerous-clean-slate: false  # Não deleta tudo antes de enviar
     exclude: |                     # Ignora estes arquivos
       **/.git*
       **/node_modules/**
     log-level: standard            # Logs detalhados
+    security: loose                # Aceita certificados SSL auto-assinados
+    timeout: 300000                # Timeout: 5 minutos
 ```
 
 ### 🔧 Reconfigurar Secrets (se necessário)
@@ -584,6 +592,150 @@ supabase functions deploy function-name \
 ---
 
 ## 🐛 Solução de Problemas
+
+### ❌ Erro: "connect ECONNREFUSED" (FTP Connection Refused)
+
+**Sintoma:**
+```
+Error: connect ECONNREFUSED 15.235.50.240:21
+code: 'ECONNREFUSED'
+syscall: 'connect'
+Deploy via FTP falha ao tentar conectar
+```
+
+**Causa:** O servidor FTP está recusando a conexão. Pode ser:
+1. cPanel usa FTPS (FTP com SSL) em vez de FTP puro
+2. Porta incorreta (cPanel pode usar porta diferente de 21)
+3. Firewall bloqueando conexões do GitHub Actions
+4. Servidor ou hostname incorreto
+
+---
+
+**Solução 1: Configurar FTPS (Mais Comum para cPanel)** ⭐
+
+cPanel geralmente usa FTPS (FTP com SSL/TLS) por padrão:
+
+```
+GitHub → Settings → Secrets and variables → Actions
+
+Adicionar novo secret:
+Name: FTP_PROTOCOL
+Value: ftps
+
+✅ Salvar e re-run do workflow
+```
+
+---
+
+**Solução 2: Tentar FTP Puro (Se FTPS não funcionar)**
+
+```
+GitHub → Settings → Secrets and variables → Actions
+
+Atualizar FTP_PROTOCOL:
+Name: FTP_PROTOCOL
+Value: ftp
+
+✅ Salvar e re-run do workflow
+```
+
+---
+
+**Solução 3: Usar SFTP (SSH File Transfer)**
+
+Se seu cPanel tem SSH habilitado:
+
+```
+GitHub → Settings → Secrets and variables → Actions
+
+Secret 1:
+Name: FTP_PROTOCOL
+Value: sftp
+
+Secret 2:
+Name: FTP_PORT
+Value: 22
+
+✅ Salvar e re-run do workflow
+```
+
+---
+
+**Solução 4: Verificar Porta Customizada**
+
+Alguns hosts usam portas não-padrão:
+
+```
+1. Entre em contato com suporte do hosting
+2. Pergunte: "Qual porta usar para FTP/FTPS?"
+3. Adicione no GitHub:
+
+Name: FTP_PORT
+Value: [porta fornecida pelo host]
+```
+
+---
+
+**Solução 5: Verificar Hostname FTP**
+
+```
+Tente diferentes formatos de FTP_SERVER:
+
+Opção 1: ftp.seudominio.com
+Opção 2: seudominio.com
+Opção 3: IP direto (15.235.50.240)
+Opção 4: Hostname do cPanel
+
+Verifique em: cPanel → FTP Accounts → FTP Server
+```
+
+---
+
+**Solução 6: Firewall/IP Whitelist**
+
+Alguns hosts bloqueiam IPs desconhecidos:
+
+```
+1. Acesse cPanel → Security → IP Blocker
+2. Verifique se IPs do GitHub Actions estão bloqueados
+3. Entre em contato com hosting para whitelist GitHub Actions IPs:
+   - https://api.github.com/meta (lista de IPs do GitHub)
+```
+
+---
+
+**Solução 7: Teste de Conexão Manual**
+
+Teste conexão FTP localmente primeiro:
+
+```bash
+# Testar FTP puro
+ftp ftp.seudominio.com
+
+# Testar FTPS com curl
+curl -v ftps://ftp.seudominio.com --user usuario:senha
+
+# Testar SFTP
+sftp usuario@seudominio.com
+```
+
+Se funcionar localmente mas falhar no GitHub, é firewall/IP blocker.
+
+---
+
+**Configuração Recomendada para cPanel:**
+
+```yaml
+# Configuração mais comum que funciona:
+FTP_SERVER: seudominio.com
+FTP_PORT: 21
+FTP_PROTOCOL: ftps
+FTP_USERNAME: usuario@seudominio.com
+FTP_PASSWORD: sua_senha
+FTP_SERVER_DIR: /public_html/
+```
+
+---
 
 ### ❌ Erro: "server-dir should be a folder (must end with /)"
 

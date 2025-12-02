@@ -59,6 +59,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ${{ secrets.FTP_PROTOCOL || 'ftps' }}
           server-dir: ${{ steps.ftp-config.outputs.server-dir }}
           local-dir: ./cpanel-package/
           dangerous-clean-slate: false
@@ -68,6 +70,8 @@ jobs:
             **/node_modules/**
             **/.DS_Store
           log-level: standard
+          security: loose
+          timeout: 300000
 
       - name: Verify deployment
         run: |
