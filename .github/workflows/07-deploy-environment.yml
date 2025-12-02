@@ -87,8 +87,32 @@ jobs:
 
           echo "✅ Deploy via SFTP concluído!"
 
+      - name: Test FTP/SFTP connectivity
+        id: connectivity-test
+        continue-on-error: true
+        run: |
+          echo "🔍 Testando conectividade..."
+          
+          # Testar FTP (porta 21)
+          if timeout 5 bash -c "</dev/tcp/${{ secrets.FTP_SERVER }}/21" 2>/dev/null; then
+            echo "✅ Porta FTP (21) está aberta"
+            echo "ftp-available=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Porta FTP (21) está fechada ou inacessível"
+            echo "ftp-available=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Testar SFTP (porta 22)
+          if timeout 5 bash -c "</dev/tcp/${{ secrets.FTP_SERVER }}/22" 2>/dev/null; then
+            echo "✅ Porta SSH/SFTP (22) está aberta"
+            echo "ssh-available=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Porta SSH/SFTP (22) está fechada ou inacessível"
+            echo "ssh-available=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy via SFTP with password (using sshpass)
-        if: steps.deploy-config.outputs.deploy-method == 'ftp'
+        if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.connectivity-test.outputs.ssh-available == 'true'
         id: sftp-deploy
         continue-on-error: true
         run: |
@@ -125,7 +149,7 @@ jobs:
           fi
 
       - name: Deploy via FTP/FTPS (Last Resort Fallback)
-        if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.sftp-deploy.outcome != 'success'
+        if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.sftp-deploy.outcome != 'success' && steps.connectivity-test.outputs.ftp-available == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -144,6 +168,39 @@ jobs:
           log-level: standard
           security: loose
           timeout: 300000
+
+      - name: Handle deployment failure
+        if: failure() && steps.sftp-deploy.outcome != 'success' && steps.connectivity-test.outputs.ftp-available != 'true'
+        run: |
+          echo "## ❌ Deploy Falhou - Problemas de Conectividade" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Diagnóstico" >> $GITHUB_STEP_SUMMARY
+          
+          FTP_AVAILABLE="${{ steps.connectivity-test.outputs.ftp-available }}"
+          SSH_AVAILABLE="${{ steps.connectivity-test.outputs.ssh-available }}"
+          
+          echo "- FTP (porta 21): $FTP_AVAILABLE" >> $GITHUB_STEP_SUMMARY
+          echo "- SSH/SFTP (porta 22): $SSH_AVAILABLE" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$FTP_AVAILABLE" != "true" ] && [ "$SSH_AVAILABLE" != "true" ]; then
+            echo "**Problema:** Nenhuma porta está acessível!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🛠️ Soluções" >> $GITHUB_STEP_SUMMARY
+            echo "1. Verifique se o servidor FTP está online" >> $GITHUB_STEP_SUMMARY
+            echo "2. Confirme o IP/hostname está correto: \`${{ secrets.FTP_SERVER }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "3. Verifique firewall/bloqueios de porta" >> $GITHUB_STEP_SUMMARY
+            echo "4. Teste manualmente com: \`curl -v ftp://${{ secrets.FTP_SERVER }}\`" >> $GITHUB_STEP_SUMMARY
+          elif [ "$SSH_AVAILABLE" == "true" ] && [ "${{ steps.sftp-deploy.outcome }}" != "success" ]; then
+            echo "**Problema:** SSH está aberto mas SFTP falhou" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🛠️ Soluções" >> $GITHUB_STEP_SUMMARY
+            echo "1. Verifique credenciais FTP_USERNAME/FTP_PASSWORD" >> $GITHUB_STEP_SUMMARY
+            echo "2. Confirme que o usuário tem permissão no diretório" >> $GITHUB_STEP_SUMMARY
+            echo "3. Teste manualmente com: \`sshpass -p 'SENHA' ssh -o StrictHostKeyChecking=no USER@${{ secrets.FTP_SERVER }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          exit 1
 
       - name: Verify deployment
         run: |
