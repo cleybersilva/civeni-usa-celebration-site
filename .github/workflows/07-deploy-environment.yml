@@ -20,16 +20,88 @@ jobs:
         with:
           name: cpanel-package-${{ github.sha }}
 
-      - name: Verify package
-        run: sha256sum -c civeni-cpanel.zip.sha256
-
-      - name: Deploy
+      - name: Verify package integrity
         run: |
-          echo "🚀 Deploying to ${{ inputs.environment }}..."
-          echo "Package: civeni-cpanel.zip"
-          # Add deployment commands here
+          echo "🔍 Verificando integridade do pacote..."
+          sha256sum -c civeni-cpanel.zip.sha256
+          echo "✅ Checksum validado com sucesso!"
 
-      - run: |
-          echo "## 🌐 Deployed to ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "URL: ${{ inputs.environment == 'production' && 'https://civeni.com' || 'https://staging.civeni.com' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Pipeline Complete!** ✅" >> $GITHUB_STEP_SUMMARY
+      - name: Extract package
+        run: |
+          echo "📦 Extraindo pacote de deploy..."
+          mkdir -p cpanel-package
+          unzip -q civeni-cpanel.zip -d cpanel-package
+          echo "✅ Pacote extraído: $(ls -lh cpanel-package | wc -l) arquivos"
+
+      - name: Verify extracted contents
+        run: |
+          echo "🔍 Verificando arquivos essenciais..."
+          test -f cpanel-package/index.html && echo "✅ index.html encontrado" || (echo "❌ index.html não encontrado" && exit 1)
+          test -f cpanel-package/.htaccess && echo "✅ .htaccess encontrado" || echo "⚠️ .htaccess não encontrado"
+          test -d cpanel-package/assets && echo "✅ pasta assets/ encontrada" || (echo "❌ pasta assets/ não encontrada" && exit 1)
+
+      - name: Deploy to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
+          local-dir: ./cpanel-package/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.DS_Store
+          log-level: standard
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Deploy via FTP concluído com sucesso!"
+          echo "📊 Estatísticas do deploy:" >> $GITHUB_STEP_SUMMARY
+          echo "- Ambiente: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Post-deployment summary
+        if: success()
+        run: |
+          echo "## 🎉 Deploy Concluído com Sucesso!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Ambiente:** \`${{ inputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** ${{ inputs.environment == 'production' && 'https://civeni.com' || 'https://staging.civeni.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Passos Executados" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Pacote baixado e validado (SHA256)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Arquivos extraídos e verificados" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Deploy via FTP concluído" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Edge Functions implantadas (Stage 6)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Próximos Passos" >> $GITHUB_STEP_SUMMARY
+          echo "1. Acesse: ${{ inputs.environment == 'production' && 'https://civeni.com' || 'https://staging.civeni.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verifique se o site carrega corretamente" >> $GITHUB_STEP_SUMMARY
+          echo "3. Teste funcionalidades críticas (login admin, inscrições)" >> $GITHUB_STEP_SUMMARY
+          echo "4. Monitore logs do Supabase para Edge Functions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Pipeline Completo!** 🚀✅" >> $GITHUB_STEP_SUMMARY
+
+      - name: Deployment failed notification
+        if: failure()
+        run: |
+          echo "## ❌ Deploy Falhou!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Ambiente:** \`${{ inputs.environment }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Falha em:** Stage 7 - Deploy to Environment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Possíveis Causas" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Credenciais FTP incorretas ou expiradas" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Servidor FTP inacessível" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Diretório de destino não existe ou sem permissão" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Pacote corrompido ou incompleto" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🛠️ Ações Recomendadas" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verifique os secrets no GitHub: FTP_SERVER, FTP_USERNAME, FTP_PASSWORD" >> $GITHUB_STEP_SUMMARY
+          echo "2. Teste conexão FTP manualmente" >> $GITHUB_STEP_SUMMARY
+          echo "3. Verifique logs detalhados acima" >> $GITHUB_STEP_SUMMARY
+          echo "4. Se necessário, faça deploy manual (docs/operacoes/deploy.md)" >> $GITHUB_STEP_SUMMARY

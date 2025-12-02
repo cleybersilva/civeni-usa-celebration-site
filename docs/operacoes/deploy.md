@@ -1,483 +1,1035 @@
-# Guia de Deploy CIVENI
+# 🚀 Guia de Deploy CIVENI
 
-Guia completo para implantação da plataforma CIVENI em produção.
+> Guia completo e visual para implantação da plataforma CIVENI em produção
 
-## Índice
+<div align="center">
 
-1. [Checklist Pré-Deploy](#checklist-pré-deploy)
-2. [Deploy no cPanel](#deploy-no-cpanel)
-3. [Configuração de Ambiente](#configuração-de-ambiente)
-4. [Verificação Pós-Deploy](#verificação-pós-deploy)
-5. [Procedimentos de Rollback](#procedimentos-de-rollback)
-6. [Solução de Problemas](#solução-de-problemas)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![Version](https://img.shields.io/badge/version-2.1-blue.svg)
+![Last Update](https://img.shields.io/badge/updated-2025--12--01-orange.svg)
 
-## Checklist Pré-Deploy
+</div>
 
-### Qualidade de Código
+---
 
-- [ ] Todos os erros de compilação TypeScript resolvidos
-- [ ] ESLint não mostra erros
-- [ ] Todos os testes passando (testes manuais completos)
-- [ ] Nenhum console.error no código de produção
-- [ ] Headers de segurança configurados
-- [ ] Redirecionamento HTTPS habilitado
+## 📋 Índice Rápido
 
-### Banco de Dados
+| Seção | Descrição | Tempo Estimado |
+|-------|-----------|----------------|
+| [🎼 Pipeline CI/CD](#-pipeline-cicd) | Entenda o fluxo automatizado | 5 min |
+| [✅ Pré-Deploy](#-checklist-pré-deploy) | Checklist completo | 10 min |
+| [🏗️ Deploy Manual](#-deploy-manual-cpanel) | Upload direto para cPanel | 15 min |
+| [🤖 Deploy Automático](#-deploy-automático-ftp) | Configuração via GitHub Actions | 20 min |
+| [🔍 Validação](#-verificação-pós-deploy) | Testes pós-implantação | 15 min |
+| [🔄 Rollback](#-procedimentos-de-rollback) | Reverter em caso de falha | 10 min |
+| [🐛 Troubleshooting](#-solução-de-problemas) | Resolver problemas comuns | - |
 
-- [ ] Todas as migrações aplicadas ao banco de produção
-- [ ] Políticas RLS configuradas corretamente
-- [ ] Usuários admin criados e funções atribuídas
-- [ ] Dados de teste removidos
-- [ ] Backup do banco de produção criado
+---
 
-### Edge Functions
+## 🎼 Pipeline CI/CD
 
-- [ ] Todas as funções implantadas no Supabase
-- [ ] Variáveis de ambiente definidas no dashboard Supabase
-- [ ] Endpoints de webhook configurados no Stripe
-- [ ] Logs de funções revisados para erros
+### Arquitetura do Pipeline (7 Stages)
 
-### Assets
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    CIVENI Sequential Pipeline                       │
+│                     GitHub Actions Workflow                         │
+└─────────────────────────────────────────────────────────────────────┘
 
-- [ ] Todas as imagens otimizadas
-- [ ] Arquivos de favicon presentes
-- [ ] Service worker configurado
-- [ ] Arquivo manifest atualizado
-
-### Configuração
-
-- [ ] Variáveis `.env` documentadas
-- [ ] Chaves Stripe configuradas (modo produção)
-- [ ] Serviço de e-mail configurado
-- [ ] Configurações CORS atualizadas para domínio de produção
-
-## Deploy no cPanel
-
-### Método 1: Script de Build (Recomendado)
-
-1. **Executar script de build**
-   ```bash
-   ./build-cpanel.sh
-   ```
-
-   Isso cria `civeni-saas-cpanel.zip` com:
-   - Build de produção otimizado
-   - Headers de segurança (.htaccess)
-   - Service worker
-   - Todos os assets estáticos
-
-2. **Upload para cPanel**
-   - Fazer login no cPanel
-   - Navegar para Gerenciador de Arquivos
-   - Ir para `public_html/` (ou raiz do domínio)
-   - Upload de `civeni-saas-cpanel.zip`
-   - Extrair arquivo
-   - Verificar se `.htaccess` está presente
-
-3. **Verificar deployment**
-   - Visitar seu domínio
-   - Verificar se redirecionamento HTTPS funciona
-   - Testar roteamento (atualizar em sub-páginas)
-   - Verificar se assets carregam corretamente
-
-### Método 2: Script Python
-
-Método alternativo de build:
-
-```bash
-python3 create-cpanel-zip.py
+  Trigger: Push/PR → main, develop
+           │
+           ▼
+  ┌───────────────────┐
+  │ 📝 STAGE 1/7      │  Code Quality
+  │ Lint + TypeScript │  ✓ ESLint validation
+  └─────────┬─────────┘  ✓ TypeScript check
+            │
+            ▼
+  ┌───────────────────┐
+  │ 🔒 STAGE 2/7      │  Security Scan
+  │ npm audit         │  ✓ Dependency vulnerabilities
+  └─────────┬─────────┘  ✓ OWASP check
+            │
+            ▼
+  ┌───────────────────┐
+  │ 🏗️ STAGE 3/7      │  Build Frontend
+  │ Vite Production   │  ✓ Optimized bundle
+  └─────────┬─────────┘  ✓ dist/ artifact upload
+            │
+            ▼
+  ┌───────────────────┐
+  │ 🔧 STAGE 4/7      │  Validate Supabase Functions
+  │ Deno Check        │  ✓ TypeScript validation
+  └─────────┬─────────┘  ✓ All Edge Functions
+            │
+            ▼
+  ┌───────────────────┐
+  │ 📦 STAGE 5/7      │  Create cPanel Package
+  │ ZIP Generation    │  ✓ civeni-cpanel.zip
+  └─────────┬─────────┘  ✓ SHA256 checksum
+            │
+            ▼
+  ┌───────────────────┐
+  │ 🚀 STAGE 6/7      │  Deploy Edge Functions
+  │ Supabase CLI      │  ✓ Auto-deploy to Supabase
+  └─────────┬─────────┘  ✓ Production environment
+            │
+            ▼
+  ┌───────────────────┐
+  │ 🌐 STAGE 7/7      │  Deploy to Environment
+  │ FTP Deployment    │  ✓ Auto-deploy to cPanel
+  └───────────────────┘  ✓ Production/Staging sync
 ```
 
-Produz mesmo resultado do script bash, útil em sistemas Windows.
+### 📊 Status dos Stages
 
-### Estrutura de Diretórios Após Deploy
+| Stage | Nome | Automação | Status |
+|:-----:|------|:---------:|:------:|
+| 1️⃣ | Code Quality | ✅ Full | 🟢 Ativo |
+| 2️⃣ | Security Scan | ✅ Full | 🟢 Ativo |
+| 3️⃣ | Build Frontend | ✅ Full | 🟢 Ativo |
+| 4️⃣ | Validate Functions | ✅ Full | 🟢 Ativo |
+| 5️⃣ | Create Package | ✅ Full | 🟢 Ativo |
+| 6️⃣ | Deploy Functions | ✅ Full | 🟢 Ativo |
+| 7️⃣ | Deploy Environment | ✅ Full (FTP) | 🟢 Ativo |
+
+---
+
+## ✅ Checklist Pré-Deploy
+
+### 🎯 Qualidade de Código
+
+```bash
+# Execute localmente antes de fazer push
+npm run lint          # ✓ Sem erros ESLint
+npm run build         # ✓ Build com sucesso
+npm run preview       # ✓ Testar build localmente
+```
+
+- [ ] ✅ Todos os erros de compilação TypeScript resolvidos
+- [ ] ✅ ESLint não mostra erros (`npm run lint`)
+- [ ] ✅ Build de produção completa sem warnings
+- [ ] ✅ Testes manuais executados com sucesso
+- [ ] ✅ Nenhum `console.error` ou `console.log` desnecessário no código
+- [ ] ✅ Headers de segurança configurados no `.htaccess`
+- [ ] ✅ Redirecionamento HTTPS habilitado
+
+### 💾 Banco de Dados Supabase
+
+- [ ] 🗄️ Todas as migrações aplicadas ao banco de produção
+- [ ] 🔐 Políticas RLS (Row Level Security) configuradas e testadas
+- [ ] 👥 Usuários admin criados com funções apropriadas
+- [ ] 🧹 Dados de teste removidos do ambiente de produção
+- [ ] 💾 Backup do banco de produção criado e validado
+- [ ] 🔍 Índices de performance criados para queries principais
+
+### ⚡ Edge Functions Supabase
+
+```bash
+# Deploy manual de funções (se necessário)
+supabase functions deploy --project-ref wdkeqxfglmritghmakma
+```
+
+- [ ] 🚀 Todas as funções implantadas no Supabase
+- [ ] 🔑 Variáveis de ambiente definidas no dashboard Supabase
+- [ ] 🔗 Endpoints de webhook configurados no Stripe Dashboard
+- [ ] 📋 Logs de funções revisados para erros críticos
+- [ ] 🧪 Testes de Edge Functions executados com sucesso
+
+### 🖼️ Assets e Mídia
+
+- [ ] 🎨 Todas as imagens otimizadas (WebP quando possível)
+- [ ] 🎯 Favicon e ícones PWA presentes (`public/`)
+- [ ] ⚙️ Service Worker configurado e testado
+- [ ] 📱 Arquivo `manifest.webmanifest` atualizado
+- [ ] 📄 `robots.txt` e `sitemap.xml` configurados
+
+### ⚙️ Configuração e Secrets
+
+- [ ] 🔐 Variáveis `.env` documentadas (não commitadas!)
+- [ ] 💳 Chaves Stripe configuradas (modo produção)
+- [ ] 📧 Serviço de e-mail configurado e testado
+- [ ] 🌐 Configurações CORS atualizadas para domínio de produção
+- [ ] 🔑 GitHub Secrets configurados:
+  - `SUPABASE_ACCESS_TOKEN` ✅
+  - `FTP_SERVER` (opcional - deploy automático)
+  - `FTP_USERNAME` (opcional - deploy automático)
+  - `FTP_PASSWORD` (opcional - deploy automático)
+
+---
+
+## 🏗️ Deploy Manual (cPanel)
+
+> 💡 **Recomendado para:** Primeira implantação, deploys críticos, ou quando preferir controle total
+
+### 📥 Passo 1: Obter Pacote de Deploy
+
+#### Opção A: Via GitHub Actions (Recomendado)
+
+```
+1. Acesse: https://github.com/seu-usuario/seu-repo/actions
+2. Clique no workflow mais recente com ✅ sucesso
+3. Role até "Artifacts" no final da página
+4. Baixe: cpanel-package-[hash].zip
+5. Extraia localmente para verificar conteúdo
+```
+
+#### Opção B: Build Local
+
+```bash
+# Na pasta do projeto
+npm run build
+
+# Criar pacote manualmente
+cd dist
+zip -r ../civeni-cpanel.zip .
+cd ..
+```
+
+### 📤 Passo 2: Upload para cPanel
+
+#### Via File Manager (Mais Fácil)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  cPanel → File Manager → public_html/                   │
+└─────────────────────────────────────────────────────────┘
+
+1. 🔐 Login no cPanel
+2. 📁 Abra "File Manager"
+3. 📂 Navegue até "public_html/" (ou raiz do domínio)
+4. 🗑️  BACKUP IMPORTANTE: Baixe conteúdo atual antes!
+5. ⬆️  Upload do civeni-cpanel.zip
+6. 📦 Clique direito → "Extract"
+7. ✅ Verifique se .htaccess está presente
+```
+
+#### Via FTP (Alternativo)
+
+```bash
+# Usando FileZilla, WinSCP, ou cliente FTP
+Host: ftp.seudominio.com
+User: seu_usuario_cpanel
+Pass: sua_senha_cpanel
+Port: 21 (FTP) ou 22 (SFTP)
+
+# Após conectar:
+1. Navegue até /public_html/
+2. Arraste arquivos de dist/ para o servidor
+3. Aguarde upload completo (pode demorar)
+```
+
+### 🔍 Passo 3: Verificar Estrutura de Arquivos
 
 ```
 public_html/
-├── index.html
-├── .htaccess              # CRÍTICO - roteamento & segurança
-├── assets/
+├── 📄 index.html                 ✅ Arquivo principal
+├── ⚙️  .htaccess                 ✅ CRÍTICO - roteamento & segurança
+├── 📱 manifest.webmanifest       ✅ PWA
+├── ⚙️  service-worker.js         ✅ Cache offline
+├── 🤖 robots.txt                 ✅ SEO
+├── 🗺️  sitemap.xml               ✅ SEO
+├── 📁 assets/                    ✅ CSS, JS, imagens
 │   ├── index-[hash].js
 │   ├── index-[hash].css
 │   └── ...
-├── uploads/
-│   └── [arquivos de imagem]
-├── service-worker.js
-├── manifest.webmanifest
-├── robots.txt
-├── sitemap.xml
-└── _headers
+└── 📁 uploads/                   (criado automaticamente)
 ```
 
-## Configuração de Ambiente
+### 🔐 Passo 4: Configurar Permissões
 
-### Variáveis de Ambiente Frontend
-
-Definir em `.env` antes do build:
-
-```env
-# Configuração Supabase
-VITE_SUPABASE_URL=https://wdkeqxfglmritghmakma.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGc...
-
-# Opcional
-VITE_DEBUG=false
+```bash
+# Permissões corretas
+Arquivos: 644 (rw-r--r--)
+Pastas:   755 (rwxr-xr-x)
+.htaccess: 644
 ```
 
-**IMPORTANTE**: Nunca commitar `.env` no repositório!
+No cPanel File Manager:
+1. Selecione todos os arquivos
+2. Clique em "Permissions"
+3. Configure conforme acima
 
-### Secrets de Edge Functions Supabase
+---
 
-Definir em Dashboard Supabase → Configurações → Edge Functions:
+## 🤖 Deploy Automático (FTP)
+
+> ✅ **Status:** ATIVO - Deploy automático configurado via FTP
+
+### 🎯 Benefícios da Automação
+
+| Recurso | Manual | Automático |
+|---------|:------:|:----------:|
+| Deploy em 1 clique | ❌ | ✅ |
+| Validação de checksum | ⚠️ Manual | ✅ Auto |
+| Rollback fácil | 🔄 Complexo | ✅ Simples |
+| Logs de deploy | ❌ | ✅ Completo |
+| Notificações de erro | ❌ | ✅ Email/Slack |
+
+### ✅ Configuração Atual (Ativo)
+
+O deploy automático está **configurado e funcionando**. A cada push para `main` ou `develop`, o sistema:
+
+1. ✅ Executa todos os testes e validações (Stages 1-4)
+2. ✅ Cria o pacote de produção (Stage 5)
+3. ✅ Faz deploy das Edge Functions no Supabase (Stage 6)
+4. ✅ **Envia arquivos automaticamente para cPanel via FTP (Stage 7)**
+
+#### 🔐 Secrets Configurados
+
+Os seguintes secrets estão ativos no repositório GitHub:
+
+| Secret | Descrição | Status |
+|--------|-----------|:------:|
+| `FTP_SERVER` | Servidor FTP do cPanel | ✅ |
+| `FTP_USERNAME` | Usuário FTP | ✅ |
+| `FTP_PASSWORD` | Senha FTP | ✅ |
+| `FTP_SERVER_DIR` | Diretório de destino (`/public_html/`) | ✅ |
+
+#### 🔄 Como Funciona o Deploy Automático
+
+```yaml
+# Workflow: .github/workflows/07-deploy-environment.yml
+- name: Deploy to cPanel via FTP
+  uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+  with:
+    server: ${{ secrets.FTP_SERVER }}
+    username: ${{ secrets.FTP_USERNAME }}
+    password: ${{ secrets.FTP_PASSWORD }}
+    server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
+    local-dir: ./cpanel-package/
+    dangerous-clean-slate: false  # Não deleta tudo antes de enviar
+    exclude: |                     # Ignora estes arquivos
+      **/.git*
+      **/node_modules/**
+    log-level: standard            # Logs detalhados
+```
+
+### 🔧 Reconfigurar Secrets (se necessário)
+
+Se precisar atualizar as credenciais FTP:
+
+#### Passo 1: Atualizar Secret no GitHub
 
 ```
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-LOVABLE_API_KEY=...
-SENDGRID_API_KEY=...
+Repositório → Settings → Secrets and variables → Actions
+Clique no secret que deseja atualizar
+Clique em "Update secret"
+Cole o novo valor
+Salve
 ```
 
-### Configuração Stripe
+#### Passo 2: Testar Deploy
 
-1. **Dashboard → Developers → Webhooks**
-   - Adicionar endpoint: `https://wdkeqxfglmritghmakma.supabase.co/functions/v1/stripe-webhook`
-   - Selecionar eventos:
-     - `checkout.session.completed`
-     - `payment_intent.succeeded`
-     - `charge.succeeded`
-   - Copiar webhook signing secret para secrets Supabase
+```
+Faça um commit pequeno (ex: atualizar README)
+Push para develop
+Monitore o pipeline no GitHub Actions
+Verifique se Stage 7 completa com sucesso
+```
 
-2. **Produtos e Preços**
-   - Criar produtos para cada categoria de evento
-   - Copiar IDs de Preço para `event_category.stripe_price_id`
+> 🔔 **Deploy Automático:** A cada push para `main` (produção) ou `develop` (staging), o site será atualizado automaticamente!
 
-### Apache .htaccess
+---
 
-**CRÍTICO**: `.htaccess` deve estar presente para:
-- Roteamento SPA (todas as rotas → index.html)
-- Headers de segurança
-- Redirecionamento HTTPS
-- Compressão
+## 🔍 Verificação Pós-Deploy
+
+### 🌐 Checklist do Site Público
+
+```bash
+# Teste rápido via cURL
+curl -I https://seudominio.com
+```
+
+**Esperado:**
+```
+HTTP/2 200 OK
+strict-transport-security: max-age=31536000
+x-frame-options: DENY
+x-content-type-options: nosniff
+```
+
+#### Testes Manuais Essenciais
+
+- [ ] 🏠 **Página Inicial** (`/`)
+  - [ ] Carrega sem erros 404/500
+  - [ ] Imagens aparecem corretamente
+  - [ ] Animações funcionam
+  - [ ] Links de navegação funcionais
+
+- [ ] 🗣️ **Palestrantes** (`/palestrantes`)
+  - [ ] Lista completa de speakers
+  - [ ] Fotos carregam do Supabase Storage
+  - [ ] Modal de detalhes abre
+
+- [ ] 📅 **Programação** (`/cronograma`)
+  - [ ] Sessões aparecem organizadas
+  - [ ] Datas e horários corretos
+  - [ ] Filtros funcionam
+
+- [ ] 📝 **Inscrições** (`/inscricoes`)
+  - [ ] Formulário renderiza
+  - [ ] Integração Stripe funciona
+  - [ ] Validação de campos ativa
+
+- [ ] 🌍 **Troca de Idioma**
+  - [ ] PT → EN → ES → TR funcionam
+  - [ ] Conteúdo traduz corretamente
+  - [ ] Persistência em localStorage
+
+- [ ] 📱 **Responsividade**
+  - [ ] Desktop (1920x1080) ✅
+  - [ ] Tablet (768x1024) ✅
+  - [ ] Mobile (375x667) ✅
+
+### 🔐 Checklist do Painel Admin
+
+- [ ] 🔑 **Login** (`/admin`)
+  - [ ] Página de login acessível
+  - [ ] Credenciais admin funcionam
+  - [ ] Redirecionamento pós-login correto
+
+- [ ] 📊 **Dashboard**
+  - [ ] KPIs carregam corretamente
+  - [ ] Gráficos renderizam (Recharts)
+  - [ ] Sem erros no console
+
+- [ ] ✏️ **CRUD Operations**
+  - [ ] Criar registros funciona
+  - [ ] Editar registros funciona
+  - [ ] Deletar registros funciona
+  - [ ] Upload de imagens funciona
+
+- [ ] 💰 **Financial Dashboard**
+  - [ ] Revenue charts exibem
+  - [ ] Dados Stripe sincronizados
+  - [ ] Filtros de data funcionam
+
+- [ ] 📤 **Exportação**
+  - [ ] Export CSV funciona
+  - [ ] Export PDF funciona
+  - [ ] Download de relatórios
+
+### 💳 Fluxo de Pagamento Stripe
+
+```
+Teste com Cartão de Teste Stripe:
+Card: 4242 4242 4242 4242
+Exp:  12/34
+CVC:  123
+ZIP:  12345
+```
+
+- [ ] 🛒 **Checkout Flow**
+  - [ ] Stripe Checkout Session abre
+  - [ ] Valores corretos exibidos
+  - [ ] Pagamento processa
+  - [ ] Redirecionamento pós-pagamento
+
+- [ ] 🔔 **Webhook Processing**
+  - [ ] Webhook recebe eventos (`checkout.session.completed`)
+  - [ ] Registro criado no banco de dados
+  - [ ] Status atualizado corretamente
+
+- [ ] 📧 **Email Confirmation**
+  - [ ] Email enviado automaticamente
+  - [ ] Template correto renderizado
+  - [ ] Links funcionais no email
+
+### 🎓 Sistema de Certificados
+
+- [ ] 📜 **Geração**
+  - [ ] Certificado PDF gerado
+  - [ ] Dados corretos (nome, evento, data)
+  - [ ] Logo e design aparecem
+
+- [ ] 📬 **Entrega**
+  - [ ] Email com certificado anexado
+  - [ ] Link de verificação incluído
+
+- [ ] ✅ **Verificação**
+  - [ ] `/certificados/verify/:code` funciona
+  - [ ] Validação de autenticidade exibe
+
+### ⚡ Testes de Performance
+
+#### Google PageSpeed Insights
+
+```
+🔗 https://pagespeed.web.dev/
+
+Páginas para testar:
+1. Home (/)
+2. Palestrantes (/palestrantes)
+3. Cronograma (/cronograma)
+4. Inscrições (/inscricoes)
+```
+
+**Metas de Pontuação:**
+
+| Métrica | Target | Status |
+|---------|:------:|:------:|
+| Performance | > 90 | 🎯 |
+| Accessibility | > 95 | 🎯 |
+| Best Practices | > 95 | 🎯 |
+| SEO | > 95 | 🎯 |
+
+#### Core Web Vitals
+
+```
+Métricas Críticas:
+✅ LCP (Largest Contentful Paint): < 2.5s
+✅ FID (First Input Delay):        < 100ms
+✅ CLS (Cumulative Layout Shift):  < 0.1
+```
+
+### 🔒 Testes de Segurança
+
+```bash
+# Verificar headers de segurança
+curl -I https://seudominio.com | grep -i "security\|frame\|xss\|content-type"
+```
+
+- [ ] 🔐 **HTTPS Enforcement**
+  - [ ] HTTP redireciona para HTTPS (301)
+  - [ ] Certificado SSL válido
+  - [ ] HSTS header presente
+
+- [ ] 🛡️ **Security Headers** (verificar em https://securityheaders.com)
+  - [ ] `X-Frame-Options: DENY`
+  - [ ] `X-Content-Type-Options: nosniff`
+  - [ ] `X-XSS-Protection: 1; mode=block`
+  - [ ] `Referrer-Policy: strict-origin-when-cross-origin`
+  - [ ] `Content-Security-Policy` configurado
+
+- [ ] 🔍 **Proteções Ativas**
+  - [ ] SQL Injection bloqueado
+  - [ ] XSS bloqueado (CSP)
+  - [ ] CSRF tokens validados
+  - [ ] Rate limiting ativo
+
+- [ ] 🚪 **Acesso Admin**
+  - [ ] Rotas `/admin/*` requerem autenticação
+  - [ ] Session timeout funciona
+  - [ ] Logout limpa sessão
+
+---
+
+## 🔄 Procedimentos de Rollback
+
+### ⚡ Rollback Rápido (Frontend)
+
+> ⏱️ **Tempo estimado:** 5-10 minutos
+
+```
+┌─────────────────────────────────────────────────────┐
+│  PROCEDIMENTO DE EMERGÊNCIA                         │
+└─────────────────────────────────────────────────────┘
+
+1. 🔐 Acesse cPanel → File Manager
+2. 📁 Navegue para public_html/
+3. 🗑️  Delete arquivos atuais (ou renomeie para backup/)
+4. ⬆️  Upload da versão anterior (mantida em local seguro)
+5. 📦 Extraia arquivos
+6. ✅ Teste site imediatamente
+```
+
+#### Manter Backups de Deploy
+
+```bash
+# Estrutura recomendada localmente
+backups/
+├── 2025-12-01-build/
+│   └── civeni-cpanel.zip
+├── 2025-11-28-build/
+│   └── civeni-cpanel.zip
+└── 2025-11-25-build/
+    └── civeni-cpanel.zip
+
+# Manter últimos 5 deploys
+```
+
+### 💾 Rollback de Banco de Dados
+
+> ⚠️ **CUIDADO:** Pode resultar em perda de dados recentes!
+
+```bash
+# Supabase Dashboard → Database → Backups
+# Selecionar backup anterior e restaurar
+```
+
+**Via CLI:**
+
+```bash
+# 1. Download do backup
+supabase db dump -f backup-YYYY-MM-DD.sql --project-ref wdkeqxfglmritghmakma
+
+# 2. Restaurar (USE COM CAUTELA!)
+supabase db reset --db-url <production-url> --file backup-YYYY-MM-DD.sql
+```
+
+### ⚙️ Rollback de Edge Functions
+
+```bash
+# Deploy versão anterior de uma função específica
+supabase functions deploy function-name \
+  --project-ref wdkeqxfglmritghmakma \
+  --legacy-bundle  # Se usar versão antiga
+```
+
+> 💡 **Dica:** Mantenha histórico de commits das Edge Functions para rollback fácil
+
+---
+
+## 🐛 Solução de Problemas
+
+### ❌ Erro: "Rotas retornam 404 ao atualizar"
+
+**Sintoma:**
+```
+Página funciona ao navegar, mas retorna 404 ao dar F5 (refresh)
+Exemplo: /admin, /inscricoes retornam "Not Found"
+```
+
+**Causa:** `.htaccess` ausente ou mod_rewrite desabilitado
+
+**Soluções:**
 
 ```apache
-# Redirecionamento HTTPS
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# 1. Verificar se .htaccess existe em public_html/
 
-# Roteamento SPA
-RewriteEngine On
-RewriteBase /
-RewriteRule ^index\.html$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
-
-# Headers de Segurança
-Header set X-Frame-Options "DENY"
-Header set X-Content-Type-Options "nosniff"
-Header set X-XSS-Protection "1; mode=block"
-Header set Referrer-Policy "strict-origin-when-cross-origin"
-Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-
-# Content Security Policy
-Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://wdkeqxfglmritghmakma.supabase.co https://checkout.stripe.com https://api.stripe.com;"
-
-# Compressão
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+# 2. Conteúdo mínimo necessário:
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
 </IfModule>
+```
 
-# Controle de Cache
+**Validação:**
+
+```bash
+# Teste local
+curl -I https://seudominio.com/admin
+# Deve retornar 200, não 404
+```
+
+---
+
+### ❌ Erro: "Assets falham ao carregar (CSS/JS 404)"
+
+**Sintoma:**
+```
+Página carrega sem estilos
+Console mostra: GET /assets/index-abc123.js 404
+```
+
+**Causa:** Caminhos incorretos ou pasta `assets/` ausente
+
+**Soluções:**
+
+```bash
+# 1. Verificar estrutura
+public_html/
+├── index.html  ✅
+└── assets/     ✅ Deve existir!
+    ├── index-[hash].js
+    └── index-[hash].css
+
+# 2. Verificar permissões
+chmod 755 assets/
+chmod 644 assets/*
+
+# 3. Limpar cache
+# Browser: Ctrl+Shift+R (hard reload)
+# cPanel: Nenhum cache de servidor por padrão
+```
+
+---
+
+### ❌ Erro: "HTTPS redirect não funciona"
+
+**Sintoma:**
+```
+Site acessível via HTTP, mas não redireciona para HTTPS
+```
+
+**Causa:** Regras de rewrite faltando ou SSL não configurado
+
+**Soluções:**
+
+```apache
+# Adicionar no topo do .htaccess
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+```
+
+**Verificar SSL:**
+
+```
+cPanel → SSL/TLS Status
+✅ Certificado válido e ativo
+✅ AutoSSL habilitado (Let's Encrypt)
+```
+
+---
+
+### ❌ Erro: "Webhook Stripe não dispara"
+
+**Sintoma:**
+```
+Pagamento completa no Stripe, mas nada acontece no banco de dados
+Sem registro criado, sem email enviado
+```
+
+**Causa:** URL incorreta, secret inválido, ou função com erro
+
+**Soluções:**
+
+```bash
+# 1. Verificar URL no Stripe Dashboard
+# Deve ser EXATAMENTE:
+https://wdkeqxfglmritghmakma.supabase.co/functions/v1/stripe-webhook
+
+# 2. Verificar eventos selecionados
+✅ checkout.session.completed
+✅ payment_intent.succeeded
+✅ charge.succeeded
+
+# 3. Verificar Webhook Secret
+# Supabase Dashboard → Edge Functions → Settings
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# 4. Testar localmente com Stripe CLI
+stripe listen --forward-to localhost:54321/functions/v1/stripe-webhook
+stripe trigger checkout.session.completed
+```
+
+**Logs:**
+
+```
+Supabase Dashboard → Edge Functions → stripe-webhook → Logs
+Verificar erros em tempo real
+```
+
+---
+
+### ❌ Erro: "Imagens não carregam do Supabase Storage"
+
+**Sintoma:**
+```
+Imagens aparecem como "broken image" icon
+Console: CORS error ou 403 Forbidden
+```
+
+**Causa:** Políticas RLS ou configuração CORS
+
+**Soluções:**
+
+```sql
+-- 1. Verificar política de leitura pública
+-- SQL Editor no Supabase:
+
+CREATE POLICY "Public read access"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'site-civeni');
+
+-- 2. Verificar se bucket é público
+-- Storage → site-civeni → Settings → Public bucket: ON
+```
+
+**CORS:**
+
+```
+Supabase Dashboard → Storage → Configuration → CORS
+Allowed Origins: *
+(ou seu domínio específico)
+```
+
+---
+
+### ❌ Erro: "Login admin falha"
+
+**Sintoma:**
+```
+Credenciais corretas, mas retorna erro de autenticação
+Console: "Unauthorized" ou "Session expired"
+```
+
+**Causa:** RLS policy, função RPC ausente, ou sessão inválida
+
+**Soluções:**
+
+```sql
+-- 1. Verificar se usuário existe
+SELECT * FROM admin_users WHERE email = 'seu@email.com';
+
+-- 2. Verificar função RPC
+SELECT * FROM pg_proc WHERE proname = 'check_user_role_secure';
+
+-- 3. Resetar senha (se necessário)
+UPDATE admin_users
+SET password_hash = crypt('nova_senha', gen_salt('bf'))
+WHERE email = 'seu@email.com';
+```
+
+**Frontend:**
+
+```javascript
+// Limpar localStorage
+localStorage.removeItem('adminSession');
+// Tentar login novamente
+```
+
+---
+
+### 🐌 Performance: Carregamento Lento
+
+**Sintomas:**
+- Página demora > 3s para carregar
+- Baixo score no PageSpeed Insights
+
+**Soluções:**
+
+#### 1. Compressão (`.htaccess`)
+
+```apache
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml
+  AddOutputFilterByType DEFLATE text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/json
+</IfModule>
+```
+
+#### 2. Cache (`.htaccess`)
+
+```apache
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresByType image/jpg "access plus 1 year"
   ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/gif "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
   ExpiresByType text/css "access plus 1 month"
   ExpiresByType application/javascript "access plus 1 month"
-  ExpiresByType text/html "access plus 1 day"
+  ExpiresByType text/html "access plus 0 seconds"
 </IfModule>
 ```
 
-## Verificação Pós-Deploy
-
-### Verificações Automatizadas
-
-Executar script de verificação:
-```bash
-# Da máquina local
-curl -I https://seudominio.com
-```
-
-Verificar:
-- Status: 200 OK
-- Presença de headers de segurança
-- Conexão HTTPS
-
-### Verificação Manual
-
-**Site Público**:
-- [ ] Página inicial carrega corretamente
-- [ ] Todos os links de navegação funcionam
-- [ ] Página de palestrantes exibe fotos
-- [ ] Páginas de programação mostram dados
-- [ ] Formulário de inscrição abre
-- [ ] Troca de idioma funciona
-- [ ] Design responsivo mobile funciona
-- [ ] Service Worker registra
-- [ ] PWA instalável
-
-**Painel Admin**:
-- [ ] Página de login acessível em `/admin`
-- [ ] Credenciais admin funcionam
-- [ ] Dashboard carrega sem erros
-- [ ] Operações CRUD funcionais
-- [ ] Uploads de imagem funcionam
-- [ ] Gráficos financeiros exibem
-- [ ] Funções de exportação funcionam
-
-**Fluxo de Pagamento**:
-- [ ] Stripe Checkout abre
-- [ ] Pagamento de teste processa (usar cartões de teste Stripe)
-- [ ] Webhook recebe eventos
-- [ ] Inscrição criada no banco de dados
-- [ ] E-mail de confirmação enviado
-
-**Sistema de Certificados**:
-- [ ] Geração de certificados funciona
-- [ ] PDF baixa corretamente
-- [ ] Entrega de e-mail funcional
-- [ ] Página de verificação funciona
-
-### Testes de Performance
+#### 3. Otimização de Imagens
 
 ```bash
-# Google PageSpeed Insights
-https://pagespeed.web.dev/
-
-# Verificar todas as páginas:
-- Home
-- Palestrantes
-- Programação
-- Inscrições
-
-# Metas de pontuação:
-- Performance: > 90
-- Acessibilidade: > 95
-- Melhores Práticas: > 95
-- SEO: > 95
+# Converter para WebP (menor tamanho)
+# Usar ferramentas como Squoosh.app ou ImageOptim
 ```
 
-### Testes de Segurança
-
-- [ ] HTTPS forçado (HTTP redireciona para HTTPS)
-- [ ] Headers de segurança presentes (verificar com securityheaders.com)
-- [ ] Sem dados sensíveis em logs do console
-- [ ] Proteção CSRF ativa
-- [ ] Testes de SQL injection falham (entrada sanitizada)
-- [ ] Tentativas XSS bloqueadas (headers CSP)
-- [ ] Rotas admin requerem autenticação
-
-## Procedimentos de Rollback
-
-### Rollback Rápido
-
-Se deployment falhar:
-
-1. **Acessar Gerenciador de Arquivos cPanel**
-2. **Navegar para public_html/**
-3. **Deletar arquivos atuais**
-4. **Upload versão anterior funcional**
-5. **Extrair arquivo**
-
-### Rollback de Banco de Dados
-
-Se migração de banco falhar:
+#### 4. Análise de Bundle
 
 ```bash
-# No Dashboard Supabase → Database → Migrations
-# Reverter para migração anterior
+# Verificar tamanho do bundle
+npm run build -- --analyze
 
-# Ou usando CLI:
-supabase db reset --db-url <production-url>
+# Considerar lazy loading de componentes pesados
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 ```
-
-**AVISO**: Apenas reverter banco se absolutamente necessário. Pode ocorrer perda de dados.
-
-### Rollback de Edge Function
-
-```bash
-# Implantar versão anterior
-supabase functions deploy function-name --project-ref wdkeqxfglmritghmakma
-```
-
-## Solução de Problemas
-
-### Problemas Comuns de Deploy
-
-#### Problema: Rotas retornam 404 ao atualizar
-
-**Causa**: `.htaccess` ausente ou não carregado
-
-**Solução**:
-1. Verificar se `.htaccess` existe na raiz
-2. Verificar se Apache tem `mod_rewrite` habilitado
-3. Verificar `AllowOverride All` na config Apache
-
-#### Problema: Assets falham ao carregar (404)
-
-**Causa**: Caminhos de assets incorretos ou arquivos ausentes
-
-**Solução**:
-1. Verificar se `index.html` tem caminhos de assets corretos
-2. Verificar se diretório `assets/` existe
-3. Verificar console do navegador para arquivos específicos ausentes
-4. Limpar cache do navegador
-
-#### Problema: Redirecionamento HTTPS não funciona
-
-**Causa**: `.htaccess` RewriteEngine não ativo
-
-**Solução**:
-1. Verificar módulo `mod_rewrite` Apache habilitado
-2. Verificar sintaxe `.htaccess`
-3. Testar com: `curl -I http://seudominio.com`
-
-#### Problema: Webhook de pagamento não dispara
-
-**Causa**: URL webhook incorreta ou falha na validação de assinatura
-
-**Solução**:
-1. Verificar URL webhook no Dashboard Stripe
-2. Verificar se webhook signing secret corresponde ao secret Supabase
-3. Revisar logs de função Supabase para erros
-4. Testar com Stripe CLI: `stripe trigger checkout.session.completed`
-
-#### Problema: Imagens não carregam do Supabase Storage
-
-**Causa**: Configuração CORS ou políticas RLS
-
-**Solução**:
-1. Verificar configurações CORS do Supabase Storage
-2. Verificar se bucket é público
-3. Verificar se políticas RLS permitem leitura pública
-4. Testar URL da imagem diretamente no navegador
-
-#### Problema: Login admin falha
-
-**Causa**: Validação de sessão ou problemas de política RLS
-
-**Solução**:
-1. Verificar se tabela `admin_users` tem registro de usuário
-2. Verificar se função RPC `check_user_role_secure` existe
-3. Verificar localStorage do navegador para dados de sessão
-4. Revisar logs Supabase para erros de auth
-
-### Problemas de Performance
-
-#### Carregamento lento de página
-
-**Soluções**:
-- Habilitar compressão em `.htaccess`
-- Otimizar imagens (usar formato WebP)
-- Implementar lazy loading
-- Revisar tamanho de bundle: `npm run build -- --analyze`
-
-#### Queries de banco lentas
-
-**Soluções**:
-- Adicionar índices a colunas frequentemente consultadas
-- Usar views de banco para queries complexas
-- Implementar paginação
-- Cachear resultados com TanStack Query
-
-### Monitoramento
-
-**Dashboard Supabase**:
-- Monitorar logs de Edge Functions
-- Verificar métricas de performance do banco
-- Revisar uso de storage
-
-**DevTools do Navegador**:
-- Aba Network para tempos de carregamento
-- Console para erros JavaScript
-- Aba Application para Service Worker
-
-**Ferramentas Externas**:
-- Google Analytics para comportamento de usuário
-- Sentry para rastreamento de erros (se configurado)
-- Serviço de monitoramento de uptime
-
-## Deploy Contínuo
-
-Para deploys automatizados:
-
-1. **Configurar pipeline CI/CD** (exemplo GitHub Actions):
-
-```yaml
-name: Deploy to Production
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
-      - name: Deploy to cPanel
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-```
-
-2. **Configurar secrets nas configurações do repositório GitHub**
-
-3. **Testar deployment em ambiente de staging primeiro**
-
-## Estratégia de Backup
-
-### Backups de Banco de Dados
-
-**Automatizado**:
-- Supabase fornece backups diários automáticos
-- Retidos por 7 dias no plano gratuito
-
-**Manual**:
-```bash
-# Exportar banco de dados
-supabase db dump -f backup.sql --project-ref wdkeqxfglmritghmakma
-
-# Importar banco de dados
-supabase db reset --db-url <database-url> --file backup.sql
-```
-
-### Backups de Arquivos
-
-**Antes de cada deployment**:
-1. Baixar arquivos de produção atuais do cPanel
-2. Armazenar em pasta `backups/AAAA-MM-DD/`
-3. Manter últimos 5 deployments
-
-**Backups de Storage**:
-- Supabase Storage tem versionamento automático
-- Baixar assets críticos periodicamente
 
 ---
 
-**Última Atualização**: 2025-11-28
-**Versão de Deploy**: Produção 2.0
+### 🐌 Performance: Queries de Banco Lentas
+
+**Sintoma:**
+```
+Dashboard demora > 5s para carregar dados
+Timeout em queries complexas
+```
+
+**Soluções:**
+
+```sql
+-- 1. Adicionar índices
+CREATE INDEX idx_registrations_event_id ON event_registrations(event_id);
+CREATE INDEX idx_registrations_status ON event_registrations(status);
+CREATE INDEX idx_registrations_created ON event_registrations(created_at);
+
+-- 2. Usar views materializadas
+CREATE MATERIALIZED VIEW registrations_summary AS
+SELECT
+  event_id,
+  COUNT(*) as total_registrations,
+  SUM(amount_paid) as total_revenue
+FROM event_registrations
+GROUP BY event_id;
+
+-- 3. Refresh periódico
+REFRESH MATERIALIZED VIEW registrations_summary;
+```
+
+---
+
+## 📊 Monitoramento e Manutenção
+
+### 🔍 Ferramentas de Monitoramento
+
+```
+┌──────────────────────────────────────────────────────┐
+│  MONITORAMENTO CONTÍNUO                              │
+└──────────────────────────────────────────────────────┘
+
+📊 Google Analytics
+   └─ Tráfego, conversões, comportamento
+
+📈 Supabase Dashboard
+   ├─ Edge Function logs
+   ├─ Database metrics
+   └─ Storage usage
+
+🐛 Browser DevTools
+   ├─ Network tab (tempos de carregamento)
+   ├─ Console (erros JavaScript)
+   └─ Application (Service Worker)
+
+🔔 Uptime Monitoring
+   └─ UptimeRobot, Pingdom, ou similar
+```
+
+### 📅 Checklist de Manutenção Mensal
+
+- [ ] 🔄 Atualizar dependências (`npm update`)
+- [ ] 🔐 Verificar vulnerabilidades (`npm audit`)
+- [ ] 💾 Backup manual do banco de dados
+- [ ] 📊 Revisar logs de erros (Supabase + cPanel)
+- [ ] 🚀 Verificar performance (PageSpeed)
+- [ ] 🔍 Validar SSL (renovação automática)
+- [ ] 📈 Analisar métricas de uso
+- [ ] 🧹 Limpar dados antigos (se aplicável)
+
+---
+
+## 🎯 Estratégia de Backup
+
+### 💾 Backup Automatizado
+
+```
+┌─────────────────────────────────────────────┐
+│  POLÍTICA DE BACKUP                         │
+└─────────────────────────────────────────────┘
+
+DIÁRIO (Automático)
+├─ Supabase: Backup automático do banco
+└─ Retenção: 7 dias (plano gratuito)
+
+SEMANAL (Manual recomendado)
+├─ Download backup do banco via CLI
+├─ Backup de Storage crítico
+└─ Retenção: 4 semanas
+
+MENSAL (Deploy releases)
+├─ Snapshot completo do sistema
+├─ Documentação de configuração
+└─ Retenção: 6 meses
+```
+
+### 📥 Backup Manual
+
+```bash
+# Banco de Dados
+supabase db dump -f backup-$(date +%Y%m%d).sql \
+  --project-ref wdkeqxfglmritghmakma
+
+# Storage (via Supabase Dashboard)
+# Storage → site-civeni → Download bucket
+
+# Arquivos Frontend (antes de deploy)
+cd public_html
+tar -czf ../backup-frontend-$(date +%Y%m%d).tar.gz .
+```
+
+---
+
+## 📚 Recursos Adicionais
+
+### 🔗 Links Úteis
+
+| Recurso | URL |
+|---------|-----|
+| 🗄️ Supabase Dashboard | https://supabase.com/dashboard/project/wdkeqxfglmritghmakma |
+| 📚 Supabase Docs | https://supabase.com/docs |
+| 💳 Stripe Dashboard | https://dashboard.stripe.com |
+| 📖 cPanel Docs | https://docs.cpanel.net |
+| 🎨 Shadcn/ui | https://ui.shadcn.com |
+
+### 📞 Suporte
+
+```
+🐛 Issues: GitHub Issues
+📧 Email: suporte@civeni.com
+📖 Documentação: ./docs/
+```
+
+---
+
+## ✅ Checklist Final de Deploy
+
+```
+┌──────────────────────────────────────────────────────┐
+│  VALIDAÇÃO PRÉ-PRODUÇÃO                              │
+└──────────────────────────────────────────────────────┘
+```
+
+### 🏗️ Build e Pacote
+
+- [ ] ✅ Build de produção completo sem erros
+- [ ] ✅ Pacote ZIP criado com sucesso
+- [ ] ✅ Checksum SHA256 gerado
+- [ ] ✅ Tamanho do pacote razoável (< 50MB)
+
+### 🌐 Configuração
+
+- [ ] ✅ Domínio configurado no Supabase
+- [ ] ✅ SSL ativo e válido
+- [ ] ✅ `.htaccess` presente e configurado
+- [ ] ✅ Variáveis de ambiente corretas
+
+### 🧪 Funcionalidades
+
+- [ ] ✅ Todas as rotas acessíveis
+- [ ] ✅ Login admin funcional
+- [ ] ✅ CRUD operations funcionam
+- [ ] ✅ Stripe checkout completa
+- [ ] ✅ Certificados geram corretamente
+
+### 🚀 Performance
+
+- [ ] ✅ PageSpeed Score > 90
+- [ ] ✅ Core Web Vitals no verde
+- [ ] ✅ Sem erros no console
+- [ ] ✅ Service Worker registrado
+
+### 🔒 Segurança
+
+- [ ] ✅ HTTPS forçado
+- [ ] ✅ Headers de segurança presentes
+- [ ] ✅ Proteções XSS/CSRF ativas
+- [ ] ✅ Admin routes protegidas
+
+---
+
+<div align="center">
+
+## 🎉 Deploy Completo!
+
+**Última Atualização:** 2025-12-01
+**Versão:** 2.1
+**Pipeline:** 7 Stages Sequenciais
+
+---
+
+💡 **Dica:** Mantenha este documento atualizado após cada mudança significativa no processo de deploy.
+
+</div>
