@@ -194,18 +194,11 @@ const AdminDashboard = () => {
         description: `${data.synced} registros sincronizados do Stripe`,
       });
 
-      // Aguardar 2 segundos para garantir que os dados do Stripe foram completamente salvos no banco
-      console.log('⏳ Aguardando 2s para garantir persistência dos dados...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
       // Atualizar TODOS os dados após sync
-      console.log('🔄 Atualizando dashboard com dados mais recentes...');
       await Promise.all([
         refresh(),
         fetchAllTimeseries()
       ]);
-      
-      console.log('✅ Dashboard atualizado com sucesso!');
     } catch (error) {
       console.error('Sync error:', error);
       toast({
