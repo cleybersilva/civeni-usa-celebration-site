@@ -126,7 +126,6 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
         .from('submissions')
         .select('*')
         .is('deleted_at', null)
-        .eq('status', 'validado')
         .limit(20);
 
       if (searchTerm) {
