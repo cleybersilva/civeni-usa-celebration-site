@@ -90,9 +90,9 @@ const AdminLoginForm = () => {
               e.stopPropagation();
               setOpenDropdown(!openDropdown);
             }}
-            className="flex items-center space-x-2 text-white hover:text-white transition-colors bg-civeni-blue bg-opacity-80 px-3 py-2 rounded-md hover:bg-civeni-red hover:bg-opacity-90 border border-white border-opacity-30"
+            className="flex items-center space-x-2 text-white hover:text-white transition-colors bg-[#0a3d62] px-3 py-2 rounded-md hover:bg-[#0d4a75] border border-white/20"
           >
-            <span className="text-xl">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
+            <span className="text-base font-semibold">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
             <span className="text-sm font-medium">{languages.find(l => l.code === selectedLanguage)?.name}</span>
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -100,7 +100,7 @@ const AdminLoginForm = () => {
           </button>
           
           {openDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-[99999] overflow-hidden">
+            <div className="absolute right-0 mt-2 w-48 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-md shadow-xl z-[99999] overflow-hidden">
               {languages.map((lang) => (
                 <button
                   key={lang.code}
@@ -110,12 +110,12 @@ const AdminLoginForm = () => {
                     e.stopPropagation();
                     changeLanguage(lang.code);
                   }}
-                  className={`w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
-                    selectedLanguage === lang.code ? 'bg-gray-100 font-medium' : ''
+                  className={`w-full px-4 py-3 text-left text-white hover:bg-white/20 flex items-center space-x-3 transition-colors ${
+                    selectedLanguage === lang.code ? 'bg-white/30 font-semibold' : ''
                   }`}
                 >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span className="text-sm">{lang.name}</span>
+                  <span className="text-lg font-semibold">{lang.flag}</span>
+                  <span className="text-sm font-medium">{lang.name}</span>
                 </button>
               ))}
             </div>
