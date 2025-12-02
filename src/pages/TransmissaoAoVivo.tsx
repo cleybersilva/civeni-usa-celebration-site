@@ -727,11 +727,42 @@ const TransmissaoAoVivo = () => {
                               ))}
                             </div>
                           </div>
-                ) : (
-                <p className="text-gray-500 text-center py-4">
-                  {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
-                </p>
+                        ) : room.fallbackWorks && room.fallbackWorks.length > 0 ? (
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-base sm:text-lg text-gray-800">
+                              {t('transmission.roomWorks', 'Trabalhos desta sala')} ({room.fallbackWorks.length})
+                            </h4>
+                            <div className="overflow-x-auto">
+                              <table className="min-w-full text-sm">
+                                <thead>
+                                  <tr className="border-b border-gray-200 text-left text-gray-600">
+                                    <th className="py-2 pr-4 w-16">{t('transmission.order', 'Ordem')}</th>
+                                    <th className="py-2 pr-4">{t('transmission.workTitle', 'Título da Apresentação')}</th>
+                                    <th className="py-2">{t('transmission.workAuthors', 'Autores')}</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {room.fallbackWorks.map((work, idx) => (
+                                    <tr key={work.id} className="border-b border-gray-100 last:border-0">
+                                      <td className="py-2 pr-4 align-top text-gray-700 font-medium">{work.ordem ?? idx + 1}</td>
+                                      <td className="py-2 pr-4 align-top text-gray-900">
+                                        {work.titulo_apresentacao}
+                                      </td>
+                                      <td className="py-2 align-top text-gray-700">
+                                        {work.autores}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-center py-4">
+                            {t('transmission.noRooms', 'Nenhum trabalho agendado para esta sala ainda.')}
+                          </p>
                         )}
+
                       </div>
                     </Card>
                   ))}
