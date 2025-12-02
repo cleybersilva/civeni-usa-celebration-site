@@ -40,10 +40,36 @@ interface RoomWorkFormData {
   ordem: number | null;
 }
 
+interface SubmissionSummary {
+  id: string;
+  autor_principal: string;
+  email: string;
+  titulo: string;
+  tipo: string;
+}
+
 interface Props {
   roomId: string;
   onBack: () => void;
 }
+
+const formatTimeNoTimezone = (value?: string | null) => {
+  if (!value) return '';
+
+  // Caso venha apenas como horário (HH:mm:ss ou HH:mm)
+  if (/^\d{2}:\d{2}/.test(value)) {
+    return value.slice(0, 5);
+  }
+
+  // Extrai horário de strings completas de data (YYYY-MM-DDTHH:mm:ss[...])
+  const matchT = value.match(/T(\d{2}:\d{2})/);
+  if (matchT) return matchT[1];
+
+  const matchSpace = value.match(/\s(\d{2}:\d{2})/);
+  if (matchSpace) return matchSpace[1];
+
+  return value;
+};
 
 
 export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
@@ -66,7 +92,6 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
   
   const queryClient = useQueryClient();
   const { data: roomDetails } = usePresentationRoomDetails(roomId);
-
   // Configura sessão admin para acessar tabela de submissões
   const setupAdminSession = async () => {
     const savedSession = localStorage.getItem('adminSession');
@@ -145,6 +170,39 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
     },
     enabled: isDialogOpen,
   });
+
+  // Submissões vinculadas aos trabalhos já atribuídos (para exibir Aluno/Título/Tipo)
+  const { data: assignmentSubmissionsMap } = useQuery<{ [id: string]: SubmissionSummary }>({
+    queryKey: ['assignment-submissions', roomId],
+    enabled: !!roomDetails?.assignments?.length,
+    queryFn: async () => {
+      const sessionOk = await setupAdminSession();
+      if (!sessionOk) {
+        return {};
+      }
+
+      const ids = (roomDetails?.assignments || [])
+        .map((a: any) => a.submission_id)
+        .filter(Boolean) as string[];
+
+      if (!ids.length) return {};
+
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('id, autor_principal, email, titulo, tipo')
+        .in('id', ids);
+
+      if (error) throw error;
+
+      const map: { [id: string]: SubmissionSummary } = {};
+      (data || []).forEach((s: any) => {
+        map[s.id] = s as SubmissionSummary;
+      });
+
+      return map;
+    },
+  });
+
 
   const createAssignmentMutation = useMutation({
     mutationFn: async (data: AssignmentFormData) => {
@@ -563,47 +621,55 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {roomDetails?.assignments?.map((assignment: any) => (
-                <TableRow
-                  key={assignment.id}
-                  className="hover:bg-muted/60 transition-colors"
-                >
-                  <TableCell className="text-center font-semibold">
-                    {assignment.ordem_apresentacao}
-                  </TableCell>
-                  <TableCell className="text-center text-sm font-medium whitespace-nowrap">
-                    {format(new Date(assignment.inicio_apresentacao), 'HH:mm')} -{' '}
-                    {format(new Date(assignment.fim_apresentacao), 'HH:mm')}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="font-medium">
-                        {assignment.submission?.autor_principal}
-                      </span>
-                      {assignment.submission?.email && (
-                        <span className="text-xs text-muted-foreground break-words">
-                          {assignment.submission?.email}
+              {roomDetails?.assignments?.map((assignment: any) => {
+                const submission =
+                  assignment.submission ||
+                  (assignmentSubmissionsMap
+                    ? assignmentSubmissionsMap[assignment.submission_id]
+                    : undefined);
+
+                return (
+                  <TableRow
+                    key={assignment.id}
+                    className="hover:bg-muted/60 transition-colors"
+                  >
+                    <TableCell className="text-center font-semibold">
+                      {assignment.ordem_apresentacao}
+                    </TableCell>
+                    <TableCell className="text-center text-sm font-medium whitespace-nowrap">
+                      {formatTimeNoTimezone(assignment.inicio_apresentacao)} -{' '}
+                      {formatTimeNoTimezone(assignment.fim_apresentacao)}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-medium">
+                          {submission?.autor_principal || '-'}
                         </span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-sm leading-snug max-w-xl break-words">
-                    {assignment.submission?.titulo}
-                  </TableCell>
-                  <TableCell className="text-center text-sm font-medium">
-                    {assignment.submission?.tipo}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(assignment.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        {submission?.email && (
+                          <span className="text-xs text-muted-foreground break-words">
+                            {submission.email}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center text-sm leading-snug max-w-xl break-words">
+                      {submission?.titulo || '-'}
+                    </TableCell>
+                    <TableCell className="text-center text-sm font-medium">
+                      {submission?.tipo || '-'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(assignment.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
