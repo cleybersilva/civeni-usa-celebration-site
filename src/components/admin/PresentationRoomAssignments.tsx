@@ -538,51 +538,75 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
         </Dialog>
       </div>
 
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold mb-4">Trabalhos da Sala</h3>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ordem</TableHead>
-              <TableHead>Horário</TableHead>
-              <TableHead>Aluno</TableHead>
-              <TableHead>Título do Trabalho</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {roomDetails?.assignments?.map((assignment: any) => (
-              <TableRow key={assignment.id}>
-                <TableCell>{assignment.ordem_apresentacao}</TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {format(
-                    new Date(assignment.inicio_apresentacao),
-                    'HH:mm'
-                  )}{' '}
-                  -{' '}
-                  {format(new Date(assignment.fim_apresentacao), 'HH:mm')}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {assignment.submission?.autor_principal}
-                </TableCell>
-                <TableCell className="max-w-xs truncate">
-                  {assignment.submission?.titulo}
-                </TableCell>
-                <TableCell>{assignment.submission?.tipo}</TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(assignment.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </TableCell>
+      <Card className="p-4 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h3 className="text-lg font-semibold">Trabalhos da Sala</h3>
+            <p className="text-sm text-muted-foreground">
+              Visão centralizada dos artigos e consórcios atribuídos a esta sala.
+            </p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border bg-background">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center whitespace-nowrap">Ordem</TableHead>
+                <TableHead className="text-center whitespace-nowrap">Horário</TableHead>
+                <TableHead className="text-center whitespace-nowrap">Aluno</TableHead>
+                <TableHead className="text-center whitespace-nowrap">
+                  Título do Trabalho
+                </TableHead>
+                <TableHead className="text-center whitespace-nowrap">Tipo</TableHead>
+                <TableHead className="text-center whitespace-nowrap">Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {roomDetails?.assignments?.map((assignment: any) => (
+                <TableRow
+                  key={assignment.id}
+                  className="hover:bg-muted/60 transition-colors"
+                >
+                  <TableCell className="text-center font-semibold">
+                    {assignment.ordem_apresentacao}
+                  </TableCell>
+                  <TableCell className="text-center text-sm font-medium whitespace-nowrap">
+                    {format(new Date(assignment.inicio_apresentacao), 'HH:mm')} -{' '}
+                    {format(new Date(assignment.fim_apresentacao), 'HH:mm')}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="font-medium">
+                        {assignment.submission?.autor_principal}
+                      </span>
+                      {assignment.submission?.email && (
+                        <span className="text-xs text-muted-foreground break-words">
+                          {assignment.submission?.email}
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center text-sm leading-snug max-w-xl break-words">
+                    {assignment.submission?.titulo}
+                  </TableCell>
+                  <TableCell className="text-center text-sm font-medium">
+                    {assignment.submission?.tipo}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(assignment.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
  
         {!roomDetails?.assignments?.length && (
           <div className="text-center py-8 text-muted-foreground">
