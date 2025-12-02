@@ -2812,6 +2812,44 @@ export type Database = {
           },
         ]
       }
+      salas_apresentacao_trabalhos: {
+        Row: {
+          autores: string
+          created_at: string
+          id: string
+          ordem: number | null
+          sala_id: string
+          titulo_apresentacao: string
+          updated_at: string
+        }
+        Insert: {
+          autores: string
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          sala_id: string
+          titulo_apresentacao: string
+          updated_at?: string
+        }
+        Update: {
+          autores?: string
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          sala_id?: string
+          titulo_apresentacao?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salas_apresentacao_trabalhos_sala_id_fkey"
+            columns: ["sala_id"]
+            isOneToOne: false
+            referencedRelation: "presentation_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schedules: {
         Row: {
           category: string
