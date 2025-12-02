@@ -67,6 +67,33 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
   const queryClient = useQueryClient();
   const { data: roomDetails } = usePresentationRoomDetails(roomId);
 
+  // Configura sessão admin para acessar tabela de submissões
+  const setupAdminSession = async () => {
+    const savedSession = localStorage.getItem('adminSession');
+    if (!savedSession) {
+      console.error('Sessão admin não encontrada');
+      return false;
+    }
+
+    const sessionData = JSON.parse(savedSession);
+    if (!sessionData.session_token || !sessionData.user?.email) {
+      console.error('Sessão admin inválida');
+      return false;
+    }
+
+    const { data, error } = await supabase.rpc('set_current_user_email_secure', {
+      user_email: sessionData.user.email,
+      session_token: sessionData.session_token,
+    });
+
+    if (error || !data) {
+      console.error('Erro ao configurar sessão admin para submissões:', error);
+      return false;
+    }
+
+    return true;
+  };
+
   // Trabalhos manuais (título + autores)
   const { data: manualWorks } = useQuery({
     queryKey: ['room-works', roomId],
@@ -86,15 +113,21 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
   const { data: availableSubmissions } = useQuery({
     queryKey: ['available-submissions', searchTerm],
     queryFn: async () => {
+      const sessionOk = await setupAdminSession();
+      if (!sessionOk) {
+        return [];
+      }
+
       let query = supabase
         .from('submissions')
         .select('*')
+        .is('deleted_at', null)
         .eq('status', 'validado')
         .limit(20);
 
       if (searchTerm) {
         query = query.or(
-          `autor_principal.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,titulo.ilike.%${searchTerm}%`
+          `titulo.ilike.%${searchTerm}%,autor_principal.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`
         );
       }
 
