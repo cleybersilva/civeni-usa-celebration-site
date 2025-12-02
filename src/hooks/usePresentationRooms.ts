@@ -31,8 +31,17 @@ export interface PresentationAssignment {
   };
 }
 
+export interface PresentationRoomWork {
+  id: string;
+  sala_id: string;
+  titulo_apresentacao: string;
+  autores: string;
+  ordem: number | null;
+}
+
 export interface RoomWithAssignments extends PresentationRoom {
   assignments: PresentationAssignment[];
+  fallbackWorks?: PresentationRoomWork[];
 }
 
 export const usePresentationRooms = (publicOnly = false) => {
@@ -110,6 +119,36 @@ export const usePublicPresentationRoomsWithAssignments = () => {
 
       if (roomsError) throw roomsError;
 
+      const roomIds = (rooms || []).map((room) => room.id);
+
+      let worksByRoom: Record<string, PresentationRoomWork[]> = {};
+
+      if (roomIds.length > 0) {
+        const { data: works, error: worksError } = await supabase
+          .from('salas_apresentacao_trabalhos')
+          .select('*')
+          .in('sala_id', roomIds);
+
+        if (worksError) throw worksError;
+
+        worksByRoom = (works || []).reduce((acc, work) => {
+          const key = work.sala_id as string;
+          const existing = acc[key] || [];
+          acc[key] = [...existing, work as PresentationRoomWork];
+          return acc;
+        }, {} as Record<string, PresentationRoomWork[]>);
+
+        // Sort works within each room by ordem when available
+        Object.keys(worksByRoom).forEach((key) => {
+          worksByRoom[key] = worksByRoom[key].slice().sort((a, b) => {
+            if (a.ordem == null && b.ordem == null) return 0;
+            if (a.ordem == null) return 1;
+            if (b.ordem == null) return -1;
+            return a.ordem - b.ordem;
+          });
+        });
+      }
+
       const roomsWithAssignments = await Promise.all(
         (rooms || []).map(async (room) => {
           const { data: assignments, error: assignmentsError } = await supabase
@@ -132,6 +171,7 @@ export const usePublicPresentationRoomsWithAssignments = () => {
           return {
             ...room,
             assignments: assignments || [],
+            fallbackWorks: worksByRoom[room.id] || [],
           } as RoomWithAssignments;
         })
       );
