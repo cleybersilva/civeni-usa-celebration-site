@@ -138,7 +138,6 @@ export const usePublicPresentationRoomsWithAssignments = () => {
           return acc;
         }, {} as Record<string, PresentationRoomWork[]>);
 
-        // Sort works within each room by ordem when available
         Object.keys(worksByRoom).forEach((key) => {
           worksByRoom[key] = worksByRoom[key].slice().sort((a, b) => {
             if (a.ordem == null && b.ordem == null) return 0;
