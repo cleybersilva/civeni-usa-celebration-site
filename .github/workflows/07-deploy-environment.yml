@@ -87,19 +87,42 @@ jobs:
 
           echo "✅ Deploy via SFTP concluído!"
 
-      - name: Deploy via SFTP (password-based)
+      - name: Deploy via SFTP with password (using sshpass)
         if: steps.deploy-config.outputs.deploy-method == 'ftp'
         id: sftp-deploy
         continue-on-error: true
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          local_path: './cpanel-package/*'
-          remote_path: ${{ steps.deploy-config.outputs.server-dir }}
-          sftp_only: true
+        run: |
+          echo "🚀 Tentando deploy via SFTP (porta 22)..."
+
+          # Instalar sshpass para autenticação com senha
+          sudo apt-get update -qq
+          sudo apt-get install -y sshpass rsync
+
+          # Extrair username (remover @dominio se existir)
+          USERNAME="${{ secrets.FTP_USERNAME }}"
+          USERNAME="${USERNAME%%@*}"
+
+          echo "📡 Conectando em: ${{ secrets.FTP_SERVER }}:22"
+          echo "👤 Usuário: $USERNAME"
+
+          # Usar rsync over SSH com senha via sshpass
+          sshpass -p "${{ secrets.FTP_PASSWORD }}" \
+            rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22" \
+            --exclude='.git*' \
+            --exclude='node_modules' \
+            --exclude='.DS_Store' \
+            ./cpanel-package/ \
+            $USERNAME@${{ secrets.FTP_SERVER }}:${{ steps.deploy-config.outputs.server-dir }}
+
+          if [ $? -eq 0 ]; then
+            echo "✅ Deploy via SFTP concluído com sucesso!"
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ SFTP falhou"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
       - name: Deploy via FTP/FTPS (Last Resort Fallback)
         if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.sftp-deploy.outcome != 'success'
