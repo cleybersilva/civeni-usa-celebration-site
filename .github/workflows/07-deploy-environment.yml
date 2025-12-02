@@ -40,8 +40,8 @@ jobs:
           test -f cpanel-package/.htaccess && echo "✅ .htaccess encontrado" || echo "⚠️ .htaccess não encontrado"
           test -d cpanel-package/assets && echo "✅ pasta assets/ encontrada" || (echo "❌ pasta assets/ não encontrada" && exit 1)
 
-      - name: Prepare FTP configuration
-        id: ftp-config
+      - name: Prepare deployment configuration
+        id: deploy-config
         run: |
           # Garantir que server-dir termine com /
           SERVER_DIR="${{ secrets.FTP_SERVER_DIR }}"
@@ -53,7 +53,42 @@ jobs:
           echo "server-dir=$SERVER_DIR" >> $GITHUB_OUTPUT
           echo "📁 Diretório de destino: $SERVER_DIR"
 
-      - name: Deploy to cPanel via FTP
+          # Detectar método de deploy preferido
+          if [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "deploy-method=ssh" >> $GITHUB_OUTPUT
+            echo "🔐 Método detectado: SSH/SFTP (recomendado)"
+          else
+            echo "deploy-method=ftp" >> $GITHUB_OUTPUT
+            echo "📡 Método detectado: FTP/FTPS"
+          fi
+
+      - name: Setup SSH key (if using SSH deploy)
+        if: steps.deploy-config.outputs.deploy-method == 'ssh'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          echo "✅ SSH key configurada"
+
+      - name: Deploy via SFTP/SCP (Recommended)
+        if: steps.deploy-config.outputs.deploy-method == 'ssh'
+        run: |
+          echo "🚀 Iniciando deploy via SFTP..."
+
+          # Usar rsync over SSH (mais eficiente)
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT || 22 }}" \
+            --exclude='.git*' \
+            --exclude='node_modules' \
+            --exclude='.DS_Store' \
+            ./cpanel-package/ \
+            ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:${{ steps.deploy-config.outputs.server-dir }}
+
+          echo "✅ Deploy via SFTP concluído!"
+
+      - name: Deploy via FTP/FTPS (Fallback)
+        if: steps.deploy-config.outputs.deploy-method == 'ftp'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -61,7 +96,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ${{ secrets.FTP_PROTOCOL || 'ftps' }}
-          server-dir: ${{ steps.ftp-config.outputs.server-dir }}
+          server-dir: ${{ steps.deploy-config.outputs.server-dir }}
           local-dir: ./cpanel-package/
           dangerous-clean-slate: false
           exclude: |
