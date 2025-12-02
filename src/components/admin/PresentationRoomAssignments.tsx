@@ -158,10 +158,23 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
         throw new Error('Sessão inválida');
       }
  
+      // Combina a data da sala com os horários informados para gerar timestamps válidos
+      const makeDateTime = (time: string) => {
+        if (!roomDetails?.data_apresentacao || !time) return null;
+        return `${roomDetails.data_apresentacao}T${time}:00`;
+      };
+ 
+      const assignmentPayload = {
+        ...data,
+        room_id: roomId,
+        inicio_apresentacao: makeDateTime(data.inicio_apresentacao),
+        fim_apresentacao: makeDateTime(data.fim_apresentacao),
+      } as any;
+ 
       const { data: result, error } = await supabase.rpc(
         'admin_upsert_presentation_assignment',
         {
-          assignment_data: { ...data, room_id: roomId } as any,
+          assignment_data: assignmentPayload,
           user_email: sessionData.user.email,
           session_token: sessionData.session_token,
         }
