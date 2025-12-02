@@ -737,8 +737,8 @@ const TransmissaoAoVivo = () => {
                                 <thead>
                                   <tr className="border-b border-gray-200 text-left text-gray-600">
                                     <th className="py-2 pr-4 w-16">{t('transmission.order', 'Ordem')}</th>
-                                    <th className="py-2 pr-4">{t('transmission.workTitle', 'Título da Apresentação')}</th>
-                                    <th className="py-2">{t('transmission.workAuthors', 'Autores')}</th>
+                                    <th className="py-2 pr-4 text-center">{t('transmission.workTitle', 'Título da Apresentação')}</th>
+                                    <th className="py-2 text-center">{t('transmission.workAuthors', 'Autores')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
