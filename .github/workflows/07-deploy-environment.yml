@@ -92,17 +92,30 @@ jobs:
         continue-on-error: true
         run: |
           echo "🔍 Testando conectividade..."
-          
-          # Testar FTP (porta 21)
-          if timeout 5 bash -c "</dev/tcp/${{ secrets.FTP_SERVER }}/21" 2>/dev/null; then
-            echo "✅ Porta FTP (21) está aberta"
+
+          FTP_PORT="${{ secrets.FTP_PORT || 2121 }}"
+
+          # Testar FTP (porta 2121 ou customizada)
+          echo "🔍 Testando FTP na porta $FTP_PORT..."
+          if timeout 5 bash -c "</dev/tcp/${{ secrets.FTP_SERVER }}/$FTP_PORT" 2>/dev/null; then
+            echo "✅ Porta FTP ($FTP_PORT) está aberta"
             echo "ftp-available=true" >> $GITHUB_OUTPUT
+            echo "ftp-port=$FTP_PORT" >> $GITHUB_OUTPUT
           else
-            echo "❌ Porta FTP (21) está fechada ou inacessível"
+            echo "❌ Porta FTP ($FTP_PORT) está fechada ou inacessível"
             echo "ftp-available=false" >> $GITHUB_OUTPUT
+
+            # Tentar porta padrão 21 também
+            echo "🔍 Testando FTP na porta padrão 21..."
+            if timeout 5 bash -c "</dev/tcp/${{ secrets.FTP_SERVER }}/21" 2>/dev/null; then
+              echo "✅ Porta FTP (21) está aberta"
+              echo "ftp-available=true" >> $GITHUB_OUTPUT
+              echo "ftp-port=21" >> $GITHUB_OUTPUT
+            fi
           fi
-          
+
           # Testar SFTP (porta 22)
+          echo "🔍 Testando SSH/SFTP na porta 22..."
           if timeout 5 bash -c "</dev/tcp/${{ secrets.FTP_SERVER }}/22" 2>/dev/null; then
             echo "✅ Porta SSH/SFTP (22) está aberta"
             echo "ssh-available=true" >> $GITHUB_OUTPUT
@@ -155,7 +168,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT || 21 }}
+          port: ${{ steps.connectivity-test.outputs.ftp-port || secrets.FTP_PORT || 2121 }}
           protocol: ${{ secrets.FTP_PROTOCOL || 'ftps' }}
           server-dir: ${{ steps.deploy-config.outputs.server-dir }}
           local-dir: ./cpanel-package/
