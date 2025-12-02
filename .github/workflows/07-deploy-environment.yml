@@ -88,7 +88,7 @@ jobs:
           echo "✅ Deploy via SFTP concluído!"
 
       - name: Deploy via SFTP (password-based)
-        if: steps.deploy-config.outputs.deploy-method == 'ftp' && secrets.FTP_PASSWORD != ''
+        if: steps.deploy-config.outputs.deploy-method == 'ftp'
         id: sftp-deploy
         continue-on-error: true
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
@@ -102,7 +102,7 @@ jobs:
           sftp_only: true
 
       - name: Deploy via FTP/FTPS (Last Resort Fallback)
-        if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.sftp-deploy.outcome == 'failure'
+        if: steps.deploy-config.outputs.deploy-method == 'ftp' && steps.sftp-deploy.outcome != 'success'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
