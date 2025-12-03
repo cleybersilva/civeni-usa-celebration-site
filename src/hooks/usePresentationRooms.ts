@@ -117,7 +117,8 @@ export const usePublicPresentationRoomsWithAssignments = () => {
         .select('*')
         .eq('status', 'publicado')
         .order('data_apresentacao', { ascending: true })
-        .order('horario_inicio_sala', { ascending: true });
+        .order('horario_inicio_sala', { ascending: true })
+        .order('ordem_sala', { ascending: true });
 
       if (roomsError) throw roomsError;
 
