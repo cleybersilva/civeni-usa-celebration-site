@@ -2577,6 +2577,7 @@ export type Database = {
           id: string
           meet_link: string
           nome_sala: string
+          ordem_sala: number | null
           responsavel_sala: string | null
           status: string
           updated_at: string
@@ -2590,6 +2591,7 @@ export type Database = {
           id?: string
           meet_link: string
           nome_sala: string
+          ordem_sala?: number | null
           responsavel_sala?: string | null
           status?: string
           updated_at?: string
@@ -2603,6 +2605,7 @@ export type Database = {
           id?: string
           meet_link?: string
           nome_sala?: string
+          ordem_sala?: number | null
           responsavel_sala?: string | null
           status?: string
           updated_at?: string

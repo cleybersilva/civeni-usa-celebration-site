@@ -13,6 +13,7 @@ export interface PresentationRoom {
   responsavel_sala: string | null;
   created_at: string;
   updated_at: string;
+  ordem_sala?: number | null;
 }
 
 export interface PresentationAssignment {
@@ -52,7 +53,8 @@ export const usePresentationRooms = (publicOnly = false) => {
         .from('presentation_rooms')
         .select('*')
         .order('data_apresentacao', { ascending: true })
-        .order('horario_inicio_sala', { ascending: true });
+        .order('horario_inicio_sala', { ascending: true })
+        .order('ordem_sala', { ascending: true });
 
       if (publicOnly) {
         query = query.eq('status', 'publicado');
