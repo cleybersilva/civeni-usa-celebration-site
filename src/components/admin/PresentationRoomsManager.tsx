@@ -214,6 +214,69 @@ export const PresentationRoomsManager = () => {
     },
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: async (newOrderedIds: string[]) => {
+      if (!rooms || rooms.length === 0) return;
+
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
+      }
+
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
+      }
+
+      const orderedRooms = newOrderedIds
+        .map((id) => (rooms || []).find((room) => room.id === id))
+        .filter((room): room is PresentationRoom => Boolean(room));
+
+      for (let index = 0; index < orderedRooms.length; index++) {
+        const room = orderedRooms[index];
+
+        const { error } = await supabase.rpc('admin_upsert_presentation_room', {
+          room_data: {
+            id: room.id,
+            nome_sala: room.nome_sala,
+            descricao_sala: room.descricao_sala,
+            meet_link: room.meet_link,
+            data_apresentacao: room.data_apresentacao,
+            horario_inicio_sala: room.horario_inicio_sala,
+            horario_fim_sala: room.horario_fim_sala,
+            status: room.status,
+            responsavel_sala: room.responsavel_sala,
+            ordem_sala: index + 1,
+          } as any,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['presentation-rooms'] });
+    },
+    onError: (error: any) => {
+      const message = error?.message || String(error);
+      if (message.includes('invalid or expired session')) {
+        toast.error('Sua sessão expirou. Faça login novamente para continuar.');
+      } else {
+        toast.error(`Erro ao atualizar ordem das salas: ${message}`);
+      }
+    },
+  });
+
   const resetForm = () => {
     setFormData({
       nome_sala: '',
@@ -306,7 +369,9 @@ export const PresentationRoomsManager = () => {
       const newIndex = current.indexOf(over.id as string);
 
       if (oldIndex === -1 || newIndex === -1) return current;
-      return arrayMove(current, oldIndex, newIndex);
+      const newOrder = arrayMove(current, oldIndex, newIndex);
+      reorderMutation.mutate(newOrder);
+      return newOrder;
     });
   };
 
