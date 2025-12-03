@@ -31,7 +31,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Users } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { PresentationRoomAssignments } from './PresentationRoomAssignments';
 import { usePresentationRooms } from '@/hooks/usePresentationRooms';
 
@@ -69,22 +69,31 @@ export const PresentationRoomsManager = () => {
 
   const createMutation = useMutation({
     mutationFn: async (data: RoomFormData) => {
-      const savedSession = localStorage.getItem('adminSession');
-      if (!savedSession) {
-        throw new Error('Sessão não encontrada');
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
       }
 
-      const sessionData = JSON.parse(savedSession);
-      if (!sessionData.session_token || !sessionData.user?.email) {
-        throw new Error('Sessão inválida');
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
       }
 
       const { data: result, error } = await supabase.rpc(
         'admin_upsert_presentation_room',
         {
           room_data: data as any,
-          user_email: sessionData.user.email,
-          session_token: sessionData.session_token,
+          user_email: sessionEmail,
+          session_token: sessionToken,
         }
       );
       
@@ -97,29 +106,43 @@ export const PresentationRoomsManager = () => {
       setIsDialogOpen(false);
       resetForm();
     },
-    onError: (error) => {
-      toast.error(`Erro ao criar sala: ${error.message}`);
+    onError: (error: any) => {
+      const message = error?.message || String(error);
+      if (message.includes('invalid or expired session')) {
+        toast.error('Sua sessão expirou. Faça login novamente para continuar.');
+      } else {
+        toast.error(`Erro ao criar sala: ${message}`);
+      }
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: RoomFormData }) => {
-      const savedSession = localStorage.getItem('adminSession');
-      if (!savedSession) {
-        throw new Error('Sessão não encontrada');
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
       }
 
-      const sessionData = JSON.parse(savedSession);
-      if (!sessionData.session_token || !sessionData.user?.email) {
-        throw new Error('Sessão inválida');
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
       }
 
       const { data: result, error } = await supabase.rpc(
         'admin_upsert_presentation_room',
         {
           room_data: { ...data, id } as any,
-          user_email: sessionData.user.email,
-          session_token: sessionData.session_token,
+          user_email: sessionEmail,
+          session_token: sessionToken,
         }
       );
       
@@ -132,29 +155,43 @@ export const PresentationRoomsManager = () => {
       setIsDialogOpen(false);
       resetForm();
     },
-    onError: (error) => {
-      toast.error(`Erro ao atualizar sala: ${error.message}`);
+    onError: (error: any) => {
+      const message = error?.message || String(error);
+      if (message.includes('invalid or expired session')) {
+        toast.error('Sua sessão expirou. Faça login novamente para continuar.');
+      } else {
+        toast.error(`Erro ao atualizar sala: ${message}`);
+      }
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const savedSession = localStorage.getItem('adminSession');
-      if (!savedSession) {
-        throw new Error('Sessão não encontrada');
+      const sessionRaw = localStorage.getItem('adminSession');
+      let sessionEmail = '';
+      let sessionToken: string | undefined;
+
+      if (sessionRaw) {
+        try {
+          const parsed = JSON.parse(sessionRaw);
+          sessionEmail = parsed?.user?.email || '';
+          sessionToken = parsed?.session_token || parsed?.sessionToken;
+        } catch (e) {
+          console.warn('Failed to read admin session from localStorage');
+          throw new Error('Sessão administrativa inválida. Faça login novamente.');
+        }
       }
 
-      const sessionData = JSON.parse(savedSession);
-      if (!sessionData.session_token || !sessionData.user?.email) {
-        throw new Error('Sessão inválida');
+      if (!sessionEmail || !sessionToken) {
+        throw new Error('Sessão administrativa inválida. Faça login novamente.');
       }
 
       const { data: result, error } = await supabase.rpc(
         'admin_delete_presentation_room',
         {
           room_id: id,
-          user_email: sessionData.user.email,
-          session_token: sessionData.session_token,
+          user_email: sessionEmail,
+          session_token: sessionToken,
         }
       );
       
@@ -165,8 +202,13 @@ export const PresentationRoomsManager = () => {
       queryClient.invalidateQueries({ queryKey: ['presentation-rooms'] });
       toast.success('Sala excluída com sucesso!');
     },
-    onError: (error) => {
-      toast.error(`Erro ao excluir sala: ${error.message}`);
+    onError: (error: any) => {
+      const message = error?.message || String(error);
+      if (message.includes('invalid or expired session')) {
+        toast.error('Sua sessão expirou. Faça login novamente para continuar.');
+      } else {
+        toast.error(`Erro ao excluir sala: ${message}`);
+      }
     },
   });
 
@@ -449,7 +491,12 @@ export const PresentationRoomsManager = () => {
                 <TableRow key={room.id}>
                   <TableCell className="font-medium">{room.nome_sala}</TableCell>
                   <TableCell>
-                    {format(new Date(room.data_apresentacao), 'dd/MM/yyyy')}
+                    {room.data_apresentacao
+                      ? format(
+                          parse(room.data_apresentacao, 'yyyy-MM-dd', new Date()),
+                          'dd/MM/yyyy'
+                        )
+                      : ''}
                   </TableCell>
                   <TableCell>
                     {room.horario_inicio_sala} - {room.horario_fim_sala}
