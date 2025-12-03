@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -30,11 +30,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Users } from 'lucide-react';
+import { Plus, Pencil, Trash2, Users, GripVertical } from 'lucide-react';
 import { format, parse } from 'date-fns';
 import { PresentationRoomAssignments } from './PresentationRoomAssignments';
-import { usePresentationRooms } from '@/hooks/usePresentationRooms';
-
+import { usePresentationRooms, PresentationRoom } from '@/hooks/usePresentationRooms';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 interface RoomFormData {
   nome_sala: string;
   descricao_sala: string;
@@ -55,7 +57,7 @@ export const PresentationRoomsManager = () => {
 
   const queryClient = useQueryClient();
   const { data: rooms, isLoading } = usePresentationRooms(false);
-
+  const [orderedIds, setOrderedIds] = useState<string[]>([]);
   const [formData, setFormData] = useState<RoomFormData>({
     nome_sala: '',
     descricao_sala: '',
@@ -263,13 +265,50 @@ export const PresentationRoomsManager = () => {
     }
   };
 
-  const filteredRooms = rooms?.filter((room) => {
-    const matchesStatus = filterStatus === 'all' || room.status === filterStatus;
-    const matchesSearch =
-      searchTerm === '' ||
-      room.nome_sala.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+  useEffect(() => {
+    if (rooms && rooms.length > 0) {
+      setOrderedIds((prev) => {
+        if (prev.length === 0) return rooms.map((room) => room.id);
+        const existing = prev.filter((id) => rooms.some((room) => room.id === id));
+        const missing = rooms
+          .map((room) => room.id)
+          .filter((id) => !existing.includes(id));
+        return [...existing, ...missing];
+      });
+    }
+  }, [rooms]);
+
+  const filteredRooms = (rooms || [])
+    .filter((room) => {
+      const matchesStatus = filterStatus === 'all' || room.status === filterStatus;
+      const matchesSearch =
+        searchTerm === '' ||
+        room.nome_sala.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesStatus && matchesSearch;
+    })
+    .sort((a, b) => {
+      // Apply custom drag-and-drop order when available
+      const indexA = orderedIds.indexOf(a.id);
+      const indexB = orderedIds.indexOf(b.id);
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setOrderedIds((current) => {
+      const oldIndex = current.indexOf(active.id as string);
+      const newIndex = current.indexOf(over.id as string);
+
+      if (oldIndex === -1 || newIndex === -1) return current;
+      return arrayMove(current, oldIndex, newIndex);
+    });
+  };
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -292,7 +331,6 @@ export const PresentationRoomsManager = () => {
       />
     );
   }
-
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -475,67 +513,112 @@ export const PresentationRoomsManager = () => {
         {isLoading ? (
           <div className="text-center py-8">Carregando...</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome da Sala</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Horário</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Trabalhos</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRooms?.map((room) => (
-                <TableRow key={room.id}>
-                  <TableCell className="font-medium">{room.nome_sala}</TableCell>
-                  <TableCell>
-                    {room.data_apresentacao
-                      ? format(
-                          parse(room.data_apresentacao, 'yyyy-MM-dd', new Date()),
-                          'dd/MM/yyyy'
-                        )
-                      : ''}
-                  </TableCell>
-                  <TableCell>
-                    {room.horario_inicio_sala} - {room.horario_fim_sala}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(room.status)}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedRoomId(room.id)}
-                    >
-                      <Users className="w-4 h-4 mr-1" />
-                      Gerenciar
-                    </Button>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(room)}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(room.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext
+              items={filteredRooms?.map((room) => room.id) || []}
+              strategy={verticalListSortingStrategy}
+            >
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome da Sala</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Horário</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Trabalhos</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRooms?.map((room) => (
+                    <SortableRoomRow
+                      key={room.id}
+                      room={room}
+                      onManage={() => setSelectedRoomId(room.id)}
+                      onEdit={() => handleEdit(room)}
+                      onDelete={() => handleDelete(room.id)}
+                      getStatusBadge={getStatusBadge}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </SortableContext>
+          </DndContext>
         )}
       </Card>
     </div>
+  );
+};
+
+interface SortableRoomRowProps {
+  room: PresentationRoom;
+  onManage: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  getStatusBadge: (status: string) => JSX.Element;
+}
+
+const SortableRoomRow: React.FC<SortableRoomRowProps> = ({
+  room,
+  onManage,
+  onEdit,
+  onDelete,
+  getStatusBadge,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: room.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      className="hover:bg-muted/40 transition-colors animate-fade-in"
+    >
+      <TableCell className="font-medium">
+        <button
+          type="button"
+          className="mr-2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="w-4 h-4" />
+        </button>
+        {room.nome_sala}
+      </TableCell>
+      <TableCell>
+        {room.data_apresentacao
+          ? format(
+              parse(room.data_apresentacao, 'yyyy-MM-dd', new Date()),
+              'dd/MM/yyyy'
+            )
+          : ''}
+      </TableCell>
+      <TableCell>
+        {room.horario_inicio_sala} - {room.horario_fim_sala}
+      </TableCell>
+      <TableCell>{getStatusBadge(room.status)}</TableCell>
+      <TableCell>
+        <Button variant="ghost" size="sm" onClick={onManage}>
+          <Users className="w-4 h-4 mr-1" />
+          Gerenciar
+        </Button>
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={onEdit}>
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onDelete}>
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
   );
 };
