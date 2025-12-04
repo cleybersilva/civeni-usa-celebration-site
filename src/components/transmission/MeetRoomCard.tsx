@@ -89,7 +89,7 @@ const MeetRoomCard = ({ room }: MeetRoomCardProps) => {
 
       {/* Action */}
       <Button 
-        className={`inline-flex items-center justify-center px-5 sm:px-6 py-2 text-xs sm:text-sm md:text-base rounded-full bg-gradient-to-r from-civeni-blue to-civeni-red text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all mx-auto md:mx-0 ${room.status === 'live' ? 'pulse' : ''}`}
+        className={`inline-flex items-center justify-center px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full bg-gradient-to-r from-civeni-blue to-civeni-red text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all mx-auto md:mx-0 ${room.status === 'live' ? 'pulse' : ''}`}
         variant={room.status === 'live' ? 'default' : 'outline'}
         disabled={room.status === 'ended'}
       >
