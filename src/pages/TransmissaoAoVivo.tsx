@@ -500,7 +500,7 @@ const TransmissaoAoVivo = () => {
                       asChild
                     >
                       <a
-                        href={`https://www.youtube.com/${transmission.channel_handle}`}
+                        href={`https://www.youtube.com/watch?v=${transmission.youtube_video_id}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
