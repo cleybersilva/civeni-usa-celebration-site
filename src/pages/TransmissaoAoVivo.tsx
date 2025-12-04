@@ -35,7 +35,7 @@ const getDateLocale = (lang: string) => {
   }
 };
 
-const LiveVideosOrPlaceholder: React.FC = () => {
+const LiveVideosOrPlaceholder = () => {
   const { t } = useTranslation();
   const { data: videos = [], isLoading } = useLiveStreamVideos();
 
