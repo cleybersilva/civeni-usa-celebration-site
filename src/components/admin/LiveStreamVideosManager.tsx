@@ -57,6 +57,33 @@ const LiveStreamVideosManager: React.FC = () => {
     is_published: true,
   });
 
+  const getAdminSession = (): { sessionEmail: string; sessionToken: string } | null => {
+    const sessionRaw = localStorage.getItem('adminSession');
+    let sessionEmail = '';
+    let sessionToken: string | undefined;
+
+    if (sessionRaw) {
+      try {
+        const parsed = JSON.parse(sessionRaw);
+        sessionEmail = parsed?.user?.email || '';
+        sessionToken = parsed?.session_token || parsed?.sessionToken;
+      } catch (e) {
+        console.warn('Falha ao ler a sessão admin do localStorage');
+      }
+    }
+
+    if (!sessionEmail || !sessionToken) {
+      toast({
+        title: 'Sessão expirada',
+        description: 'Sua sessão administrativa é inválida ou expirou. Faça login novamente.',
+        variant: 'destructive',
+      });
+      return null;
+    }
+
+    return { sessionEmail, sessionToken };
+  };
+
   useEffect(() => {
     loadVideos();
   }, []);
@@ -139,11 +166,22 @@ const LiveStreamVideosManager: React.FC = () => {
     };
 
     try {
+      const adminSession = getAdminSession();
+      if (!adminSession) {
+        return;
+      }
+
+      const { sessionEmail, sessionToken } = adminSession;
+
       if (editingVideo) {
-        const { error } = await supabase
-          .from('live_stream_videos')
-          .update({ ...payload, updated_at: new Date().toISOString() })
-          .eq('id', editingVideo.id);
+        const { error } = await (supabase as any).rpc('admin_upsert_live_stream_video', {
+          video_data: {
+            id: editingVideo.id,
+            ...payload,
+          },
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
 
         if (error) throw error;
 
@@ -152,9 +190,11 @@ const LiveStreamVideosManager: React.FC = () => {
           description: 'Vídeo atualizado com sucesso.',
         });
       } else {
-        const { error } = await supabase.from('live_stream_videos').insert([
-          payload,
-        ]);
+        const { error } = await (supabase as any).rpc('admin_upsert_live_stream_video', {
+          video_data: payload,
+          user_email: sessionEmail,
+          session_token: sessionToken,
+        });
 
         if (error) throw error;
 
@@ -193,12 +233,22 @@ const LiveStreamVideosManager: React.FC = () => {
     if (!window.confirm('Tem certeza que deseja excluir este vídeo?')) return;
 
     try {
-      const { error } = await supabase
-        .from('live_stream_videos')
-        .delete()
-        .eq('id', video.id);
+      const adminSession = getAdminSession();
+      if (!adminSession) {
+        return;
+      }
+
+      const { sessionEmail, sessionToken } = adminSession;
+
+      const { data, error } = await (supabase as any).rpc('admin_delete_live_stream_video', {
+        video_id: video.id,
+        user_email: sessionEmail,
+        session_token: sessionToken,
+      });
 
       if (error) throw error;
+
+      console.log('Vídeo de transmissão ao vivo excluído:', data);
 
       toast({
         title: 'Sucesso',

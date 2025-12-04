@@ -4651,6 +4651,10 @@ export type Database = {
         Args: { event_id: string; session_token: string; user_email: string }
         Returns: Json
       }
+      admin_delete_live_stream_video: {
+        Args: { session_token: string; user_email: string; video_id: string }
+        Returns: Json
+      }
       admin_delete_presentation_assignment: {
         Args: {
           assignment_id: string
@@ -4702,6 +4706,10 @@ export type Database = {
       }
       admin_upsert_event_certificate: {
         Args: { p_config: Json; p_session_token: string; p_user_email: string }
+        Returns: Json
+      }
+      admin_upsert_live_stream_video: {
+        Args: { session_token: string; user_email: string; video_data: Json }
         Returns: Json
       }
       admin_upsert_presentation_assignment: {
