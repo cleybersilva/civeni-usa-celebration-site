@@ -746,7 +746,7 @@ const TransmissaoAoVivo = () => {
                             )}
                           </div>
                           <Button 
-                            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white w-full sm:w-auto text-sm" 
+                            className="inline-flex items-center justify-center px-5 py-2 text-xs sm:text-sm rounded-full bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all pulse"
                             size="sm"
                             asChild
                           >
