@@ -89,7 +89,7 @@ const MeetRoomCard = ({ room }: MeetRoomCardProps) => {
 
       {/* Action */}
       <Button 
-        className="w-full" 
+        className={`w-full md:w-auto px-6 py-2 text-sm sm:text-base rounded-full bg-gradient-to-r from-civeni-blue to-civeni-red text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all ${room.status === 'live' ? 'pulse' : ''}`}
         variant={room.status === 'live' ? 'default' : 'outline'}
         disabled={room.status === 'ended'}
       >
