@@ -148,11 +148,20 @@ serve(async (req) => {
         valorTotal: totalValorData / 100
       };
     } else {
-      // Se não há payouts pendentes, buscar o último payout realizado
-      const { data: lastPaidPayout } = await supabaseClient
+      // Se não há payouts pendentes, buscar o último payout realizado (respeitando período se informado)
+      let lastPaidQuery = supabaseClient
         .from('stripe_payouts')
         .select('id, arrival_date_utc, amount, currency, status')
-        .eq('status', 'paid')
+        .eq('status', 'paid');
+
+      if (from) {
+        lastPaidQuery = lastPaidQuery.gte('arrival_date_utc', from);
+      }
+      if (to) {
+        lastPaidQuery = lastPaidQuery.lte('arrival_date_utc', to);
+      }
+
+      const { data: lastPaidPayout } = await lastPaidQuery
         .order('arrival_date_utc', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -170,11 +179,20 @@ serve(async (req) => {
       }
     }
 
-    // Buscar TOTAL de payouts depositados (status = 'paid')
-    const { data: paidPayouts } = await supabaseClient
+    // Buscar TOTAL de payouts depositados (status = 'paid'), respeitando período se informado
+    let payoutsQuery = supabaseClient
       .from('stripe_payouts')
-      .select('amount')
+      .select('amount, arrival_date_utc')
       .eq('status', 'paid');
+    
+    if (from) {
+      payoutsQuery = payoutsQuery.gte('arrival_date_utc', from);
+    }
+    if (to) {
+      payoutsQuery = payoutsQuery.lte('arrival_date_utc', to);
+    }
+    
+    const { data: paidPayouts } = await payoutsQuery;
     
     const totalPayoutsCents = paidPayouts?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
     const totalPayoutsCount = paidPayouts?.length || 0;
