@@ -98,15 +98,34 @@ const LiveVideosOrPlaceholder = () => {
                 className="w-full h-full"
               />
             </div>
-            <div className="mt-1 text-left">
-              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
-                {video.title}
-              </h2>
-              {video.description && (
-                <p className="mt-1 text-sm text-gray-600">
-                  {video.description}
-                </p>
-              )}
+            <div className="mt-1 text-left flex flex-col gap-3">
+              <div>
+                <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+                  {video.title}
+                </h2>
+                {video.description && (
+                  <p className="mt-1 text-sm text-gray-600">
+                    {video.description}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Button
+                  size="sm"
+                  className="w-full sm:w-auto bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white group"
+                  asChild
+                >
+                  <a
+                    href={`https://www.youtube.com/watch?v=${video.youtube_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Youtube className="w-4 h-4 mr-2" />
+                    Abrir no YouTube
+                    <ExternalLink className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         ))}
