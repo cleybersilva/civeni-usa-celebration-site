@@ -22,6 +22,7 @@ import TransmissionAgenda from '@/components/transmission/TransmissionAgenda';
 import { format } from 'date-fns';
 import { ptBR, enUS, es, tr } from 'date-fns/locale';
 import { useCMS } from '@/contexts/CMSContext';
+import { useLiveStreamVideos } from '@/hooks/useLiveStreamVideos';
 
 // Helper: map i18n language to date-fns locale
 const getDateLocale = (lang: string) => {
@@ -32,6 +33,86 @@ const getDateLocale = (lang: string) => {
     case 'pt':
     default: return ptBR;
   }
+};
+
+const LiveVideosOrPlaceholder: React.FC = () => {
+  const { t } = useTranslation();
+  const { data: videos = [], isLoading } = useLiveStreamVideos();
+
+  if (isLoading) {
+    return (
+      <Card className="p-16 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
+        <p className="text-gray-600 text-base">Carregando vídeos...</p>
+      </Card>
+    );
+  }
+
+  if (!videos.length) {
+    return (
+      <Card className="p-16 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+            <Video className="w-10 h-10 text-gray-400" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-gray-900">{t('transmission.noVideoTitle')}</h3>
+            <p className="text-gray-600 text-base">
+              {t('transmission.noVideoDescription')}
+            </p>
+          </div>
+          <Button 
+            size="lg"
+            className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white transition-all duration-300 group"
+            asChild
+          >
+            <a
+              href="https://www.youtube.com/@veniuniversity"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Youtube className="w-5 h-5 mr-2" />
+              {t('transmission.visitChannel')}
+              <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-8 md:p-10 bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
+      <div className="flex flex-col gap-8 max-w-5xl mx-auto">
+        {videos.map((video) => (
+          <div key={video.id} className="flex flex-col items-stretch gap-3">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-gray-200">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${video.youtube_url}?rel=0`}
+                title={video.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                className="w-full h-full"
+              />
+            </div>
+            <div className="mt-1 text-left">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+                {video.title}
+              </h2>
+              {video.description && (
+                <p className="mt-1 text-sm text-gray-600">
+                  {video.description}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
 };
 
 const TransmissaoAoVivo = () => {
@@ -381,7 +462,7 @@ const TransmissaoAoVivo = () => {
           </TabsList>
 
           <TabsContent value="ao-vivo" className="space-y-10">
-            {/* YouTube Player */}
+            {/* YouTube Player ou lista de vídeos configurados */}
             {transmission.youtube_video_id ? (
               <div id="player" className="space-y-6">
                 <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-gray-200 transform transition-all hover:scale-[1.01] duration-300">
@@ -432,34 +513,7 @@ const TransmissaoAoVivo = () => {
                 </Card>
               </div>
             ) : (
-              <Card className="p-16 text-center bg-gradient-to-br from-gray-50 to-white shadow-lg border-2 border-dashed border-gray-300 rounded-2xl">
-                <div className="max-w-md mx-auto space-y-6">
-                  <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                    <Video className="w-10 h-10 text-gray-400" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-900">{t('transmission.noVideoTitle')}</h3>
-                    <p className="text-gray-600 text-base">
-                      {t('transmission.noVideoDescription')}
-                    </p>
-                  </div>
-                  <Button 
-                    size="lg"
-                    className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:opacity-90 text-white transition-all duration-300 group"
-                    asChild
-                  >
-                    <a
-                      href="https://www.youtube.com/@veniuniversity"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Youtube className="w-5 h-5 mr-2" />
-                      {t('transmission.visitChannel')}
-                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                    </a>
-                  </Button>
-                </div>
-              </Card>
+              <LiveVideosOrPlaceholder />
             )}
 
             {/* Upcoming Transmissions */}

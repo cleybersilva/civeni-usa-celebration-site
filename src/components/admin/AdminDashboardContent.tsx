@@ -39,6 +39,7 @@ import CertificateManager from '@/components/admin/CertificateManager';
 import VideoSubmissionsManager from '@/components/admin/VideoSubmissionsManager';
 import ParticipantTypesManager from '@/components/admin/ParticipantTypesManager';
 import EventCategoriesManager from '@/components/admin/EventCategoriesManager';
+import LiveStreamVideosManager from '@/components/admin/LiveStreamVideosManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -213,6 +214,7 @@ const AdminDashboardContent = () => {
               <TransmissionStreamsManager />
               <TransmissionScheduleManager />
               <TransmissionFAQManager />
+              <LiveStreamVideosManager />
             </div>
           </PermissionGuard>
         ) : null;
