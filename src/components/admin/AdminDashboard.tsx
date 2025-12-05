@@ -179,6 +179,7 @@ const AdminDashboard = () => {
   const handleSync = async () => {
     setSyncing(true);
     try {
+      console.log('🔄 Iniciando sincronização com Stripe...');
       const { data, error } = await supabase.functions.invoke('stripe-sync', {
         body: {
           since: filters.customFrom?.toISOString(),
@@ -189,16 +190,30 @@ const AdminDashboard = () => {
 
       if (error) throw error;
 
+      console.log('✅ Sincronização concluída:', data);
+
+      // Mostrar detalhes dos payouts atualizados se houver
+      const payoutsInfo = data?.resources?.payouts_new || data?.resources?.payouts_updated 
+        ? ` (${data.resources.payouts_new || 0} novos, ${data.resources.payouts_updated || 0} atualizados)`
+        : '';
+
       toast({
         title: "Sincronização concluída!",
-        description: `${data.synced} registros sincronizados do Stripe`,
+        description: `${data.synced} registros sincronizados do Stripe${payoutsInfo}`,
       });
 
+      // Aguardar um momento para garantir que o banco foi atualizado
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      console.log('🔄 Recarregando dados após sincronização...');
+      
       // Atualizar TODOS os dados após sync
       await Promise.all([
         refresh(),
         fetchAllTimeseries()
       ]);
+
+      console.log('✅ Dados recarregados com sucesso');
     } catch (error) {
       console.error('Sync error:', error);
       toast({

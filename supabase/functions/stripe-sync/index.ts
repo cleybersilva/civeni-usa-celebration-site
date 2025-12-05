@@ -169,6 +169,14 @@ serve(async (req) => {
       let hasMore = true;
       let startingAfter: string | undefined;
       let payoutCount = 0;
+      let updatedCount = 0;
+      let newCount = 0;
+
+      // Primeiro, buscar todos os IDs de payouts existentes para detectar atualizações
+      const { data: existingPayouts } = await supabaseClient
+        .from('stripe_payouts')
+        .select('id, status');
+      const existingPayoutsMap = new Map((existingPayouts || []).map(p => [p.id, p.status]));
 
       while (hasMore) {
         // NÃO aplicar filtro de data para payouts - buscar TODOS
@@ -180,9 +188,19 @@ serve(async (req) => {
         console.log(`📊 Got ${payouts.data.length} payouts, has_more: ${payouts.has_more}`);
 
         for (const payout of payouts.data) {
-          console.log(`💸 Payout: ${payout.id} | ${payout.amount/100} ${payout.currency} | status: ${payout.status} | arrival: ${new Date(payout.arrival_date * 1000).toISOString()}`);
+          const existingStatus = existingPayoutsMap.get(payout.id);
+          const isNew = !existingStatus;
+          const statusChanged = existingStatus && existingStatus !== payout.status;
+
+          if (isNew) {
+            console.log(`🆕 NEW Payout: ${payout.id} | ${payout.amount/100} ${payout.currency} | status: ${payout.status} | arrival: ${new Date(payout.arrival_date * 1000).toISOString()}`);
+            newCount++;
+          } else if (statusChanged) {
+            console.log(`🔄 UPDATED Payout: ${payout.id} | status: ${existingStatus} → ${payout.status} | arrival: ${new Date(payout.arrival_date * 1000).toISOString()}`);
+            updatedCount++;
+          }
           
-          await supabaseClient.from('stripe_payouts').upsert({
+          const { error: upsertError } = await supabaseClient.from('stripe_payouts').upsert({
             id: payout.id,
             amount: payout.amount,
             currency: payout.currency?.toUpperCase() || 'BRL',
@@ -191,6 +209,10 @@ serve(async (req) => {
             balance_txn_id: payout.balance_transaction,
             created_utc: new Date(payout.created * 1000).toISOString()
           }, { onConflict: 'id', ignoreDuplicates: false });
+
+          if (upsertError) {
+            console.error(`❌ Error upserting payout ${payout.id}:`, upsertError);
+          }
 
           payoutCount++;
         }
@@ -202,8 +224,10 @@ serve(async (req) => {
       }
 
       results.resources.payouts = payoutCount;
+      results.resources.payouts_new = newCount;
+      results.resources.payouts_updated = updatedCount;
       results.synced += payoutCount;
-      console.log(`✅ Synced ${payoutCount} total payouts from Stripe`);
+      console.log(`✅ Synced ${payoutCount} total payouts (${newCount} new, ${updatedCount} status updates)`);
     }
 
     // Sync Customers
