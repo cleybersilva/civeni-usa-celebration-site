@@ -684,24 +684,48 @@ const createCertificatePdf = async (
 
   currentY -= 20;
 
-  // Continuação do tema (para PT, EN, ES)
-  const mainTextLine3Raw = language === "en-US" 
-    ? 'in Contemporary Society", promoted by Veni Creator Christian University,'
+  // Continuação do tema - Parte 1 (antes do nome da universidade)
+  const themeEndRaw = language === "en-US" 
+    ? 'in Contemporary Society", promoted by'
     : language === "es-ES"
-    ? 'en la Sociedad Contemporánea", promovido por la Universidad Cristiana Veni Creator,'
+    ? 'en la Sociedad Contemporanea", promovido por la'
     : language === "tr-TR"
-    ? "Veni Creator Hristiyan Universitesi tarafindan duzenlenen,"
-    : 'na Sociedade Contemporânea", promovido pela Universidade Cristã Veni Creator,';
-  const mainTextLine3 = sanitizeForPdf(mainTextLine3Raw);
-  
-  const mainTextWidth3 = textFont.widthOfTextAtSize(mainTextLine3, mainTextSize);
-  
-  page.drawText(mainTextLine3, {
-    x: (width - mainTextWidth3) / 2,
+    ? "tarafindan duzenlenen:"
+    : 'na Sociedade Contemporanea", promovido pela';
+  const themeEnd = sanitizeForPdf(themeEndRaw);
+
+  // Nome da universidade em NEGRITO
+  const universityNameRaw = language === "en-US" 
+    ? "Veni Creator Christian University,"
+    : language === "es-ES"
+    ? "Universidad Cristiana Veni Creator,"
+    : language === "tr-TR"
+    ? "Veni Creator Hristiyan Universitesi,"
+    : "Universidade Crista Veni Creator,";
+  const universityName = sanitizeForPdf(universityNameRaw);
+
+  // Calcular larguras para centralizar todo o texto junto
+  const themeEndWidth = textFont.widthOfTextAtSize(themeEnd, mainTextSize);
+  const universityNameWidth = titleFont.widthOfTextAtSize(universityName, mainTextSize);
+  const totalLine3Width = themeEndWidth + 5 + universityNameWidth;
+  const line3StartX = (width - totalLine3Width) / 2;
+
+  // Desenhar parte 1 (texto normal)
+  page.drawText(themeEnd, {
+    x: line3StartX,
     y: currentY,
     size: mainTextSize,
     font: textFont,
     color: rgb(0.3, 0.3, 0.3),
+  });
+
+  // Desenhar nome da universidade em NEGRITO
+  page.drawText(universityName, {
+    x: line3StartX + themeEndWidth + 5,
+    y: currentY,
+    size: mainTextSize,
+    font: titleFont,
+    color: rgb(CIVENI_COLORS.blue.r, CIVENI_COLORS.blue.g, CIVENI_COLORS.blue.b),
   });
 
   currentY -= 20;
