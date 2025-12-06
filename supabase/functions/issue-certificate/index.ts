@@ -137,8 +137,6 @@ interface LayoutConfig {
   background?: {
     type: 'solid' | 'gradient';
     color?: string;
-    gradientFrom?: string;
-    gradientTo?: string;
   };
   border?: {
     enabled: boolean;
@@ -146,7 +144,6 @@ interface LayoutConfig {
     style?: string;
     gradient?: {
       from: string;
-      via?: string;
       to: string;
     };
   };
@@ -156,8 +153,6 @@ interface LayoutConfig {
     subtitle: string;
     subtitleColor: string;
     showLogo?: boolean;
-    logoUrl?: string;
-    logoPosition?: 'left' | 'center' | 'right';
   };
   body?: {
     certifyLabel: string;
@@ -170,26 +165,20 @@ interface LayoutConfig {
     };
     mainText: string;
     mainTextColor: string;
-    alignment?: 'left' | 'center' | 'right';
   };
   footer?: {
     locationDateText: string;
     locationDateColor: string;
-    signatureCount?: number;
-    signatureLayout?: 'sides' | 'center' | 'left' | 'right';
-    showCenterLogo?: boolean;
-    centerLogoUrl?: string;
     signatures?: Array<{
       label: string;
       name: string;
-      signatureImageUrl?: string;
     }>;
   };
   badge?: {
     enabled: boolean;
     text: string;
     textColor: string;
-    position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'bottom-center';
+    position?: string;
     backgroundGradient?: {
       from: string;
       to: string;
@@ -208,7 +197,6 @@ const CIVENI_COLORS = {
 };
 
 // Criar PDF com design premium usando cores do CIVENI
-// Agora usa as configurações do layout_config salvo no SaaS
 const createCertificatePdf = async (
   options: CertificatePdfOptions & { layoutConfig?: LayoutConfig; eventName?: string },
 ): Promise<Uint8Array> => {
@@ -222,19 +210,12 @@ const createCertificatePdf = async (
   const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  console.log("Gerando certificado com design CIVENI premium - layoutConfig:", !!layoutConfig);
+  console.log("Gerando certificado com design CIVENI premium");
 
   // Preparar dados para substituição
   const dateStr = issueDate.toLocaleDateString(
     language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : language === "tr-TR" ? "tr-TR" : "pt-BR",
   );
-
-  // Extrair configurações do layout_config ou usar defaults
-  const headerConfig = layoutConfig?.header;
-  const bodyConfig = layoutConfig?.body;
-  const footerConfig = layoutConfig?.footer;
-  const borderConfig = layoutConfig?.border;
-  const badgeConfig = layoutConfig?.badge;
   
   // ===== BACKGROUND BRANCO =====
   page.drawRectangle({
@@ -246,101 +227,88 @@ const createCertificatePdf = async (
   });
 
   // ===== BORDA GRADIENTE EXTERNA (azul -> roxo -> vermelho) =====
-  const borderEnabled = borderConfig?.enabled ?? true;
-  const borderWidth = borderConfig?.thickness || 8;
+  const borderWidth = 8;
   const margin = 20;
   
-  // Cores do gradiente (do layout_config ou defaults)
-  const borderFromColor = borderConfig?.gradient?.from 
-    ? hexToRgb(borderConfig.gradient.from) 
-    : CIVENI_COLORS.blue;
-  const borderViaColor = borderConfig?.gradient?.via 
-    ? hexToRgb(borderConfig.gradient.via) 
-    : CIVENI_COLORS.purple;
-  const borderToColor = borderConfig?.gradient?.to 
-    ? hexToRgb(borderConfig.gradient.to) 
-    : CIVENI_COLORS.red;
-
-  if (borderEnabled) {
-    // Top (azul para roxo para vermelho)
-    for (let i = 0; i < borderWidth; i++) {
-      const progress = i / borderWidth;
-      const color = progress < 0.5 
-        ? rgb(
-            borderFromColor.r + (borderViaColor.r - borderFromColor.r) * (progress * 2),
-            borderFromColor.g + (borderViaColor.g - borderFromColor.g) * (progress * 2),
-            borderFromColor.b + (borderViaColor.b - borderFromColor.b) * (progress * 2)
-          )
-        : rgb(
-            borderViaColor.r + (borderToColor.r - borderViaColor.r) * ((progress - 0.5) * 2),
-            borderViaColor.g + (borderToColor.g - borderViaColor.g) * ((progress - 0.5) * 2),
-            borderViaColor.b + (borderToColor.b - borderViaColor.b) * ((progress - 0.5) * 2)
-          );
-      
-      page.drawLine({
-        start: { x: margin, y: height - margin - i },
-        end: { x: width - margin, y: height - margin - i },
-        thickness: 1,
-        color,
-      });
-    }
+  // Borda externa - simulando gradiente com múltiplas linhas
+  // Top (azul para roxo para vermelho)
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = progress < 0.5 
+      ? rgb(
+          CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * (progress * 2),
+          CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * (progress * 2),
+          CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * (progress * 2)
+        )
+      : rgb(
+          CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * ((progress - 0.5) * 2)
+        );
     
-    // Bottom
-    for (let i = 0; i < borderWidth; i++) {
-      const progress = i / borderWidth;
-      const color = progress < 0.5 
-        ? rgb(
-            borderFromColor.r + (borderViaColor.r - borderFromColor.r) * (progress * 2),
-            borderFromColor.g + (borderViaColor.g - borderFromColor.g) * (progress * 2),
-            borderFromColor.b + (borderViaColor.b - borderFromColor.b) * (progress * 2)
-          )
-        : rgb(
-            borderViaColor.r + (borderToColor.r - borderViaColor.r) * ((progress - 0.5) * 2),
-            borderViaColor.g + (borderToColor.g - borderViaColor.g) * ((progress - 0.5) * 2),
-            borderViaColor.b + (borderToColor.b - borderViaColor.b) * ((progress - 0.5) * 2)
-          );
-      
-      page.drawLine({
-        start: { x: margin, y: margin + i },
-        end: { x: width - margin, y: margin + i },
-        thickness: 1,
-        color,
-      });
-    }
+    page.drawLine({
+      start: { x: margin, y: height - margin - i },
+      end: { x: width - margin, y: height - margin - i },
+      thickness: 1,
+      color,
+    });
+  }
+  
+  // Bottom
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = progress < 0.5 
+      ? rgb(
+          CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * (progress * 2),
+          CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * (progress * 2),
+          CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * (progress * 2)
+        )
+      : rgb(
+          CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * ((progress - 0.5) * 2)
+        );
     
-    // Left side
-    for (let i = 0; i < borderWidth; i++) {
-      const progress = i / borderWidth;
-      const color = rgb(
-        borderFromColor.r + (borderViaColor.r - borderFromColor.r) * progress,
-        borderFromColor.g + (borderViaColor.g - borderFromColor.g) * progress,
-        borderFromColor.b + (borderViaColor.b - borderFromColor.b) * progress
-      );
-      
-      page.drawLine({
-        start: { x: margin + i, y: margin },
-        end: { x: margin + i, y: height - margin },
-        thickness: 1,
-        color,
-      });
-    }
+    page.drawLine({
+      start: { x: margin, y: margin + i },
+      end: { x: width - margin, y: margin + i },
+      thickness: 1,
+      color,
+    });
+  }
+  
+  // Left side
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = rgb(
+      CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * progress,
+      CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * progress,
+      CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * progress
+    );
     
-    // Right side
-    for (let i = 0; i < borderWidth; i++) {
-      const progress = i / borderWidth;
-      const color = rgb(
-        borderViaColor.r + (borderToColor.r - borderViaColor.r) * progress,
-        borderViaColor.g + (borderToColor.g - borderViaColor.g) * progress,
-        borderViaColor.b + (borderToColor.b - borderViaColor.b) * progress
-      );
-      
-      page.drawLine({
-        start: { x: width - margin - i, y: margin },
-        end: { x: width - margin - i, y: height - margin },
-        thickness: 1,
-        color,
-      });
-    }
+    page.drawLine({
+      start: { x: margin + i, y: margin },
+      end: { x: margin + i, y: height - margin },
+      thickness: 1,
+      color,
+    });
+  }
+  
+  // Right side
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = rgb(
+      CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * progress,
+      CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * progress,
+      CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * progress
+    );
+    
+    page.drawLine({
+      start: { x: width - margin - i, y: margin },
+      end: { x: width - margin - i, y: height - margin },
+      thickness: 1,
+      color,
+    });
   }
 
   // ===== BORDA INTERNA ELEGANTE =====
@@ -368,18 +336,19 @@ const createCertificatePdf = async (
     
     if (progress < 0.33) {
       const p = progress / 0.33;
-      r = borderFromColor.r + (borderViaColor.r - borderFromColor.r) * p;
-      g = borderFromColor.g + (borderViaColor.g - borderFromColor.g) * p;
-      b = borderFromColor.b + (borderViaColor.b - borderFromColor.b) * p;
+      r = CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * p;
+      g = CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * p;
+      b = CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * p;
     } else if (progress < 0.66) {
-      r = borderViaColor.r;
-      g = borderViaColor.g;
-      b = borderViaColor.b;
+      const p = (progress - 0.33) / 0.33;
+      r = CIVENI_COLORS.purple.r;
+      g = CIVENI_COLORS.purple.g;
+      b = CIVENI_COLORS.purple.b;
     } else {
       const p = (progress - 0.66) / 0.34;
-      r = borderViaColor.r + (borderToColor.r - borderViaColor.r) * p;
-      g = borderViaColor.g + (borderToColor.g - borderViaColor.g) * p;
-      b = borderViaColor.b + (borderToColor.b - borderViaColor.b) * p;
+      r = CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * p;
+      g = CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * p;
+      b = CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * p;
     }
     
     page.drawRectangle({
@@ -391,83 +360,87 @@ const createCertificatePdf = async (
     });
   }
 
-  // ===== LOGO NO HEADER =====
-  let headerLogoImage = null;
-  const showHeaderLogo = headerConfig?.showLogo ?? true;
-  const headerLogoUrl = headerConfig?.logoUrl || '/uploads/vccu-logo-certificate.png';
-  const logoPosition = headerConfig?.logoPosition || 'left';
-  
-  if (showHeaderLogo) {
-    try {
-      const logoUrls = [
-        headerLogoUrl.startsWith('http') ? headerLogoUrl : `https://civeni.com${headerLogoUrl}`,
-        "https://civeni.com/uploads/vccu-logo-certificate.png"
-      ];
-      
-      for (const logoUrl of logoUrls) {
-        try {
-          console.log("Trying header logo URL:", logoUrl);
-          const logoResponse = await fetch(logoUrl);
+  // ===== VCCU LOGO NO HEADER (lado esquerdo) =====
+  // NOTA: pdf-lib só suporta PNG e JPG. WebP não é suportado.
+  // As imagens do Lovable são servidas como WebP, então precisamos usar URLs externas ou base64
+  let vccuLogoImage = null;
+  try {
+    // Tentar carregar logo VCCU de diferentes URLs
+    // Google Drive link convertido para download direto
+    const vccuLogoUrls = [
+      "https://drive.google.com/uc?export=download&id=1525O_m180-994B4PJJWr39pxN54oHT8V",
+      "https://civeni.com/uploads/civeni-2025-logo-sidebar.png"
+    ];
+    
+    for (const vccuLogoUrl of vccuLogoUrls) {
+      try {
+        console.log("Trying VCCU logo URL:", vccuLogoUrl);
+        const vccuLogoResponse = await fetch(vccuLogoUrl);
+        console.log("VCCU logo fetch response status:", vccuLogoResponse.status);
+        
+        if (vccuLogoResponse.ok) {
+          const vccuLogoBytes = new Uint8Array(await vccuLogoResponse.arrayBuffer());
+          console.log("VCCU logo bytes length:", vccuLogoBytes.length);
+          console.log("VCCU logo first 12 bytes:", Array.from(vccuLogoBytes.slice(0, 12)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
           
-          if (logoResponse.ok) {
-            const logoBytes = new Uint8Array(await logoResponse.arrayBuffer());
-            
-            const isPng = logoBytes[0] === 0x89 && logoBytes[1] === 0x50 && logoBytes[2] === 0x4E && logoBytes[3] === 0x47;
-            const isJpg = logoBytes[0] === 0xFF && logoBytes[1] === 0xD8;
-            
-            if (isPng) {
-              headerLogoImage = await pdfDoc.embedPng(logoBytes);
-              console.log("Header logo embedded as PNG");
-              break;
-            } else if (isJpg) {
-              headerLogoImage = await pdfDoc.embedJpg(logoBytes);
-              console.log("Header logo embedded as JPG");
-              break;
-            }
+          // Detectar formato da imagem pelos bytes mágicos
+          const isPng = vccuLogoBytes[0] === 0x89 && vccuLogoBytes[1] === 0x50 && vccuLogoBytes[2] === 0x4E && vccuLogoBytes[3] === 0x47;
+          const isJpg = vccuLogoBytes[0] === 0xFF && vccuLogoBytes[1] === 0xD8;
+          // WebP: RIFF....WEBP
+          const isWebP = vccuLogoBytes[0] === 0x52 && vccuLogoBytes[1] === 0x49 && vccuLogoBytes[2] === 0x46 && vccuLogoBytes[3] === 0x46 &&
+                         vccuLogoBytes[8] === 0x57 && vccuLogoBytes[9] === 0x45 && vccuLogoBytes[10] === 0x42 && vccuLogoBytes[11] === 0x50;
+          
+          console.log("VCCU logo format detection - isPng:", isPng, "isJpg:", isJpg, "isWebP:", isWebP);
+          
+          if (isPng) {
+            vccuLogoImage = await pdfDoc.embedPng(vccuLogoBytes);
+            console.log("VCCU logo embedded as PNG successfully");
+            break;
+          } else if (isJpg) {
+            vccuLogoImage = await pdfDoc.embedJpg(vccuLogoBytes);
+            console.log("VCCU logo embedded as JPG successfully");
+            break;
+          } else if (isWebP) {
+            console.log("VCCU logo is WebP format - NOT SUPPORTED by pdf-lib, trying next URL");
+            continue;
+          } else {
+            console.log("VCCU logo format unknown, trying next URL");
+            continue;
           }
-        } catch (urlError) {
-          console.log("Error loading header logo:", urlError);
-          continue;
         }
+      } catch (urlError) {
+        console.log("Error loading VCCU logo from URL:", vccuLogoUrl, urlError);
+        continue;
       }
-    } catch (logoError) {
-      console.log("Could not load header logo:", logoError);
     }
+  } catch (logoError) {
+    console.log("Could not load VCCU logo, continuing without it:", logoError);
   }
 
-  // ===== TÍTULO PRINCIPAL (do layout_config ou default por idioma) =====
-  const titleTextRaw = headerConfig?.title || (
-    language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
+  // ===== TÍTULO PRINCIPAL =====
+  const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
     : language === "es-ES" ? "CERTIFICADO DE PARTICIPACION"
     : language === "tr-TR" ? "KATILIM SERTIFIKASI"
-    : "CERTIFICADO DE PARTICIPACAO"
-  );
+    : "CERTIFICADO DE PARTICIPACAO";
   const titleText = sanitizeForPdf(titleTextRaw);
   
   const titleSize = 28;
   const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
   
-  // Calcular posições para logo + título
+  // Calcular posições para centralizar logo + título juntos no cabeçalho
   const logoSize = 55;
-  const gapBetweenLogoAndTitle = 15;
-  const totalContentWidth = headerLogoImage && logoPosition !== 'center' 
-    ? (logoSize + gapBetweenLogoAndTitle + titleWidth) 
-    : titleWidth;
+  const gapBetweenLogoAndTitle = 15; // Espaço pequeno entre logo e título
+  const totalContentWidth = vccuLogoImage ? (logoSize + gapBetweenLogoAndTitle + titleWidth) : titleWidth;
   const contentStartX = (width - totalContentWidth) / 2;
   
-  // Posição do logo baseada na configuração
-  let logoX = contentStartX;
-  if (logoPosition === 'center') {
-    logoX = (width - logoSize) / 2;
-  } else if (logoPosition === 'right') {
-    logoX = contentStartX + titleWidth + gapBetweenLogoAndTitle;
-  }
+  // Posição do logo (à esquerda do título)
+  const logoX = contentStartX;
   const logoY = headerY + (headerHeight - logoSize) / 2;
   
-  // Desenhar logo do header
-  if (headerLogoImage && showHeaderLogo) {
-    const logoDims = headerLogoImage.scale(logoSize / headerLogoImage.height);
-    page.drawImage(headerLogoImage, {
+  // Desenhar logo VCCU se carregado
+  if (vccuLogoImage) {
+    const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
+    page.drawImage(vccuLogoImage, {
       x: logoX,
       y: logoY,
       width: logoDims.width,
@@ -475,15 +448,8 @@ const createCertificatePdf = async (
     });
   }
   
-  // Posição do título
-  let titleX: number;
-  if (logoPosition === 'center') {
-    titleX = (width - titleWidth) / 2;
-  } else if (logoPosition === 'right') {
-    titleX = contentStartX;
-  } else {
-    titleX = headerLogoImage ? (logoX + logoSize + gapBetweenLogoAndTitle) : contentStartX;
-  }
+  // Posição do título (logo próximo ao texto)
+  const titleX = vccuLogoImage ? (logoX + logoSize + gapBetweenLogoAndTitle) : contentStartX;
   
   page.drawText(titleText, {
     x: titleX,
@@ -494,10 +460,11 @@ const createCertificatePdf = async (
   });
 
   // ===== SUBTÍTULO DO EVENTO =====
-  const subtitleTextRaw = headerConfig?.subtitle || "III CIVENI 2025 - International Multidisciplinary Congress";
+  const subtitleTextRaw = "III CIVENI 2025 - International Multidisciplinary Congress";
   const subtitleText = sanitizeForPdf(subtitleTextRaw);
   const subtitleSize = 10;
   const subtitleWidth = textFont.widthOfTextAtSize(subtitleText, subtitleSize);
+  // Subtítulo centralizado na página inteira
   const subtitleX = (width - subtitleWidth) / 2;
   
   page.drawText(subtitleText, {
@@ -511,48 +478,36 @@ const createCertificatePdf = async (
   let currentY = headerY - 50;
 
   // ===== TEXTO "CERTIFICAMOS QUE" =====
-  const certifyTextRaw = bodyConfig?.certifyLabel || (
-    language === "en-US" ? "We hereby certify that"
+  const certifyTextRaw = language === "en-US" ? "We hereby certify that"
     : language === "es-ES" ? "Certificamos que"
     : language === "tr-TR" ? "Isbu belge ile tasdik ederiz ki"
-    : "Certificamos que"
-  );
+    : "Certificamos que";
   const certifyText = sanitizeForPdf(certifyTextRaw);
   
   const certifySize = 14;
   const certifyWidth = italicFont.widthOfTextAtSize(certifyText, certifySize);
-  
-  // Cor do texto "Certificamos que"
-  const certifyLabelColor = bodyConfig?.certifyLabelColor 
-    ? hexToRgb(bodyConfig.certifyLabelColor) 
-    : { r: 0.4, g: 0.4, b: 0.4 };
   
   page.drawText(certifyText, {
     x: (width - certifyWidth) / 2,
     y: currentY,
     size: certifySize,
     font: italicFont,
-    color: rgb(certifyLabelColor.r, certifyLabelColor.g, certifyLabelColor.b),
+    color: rgb(0.4, 0.4, 0.4),
   });
 
   currentY -= 45;
 
   // ===== NOME DO PARTICIPANTE =====
   const sanitizedName = sanitizeForPdf(fullName.toUpperCase());
-  const nameSize = bodyConfig?.participantNameStyle?.fontSize || 36;
+  const nameSize = 36;
   const nameWidth = titleFont.widthOfTextAtSize(sanitizedName, nameSize);
-  
-  // Cor do nome do participante
-  const nameColor = bodyConfig?.participantNameStyle?.color 
-    ? hexToRgb(bodyConfig.participantNameStyle.color) 
-    : CIVENI_COLORS.blue;
   
   page.drawText(sanitizedName, {
     x: (width - nameWidth) / 2,
     y: currentY,
     size: nameSize,
     font: titleFont,
-    color: rgb(nameColor.r, nameColor.g, nameColor.b),
+    color: rgb(CIVENI_COLORS.blue.r, CIVENI_COLORS.blue.g, CIVENI_COLORS.blue.b),
   });
 
   // Linha decorativa abaixo do nome
@@ -573,82 +528,63 @@ const createCertificatePdf = async (
     : "participante";
   const participationType = sanitizeForPdf(participationTypeRaw);
   
-  // Texto do corpo (do layout_config ou default)
-  let mainTextLine1Raw: string;
-  if (bodyConfig?.mainText) {
-    // Substituir placeholders no texto do layout_config
-    mainTextLine1Raw = bodyConfig.mainText
-      .replace(/\{\{nome_participante\}\}/g, '')
-      .replace(/\{\{tipo_participacao\}\}/g, participationType)
-      .replace(/\{\{nome_evento\}\}/g, eventName || 'III CIVENI 2025')
-      .replace(/\{\{data_evento\}\}/g, '11 a 14 de dezembro de 2025')
-      .replace(/\{\{carga_horaria\}\}/g, hours || '20');
-  } else {
-    mainTextLine1Raw = language === "en-US" 
-      ? `participated as ${participationType} in the`
-      : language === "es-ES"
-      ? `participo como ${participationType} en el`
-      : language === "tr-TR"
-      ? `${participationType} olarak katilmistir:`
-      : `participou como ${participationType} do`;
-  }
+  const mainTextLine1Raw = language === "en-US" 
+    ? `participated as ${participationType} in the`
+    : language === "es-ES"
+    ? `participo como ${participationType} en el`
+    : language === "tr-TR"
+    ? `${participationType} olarak katilmistir:`
+    : `participou como ${participationType} do`;
   const mainTextLine1 = sanitizeForPdf(mainTextLine1Raw);
 
   const mainTextSize = 13;
   const mainTextWidth1 = textFont.widthOfTextAtSize(mainTextLine1, mainTextSize);
-  
-  // Cor do texto principal
-  const mainTextColor = bodyConfig?.mainTextColor 
-    ? hexToRgb(bodyConfig.mainTextColor) 
-    : { r: 0.3, g: 0.3, b: 0.3 };
   
   page.drawText(mainTextLine1, {
     x: (width - mainTextWidth1) / 2,
     y: currentY,
     size: mainTextSize,
     font: textFont,
-    color: rgb(mainTextColor.r, mainTextColor.g, mainTextColor.b),
+    color: rgb(0.3, 0.3, 0.3),
   });
 
   currentY -= 28;
 
-  // Nome do evento em destaque (se não tiver mainText customizado)
-  if (!bodyConfig?.mainText) {
-    const eventDisplayNameRaw = eventName || "III CIVENI 2025";
-    const eventDisplayName = sanitizeForPdf(eventDisplayNameRaw);
-    const eventNameSize = 16;
-    const eventNameWidth = titleFont.widthOfTextAtSize(eventDisplayName, eventNameSize);
-    
-    page.drawText(eventDisplayName, {
-      x: (width - eventNameWidth) / 2,
-      y: currentY,
-      size: eventNameSize,
-      font: titleFont,
-      color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
-    });
+  // Nome do evento em destaque
+  const eventDisplayNameRaw = eventName || "III CIVENI 2025";
+  const eventDisplayName = sanitizeForPdf(eventDisplayNameRaw);
+  const eventNameSize = 16;
+  const eventNameWidth = titleFont.widthOfTextAtSize(eventDisplayName, eventNameSize);
+  
+  page.drawText(eventDisplayName, {
+    x: (width - eventNameWidth) / 2,
+    y: currentY,
+    size: eventNameSize,
+    font: titleFont,
+    color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
+  });
 
-    currentY -= 30;
+  currentY -= 30;
 
-    // Informações adicionais
-    const hoursTextRaw = language === "en-US" 
-      ? `with a total workload of ${hours || "20"} hours.`
-      : language === "es-ES"
-      ? `con una carga horaria total de ${hours || "20"} horas.`
-      : language === "tr-TR"
-      ? `toplam ${hours || "20"} saat is yuku ile.`
-      : `com carga horaria total de ${hours || "20"} horas.`;
-    const hoursText = sanitizeForPdf(hoursTextRaw);
-    
-    const hoursWidth = textFont.widthOfTextAtSize(hoursText, mainTextSize);
-    
-    page.drawText(hoursText, {
-      x: (width - hoursWidth) / 2,
-      y: currentY,
-      size: mainTextSize,
-      font: textFont,
-      color: rgb(mainTextColor.r, mainTextColor.g, mainTextColor.b),
-    });
-  }
+  // Informações adicionais
+  const hoursTextRaw = language === "en-US" 
+    ? `with a total workload of ${hours || "20"} hours.`
+    : language === "es-ES"
+    ? `con una carga horaria total de ${hours || "20"} horas.`
+    : language === "tr-TR"
+    ? `toplam ${hours || "20"} saat is yuku ile.`
+    : `com carga horaria total de ${hours || "20"} horas.`;
+  const hoursText = sanitizeForPdf(hoursTextRaw);
+  
+  const hoursWidth = textFont.widthOfTextAtSize(hoursText, mainTextSize);
+  
+  page.drawText(hoursText, {
+    x: (width - hoursWidth) / 2,
+    y: currentY,
+    size: mainTextSize,
+    font: textFont,
+    color: rgb(0.3, 0.3, 0.3),
+  });
 
   // ===== FOOTER COM GRADIENTE =====
   const footerHeight = 65;
@@ -661,18 +597,18 @@ const createCertificatePdf = async (
     
     if (progress < 0.33) {
       const p = progress / 0.33;
-      r = borderFromColor.r + (borderViaColor.r - borderFromColor.r) * p;
-      g = borderFromColor.g + (borderViaColor.g - borderFromColor.g) * p;
-      b = borderFromColor.b + (borderViaColor.b - borderFromColor.b) * p;
+      r = CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * p;
+      g = CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * p;
+      b = CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * p;
     } else if (progress < 0.66) {
-      r = borderViaColor.r;
-      g = borderViaColor.g;
-      b = borderViaColor.b;
+      r = CIVENI_COLORS.purple.r;
+      g = CIVENI_COLORS.purple.g;
+      b = CIVENI_COLORS.purple.b;
     } else {
       const p = (progress - 0.66) / 0.34;
-      r = borderViaColor.r + (borderToColor.r - borderViaColor.r) * p;
-      g = borderViaColor.g + (borderToColor.g - borderViaColor.g) * p;
-      b = borderViaColor.b + (borderToColor.b - borderViaColor.b) * p;
+      r = CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * p;
+      g = CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * p;
+      b = CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * p;
     }
     
     page.drawRectangle({
@@ -685,46 +621,28 @@ const createCertificatePdf = async (
   }
 
   // ===== ASSINATURAS =====
-  const signatureCount = footerConfig?.signatureCount ?? 2;
-  const signatureLayout = footerConfig?.signatureLayout || 'sides';
-  const sigY = 160;
+  const sigY = 160; // Subiu para afastar da imagem central
   const sigSpacing = width / 3;
   
-  // Obter assinaturas do layout_config ou usar defaults
-  const signaturesConfig = footerConfig?.signatures || [
+  const signatures = [
     { 
-      name: "Dra. Maria Emilia Camargo", 
-      label: language === "en-US" ? "Dean of International Relations/VCCU" 
+      name: sanitizeForPdf("Dra. Maria Emilia Camargo"), 
+      role: sanitizeForPdf(language === "en-US" ? "Dean of International Relations/VCCU" 
         : language === "es-ES" ? "Decana de Relaciones Internacionales/VCCU"
         : language === "tr-TR" ? "Uluslararasi Iliskiler Dekani/VCCU"
-        : "Reitora de Relacoes Internacionais/VCCU"
+        : "Reitora de Relacoes Internacionais/VCCU")
     },
     { 
-      name: "Dra. Marcela Tardanza Martins", 
-      label: language === "en-US" ? "Dean of Academic Relations/VCCU"
+      name: sanitizeForPdf("Dra. Marcela Tardanza Martins"), 
+      role: sanitizeForPdf(language === "en-US" ? "Dean of Academic Relations/VCCU"
         : language === "es-ES" ? "Decana de Relaciones Academicas/VCCU"
         : language === "tr-TR" ? "Akademik Iliskiler Dekani/VCCU"
-        : "Reitora de Relacoes Academicas/VCCU"
+        : "Reitora de Relacoes Academicas/VCCU")
     }
   ];
-
-  const signatures = signaturesConfig.slice(0, signatureCount).map(sig => ({
-    name: sanitizeForPdf(sig.name),
-    role: sanitizeForPdf(sig.label)
-  }));
   
-  // Calcular posições das assinaturas baseado na configuração
-  if (signatureCount === 1) {
-    const sig = signatures[0];
-    let sigX: number;
-    
-    if (signatureLayout === 'left') {
-      sigX = width * 0.25;
-    } else if (signatureLayout === 'right') {
-      sigX = width * 0.75;
-    } else { // center
-      sigX = width / 2;
-    }
+  signatures.forEach((sig, index) => {
+    const sigX = sigSpacing * (index + 1);
     
     // Linha de assinatura
     page.drawLine({
@@ -753,46 +671,10 @@ const createCertificatePdf = async (
       font: textFont,
       color: rgb(0.4, 0.4, 0.4),
     });
-  } else {
-    // 2 assinaturas
-    signatures.forEach((sig, index) => {
-      const sigX = sigSpacing * (index + 1);
-      
-      // Linha de assinatura
-      page.drawLine({
-        start: { x: sigX - 90, y: sigY + 5 },
-        end: { x: sigX + 90, y: sigY + 5 },
-        thickness: 1,
-        color: rgb(0.6, 0.6, 0.6),
-      });
-      
-      // Nome
-      const sigNameWidth = titleFont.widthOfTextAtSize(sig.name, 10);
-      page.drawText(sig.name, {
-        x: sigX - sigNameWidth / 2,
-        y: sigY - 12,
-        size: 10,
-        font: titleFont,
-        color: rgb(0.2, 0.2, 0.2),
-      });
-      
-      // Cargo
-      const sigRoleWidth = textFont.widthOfTextAtSize(sig.role, 8);
-      page.drawText(sig.role, {
-        x: sigX - sigRoleWidth / 2,
-        y: sigY - 25,
-        size: 8,
-        font: textFont,
-        color: rgb(0.4, 0.4, 0.4),
-      });
-    });
-  }
+  });
 
   // ===== LOCAL E DATA NO FOOTER =====
-  const locationDateTextRaw = footerConfig?.locationDateText 
-    ? footerConfig.locationDateText.replace(/\{\{data_emissao\}\}/g, dateStr)
-    : `Celebration, Florida - USA, ${dateStr}`;
-  const locationText = sanitizeForPdf(locationDateTextRaw);
+  const locationText = sanitizeForPdf(`Celebration, Florida - USA, ${dateStr}`);
   const locationWidth = textFont.widthOfTextAtSize(locationText, 10);
   
   page.drawText(locationText, {
@@ -832,74 +714,85 @@ const createCertificatePdf = async (
     color: rgb(0.9, 0.9, 0.9),
   });
 
-  // ===== LOGO CENTRAL ENTRE ASSINATURAS =====
-  const showCenterLogo = footerConfig?.showCenterLogo ?? true;
-  const centerLogoUrl = footerConfig?.centerLogoUrl || '/uploads/civeni-logo-certificate.png';
-  
-  if (showCenterLogo) {
-    let civeniLogoImage = null;
-    try {
-      const civeniLogoUrls = [
-        centerLogoUrl.startsWith('http') ? centerLogoUrl : `https://civeni.com${centerLogoUrl}`,
-        "https://civeni.com/uploads/civeni-logo-certificate.png"
-      ];
-      
-      for (const civeniLogoUrl of civeniLogoUrls) {
-        try {
-          console.log("Trying CIVENI logo URL:", civeniLogoUrl);
-          const civeniLogoResponse = await fetch(civeniLogoUrl);
+  // ===== CIVENI LOGO CENTRALIZADO ENTRE ASSINATURAS =====
+  let civeniLogoImage = null;
+  try {
+    // Tentar carregar logo CIVENI de diferentes URLs
+    const civeniLogoUrls = [
+      "https://civeni.com/assets/civeni-2025-logo.png",
+      "https://civeni.com/uploads/civeni-2025-logo-sidebar.png"
+    ];
+    
+    for (const civeniLogoUrl of civeniLogoUrls) {
+      try {
+        console.log("Trying CIVENI logo URL:", civeniLogoUrl);
+        const civeniLogoResponse = await fetch(civeniLogoUrl);
+        console.log("CIVENI logo fetch response status:", civeniLogoResponse.status);
+        
+        if (civeniLogoResponse.ok) {
+          const civeniLogoBytes = new Uint8Array(await civeniLogoResponse.arrayBuffer());
+          console.log("CIVENI logo bytes length:", civeniLogoBytes.length);
+          console.log("CIVENI logo first 12 bytes:", Array.from(civeniLogoBytes.slice(0, 12)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
           
-          if (civeniLogoResponse.ok) {
-            const civeniLogoBytes = new Uint8Array(await civeniLogoResponse.arrayBuffer());
-            
-            const isPng = civeniLogoBytes[0] === 0x89 && civeniLogoBytes[1] === 0x50 && civeniLogoBytes[2] === 0x4E && civeniLogoBytes[3] === 0x47;
-            const isJpg = civeniLogoBytes[0] === 0xFF && civeniLogoBytes[1] === 0xD8;
-            
-            if (isPng) {
-              civeniLogoImage = await pdfDoc.embedPng(civeniLogoBytes);
-              console.log("CIVENI logo embedded as PNG");
-              break;
-            } else if (isJpg) {
-              civeniLogoImage = await pdfDoc.embedJpg(civeniLogoBytes);
-              console.log("CIVENI logo embedded as JPG");
-              break;
-            }
+          // Detectar formato da imagem pelos bytes mágicos
+          const isPng = civeniLogoBytes[0] === 0x89 && civeniLogoBytes[1] === 0x50 && civeniLogoBytes[2] === 0x4E && civeniLogoBytes[3] === 0x47;
+          const isJpg = civeniLogoBytes[0] === 0xFF && civeniLogoBytes[1] === 0xD8;
+          // WebP: RIFF....WEBP
+          const isWebP = civeniLogoBytes[0] === 0x52 && civeniLogoBytes[1] === 0x49 && civeniLogoBytes[2] === 0x46 && civeniLogoBytes[3] === 0x46 &&
+                         civeniLogoBytes[8] === 0x57 && civeniLogoBytes[9] === 0x45 && civeniLogoBytes[10] === 0x42 && civeniLogoBytes[11] === 0x50;
+          
+          console.log("CIVENI logo format detection - isPng:", isPng, "isJpg:", isJpg, "isWebP:", isWebP);
+          
+          if (isPng) {
+            civeniLogoImage = await pdfDoc.embedPng(civeniLogoBytes);
+            console.log("CIVENI logo embedded as PNG successfully");
+            break;
+          } else if (isJpg) {
+            civeniLogoImage = await pdfDoc.embedJpg(civeniLogoBytes);
+            console.log("CIVENI logo embedded as JPG successfully");
+            break;
+          } else if (isWebP) {
+            console.log("CIVENI logo is WebP format - NOT SUPPORTED by pdf-lib, trying next URL");
+            continue;
+          } else {
+            console.log("CIVENI logo format unknown, trying next URL");
+            continue;
           }
-        } catch (urlError) {
-          console.log("Error loading CIVENI logo:", urlError);
-          continue;
         }
+      } catch (urlError) {
+        console.log("Error loading CIVENI logo from URL:", civeniLogoUrl, urlError);
+        continue;
       }
-    } catch (logoError) {
-      console.log("Could not load CIVENI logo:", logoError);
     }
+  } catch (logoError) {
+    console.log("Could not load CIVENI logo, continuing without it:", logoError);
+  }
 
-    // Desenhar logo CIVENI centralizado entre as assinaturas
-    if (civeniLogoImage) {
-      const civeniLogoHeight = 50;
-      const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
-      const civeniLogoX = (width - civeniLogoDims.width) / 2;
-      const civeniLogoY = sigY - 65;
-      
-      page.drawImage(civeniLogoImage, {
-        x: civeniLogoX,
-        y: civeniLogoY,
-        width: civeniLogoDims.width,
-        height: civeniLogoDims.height,
-      });
-    } else {
-      // Fallback - desenhar texto simples
-      const badgeText = badgeConfig?.text || "III CIVENI 2025";
-      const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 12);
-      
-      page.drawText(badgeText, {
-        x: (width - badgeTextWidth) / 2,
-        y: sigY - 55,
-        size: 12,
-        font: titleFont,
-        color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
-      });
-    }
+  // Desenhar logo CIVENI centralizado entre as assinaturas
+  if (civeniLogoImage) {
+    const civeniLogoHeight = 50;
+    const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
+    const civeniLogoX = (width - civeniLogoDims.width) / 2;
+    const civeniLogoY = sigY - 65; // Mais afastado das assinaturas
+    
+    page.drawImage(civeniLogoImage, {
+      x: civeniLogoX,
+      y: civeniLogoY,
+      width: civeniLogoDims.width,
+      height: civeniLogoDims.height,
+    });
+  } else {
+    // Fallback caso o logo não carregue - desenhar texto simples
+    const badgeText = "III CIVENI 2025";
+    const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 12);
+    
+    page.drawText(badgeText, {
+      x: (width - badgeTextWidth) / 2,
+      y: sigY - 55, // Mais afastado das assinaturas
+      size: 12,
+      font: titleFont,
+      color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
+    });
   }
 
   return await pdfDoc.save();
