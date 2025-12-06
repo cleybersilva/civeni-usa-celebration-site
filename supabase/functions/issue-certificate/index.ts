@@ -489,18 +489,15 @@ const createCertificatePdf = async (
   const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
   
   // Calcular posições - VCCU logo esquerda, título centro, CIVENI logo direita
-  const logoSize = 55;
-  const civeniHeaderLogoSize = 50;
-  const sideMargin = 25; // Margem igual para ambas as logos
-  
-  // Calcular largura do logo CIVENI
-  const civeniLogoWidth = civeniHeaderLogoImage ? civeniHeaderLogoSize * 2.5 : 0;
+  const logoSize = 45; // Reduzido para caber no header
+  const civeniHeaderLogoSize = 40; // Reduzido para caber no header
+  const sideMargin = 30; // Margem igual para ambas as logos
   
   // Desenhar logo VCCU se carregado (esquerda)
   if (vccuLogoImage) {
     const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
     const logoX = sideMargin;
-    const logoY = headerY + (headerHeight - logoSize) / 2;
+    const logoY = headerY + (headerHeight - logoDims.height) / 2;
     
     page.drawImage(vccuLogoImage, {
       x: logoX,
@@ -521,22 +518,20 @@ const createCertificatePdf = async (
     color: rgb(1, 1, 1),
   });
   
-  // Desenhar logo CIVENI à direita com realce branco
+  // Desenhar logo CIVENI à direita com realce branco sutil
   if (civeniHeaderLogoImage) {
     const civeniLogoDims = civeniHeaderLogoImage.scale(civeniHeaderLogoSize / civeniHeaderLogoImage.height);
     const civeniLogoX = width - sideMargin - civeniLogoDims.width;
     const civeniLogoY = headerY + (headerHeight - civeniLogoDims.height) / 2;
     
-    // Desenhar realce/fundo branco arredondado atrás do logo
-    const padding = 8;
+    // Desenhar realce branco pequeno e proporcional atrás do logo
+    const padding = 4;
     page.drawRectangle({
       x: civeniLogoX - padding,
       y: civeniLogoY - padding,
       width: civeniLogoDims.width + padding * 2,
       height: civeniLogoDims.height + padding * 2,
       color: rgb(1, 1, 1), // Branco
-      borderColor: rgb(0.9, 0.9, 0.9),
-      borderWidth: 1,
     });
     
     page.drawImage(civeniHeaderLogoImage, {
