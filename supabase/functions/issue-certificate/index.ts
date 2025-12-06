@@ -366,8 +366,9 @@ const createCertificatePdf = async (
   let vccuLogoImage = null;
   try {
     // Tentar carregar logo VCCU de diferentes URLs
+    // Google Drive link convertido para download direto
     const vccuLogoUrls = [
-      "https://raw.githubusercontent.com/user-attachments/assets/vccu-logo.png",
+      "https://drive.google.com/uc?export=download&id=1525O_m180-994B4PJJWr39pxN54oHT8V",
       "https://civeni.com/uploads/civeni-2025-logo-sidebar.png"
     ];
     
