@@ -48,7 +48,8 @@ export function usePublicNavigation(language: string = 'pt') {
       if (error) throw error;
       return data as PublicNavigationItem[];
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds for faster sync
+    refetchOnWindowFocus: true,
   });
 
   // Get label based on language
