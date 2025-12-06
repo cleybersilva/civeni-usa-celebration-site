@@ -687,12 +687,12 @@ const createCertificatePdf = async (
 
   // Data do evento
   const mainTextLine4Raw = language === "en-US" 
-    ? `from December 11 to 13, 2025, with a total workload of ${hours || "20"} hours.`
+    ? `from December 11 to 13, 2025, with a total workload of ${hours || "60"} hours.`
     : language === "es-ES"
-    ? `del 11 al 13 de diciembre de 2025, con una carga horaria de ${hours || "20"} horas.`
+    ? `del 11 al 13 de diciembre de 2025, con una carga horaria de ${hours || "60"} horas.`
     : language === "tr-TR"
-    ? `11-13 Aralik 2025 tarihleri arasinda, toplam ${hours || "20"} saat is yukuyle.`
-    : `de 11 a 13 de dezembro de 2025, com carga horária de ${hours || "20"} horas.`;
+    ? `11-13 Aralik 2025 tarihleri arasinda, toplam ${hours || "60"} saat is yukuyle.`
+    : `de 11 a 13 de dezembro de 2025, com carga horária de ${hours || "60"} horas.`;
   const mainTextLine4 = sanitizeForPdf(mainTextLine4Raw);
   
   const mainTextWidth4 = textFont.widthOfTextAtSize(mainTextLine4, mainTextSize);
