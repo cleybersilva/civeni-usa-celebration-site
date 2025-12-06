@@ -617,57 +617,43 @@ const createCertificatePdf = async (
     });
   }
 
-  // ===== ASSINATURAS =====
-  const sigY = 160; // Mais alto para afastar do logo III CIVENI
-  const sigSpacing = width / 3;
+  // ===== ASSINATURA ÚNICA CENTRALIZADA =====
+  const sigY = 155; // Posição Y da assinatura (acima do logo CIVENI)
   
-  const signatures = [
-    { 
-      name: sanitizeForPdf("Dra. Maria Emilia Camargo"), 
-      role: sanitizeForPdf(language === "en-US" ? "Dean of International Relations/VCCU" 
-        : language === "es-ES" ? "Decana de Relaciones Internacionales/VCCU"
-        : language === "tr-TR" ? "Uluslararasi Iliskiler Dekani/VCCU"
-        : "Reitora de Relacoes Internacionais/VCCU")
-    },
-    { 
-      name: sanitizeForPdf("Dra. Marcela Tardanza Martins"), 
-      role: sanitizeForPdf(language === "en-US" ? "Dean of Academic Relations/VCCU"
-        : language === "es-ES" ? "Decana de Relaciones Academicas/VCCU"
-        : language === "tr-TR" ? "Akademik Iliskiler Dekani/VCCU"
-        : "Reitora de Relacoes Academicas/VCCU")
-    }
-  ];
+  const signatureName = sanitizeForPdf("Dr. Acilina Candeia");
+  const signatureRole = sanitizeForPdf(language === "en-US" ? "President of VCCU" 
+    : language === "es-ES" ? "Presidenta de VCCU"
+    : language === "tr-TR" ? "VCCU Baskani"
+    : "Presidente da VCCU");
   
-  signatures.forEach((sig, index) => {
-    const sigX = sigSpacing * (index + 1);
-    
-    // Linha de assinatura
-    page.drawLine({
-      start: { x: sigX - 90, y: sigY + 5 },
-      end: { x: sigX + 90, y: sigY + 5 },
-      thickness: 1,
-      color: rgb(0.6, 0.6, 0.6),
-    });
-    
-    // Nome
-    const sigNameWidth = titleFont.widthOfTextAtSize(sig.name, 10);
-    page.drawText(sig.name, {
-      x: sigX - sigNameWidth / 2,
-      y: sigY - 12,
-      size: 10,
-      font: titleFont,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    
-    // Cargo
-    const sigRoleWidth = textFont.widthOfTextAtSize(sig.role, 8);
-    page.drawText(sig.role, {
-      x: sigX - sigRoleWidth / 2,
-      y: sigY - 25,
-      size: 8,
-      font: textFont,
-      color: rgb(0.4, 0.4, 0.4),
-    });
+  const sigX = width / 2; // Centralizado
+  
+  // Linha de assinatura
+  page.drawLine({
+    start: { x: sigX - 90, y: sigY + 5 },
+    end: { x: sigX + 90, y: sigY + 5 },
+    thickness: 1,
+    color: rgb(0.6, 0.6, 0.6),
+  });
+  
+  // Nome
+  const sigNameWidth = titleFont.widthOfTextAtSize(signatureName, 10);
+  page.drawText(signatureName, {
+    x: sigX - sigNameWidth / 2,
+    y: sigY - 12,
+    size: 10,
+    font: titleFont,
+    color: rgb(0.2, 0.2, 0.2),
+  });
+  
+  // Cargo
+  const sigRoleWidth = textFont.widthOfTextAtSize(signatureRole, 8);
+  page.drawText(signatureRole, {
+    x: sigX - sigRoleWidth / 2,
+    y: sigY - 25,
+    size: 8,
+    font: textFont,
+    color: rgb(0.4, 0.4, 0.4),
   });
 
   // ===== LOCAL E DATA NO FOOTER =====
@@ -765,12 +751,12 @@ const createCertificatePdf = async (
     console.log("Could not load CIVENI logo, continuing without it:", logoError);
   }
 
-  // Desenhar logo CIVENI centralizado entre as assinaturas
+  // Desenhar logo CIVENI centralizado abaixo da assinatura (acima do rodapé)
   if (civeniLogoImage) {
-    const civeniLogoHeight = 50;
+    const civeniLogoHeight = 45; // Tamanho um pouco menor
     const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
     const civeniLogoX = (width - civeniLogoDims.width) / 2;
-    const civeniLogoY = sigY - 70; // Posicionado bem abaixo das assinaturas, centralizado
+    const civeniLogoY = sigY - 75; // Posicionado abaixo da assinatura, mas acima do rodapé
     
     page.drawImage(civeniLogoImage, {
       x: civeniLogoX,
@@ -785,7 +771,7 @@ const createCertificatePdf = async (
     
     page.drawText(badgeText, {
       x: (width - badgeTextWidth) / 2,
-      y: sigY - 60,
+      y: sigY - 65,
       size: 12,
       font: titleFont,
       color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
