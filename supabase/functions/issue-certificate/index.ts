@@ -420,22 +420,58 @@ const createCertificatePdf = async (
   // ===== CARREGAR LOGO CIVENI PARA O CABEÇALHO =====
   let civeniHeaderLogoImage = null;
   try {
-    const civeniHeaderLogoUrl = "https://civeni.com/uploads/civeni-2025-logo-header.png";
-    console.log("Trying CIVENI header logo URL:", civeniHeaderLogoUrl);
-    const civeniHeaderResponse = await fetch(civeniHeaderLogoUrl);
+    // Tentar múltiplas URLs para a logo do CIVENI
+    // O Lovable CDN converte imagens para WebP, então precisamos usar uma fonte externa
+    const civeniHeaderLogoUrls = [
+      // Google Drive link para logo CIVENI III 2025 (você precisa fazer upload e pegar o ID)
+      "https://drive.google.com/uc?export=download&id=1l6g_O5pY4FSWADlGrjfvs5g0nA8n5iEJ",
+      "https://civeni.com/uploads/civeni-2025-logo-header.png"
+    ];
     
-    if (civeniHeaderResponse.ok) {
-      const civeniHeaderBytes = new Uint8Array(await civeniHeaderResponse.arrayBuffer());
-      const isPng = civeniHeaderBytes[0] === 0x89 && civeniHeaderBytes[1] === 0x50 && civeniHeaderBytes[2] === 0x4E && civeniHeaderBytes[3] === 0x47;
-      const isJpg = civeniHeaderBytes[0] === 0xFF && civeniHeaderBytes[1] === 0xD8;
-      
-      if (isPng) {
-        civeniHeaderLogoImage = await pdfDoc.embedPng(civeniHeaderBytes);
-        console.log("CIVENI header logo embedded as PNG successfully");
-      } else if (isJpg) {
-        civeniHeaderLogoImage = await pdfDoc.embedJpg(civeniHeaderBytes);
-        console.log("CIVENI header logo embedded as JPG successfully");
+    for (const civeniHeaderLogoUrl of civeniHeaderLogoUrls) {
+      try {
+        console.log("Trying CIVENI header logo URL:", civeniHeaderLogoUrl);
+        const civeniHeaderResponse = await fetch(civeniHeaderLogoUrl);
+        console.log("CIVENI header logo fetch status:", civeniHeaderResponse.status);
+        
+        if (civeniHeaderResponse.ok) {
+          const civeniHeaderBytes = new Uint8Array(await civeniHeaderResponse.arrayBuffer());
+          console.log("CIVENI header logo bytes length:", civeniHeaderBytes.length);
+          console.log("CIVENI header logo first 12 bytes:", Array.from(civeniHeaderBytes.slice(0, 12)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
+          
+          const isPng = civeniHeaderBytes[0] === 0x89 && civeniHeaderBytes[1] === 0x50 && civeniHeaderBytes[2] === 0x4E && civeniHeaderBytes[3] === 0x47;
+          const isJpg = civeniHeaderBytes[0] === 0xFF && civeniHeaderBytes[1] === 0xD8;
+          const isWebP = civeniHeaderBytes[0] === 0x52 && civeniHeaderBytes[1] === 0x49 && civeniHeaderBytes[2] === 0x46 && civeniHeaderBytes[3] === 0x46 &&
+                         civeniHeaderBytes[8] === 0x57 && civeniHeaderBytes[9] === 0x45 && civeniHeaderBytes[10] === 0x42 && civeniHeaderBytes[11] === 0x50;
+          
+          console.log("CIVENI header logo format - isPng:", isPng, "isJpg:", isJpg, "isWebP:", isWebP);
+          
+          if (isPng) {
+            civeniHeaderLogoImage = await pdfDoc.embedPng(civeniHeaderBytes);
+            console.log("CIVENI header logo embedded as PNG successfully");
+            break;
+          } else if (isJpg) {
+            civeniHeaderLogoImage = await pdfDoc.embedJpg(civeniHeaderBytes);
+            console.log("CIVENI header logo embedded as JPG successfully");
+            break;
+          } else if (isWebP) {
+            console.log("CIVENI header logo is WebP format - NOT SUPPORTED, trying next URL");
+            continue;
+          } else {
+            console.log("CIVENI header logo format unknown, trying next URL");
+            continue;
+          }
+        } else {
+          console.log("CIVENI header logo fetch failed with status:", civeniHeaderResponse.status);
+        }
+      } catch (urlError) {
+        console.log("Error loading CIVENI header logo from URL:", civeniHeaderLogoUrl, urlError);
+        continue;
       }
+    }
+    
+    if (!civeniHeaderLogoImage) {
+      console.log("FAILED to load CIVENI header logo from any URL - will display text fallback");
     }
   } catch (headerLogoError) {
     console.log("Could not load CIVENI header logo:", headerLogoError);
