@@ -20,7 +20,7 @@ export const trTranslations = {
       papers: "Bildiriler",
       submission: "Gönderim",
       submissionArticleConsortium: "Makale/Konsorsiyum Gönderimi",
-      approvedList: "Liste",
+      approvedList: "Sunum Listesi Makaleler/Projeler",
       oralPresentation: "Sunum Listesi Makaleler/Projeler",
       posterSessions: "Poster Oturumları",
       manuscripts: "Video Gönderimi",

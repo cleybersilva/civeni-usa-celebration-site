@@ -20,7 +20,7 @@ export const enTranslations = {
       papers: "Papers",
       submission: "Submission",
       submissionArticleConsortium: "Paper/Consortium Submission",
-      approvedList: "List",
+      approvedList: "Presentation List Articles/Projects",
       oralPresentation: "Presentation List Articles/Projects",
       posterSessions: "Poster Sessions",
       manuscripts: "Video Submission",
