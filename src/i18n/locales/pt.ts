@@ -20,7 +20,7 @@ export const ptTranslations = {
       papers: "Trabalhos",
       submission: "Submissão",
       submissionArticleConsortium: "Submissão Artigo/Consórcio",
-      approvedList: "Lista",
+      approvedList: "Lista de Apresentação Artigos/Projetos",
       oralPresentation: "Lista de Apresentação Artigos/Projetos",
       posterSessions: "Sessões de Pôster",
       manuscripts: "Envio de Vídeos",

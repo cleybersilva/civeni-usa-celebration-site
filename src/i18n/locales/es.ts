@@ -20,7 +20,7 @@ export const esTranslations = {
       papers: "Trabajos",
       submission: "Envío",
       submissionArticleConsortium: "Envío de Artículo/Consorcio",
-      approvedList: "Lista",
+      approvedList: "Lista de Presentación Artículos/Proyectos",
       oralPresentation: "Lista de Presentación Artículos/Proyectos",
       posterSessions: "Sesiones de Póster",
       manuscripts: "Envío de Videos",
