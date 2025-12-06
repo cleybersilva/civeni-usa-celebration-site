@@ -417,23 +417,7 @@ const createCertificatePdf = async (
     console.log("Could not load VCCU logo, continuing without it:", logoError);
   }
 
-  // Calcular posições do header com logo
-  const logoSize = 55; // Tamanho proporcional para o logo
-  const logoX = innerMargin + 25;
-  const logoY = headerY + (headerHeight - logoSize) / 2;
-  
-  // Desenhar logo VCCU se carregado
-  if (vccuLogoImage) {
-    const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
-    page.drawImage(vccuLogoImage, {
-      x: logoX,
-      y: logoY,
-      width: logoDims.width,
-      height: logoDims.height,
-    });
-  }
-
-  // ===== TÍTULO PRINCIPAL (centralizado com logo) =====
+  // ===== TÍTULO PRINCIPAL =====
   const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
     : language === "es-ES" ? "CERTIFICADO DE PARTICIPACION"
     : language === "tr-TR" ? "KATILIM SERTIFIKASI"
@@ -443,10 +427,28 @@ const createCertificatePdf = async (
   const titleSize = 28;
   const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
   
-  // Calcular posição X para centralizar texto após o logo
-  const textAreaStart = vccuLogoImage ? logoX + logoSize + 20 : innerMargin;
-  const textAreaWidth = width - textAreaStart - innerMargin;
-  const titleX = textAreaStart + (textAreaWidth - titleWidth) / 2;
+  // Calcular posições - logo e título próximos e centralizados juntos
+  const logoSize = 55;
+  const logoGap = 15; // Espaço entre logo e título
+  const totalContentWidth = (vccuLogoImage ? logoSize + logoGap : 0) + titleWidth;
+  const contentStartX = (width - totalContentWidth) / 2;
+  
+  // Desenhar logo VCCU se carregado
+  if (vccuLogoImage) {
+    const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
+    const logoX = contentStartX;
+    const logoY = headerY + (headerHeight - logoSize) / 2;
+    
+    page.drawImage(vccuLogoImage, {
+      x: logoX,
+      y: logoY,
+      width: logoDims.width,
+      height: logoDims.height,
+    });
+  }
+  
+  // Posição X do título (após o logo ou centralizado se não houver logo)
+  const titleX = vccuLogoImage ? contentStartX + logoSize + logoGap : (width - titleWidth) / 2;
   
   page.drawText(titleText, {
     x: titleX,
@@ -461,10 +463,9 @@ const createCertificatePdf = async (
   const subtitleText = sanitizeForPdf(subtitleTextRaw);
   const subtitleSize = 10;
   const subtitleWidth = textFont.widthOfTextAtSize(subtitleText, subtitleSize);
-  const subtitleX = textAreaStart + (textAreaWidth - subtitleWidth) / 2;
   
   page.drawText(subtitleText, {
-    x: subtitleX,
+    x: (width - subtitleWidth) / 2,
     y: headerY + 15,
     size: subtitleSize,
     font: textFont,
@@ -617,7 +618,7 @@ const createCertificatePdf = async (
   }
 
   // ===== ASSINATURAS =====
-  const sigY = 145;
+  const sigY = 160; // Mais alto para afastar do logo III CIVENI
   const sigSpacing = width / 3;
   
   const signatures = [
@@ -769,7 +770,7 @@ const createCertificatePdf = async (
     const civeniLogoHeight = 50;
     const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
     const civeniLogoX = (width - civeniLogoDims.width) / 2;
-    const civeniLogoY = sigY - 35; // Posicionado abaixo das assinaturas, centralizado
+    const civeniLogoY = sigY - 70; // Posicionado bem abaixo das assinaturas, centralizado
     
     page.drawImage(civeniLogoImage, {
       x: civeniLogoX,
@@ -784,7 +785,7 @@ const createCertificatePdf = async (
     
     page.drawText(badgeText, {
       x: (width - badgeTextWidth) / 2,
-      y: sigY - 25,
+      y: sigY - 60,
       size: 12,
       font: titleFont,
       color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
