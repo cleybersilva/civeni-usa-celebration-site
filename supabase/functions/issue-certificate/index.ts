@@ -1111,8 +1111,8 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("idioma", language)
       .maybeSingle();
 
-    const eventName = translation?.titulo || event?.slug || "CIVENI 2025";
-    console.log("Event name for certificate:", eventName);
+    const eventTitle = translation?.titulo || event?.slug || "CIVENI 2025";
+    console.log("Event title for certificate:", eventTitle);
 
     // Verificar se certificado já existe para este e-mail/evento
     const { data: existingCert } = await supabase
@@ -1138,7 +1138,7 @@ const handler = async (req: Request): Promise<Response> => {
     const pdfBytes = await createCertificatePdf({
       fullName: normalizedFullName,
       eventSlug: event?.slug || "CIVENI 2025",
-      eventName,
+      eventName: eventTitle,
       language,
       issueDate,
       city: eventCert.city,
@@ -1193,7 +1193,7 @@ const handler = async (req: Request): Promise<Response> => {
         body: {
           email: normalizedEmail,
           fullName: normalizedFullName,
-          eventName,
+          eventName: eventTitle,
           pdfUrl,
           code,
         },
@@ -1221,7 +1221,7 @@ const handler = async (req: Request): Promise<Response> => {
         matched: matchedCount,
         fullName: normalizedFullName,
         email: normalizedEmail,
-        eventName,
+        eventName: eventTitle,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
     );
