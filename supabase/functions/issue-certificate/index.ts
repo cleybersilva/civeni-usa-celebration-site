@@ -447,7 +447,10 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    const { eventId, email, fullName, keywords }: CertificateRequest = await req.json();
+    const body = await req.json();
+    const { eventId, email, fullName, keywords } = body as CertificateRequest;
+    // Get language from request body (sent by frontend based on user's selected language)
+    const requestLanguage = body.language || "pt-BR";
 
     // Validação básica de entrada (mensagem fixa em PT para evitar depender de linguagem aqui)
     if (!eventId || !email || !fullName || !keywords || keywords.length !== 3) {
@@ -511,8 +514,10 @@ const handler = async (req: Request): Promise<Response> => {
       language: eventCert.language
     });
 
-    // Mensagens por idioma
-    const language = eventCert.language || "pt-BR";
+    // Mensagens por idioma - usa o idioma enviado pelo frontend (baseado na seleção do usuário)
+    const language = requestLanguage;
+    console.log("Using language from frontend:", language);
+    
     const messages = {
       "pt-BR": {
         invalidData: "Dados inválidos. É necessário fornecer 3 palavras-chave.",
@@ -546,6 +551,17 @@ const handler = async (req: Request): Promise<Response> => {
           `Acertó ${matched}/3 palabras clave. Mínimo requerido: ${required}/3`,
         alreadyIssued: (date: string) => `Certificado ya emitido el ${date}`,
         success: "¡Certificado emitido con éxito!",
+      },
+      "tr-TR": {
+        invalidData: "Geçersiz veri. 3 anahtar kelime gereklidir.",
+        nameMin: "Ad en az 2 karakter olmalıdır",
+        tooManyAttempts: "Çok fazla deneme. 1 saat sonra tekrar deneyin.",
+        eventNotFound: "Etkinlik bulunamadı veya sertifikalar etkinleştirilmemiş",
+        emailNotRegistered: "E-posta bulunamadı. CIVENI kaydınızda kullandığınız e-postayı doğrulayın.",
+        keywordsMismatch: (matched: number, required: number) =>
+          `${matched}/3 anahtar kelime doğru. Gerekli minimum: ${required}/3`,
+        alreadyIssued: (date: string) => `Sertifika zaten ${date} tarihinde verildi`,
+        success: "Sertifika başarıyla verildi!",
       },
     };
 
