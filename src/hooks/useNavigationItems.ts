@@ -143,42 +143,50 @@ export function useNavigationItems() {
 
   // Toggle visibility
   const toggleVisibility = useCallback(async (item: NavigationItem) => {
-    await upsertMutation.mutateAsync({
-      id: item.id,
-      type: item.type,
-      parent_id: item.parent_id,
-      slug: item.slug,
-      path: item.path,
-      order_index: item.order_index,
-      is_visible: !item.is_visible,
-      status: item.status,
-      restricted_to_registered: item.restricted_to_registered,
-      label_pt_br: item.label_pt_br,
-      label_en: item.label_en || '',
-      label_es: item.label_es || '',
-      label_tr: item.label_tr || '',
-      icon: item.icon || '',
-    });
+    try {
+      await upsertMutation.mutateAsync({
+        id: item.id,
+        type: item.type,
+        parent_id: item.parent_id,
+        slug: item.slug,
+        path: item.path,
+        order_index: item.order_index,
+        is_visible: !item.is_visible,
+        status: item.status,
+        restricted_to_registered: item.restricted_to_registered,
+        label_pt_br: item.label_pt_br,
+        label_en: item.label_en || '',
+        label_es: item.label_es || '',
+        label_tr: item.label_tr || '',
+        icon: item.icon || '',
+      });
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+    }
   }, [upsertMutation]);
 
   // Toggle status
   const toggleStatus = useCallback(async (item: NavigationItem) => {
-    await upsertMutation.mutateAsync({
-      id: item.id,
-      type: item.type,
-      parent_id: item.parent_id,
-      slug: item.slug,
-      path: item.path,
-      order_index: item.order_index,
-      is_visible: item.is_visible,
-      status: item.status === 'active' ? 'inactive' : 'active',
-      restricted_to_registered: item.restricted_to_registered,
-      label_pt_br: item.label_pt_br,
-      label_en: item.label_en || '',
-      label_es: item.label_es || '',
-      label_tr: item.label_tr || '',
-      icon: item.icon || '',
-    });
+    try {
+      await upsertMutation.mutateAsync({
+        id: item.id,
+        type: item.type,
+        parent_id: item.parent_id,
+        slug: item.slug,
+        path: item.path,
+        order_index: item.order_index,
+        is_visible: item.is_visible,
+        status: item.status === 'active' ? 'inactive' : 'active',
+        restricted_to_registered: item.restricted_to_registered,
+        label_pt_br: item.label_pt_br,
+        label_en: item.label_en || '',
+        label_es: item.label_es || '',
+        label_tr: item.label_tr || '',
+        icon: item.icon || '',
+      });
+    } catch (error) {
+      console.error('Error toggling status:', error);
+    }
   }, [upsertMutation]);
 
   return {
