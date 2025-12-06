@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -30,13 +30,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, FileText, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, FileText, Search, Upload, Download, FileSpreadsheet } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import * as XLSX from 'xlsx';
 
 interface ApprovedWork {
   id: string;
@@ -57,6 +58,12 @@ interface WorkFormData {
   observacoes: string;
 }
 
+interface ImportedWork {
+  numero: number;
+  titulo: string;
+  autor_responsavel: string;
+}
+
 const AREAS = [
   'EDUCAÇÃO',
   'CIÊNCIAS JURÍDICAS',
@@ -68,6 +75,13 @@ export const ApprovedWorksManager = () => {
   const [editingWork, setEditingWork] = useState<ApprovedWork | null>(null);
   const [filterArea, setFilterArea] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Import state
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importArea, setImportArea] = useState<string>('');
+  const [importedData, setImportedData] = useState<ImportedWork[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
 
@@ -253,6 +267,133 @@ export const ApprovedWorksManager = () => {
     const maxNumero = areaWorks.length > 0 ? Math.max(...areaWorks.map(w => w.numero)) : 0;
     setFormData(prev => ({ ...prev, numero: maxNumero + 1 }));
     setIsDialogOpen(true);
+  };
+
+  // === IMPORT FUNCTIONS ===
+  const handleOpenImport = (area: string) => {
+    setImportArea(area);
+    setImportedData([]);
+    setIsImportDialogOpen(true);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = event.target?.result;
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet) as any[];
+
+        // Map columns - support various column name formats
+        const mappedData: ImportedWork[] = jsonData.map((row) => {
+          const numero = row['Nº'] || row['N°'] || row['Numero'] || row['NUMERO'] || row['numero'] || row['N'] || 0;
+          const titulo = row['Título'] || row['TÍTULO'] || row['Titulo'] || row['TITULO'] || row['titulo'] || '';
+          const autor = row['Autor Responsável'] || row['AUTOR RESPONSÁVEL'] || row['Autor'] || row['AUTOR'] || row['autor_responsavel'] || row['autor'] || '';
+
+          return {
+            numero: typeof numero === 'number' ? numero : parseInt(String(numero)) || 0,
+            titulo: String(titulo).trim(),
+            autor_responsavel: String(autor).trim(),
+          };
+        }).filter(item => item.numero > 0 && item.titulo && item.autor_responsavel);
+
+        if (mappedData.length === 0) {
+          toast.error('Nenhum dado válido encontrado. Verifique se as colunas estão corretas: Nº, Título, Autor Responsável');
+          return;
+        }
+
+        setImportedData(mappedData);
+        toast.success(`${mappedData.length} artigos encontrados para importação`);
+      } catch (error) {
+        console.error('Error parsing file:', error);
+        toast.error('Erro ao ler o arquivo. Verifique se é um arquivo Excel válido.');
+      }
+    };
+    reader.readAsBinaryString(file);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleImportConfirm = async () => {
+    if (importedData.length === 0 || !importArea) return;
+
+    setIsImporting(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      const { email, token } = getAdminSession();
+
+      for (const item of importedData) {
+        try {
+          const { error } = await supabase.rpc('admin_upsert_approved_work', {
+            work_data: {
+              area: importArea,
+              numero: item.numero,
+              titulo: item.titulo,
+              autor_responsavel: item.autor_responsavel,
+              observacoes: '',
+            } as any,
+            user_email: email,
+            session_token: token,
+          });
+
+          if (error) {
+            console.error('Import error for item:', item, error);
+            errorCount++;
+          } else {
+            successCount++;
+          }
+        } catch (err) {
+          console.error('Import error for item:', item, err);
+          errorCount++;
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['approved-works'] });
+
+      if (errorCount === 0) {
+        toast.success(`${successCount} artigos importados com sucesso!`);
+      } else {
+        toast.warning(`${successCount} importados, ${errorCount} com erro`);
+      }
+
+      setIsImportDialogOpen(false);
+      setImportedData([]);
+    } catch (error: any) {
+      toast.error(`Erro na importação: ${error.message}`);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const templateData = [
+      { 'Nº': 1, 'Título': 'Exemplo de título do artigo', 'Autor Responsável': 'Nome do Autor' },
+      { 'Nº': 2, 'Título': 'Outro título de exemplo', 'Autor Responsável': 'Outro Autor' },
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Artigos');
+    
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 5 },   // Nº
+      { wch: 50 },  // Título
+      { wch: 30 },  // Autor Responsável
+    ];
+
+    XLSX.writeFile(wb, 'modelo_importacao_artigos.xlsx');
+    toast.success('Modelo Excel baixado!');
   };
 
   const filteredWorks = (works || []).filter((work) => {
@@ -457,12 +598,24 @@ export const ApprovedWorksManager = () => {
             return (
               <AccordionItem key={area} value={area} className="border rounded-lg overflow-hidden">
                 <AccordionTrigger className={`px-4 py-3 ${getAreaBadgeColor(area)} text-white hover:no-underline`}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <FileText className="w-5 h-5" />
                     <span className="font-semibold">ÁREA: {area}</span>
                     <Badge variant="secondary" className="ml-2">
                       {areaWorks.length} artigos
                     </Badge>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="ml-auto"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenImport(area);
+                      }}
+                    >
+                      <Upload className="w-4 h-4 mr-1" />
+                      Importar
+                    </Button>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="p-0">
@@ -519,6 +672,115 @@ export const ApprovedWorksManager = () => {
           })}
         </Accordion>
       )}
+
+      {/* Import Dialog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5" />
+              Importar Artigos - {importArea}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Instructions */}
+            <Card className="p-4 bg-muted/50">
+              <h4 className="font-medium mb-2">Instruções:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Faça upload de um arquivo Excel (.xlsx) com as colunas: <strong>Nº, Título, Autor Responsável</strong></li>
+                <li>• Artigos com mesmo número serão atualizados</li>
+                <li>• Linhas sem dados válidos serão ignoradas</li>
+              </ul>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={downloadTemplate}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Baixar Modelo Excel
+              </Button>
+            </Card>
+
+            {/* File Upload */}
+            <div>
+              <Label htmlFor="import-file">Arquivo Excel</Label>
+              <Input
+                id="import-file"
+                type="file"
+                accept=".xlsx,.xls"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Preview */}
+            {importedData.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-2">Preview ({importedData.length} artigos)</h4>
+                <div className="max-h-64 overflow-y-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-16">Nº</TableHead>
+                        <TableHead>Título</TableHead>
+                        <TableHead>Autor Responsável</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {importedData.slice(0, 20).map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.numero}</TableCell>
+                          <TableCell className="max-w-xs truncate">{item.titulo}</TableCell>
+                          <TableCell>{item.autor_responsavel}</TableCell>
+                        </TableRow>
+                      ))}
+                      {importedData.length > 20 && (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center text-muted-foreground">
+                            ... e mais {importedData.length - 20} artigos
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsImportDialogOpen(false);
+                  setImportedData([]);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleImportConfirm}
+                disabled={importedData.length === 0 || isImporting}
+              >
+                {isImporting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Importando...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Importar {importedData.length} artigos
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
