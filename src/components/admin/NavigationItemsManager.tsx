@@ -242,7 +242,12 @@ export function NavigationItemsManager() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => toggleVisibility(item)}
+                          disabled={isUpserting}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            toggleVisibility(item);
+                          }}
                           title={item.is_visible ? 'Ocultar' : 'Mostrar'}
                         >
                           {item.is_visible ? (
@@ -256,7 +261,12 @@ export function NavigationItemsManager() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => toggleStatus(item)}
+                          disabled={isUpserting}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            toggleStatus(item);
+                          }}
                           title={item.status === 'active' ? 'Desativar' : 'Ativar'}
                           className={item.status === 'active' ? 'text-green-600' : 'text-muted-foreground'}
                         >
@@ -271,7 +281,12 @@ export function NavigationItemsManager() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => toggleRestricted(item)}
+                          disabled={isUpserting}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            toggleRestricted(item);
+                          }}
                           title={item.restricted_to_registered ? 'Remover restrição' : 'Restringir a inscritos'}
                         >
                           {item.restricted_to_registered ? (
