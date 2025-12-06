@@ -12,7 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Save, Languages } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Save, Languages, Trash2, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import CertificatePreview from './CertificatePreview';
@@ -29,60 +30,67 @@ interface CertificateTemplateDialogProps {
 const defaultConfig = {
   background: {
     type: 'solid',
-    color: '#F9FAFB'
+    color: '#FFFFFF'
   },
   border: {
     enabled: true,
     style: 'double',
     thickness: 4,
     gradient: {
-      from: '#1e40af',
-      to: '#dc2626'
+      from: '#0A2342',
+      via: '#731B4C',
+      to: '#C42448'
     }
   },
   header: {
     showLogo: true,
-    title: 'CERTIFICADO',
-    titleColor: '#1e40af',
+    logoUrl: '/uploads/vccu-logo-certificate.png',
+    logoPosition: 'left', // left, center, right
+    title: 'CERTIFICADO DE PARTICIPAÇÃO',
+    titleColor: '#0A2342',
     subtitle: 'III CIVENI 2025 – Celebration, Florida/EUA',
-    subtitleColor: '#4B5563'
+    subtitleColor: '#731B4C'
   },
   body: {
     certifyLabel: 'Certificamos que',
     certifyLabelColor: '#6B7280',
     participantNamePlaceholder: '{{nome_participante}}',
     participantNameStyle: {
-      fontSize: 32,
+      fontSize: 28,
       fontWeight: 'bold',
-      color: '#111827'
+      color: '#0A2342'
     },
-    mainText: 'Certificamos que {{nome_participante}} participou do(a) {{tipo_participacao}} no {{nome_evento}}, realizado no período de {{data_evento}}, com carga horária de {{carga_horaria}} horas.',
+    mainText: 'participou do(a) {{tipo_participacao}} no III CIVENI 2025 – Celebration/Florida/EUA, realizado no período de {{data_evento}}, com carga horária de {{carga_horaria}} horas.',
     mainTextColor: '#374151',
     alignment: 'center'
   },
   footer: {
     locationDateText: 'Celebration/Florida – EUA, {{data_emissao}}',
     locationDateColor: '#4B5563',
+    signatureCount: 2, // 1 ou 2
+    signatureLayout: 'sides', // sides, center, left, right (quando 1 assinatura)
     signatures: [
       {
         label: 'Dean of International Relations/VCCU',
-        name: '{{nome_reitor}}',
+        name: 'Dra. Maria Emilia Camargo',
         signatureImageUrl: ''
       },
       {
         label: 'Dean of Academic Relations/VCCU',
-        name: '{{nome_coordenador}}',
+        name: 'Dra. Marcela Tarciana Martins',
         signatureImageUrl: ''
       }
-    ]
+    ],
+    showCenterLogo: true,
+    centerLogoUrl: '/uploads/civeni-logo-certificate.png'
   },
   badge: {
     enabled: true,
     position: 'bottom-right',
     text: 'III CIVENI 2025',
     backgroundGradient: {
-      from: '#1e40af',
-      to: '#dc2626'
+      from: '#0A2342',
+      to: '#C42448'
     },
     textColor: '#FFFFFF'
   }
@@ -95,9 +103,9 @@ const getSampleDataByLanguage = (language: string) => {
         nome_participante: 'Participant Name',
         tipo_participacao: 'Participant',
         nome_evento: 'III CIVENI 2025 – Celebration/Florida/USA',
-        data_evento: 'December 11 to 13, 2025',
+        data_evento: 'December 11 to 14, 2025',
         carga_horaria: '20',
-        data_emissao: 'December 13, 2025',
+        data_emissao: 'December 14, 2025',
         nome_reitor: 'Dra. Maria Emilia Camargo',
         nome_coordenador: 'Dra. Marcela Tarciana Martins'
       };
@@ -106,9 +114,9 @@ const getSampleDataByLanguage = (language: string) => {
         nome_participante: 'Nombre del Participante',
         tipo_participacao: 'Participante',
         nome_evento: 'III CIVENI 2025 – Celebration/Florida/EUA',
-        data_evento: '11 a 13 de diciembre de 2025',
+        data_evento: '11 a 14 de diciembre de 2025',
         carga_horaria: '20',
-        data_emissao: '13 de diciembre de 2025',
+        data_emissao: '14 de diciembre de 2025',
         nome_reitor: 'Dra. Maria Emilia Camargo',
         nome_coordenador: 'Dra. Marcela Tarciana Martins'
       };
@@ -117,9 +125,9 @@ const getSampleDataByLanguage = (language: string) => {
         nome_participante: 'Nome do Participante',
         tipo_participacao: 'Participante',
         nome_evento: 'III CIVENI 2025 – Celebration/Florida/EUA',
-        data_evento: '11 a 13 de dezembro de 2025',
+        data_evento: '11 a 14 de dezembro de 2025',
         carga_horaria: '20',
-        data_emissao: '13 de dezembro de 2025',
+        data_emissao: '14 de dezembro de 2025',
         nome_reitor: 'Dra. Maria Emilia Camargo',
         nome_coordenador: 'Dra. Marcela Tarciana Martins'
       };
@@ -248,6 +256,27 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
     });
   };
 
+  const handleSignatureCountChange = (count: string) => {
+    const numCount = parseInt(count);
+    const currentSignatures = [...config.footer.signatures];
+    
+    if (numCount === 1 && currentSignatures.length > 1) {
+      // Mantém apenas a primeira assinatura
+      updateConfig(['footer', 'signatures'], [currentSignatures[0]]);
+    } else if (numCount === 2 && currentSignatures.length < 2) {
+      // Adiciona segunda assinatura
+      updateConfig(['footer', 'signatures'], [
+        currentSignatures[0],
+        {
+          label: 'Cargo',
+          name: 'Nome',
+          signatureImageUrl: ''
+        }
+      ]);
+    }
+    updateConfig(['footer', 'signatureCount'], numCount);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
@@ -331,8 +360,38 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                       checked={config.header.showLogo}
                       onCheckedChange={(checked) => updateConfig(['header', 'showLogo'], checked)}
                     />
-                    <Label>Exibir logo</Label>
+                    <Label>Exibir logo do cabeçalho</Label>
                   </div>
+
+                  {config.header.showLogo && (
+                    <>
+                      <div className="space-y-2">
+                        <Label>URL do logo</Label>
+                        <Input
+                          value={config.header.logoUrl || ''}
+                          onChange={(e) => updateConfig(['header', 'logoUrl'], e.target.value)}
+                          placeholder="/uploads/logo.png ou https://..."
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Posição do logo</Label>
+                        <Select
+                          value={config.header.logoPosition || 'left'}
+                          onValueChange={(value) => updateConfig(['header', 'logoPosition'], value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="left">Esquerda</SelectItem>
+                            <SelectItem value="center">Centro</SelectItem>
+                            <SelectItem value="right">Direita</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
 
                   <div className="space-y-2">
                     <Label>Título</Label>
@@ -396,7 +455,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                       className="text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Use: {'{'}nome_participante{'}'}, {'{'}tipo_participacao{'}'}, {'{'}nome_evento{'}'}, {'{'}data_evento{'}'}, {'{'}carga_horaria{'}'}
+                      Use: {'{{'}nome_participante{'}}'}, {'{{'}tipo_participacao{'}}'}, {'{{'}nome_evento{'}}'}, {'{{'}data_evento{'}}'}, {'{{'}carga_horaria{'}}'}
                     </p>
                   </div>
 
@@ -437,7 +496,48 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                     />
                   </div>
 
-                  {config.footer.signatures.map((sig: any, index: number) => (
+                  {/* Configurações de assinatura */}
+                  <div className="p-4 border rounded-lg space-y-4 bg-muted/30">
+                    <h4 className="font-semibold text-base">Configurações de Assinaturas</h4>
+                    
+                    <div className="space-y-2">
+                      <Label>Quantidade de assinaturas</Label>
+                      <Select
+                        value={String(config.footer.signatureCount || 2)}
+                        onValueChange={handleSignatureCountChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1 Assinatura</SelectItem>
+                          <SelectItem value="2">2 Assinaturas</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {config.footer.signatureCount === 1 && (
+                      <div className="space-y-2">
+                        <Label>Posição da assinatura</Label>
+                        <Select
+                          value={config.footer.signatureLayout || 'center'}
+                          onValueChange={(value) => updateConfig(['footer', 'signatureLayout'], value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="left">Esquerda</SelectItem>
+                            <SelectItem value="center">Centro</SelectItem>
+                            <SelectItem value="right">Direita</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Assinaturas individuais */}
+                  {config.footer.signatures.slice(0, config.footer.signatureCount || 2).map((sig: any, index: number) => (
                     <div key={index} className="p-4 border rounded-lg space-y-3">
                       <h4 className="font-medium">Assinatura {index + 1}</h4>
                       
@@ -466,7 +566,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>URL da assinatura (opcional)</Label>
+                        <Label>URL da imagem de assinatura (opcional)</Label>
                         <Input
                           value={sig.signatureImageUrl || ''}
                           onChange={(e) => {
@@ -479,6 +579,28 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                       </div>
                     </div>
                   ))}
+
+                  {/* Logo central entre assinaturas */}
+                  <div className="p-4 border rounded-lg space-y-3 bg-muted/30">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={config.footer.showCenterLogo ?? true}
+                        onCheckedChange={(checked) => updateConfig(['footer', 'showCenterLogo'], checked)}
+                      />
+                      <Label>Exibir logo central (entre assinaturas)</Label>
+                    </div>
+
+                    {(config.footer.showCenterLogo ?? true) && (
+                      <div className="space-y-2">
+                        <Label>URL do logo central</Label>
+                        <Input
+                          value={config.footer.centerLogoUrl || ''}
+                          onChange={(e) => updateConfig(['footer', 'centerLogoUrl'], e.target.value)}
+                          placeholder="/uploads/civeni-logo-certificate.png"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="style" className="space-y-4 mt-4">
@@ -502,7 +624,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                   {config.border.enabled && (
                     <div className="space-y-3 pl-6">
                       <div className="space-y-2">
-                        <Label>Cor inicial do gradiente</Label>
+                        <Label>Cor inicial (azul)</Label>
                         <Input
                           type="color"
                           value={config.border.gradient.from}
@@ -511,7 +633,16 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Cor final do gradiente</Label>
+                        <Label>Cor intermediária (roxo)</Label>
+                        <Input
+                          type="color"
+                          value={config.border.gradient.via || '#731B4C'}
+                          onChange={(e) => updateConfig(['border', 'gradient', 'via'], e.target.value)}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Cor final (vermelho)</Label>
                         <Input
                           type="color"
                           value={config.border.gradient.to}
@@ -546,6 +677,25 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
                           value={config.badge.text}
                           onChange={(e) => updateConfig(['badge', 'text'], e.target.value)}
                         />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Posição do badge</Label>
+                        <Select
+                          value={config.badge.position || 'bottom-right'}
+                          onValueChange={(value) => updateConfig(['badge', 'position'], value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="top-left">Topo Esquerda</SelectItem>
+                            <SelectItem value="top-right">Topo Direita</SelectItem>
+                            <SelectItem value="bottom-left">Rodapé Esquerda</SelectItem>
+                            <SelectItem value="bottom-right">Rodapé Direita</SelectItem>
+                            <SelectItem value="bottom-center">Rodapé Centro</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       <div className="space-y-2">
@@ -598,7 +748,7 @@ const CertificateTemplateDialog: React.FC<CertificateTemplateDialogProps> = ({
           <div className="border-l pl-6">
             <ScrollArea className="h-[calc(95vh-120px)]">
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Preview em Tempo Real</h3>
+                <h3 className="font-semibold text-lg">Preview em Tempo Real III CIVENI 2025</h3>
                 <CertificatePreview
                   layoutConfig={config}
                   sampleData={sampleData}
