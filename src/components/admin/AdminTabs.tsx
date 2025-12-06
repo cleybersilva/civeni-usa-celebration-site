@@ -19,6 +19,7 @@ import { SubmissionsManager } from './SubmissionsManager';
 import VideoSubmissionsManager from './VideoSubmissionsManager';
 import { PresentationRoomsManager } from './PresentationRoomsManager';
 import CertificateManager from './CertificateManager';
+import { NavigationItemsManager } from './NavigationItemsManager';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const AdminTabs = () => {
@@ -287,6 +288,17 @@ const AdminTabs = () => {
       <TabsContent value="salas-apresentacao">
         {hasPermission('cronograma') ? (
           <PresentationRoomsManager />
+        ) : (
+          <div className="p-8 text-center">
+            <p>Acesso negado</p>
+          </div>
+        )}
+      </TabsContent>
+
+      {/* MENU/SUBMENU */}
+      <TabsContent value="menu-submenu">
+        {isAdminRoot() ? (
+          <NavigationItemsManager />
         ) : (
           <div className="p-8 text-center">
             <p>Acesso negado</p>

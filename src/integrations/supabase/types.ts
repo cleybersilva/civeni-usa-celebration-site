@@ -101,6 +101,39 @@ export type Database = {
         }
         Relationships: []
       }
+      approved_works: {
+        Row: {
+          area: string
+          autor_responsavel: string
+          created_at: string
+          id: string
+          numero: number
+          observacoes: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          autor_responsavel: string
+          created_at?: string
+          id?: string
+          numero: number
+          observacoes?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          autor_responsavel?: string
+          created_at?: string
+          id?: string
+          numero?: number
+          observacoes?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -2417,6 +2450,71 @@ export type Database = {
         }
         Relationships: []
       }
+      navigation_items: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          is_visible: boolean
+          label_en: string | null
+          label_es: string | null
+          label_pt_br: string
+          label_tr: string | null
+          order_index: number
+          parent_id: string | null
+          path: string
+          restricted_to_registered: boolean
+          slug: string
+          status: Database["public"]["Enums"]["navigation_item_status"]
+          type: Database["public"]["Enums"]["navigation_item_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_visible?: boolean
+          label_en?: string | null
+          label_es?: string | null
+          label_pt_br: string
+          label_tr?: string | null
+          order_index?: number
+          parent_id?: string | null
+          path: string
+          restricted_to_registered?: boolean
+          slug: string
+          status?: Database["public"]["Enums"]["navigation_item_status"]
+          type?: Database["public"]["Enums"]["navigation_item_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_visible?: boolean
+          label_en?: string | null
+          label_es?: string | null
+          label_pt_br?: string
+          label_tr?: string | null
+          order_index?: number
+          parent_id?: string | null
+          path?: string
+          restricted_to_registered?: boolean
+          slug?: string
+          status?: Database["public"]["Enums"]["navigation_item_status"]
+          type?: Database["public"]["Enums"]["navigation_item_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "navigation_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "navigation_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participant_types: {
         Row: {
           created_at: string
@@ -4643,6 +4741,10 @@ export type Database = {
         }
         Returns: number
       }
+      admin_delete_approved_work: {
+        Args: { session_token: string; user_email: string; work_id: string }
+        Returns: Json
+      }
       admin_delete_civeni_session: {
         Args: { session_id: string; session_token: string; user_email: string }
         Returns: undefined
@@ -4655,6 +4757,7 @@ export type Database = {
         Args: { session_token: string; user_email: string; video_id: string }
         Returns: Json
       }
+      admin_delete_navigation_item: { Args: { p_id: string }; Returns: boolean }
       admin_delete_presentation_assignment: {
         Args: {
           assignment_id: string
@@ -4692,6 +4795,10 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_upsert_approved_work: {
+        Args: { session_token: string; user_email: string; work_data: Json }
+        Returns: Json
+      }
       admin_upsert_banner_slide: {
         Args: { session_token: string; slide: Json; user_email: string }
         Returns: Json
@@ -4711,6 +4818,25 @@ export type Database = {
       admin_upsert_live_stream_video: {
         Args: { session_token: string; user_email: string; video_data: Json }
         Returns: Json
+      }
+      admin_upsert_navigation_item: {
+        Args: {
+          p_icon?: string
+          p_id?: string
+          p_is_visible?: boolean
+          p_label_en?: string
+          p_label_es?: string
+          p_label_pt_br?: string
+          p_label_tr?: string
+          p_order_index?: number
+          p_parent_id?: string
+          p_path?: string
+          p_restricted_to_registered?: boolean
+          p_slug?: string
+          p_status?: Database["public"]["Enums"]["navigation_item_status"]
+          p_type?: Database["public"]["Enums"]["navigation_item_type"]
+        }
+        Returns: string
       }
       admin_upsert_presentation_assignment: {
         Args: {
@@ -5016,6 +5142,8 @@ export type Database = {
         | "aprovado"
         | "rejeitado"
       civeni_tipo_submissao: "artigo" | "consorcio"
+      navigation_item_status: "active" | "inactive"
+      navigation_item_type: "menu" | "submenu"
       submission_kind: "artigo" | "consorcio"
       transmission_status: "scheduled" | "live" | "ended"
     }
@@ -5169,6 +5297,8 @@ export const Constants = {
         "rejeitado",
       ],
       civeni_tipo_submissao: ["artigo", "consorcio"],
+      navigation_item_status: ["active", "inactive"],
+      navigation_item_type: ["menu", "submenu"],
       submission_kind: ["artigo", "consorcio"],
       transmission_status: ["scheduled", "live", "ended"],
     },

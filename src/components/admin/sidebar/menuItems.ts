@@ -16,6 +16,7 @@ import {
   CalendarDays,
   Inbox,
   Award,
+  Menu,
 } from 'lucide-react';
 import { MenuItem } from './types';
 
@@ -210,6 +211,13 @@ export const createMenuItems = (
       label: t('admin.menu.eventCategories', 'Categorias de Evento'),
       icon: FileText,
       show: hasPermission('inscricoes') || isAdminRoot(),
+      isPriority: false
+    },
+    {
+      id: 'menu-submenu',
+      label: t('admin.menu.menuSubmenu', 'Menu/Submenu'),
+      icon: Menu,
+      show: isAdminRoot(),
       isPriority: false
     }
   ];

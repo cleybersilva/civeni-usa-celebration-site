@@ -41,7 +41,7 @@ import ParticipantTypesManager from '@/components/admin/ParticipantTypesManager'
 import EventCategoriesManager from '@/components/admin/EventCategoriesManager';
 import LiveStreamVideosManager from '@/components/admin/LiveStreamVideosManager';
 import ApprovedWorksManager from '@/components/admin/ApprovedWorksManager';
-
+import { NavigationItemsManager } from '@/components/admin/NavigationItemsManager';
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -279,6 +279,11 @@ const AdminDashboardContent = () => {
           <PermissionGuard resource="trabalhos">
             <ApprovedWorksManager />
           </PermissionGuard>
+        ) : null;
+      
+      case 'menu-submenu':
+        return isAdminRoot() ? (
+          <NavigationItemsManager />
         ) : null;
       
       default:
