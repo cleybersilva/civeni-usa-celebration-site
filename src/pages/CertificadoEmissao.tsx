@@ -220,13 +220,8 @@ const CertificadoEmissao = () => {
               </div>
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>{t('certificateEmission.nextEvents').split('próximos eventos')[0]}
-                  <button 
-                    onClick={() => navigate('/eventos')} 
-                    className="font-bold underline hover:text-white transition-colors cursor-pointer"
-                  >
-                    {t('navigation.events')}
-                  </button>
+                <span>
+                  {t('certificateEmission.nextEvents')}
                 </span>
               </div>
             </div>

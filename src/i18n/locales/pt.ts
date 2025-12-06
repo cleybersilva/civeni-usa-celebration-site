@@ -1038,12 +1038,11 @@ export const ptTranslations = {
       loading: 'Carregando programação...',
       noSchedule: 'Nenhuma programação encontrada.',
     },
-  },
-  events: {
-    title: "Eventos",
-    subtitle: "Congresso Internacional Multidisciplinar",
-    description: "Gerencie eventos acadêmicos e científicos",
-    list: "Lista de Eventos",
+    events: {
+      title: "Eventos",
+      subtitle: "Congresso Internacional Multidisciplinar",
+      description: "Gerencie eventos acadêmicos e científicos",
+      list: "Lista de Eventos",
     create: "Criar Evento", 
     edit: "Editar Evento",
     filters: "Filtros",
@@ -1172,6 +1171,7 @@ export const ptTranslations = {
         sunday: 'Domingo',
       },
       noSessionsForDay: 'Nenhuma sessão publicada para este dia ainda.',
+    },
     },
     certificateEmission: {
       pageTitle: 'Parabéns por ter chegado ao final do evento!',
