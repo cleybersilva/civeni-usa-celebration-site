@@ -79,24 +79,35 @@ export function useNavigationItems() {
   // Upsert mutation
   const upsertMutation = useMutation({
     mutationFn: async (formData: NavigationItemFormData) => {
-      const { data, error } = await supabase.rpc('admin_upsert_navigation_item', {
+      console.log('[useNavigationItems] Upsert formData:', formData);
+      
+      const rpcParams = {
         p_id: formData.id || null,
         p_type: formData.type,
         p_parent_id: formData.parent_id || null,
         p_slug: formData.slug,
         p_path: formData.path,
         p_order_index: formData.order_index,
-        p_is_visible: formData.is_visible,
+        p_is_visible: Boolean(formData.is_visible),
         p_status: formData.status,
-        p_restricted_to_registered: formData.restricted_to_registered,
+        p_restricted_to_registered: Boolean(formData.restricted_to_registered),
         p_label_pt_br: formData.label_pt_br,
         p_label_en: formData.label_en || null,
         p_label_es: formData.label_es || null,
         p_label_tr: formData.label_tr || null,
         p_icon: formData.icon || null,
-      });
+      };
+      
+      console.log('[useNavigationItems] RPC params:', rpcParams);
+      
+      const { data, error } = await supabase.rpc('admin_upsert_navigation_item', rpcParams);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useNavigationItems] RPC error:', error);
+        throw error;
+      }
+      
+      console.log('[useNavigationItems] RPC success, returned:', data);
       return data;
     },
     onSuccess: () => {
@@ -107,6 +118,7 @@ export function useNavigationItems() {
       });
     },
     onError: (error: Error) => {
+      console.error('[useNavigationItems] Mutation error:', error);
       toast({
         title: 'Erro',
         description: error.message,

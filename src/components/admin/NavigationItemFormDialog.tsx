@@ -122,23 +122,26 @@ export function NavigationItemFormDialog({
   }, [item, form]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log('Form values to submit:', values);
     try {
-      await onSubmit({
+      const dataToSubmit = {
         id: item?.id,
         type: values.type,
         parent_id: values.type === 'menu' ? null : values.parent_id,
         slug: values.slug,
         path: values.path,
         order_index: values.order_index,
-        is_visible: values.is_visible,
+        is_visible: Boolean(values.is_visible),
         status: values.status,
-        restricted_to_registered: values.restricted_to_registered,
+        restricted_to_registered: Boolean(values.restricted_to_registered),
         label_pt_br: values.label_pt_br,
-        label_en: values.label_en,
-        label_es: values.label_es,
-        label_tr: values.label_tr,
-        icon: values.icon,
-      });
+        label_en: values.label_en || '',
+        label_es: values.label_es || '',
+        label_tr: values.label_tr || '',
+        icon: values.icon || '',
+      };
+      console.log('Data to submit:', dataToSubmit);
+      await onSubmit(dataToSubmit);
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving navigation item:', error);
