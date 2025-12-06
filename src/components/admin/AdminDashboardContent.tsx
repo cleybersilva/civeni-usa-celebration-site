@@ -40,6 +40,7 @@ import VideoSubmissionsManager from '@/components/admin/VideoSubmissionsManager'
 import ParticipantTypesManager from '@/components/admin/ParticipantTypesManager';
 import EventCategoriesManager from '@/components/admin/EventCategoriesManager';
 import LiveStreamVideosManager from '@/components/admin/LiveStreamVideosManager';
+import ApprovedWorksManager from '@/components/admin/ApprovedWorksManager';
 
 import PermissionGuard from '@/components/admin/PermissionGuard';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -270,6 +271,13 @@ const AdminDashboardContent = () => {
         return (hasPermission('inscricoes') || isAdminRoot()) ? (
           <PermissionGuard resource="inscricoes">
             <EventCategoriesManager />
+          </PermissionGuard>
+        ) : null;
+      
+      case 'lista-aprovados':
+        return (hasPermission('trabalhos') || isAdminRoot()) ? (
+          <PermissionGuard resource="trabalhos">
+            <ApprovedWorksManager />
           </PermissionGuard>
         ) : null;
       
