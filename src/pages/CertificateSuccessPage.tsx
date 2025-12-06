@@ -43,9 +43,29 @@ const CertificateSuccessPage = () => {
     );
   }
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (state.pdfUrl) {
-      window.open(state.pdfUrl, '_blank');
+      try {
+        // Fetch PDF como blob para evitar bloqueio por ad blockers
+        const response = await fetch(state.pdfUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        // Criar link de download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `certificado-civeni-${state.code || 'download'}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Limpar URL do blob
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Erro ao baixar PDF:', error);
+        // Fallback: abrir em nova aba
+        window.open(state.pdfUrl, '_blank');
+      }
     }
   };
 
