@@ -101,39 +101,6 @@ export type Database = {
         }
         Relationships: []
       }
-      approved_works: {
-        Row: {
-          area: string
-          autor_responsavel: string
-          created_at: string
-          id: string
-          numero: number
-          observacoes: string | null
-          titulo: string
-          updated_at: string
-        }
-        Insert: {
-          area: string
-          autor_responsavel: string
-          created_at?: string
-          id?: string
-          numero: number
-          observacoes?: string | null
-          titulo: string
-          updated_at?: string
-        }
-        Update: {
-          area?: string
-          autor_responsavel?: string
-          created_at?: string
-          id?: string
-          numero?: number
-          observacoes?: string | null
-          titulo?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       audit_logs: {
         Row: {
           action: string
@@ -4676,10 +4643,6 @@ export type Database = {
         }
         Returns: number
       }
-      admin_delete_approved_work: {
-        Args: { session_token: string; user_email: string; work_id: string }
-        Returns: Json
-      }
       admin_delete_civeni_session: {
         Args: { session_id: string; session_token: string; user_email: string }
         Returns: undefined
@@ -4727,10 +4690,6 @@ export type Database = {
           session_token: string
           user_email: string
         }
-        Returns: Json
-      }
-      admin_upsert_approved_work: {
-        Args: { session_token: string; user_email: string; work_data: Json }
         Returns: Json
       }
       admin_upsert_banner_slide: {

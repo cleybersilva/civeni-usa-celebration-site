@@ -4,7 +4,14 @@
       "Bash(npm run lint:*)",
       "Bash(npm install:*)",
       "Bash(npm audit:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: Add automatic SFTP fallback for FTP connection issues\n\n- Add SFTP (port 22) as intermediate fallback before FTP\n- Tries SFTP with password if FTP port 21 is blocked\n- Maintains FTP/FTPS as last resort option\n- Auto-detects and reports which method succeeded\n- Resolves ECONNREFUSED errors when FTP is blocked by firewall\n\nDeploy flow now: SSH (key) → SFTP (password) → FTP/FTPS\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(git stash pop:*)"
     ],
     "deny": [],
     "ask": []
