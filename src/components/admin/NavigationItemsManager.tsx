@@ -257,11 +257,12 @@ export function NavigationItemsManager() {
                           size="icon"
                           onClick={() => toggleStatus(item)}
                           title={item.status === 'active' ? 'Desativar' : 'Ativar'}
+                          className={item.status === 'active' ? 'text-green-600' : 'text-muted-foreground'}
                         >
                           {item.status === 'active' ? (
-                            <ToggleRight className="h-5 w-5 text-green-600" />
+                            <ToggleRight className="h-5 w-5" />
                           ) : (
-                            <ToggleLeft className="h-5 w-5 text-muted-foreground" />
+                            <ToggleLeft className="h-5 w-5" />
                           )}
                         </Button>
                       </TableCell>
