@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { resolveAssetUrl } from '@/utils/assetUrl';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import FlagEmoji from '@/components/FlagEmoji';
+import { usePublicNavigation } from '@/hooks/usePublicNavigation';
+import { cn } from '@/lib/utils';
 
 const Header = () => {
   const { t, i18n } = useTranslation();
@@ -12,6 +14,9 @@ const Header = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState<string | null>(null);
+
+  // Get navigation items from database
+  const { menuItems: dbMenuItems } = usePublicNavigation(i18n.language);
 
   const languages = [
     { code: 'en', flag: '🇺🇸', name: 'English' },
@@ -26,46 +31,24 @@ const Header = () => {
     setOpenDropdown(null);
   };
 
-  const menuItems = [
-    {
-      title: t('header.thematicAreas'),
-      items: []
-    },
-    {
-      title: t('header.congress'),
-      items: [
-        { name: t('header.presentation'), href: '/congresso/apresentacao' },
-        { name: t('header.evaluators'), href: '/congresso/avaliadores' },
-        { name: t('header.committee'), href: '/congresso/comite' }
-      ]
-    },
-    {
-      title: t('header.events'),
-      items: []
-    },
-    {
-      title: t('header.speakers'),
-      items: []
-    },
-    {
-      title: t('header.schedule'),
-      items: [
-        { name: t('header.inPerson'), href: '/programacao-presencial' },
-        { name: t('header.online'), href: '/programacao-online' },
-        { name: t('header.liveStream'), href: '/transmissao-ao-vivo' }
-      ]
-    },
-    {
-      title: t('header.papers'),
-      items: [
-        { name: t('header.submissionArticleConsortium'), href: '/submissao-trabalhos' },
-        { name: t('header.approvedList', 'Lista de Apresentação Artigos/Projetos'), href: '/lista-apresentacao' },
-        { name: t('header.posterSessions'), href: '/sessoes-poster' },
-        { name: t('header.manuscripts'), href: '/manuscritos' },
-        { name: t('header.templatesArticlesSlides'), href: '/templates-artigos-slides' }
-      ]
+  // Helper function to check if a menu item should be clickable
+  const isMenuItemActive = (status: 'active' | 'inactive') => status === 'active';
+
+  // Get menu item styles based on status
+  const getMenuItemClasses = (status: 'active' | 'inactive', baseClasses: string) => {
+    if (status === 'inactive') {
+      return cn(baseClasses, 'opacity-50 cursor-not-allowed pointer-events-none');
     }
-  ];
+    return baseClasses;
+  };
+
+  // Get submenu item styles based on status
+  const getSubmenuItemClasses = (status: 'active' | 'inactive', baseClasses: string) => {
+    if (status === 'inactive') {
+      return cn(baseClasses, 'opacity-50 cursor-not-allowed');
+    }
+    return baseClasses;
+  };
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
@@ -172,67 +155,71 @@ const Header = () => {
             </div>
             
             <div className="hidden lg:flex items-center space-x-8">
-              {menuItems.map((item) => (
-                <div key={item.title} className="relative">
-                  {item.title === t('header.speakers') ? (
-                    <Link
-                      to="/palestrantes"
-                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
-                      onClick={() => setOpenDropdown(null)}
-                    >
-                      {item.title}
-                    </Link>
-                  ) : item.title === t('header.thematicAreas') ? (
-                    <Link
-                      to="/area-tematica"
-                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
-                      onClick={() => setOpenDropdown(null)}
-                    >
-                      {item.title}
-                    </Link>
-                  ) : item.title === t('header.events') ? (
-                    <Link
-                      to="/eventos"
-                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
-                      onClick={() => setOpenDropdown(null)}
-                    >
-                      {item.title}
-                    </Link>
+              {dbMenuItems.map((item) => (
+                <div key={item.id} className="relative">
+                  {item.items.length === 0 ? (
+                    // Menu without submenus - direct link
+                    isMenuItemActive(item.status) ? (
+                      <Link
+                        to={item.path}
+                        className={getMenuItemClasses(
+                          item.status,
+                          "text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
+                        )}
+                        onClick={() => setOpenDropdown(null)}
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <span
+                        className="text-civeni-blue font-semibold py-2 font-poppins opacity-50 cursor-not-allowed"
+                      >
+                        {item.label}
+                      </span>
+                    )
                   ) : (
-                    <button
-                      onClick={() => setOpenDropdown(openDropdown === item.title ? null : item.title)}
-                      className="text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
-                    >
-                      {item.title}
-                    </button>
-                  )}
-                  
-                  {item.items.length > 0 && openDropdown === item.title && (
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden">
-                      <div className="py-2">
-                        {item.items.map((subItem, index) => (
-                          subItem.href.startsWith('#') ? (
-                            <a
-                              key={subItem.name}
-                              href={subItem.href}
-                              className="block px-5 py-3 text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
-                              onClick={() => setOpenDropdown(null)}
-                            >
-                              {subItem.name}
-                            </a>
-                          ) : (
-                            <Link
-                              key={subItem.name}
-                              to={subItem.href}
-                              className="block px-5 py-3 text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
-                              onClick={() => setOpenDropdown(null)}
-                            >
-                              {subItem.name}
-                            </Link>
-                          )
-                        ))}
-                      </div>
-                    </div>
+                    // Menu with submenus - dropdown
+                    <>
+                      <button
+                        onClick={() => setOpenDropdown(openDropdown === item.label ? null : item.label)}
+                        className={getMenuItemClasses(
+                          item.status,
+                          "text-civeni-blue font-semibold hover:text-civeni-red transition-colors py-2 font-poppins"
+                        )}
+                        disabled={!isMenuItemActive(item.status)}
+                      >
+                        {item.label}
+                      </button>
+                      
+                      {openDropdown === item.label && (
+                        <div className="absolute top-full left-0 mt-2 w-64 bg-gradient-to-r from-civeni-blue to-civeni-red rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden">
+                          <div className="py-2">
+                            {item.items.map((subItem) => (
+                              isMenuItemActive(subItem.status) ? (
+                                <Link
+                                  key={subItem.id}
+                                  to={subItem.href}
+                                  className={getSubmenuItemClasses(
+                                    subItem.status,
+                                    "block px-5 py-3 text-white font-medium hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0"
+                                  )}
+                                  onClick={() => setOpenDropdown(null)}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              ) : (
+                                <span
+                                  key={subItem.id}
+                                  className="block px-5 py-3 text-white font-medium opacity-50 cursor-not-allowed border-b border-white/10 last:border-b-0"
+                                >
+                                  {subItem.name}
+                                </span>
+                              )
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ))}
@@ -280,47 +267,47 @@ const Header = () => {
 
                 <div className="flex flex-col px-4 py-3">
                   {/* Mobile Menu Items */}
-                  {menuItems.map((item, index) => (
-                    <div key={item.title} className="mb-0.5">
-                      {item.title === t('header.speakers') ? (
-                        <Link
-                          to="/palestrantes"
-                          className="flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
-                          {item.title}
-                        </Link>
-                      ) : item.title === t('header.thematicAreas') ? (
-                        <Link
-                          to="/area-tematica"
-                          className="flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
-                          {item.title}
-                        </Link>
-                      ) : item.title === t('header.events') ? (
-                        <Link
-                          to="/eventos"
-                          className="flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
-                          {item.title}
-                        </Link>
+                  {dbMenuItems.map((item) => (
+                    <div key={item.id} className="mb-0.5">
+                      {item.items.length === 0 ? (
+                        // Menu without submenus - direct link
+                        isMenuItemActive(item.status) ? (
+                          <Link
+                            to={item.path}
+                            className={getMenuItemClasses(
+                              item.status,
+                              "flex items-center px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                            )}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
+                            {item.label}
+                          </Link>
+                        ) : (
+                          <span
+                            className="flex items-center px-4 py-3 text-white font-semibold text-base rounded-xl opacity-50 cursor-not-allowed"
+                          >
+                            <span className="w-2 h-2 rounded-full bg-white/40 mr-3"></span>
+                            {item.label}
+                          </span>
+                        )
                       ) : (
+                        // Menu with submenus - dropdown
                         <>
                           <button
-                            onClick={() => setMobileSubmenuOpen(mobileSubmenuOpen === item.title ? null : item.title)}
-                            className="flex items-center justify-between w-full px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                            onClick={() => isMenuItemActive(item.status) && setMobileSubmenuOpen(mobileSubmenuOpen === item.label ? null : item.label)}
+                            className={getMenuItemClasses(
+                              item.status,
+                              "flex items-center justify-between w-full px-4 py-3 text-white font-semibold text-base hover:bg-white/15 transition-all duration-200 rounded-xl group"
+                            )}
+                            disabled={!isMenuItemActive(item.status)}
                           >
                             <span className="flex items-center">
                               <span className="w-2 h-2 rounded-full bg-white/40 mr-3 group-hover:bg-white transition-colors"></span>
-                              {item.title}
+                              {item.label}
                             </span>
                             <svg
-                              className={`w-4 h-4 transition-transform duration-300 ${mobileSubmenuOpen === item.title ? 'rotate-180' : ''}`}
+                              className={`w-4 h-4 transition-transform duration-300 ${mobileSubmenuOpen === item.label ? 'rotate-180' : ''}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -328,18 +315,30 @@ const Header = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </button>
-                          {item.items.length > 0 && mobileSubmenuOpen === item.title && (
+                          {item.items.length > 0 && mobileSubmenuOpen === item.label && (
                             <div className="mt-0.5 ml-4 mr-2 overflow-hidden rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 animate-fade-in">
                               <div className="py-0.5">
                                 {item.items.map((subItem) => (
-                                  <Link
-                                    key={subItem.name}
-                                    to={subItem.href}
-                                    className="block px-4 py-2 text-xs text-white/90 font-medium hover:bg-white/15 hover:text-white transition-all duration-200 border-b border-white/10 last:border-b-0"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                  >
-                                    {subItem.name}
-                                  </Link>
+                                  isMenuItemActive(subItem.status) ? (
+                                    <Link
+                                      key={subItem.id}
+                                      to={subItem.href}
+                                      className={getSubmenuItemClasses(
+                                        subItem.status,
+                                        "block px-4 py-2 text-xs text-white/90 font-medium hover:bg-white/15 hover:text-white transition-all duration-200 border-b border-white/10 last:border-b-0"
+                                      )}
+                                      onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                      {subItem.name}
+                                    </Link>
+                                  ) : (
+                                    <span
+                                      key={subItem.id}
+                                      className="block px-4 py-2 text-xs text-white/90 font-medium opacity-50 cursor-not-allowed border-b border-white/10 last:border-b-0"
+                                    >
+                                      {subItem.name}
+                                    </span>
+                                  )
                                 ))}
                               </div>
                             </div>
