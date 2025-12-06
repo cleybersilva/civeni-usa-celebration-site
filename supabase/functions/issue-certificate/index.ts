@@ -730,24 +730,42 @@ const createCertificatePdf = async (
 
   currentY -= 20;
 
-  // Data do evento
-  const mainTextLine4Raw = language === "en-US" 
-    ? `from December 11 to 13, 2025, with a total workload of ${hours || "60"} hours.`
+  // Data do evento - Parte 1 (antes das horas)
+  const datePart1Raw = language === "en-US" 
+    ? "from December 11 to 13, 2025, with a total workload of"
     : language === "es-ES"
-    ? `del 11 al 13 de diciembre de 2025, con una carga horaria de ${hours || "60"} horas.`
+    ? "del 11 al 13 de diciembre de 2025, con una carga horaria de"
     : language === "tr-TR"
-    ? `11-13 Aralik 2025 tarihleri arasinda, toplam ${hours || "60"} saat is yukuyle.`
-    : `de 11 a 13 de dezembro de 2025, com carga horária de ${hours || "60"} horas.`;
-  const mainTextLine4 = sanitizeForPdf(mainTextLine4Raw);
+    ? "11-13 Aralik 2025 tarihleri arasinda, toplam"
+    : "de 11 a 13 de dezembro de 2025, com carga horária de";
+  const datePart1 = sanitizeForPdf(datePart1Raw);
   
-  const mainTextWidth4 = textFont.widthOfTextAtSize(mainTextLine4, mainTextSize);
+  // Horas em NEGRITO
+  const hoursTextRaw = `${hours || "60"} ${language === "en-US" ? "hours" : language === "es-ES" ? "horas" : language === "tr-TR" ? "saat" : "horas"}.`;
+  const hoursText = sanitizeForPdf(hoursTextRaw);
   
-  page.drawText(mainTextLine4, {
-    x: (width - mainTextWidth4) / 2,
+  // Calcular larguras
+  const datePart1Width = textFont.widthOfTextAtSize(datePart1, mainTextSize);
+  const hoursWidth = titleFont.widthOfTextAtSize(hoursText, mainTextSize);
+  const totalLine4Width = datePart1Width + 4 + hoursWidth;
+  
+  // Desenhar parte 1 (texto normal)
+  const line4StartX = (width - totalLine4Width) / 2;
+  page.drawText(datePart1, {
+    x: line4StartX,
     y: currentY,
     size: mainTextSize,
     font: textFont,
     color: rgb(0.3, 0.3, 0.3),
+  });
+  
+  // Desenhar horas em NEGRITO
+  page.drawText(hoursText, {
+    x: line4StartX + datePart1Width + 4,
+    y: currentY,
+    size: mainTextSize,
+    font: titleFont,
+    color: rgb(CIVENI_COLORS.blue.r, CIVENI_COLORS.blue.g, CIVENI_COLORS.blue.b),
   });
 
   // ===== FOOTER COM GRADIENTE =====
