@@ -277,39 +277,7 @@ const createCertificatePdf = async (
     });
   }
   
-  // Left side
-  for (let i = 0; i < borderWidth; i++) {
-    const progress = i / borderWidth;
-    const color = rgb(
-      CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * progress,
-      CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * progress,
-      CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * progress
-    );
-    
-    page.drawLine({
-      start: { x: margin + i, y: margin },
-      end: { x: margin + i, y: height - margin },
-      thickness: 1,
-      color,
-    });
-  }
-  
-  // Right side
-  for (let i = 0; i < borderWidth; i++) {
-    const progress = i / borderWidth;
-    const color = rgb(
-      CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * progress,
-      CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * progress,
-      CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * progress
-    );
-    
-    page.drawLine({
-      start: { x: width - margin - i, y: margin },
-      end: { x: width - margin - i, y: height - margin },
-      thickness: 1,
-      color,
-    });
-  }
+  // Bordas laterais removidas para design limpo
 
   // ===== BORDA INTERNA ELEGANTE =====
   const innerMargin = margin + borderWidth + 6;
@@ -753,10 +721,10 @@ const createCertificatePdf = async (
 
   // Desenhar logo CIVENI centralizado abaixo da assinatura (acima do rodapé)
   if (civeniLogoImage) {
-    const civeniLogoHeight = 45; // Tamanho um pouco menor
+    const civeniLogoHeight = 40; // Tamanho reduzido
     const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
     const civeniLogoX = (width - civeniLogoDims.width) / 2;
-    const civeniLogoY = sigY - 75; // Posicionado abaixo da assinatura, mas acima do rodapé
+    const civeniLogoY = sigY - 60; // Subido para não atingir o rodapé
     
     page.drawImage(civeniLogoImage, {
       x: civeniLogoX,
