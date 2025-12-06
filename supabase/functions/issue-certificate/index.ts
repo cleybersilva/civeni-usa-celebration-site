@@ -360,19 +360,54 @@ const createCertificatePdf = async (
     });
   }
 
-  // ===== TÍTULO PRINCIPAL =====
+  // ===== VCCU LOGO NO HEADER (lado esquerdo) =====
+  let vccuLogoImage = null;
+  try {
+    const vccuLogoUrl = "https://civeni.com/uploads/civeni-2025-logo-sidebar.png";
+    const vccuLogoResponse = await fetch(vccuLogoUrl);
+    if (vccuLogoResponse.ok) {
+      const vccuLogoBytes = await vccuLogoResponse.arrayBuffer();
+      vccuLogoImage = await pdfDoc.embedPng(new Uint8Array(vccuLogoBytes));
+      console.log("VCCU logo embedded successfully");
+    }
+  } catch (logoError) {
+    console.log("Could not load VCCU logo, continuing without it:", logoError);
+  }
+
+  // Calcular posições do header com logo
+  const logoSize = 55; // Tamanho proporcional para o logo
+  const logoX = innerMargin + 25;
+  const logoY = headerY + (headerHeight - logoSize) / 2;
+  
+  // Desenhar logo VCCU se carregado
+  if (vccuLogoImage) {
+    const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
+    page.drawImage(vccuLogoImage, {
+      x: logoX,
+      y: logoY,
+      width: logoDims.width,
+      height: logoDims.height,
+    });
+  }
+
+  // ===== TÍTULO PRINCIPAL (centralizado com logo) =====
   const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
     : language === "es-ES" ? "CERTIFICADO DE PARTICIPACION"
     : language === "tr-TR" ? "KATILIM SERTIFIKASI"
     : "CERTIFICADO DE PARTICIPACAO";
   const titleText = sanitizeForPdf(titleTextRaw);
   
-  const titleSize = 32;
+  const titleSize = 28;
   const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
   
+  // Calcular posição X para centralizar texto após o logo
+  const textAreaStart = vccuLogoImage ? logoX + logoSize + 20 : innerMargin;
+  const textAreaWidth = width - textAreaStart - innerMargin;
+  const titleX = textAreaStart + (textAreaWidth - titleWidth) / 2;
+  
   page.drawText(titleText, {
-    x: (width - titleWidth) / 2,
-    y: headerY + (headerHeight / 2) - 5,
+    x: titleX,
+    y: headerY + (headerHeight / 2) + 5,
     size: titleSize,
     font: titleFont,
     color: rgb(1, 1, 1),
@@ -381,12 +416,13 @@ const createCertificatePdf = async (
   // ===== SUBTÍTULO DO EVENTO =====
   const subtitleTextRaw = "III CIVENI 2025 - International Multidisciplinary Congress";
   const subtitleText = sanitizeForPdf(subtitleTextRaw);
-  const subtitleSize = 11;
+  const subtitleSize = 10;
   const subtitleWidth = textFont.widthOfTextAtSize(subtitleText, subtitleSize);
+  const subtitleX = textAreaStart + (textAreaWidth - subtitleWidth) / 2;
   
   page.drawText(subtitleText, {
-    x: (width - subtitleWidth) / 2,
-    y: headerY + 12,
+    x: subtitleX,
+    y: headerY + 15,
     size: subtitleSize,
     font: textFont,
     color: rgb(1, 1, 1),
@@ -631,30 +667,46 @@ const createCertificatePdf = async (
     color: rgb(0.9, 0.9, 0.9),
   });
 
-  // ===== BADGE DO EVENTO =====
-  const badgeWidth = 120;
-  const badgeHeight = 25;
-  const badgeX = width - innerMargin - badgeWidth - 10;
-  const badgeY = footerY + footerHeight + 5;
-  
-  page.drawRectangle({
-    x: badgeX,
-    y: badgeY,
-    width: badgeWidth,
-    height: badgeHeight,
-    color: rgb(CIVENI_COLORS.gold.r, CIVENI_COLORS.gold.g, CIVENI_COLORS.gold.b),
-  });
-  
-  const badgeText = "III CIVENI 2025";
-  const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 10);
-  
-  page.drawText(badgeText, {
-    x: badgeX + (badgeWidth - badgeTextWidth) / 2,
-    y: badgeY + 8,
-    size: 10,
-    font: titleFont,
-    color: rgb(0.1, 0.1, 0.1),
-  });
+  // ===== CIVENI LOGO CENTRALIZADO ENTRE ASSINATURAS =====
+  let civeniLogoImage = null;
+  try {
+    const civeniLogoUrl = "https://civeni.com/assets/civeni-2025-logo.png";
+    const civeniLogoResponse = await fetch(civeniLogoUrl);
+    if (civeniLogoResponse.ok) {
+      const civeniLogoBytes = await civeniLogoResponse.arrayBuffer();
+      civeniLogoImage = await pdfDoc.embedPng(new Uint8Array(civeniLogoBytes));
+      console.log("CIVENI logo embedded successfully");
+    }
+  } catch (logoError) {
+    console.log("Could not load CIVENI logo, continuing without it:", logoError);
+  }
+
+  // Desenhar logo CIVENI centralizado entre as assinaturas
+  if (civeniLogoImage) {
+    const civeniLogoHeight = 50;
+    const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
+    const civeniLogoX = (width - civeniLogoDims.width) / 2;
+    const civeniLogoY = sigY - 35; // Posicionado abaixo das assinaturas, centralizado
+    
+    page.drawImage(civeniLogoImage, {
+      x: civeniLogoX,
+      y: civeniLogoY,
+      width: civeniLogoDims.width,
+      height: civeniLogoDims.height,
+    });
+  } else {
+    // Fallback caso o logo não carregue - desenhar texto simples
+    const badgeText = "III CIVENI 2025";
+    const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 12);
+    
+    page.drawText(badgeText, {
+      x: (width - badgeTextWidth) / 2,
+      y: sigY - 25,
+      size: 12,
+      font: titleFont,
+      color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
+    });
+  }
 
   return await pdfDoc.save();
 };
