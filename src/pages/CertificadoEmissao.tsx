@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,7 @@ const CertificadoEmissao = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -31,6 +33,16 @@ const CertificadoEmissao = () => {
   } | null>(null);
 
   const [event, setEvent] = useState<any>(null);
+
+  // Map i18n language to edge function language code
+  const getLanguageCode = () => {
+    const lang = i18n.language;
+    if (lang.startsWith('pt')) return 'pt-BR';
+    if (lang.startsWith('en')) return 'en-US';
+    if (lang.startsWith('es')) return 'es-ES';
+    if (lang.startsWith('tr')) return 'tr-TR';
+    return 'pt-BR';
+  };
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -57,8 +69,8 @@ const CertificadoEmissao = () => {
       if (error || !data) {
         toast({
           variant: "destructive",
-          title: "Erro",
-          description: "Evento não encontrado ou certificados não habilitados"
+          title: t('common.error'),
+          description: t('certificateEmission.eventNotFoundError')
         });
         setEventLoading(false);
         return;
@@ -67,8 +79,8 @@ const CertificadoEmissao = () => {
       if (!data.event_certificates || !data.event_certificates.is_enabled) {
         toast({
           variant: "destructive", 
-          title: "Erro",
-          description: "Este evento não possui certificados habilitados"
+          title: t('common.error'),
+          description: t('certificateEmission.eventNotFoundDescription')
         });
         setEventLoading(false);
         return;
@@ -79,7 +91,7 @@ const CertificadoEmissao = () => {
     };
 
     loadEvent();
-  }, [slug, toast]);
+  }, [slug, toast, t]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -108,7 +120,8 @@ const CertificadoEmissao = () => {
           eventId: event.id,
           email: formData.email.toLowerCase().trim(),
           fullName: formData.fullName.trim(),
-          keywords: formData.keywords.map(kw => kw.trim())
+          keywords: formData.keywords.map(kw => kw.trim()),
+          language: getLanguageCode() // Send current language to edge function
         }
       });
 
@@ -141,7 +154,7 @@ const CertificadoEmissao = () => {
       console.error('Erro ao emitir certificado:', error);
       setResult({
         success: false,
-        message: error?.message || 'Erro ao processar solicitação. Tente novamente.'
+        message: error?.message || t('certificateEmission.errorProcessing')
       });
     } finally {
       setLoading(false);
@@ -168,12 +181,12 @@ const CertificadoEmissao = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-civeni-blue to-civeni-red">
         <Card className="p-8 text-center">
           <XCircle className="h-16 w-16 text-civeni-red mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Evento não encontrado</h2>
+          <h2 className="text-xl font-bold mb-2">{t('certificateEmission.eventNotFound')}</h2>
           <p className="text-muted-foreground mb-4">
-            O evento solicitado não foi encontrado ou não possui certificados habilitados.
+            {t('certificateEmission.eventNotFoundDescription')}
           </p>
           <Button onClick={() => navigate('/eventos')} className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white">
-            Voltar para Eventos
+            {t('certificateEmission.backToEvents')}
           </Button>
         </Card>
       </div>
@@ -189,30 +202,30 @@ const CertificadoEmissao = () => {
           <div className="text-white space-y-8">
             <div>
               <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-                Parabéns por ter chegado ao final do evento!
+                {t('certificateEmission.pageTitle')}
               </h1>
               <p className="text-xl text-white/90 mb-8">
-                Agora é hora de emitir seu certificado!
+                {t('certificateEmission.pageSubtitle')}
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Compartilhe no LinkedIn</span>
+                <span>{t('certificateEmission.shareLinkedIn')}</span>
               </div>
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Siga o CIVENI 2025 nas redes</span>
+                <span>{t('certificateEmission.followCiveni')}</span>
               </div>
               <div className="flex items-center space-x-3 text-white/90">
                 <div className="w-2 h-2 bg-civeni-green rounded-full"></div>
-                <span>Conheça nossos{' '}
+                <span>{t('certificateEmission.nextEvents').split('próximos eventos')[0]}
                   <button 
                     onClick={() => navigate('/eventos')} 
                     className="font-bold underline hover:text-white transition-colors cursor-pointer"
                   >
-                    próximos eventos
+                    {t('navigation.events')}
                   </button>
                 </span>
               </div>
@@ -228,37 +241,37 @@ const CertificadoEmissao = () => {
                     className="w-16 h-auto mx-auto mb-2"
                   />
                   <div className="text-civeni-blue font-bold text-lg mb-2">CIVENI 2025</div>
-                  <div className="text-sm text-gray-600 mb-4">CERTIFICADO DE PARTICIPAÇÃO</div>
+                  <div className="text-sm text-gray-600 mb-4">{t('certificateEmission.certificateTitle')}</div>
                   <div className="text-xs text-gray-500 mb-6">VCCU/Civeni</div>
                   
                   <div className="border-t border-b border-gray-200 py-4 mb-4">
-                    <div className="text-xs text-gray-600 mb-1">Certificamos que</div>
-                    <div className="font-bold text-gray-800">[SEU NOME AQUI]</div>
-                    <div className="text-xs text-gray-600 mt-1">participou do evento</div>
+                    <div className="text-xs text-gray-600 mb-1">{t('certificateEmission.certifyThat')}</div>
+                    <div className="font-bold text-gray-800">{t('certificateEmission.yourNameHere')}</div>
+                    <div className="text-xs text-gray-600 mt-1">{t('certificateEmission.participatedEvent')}</div>
                   </div>
                   
                   <div className="flex justify-between items-end text-xs">
                     <div>
                       <div className="w-16 h-8 bg-civeni-blue/10 rounded mb-1"></div>
-                      <div className="text-gray-500">Assinatura</div>
+                      <div className="text-gray-500">{t('certificateEmission.signature')}</div>
                     </div>
                     <div className="w-12 h-12 bg-civeni-blue/10 rounded"></div>
                   </div>
                 </div>
-                 </div>
-               </div>
-               
-               {/* Botão Voltar para a Home */}
-               <div className="mt-8 text-center">
-                 <Button
-                   onClick={() => navigate('/')}
-                   className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white"
-                 >
-                   <ArrowLeft className="h-4 w-4 mr-2" />
-                   Voltar para a Home
-                 </Button>
                </div>
              </div>
+             
+             {/* Botão Voltar para a Home */}
+             <div className="mt-8 text-center">
+               <Button
+                 onClick={() => navigate('/')}
+                 className="bg-gradient-to-r from-civeni-blue to-civeni-red hover:from-civeni-blue/90 hover:to-civeni-red/90 text-white"
+               >
+                 <ArrowLeft className="h-4 w-4 mr-2" />
+                 {t('certificateEmission.backToHome')}
+               </Button>
+             </div>
+           </div>
 
           {/* Coluna Direita - Formulário */}
           <div className="flex justify-center">
@@ -266,7 +279,7 @@ const CertificadoEmissao = () => {
               <CardHeader className="bg-gradient-to-r from-civeni-blue to-civeni-red text-white rounded-t-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl">Emita seu certificado</CardTitle>
+                    <CardTitle className="text-xl">{t('certificateEmission.formTitle')}</CardTitle>
                     <p className="text-white/90 text-sm">VCCU/Civeni</p>
                   </div>
                   <div className="text-right">
@@ -283,14 +296,14 @@ const CertificadoEmissao = () => {
                   {/* Email */}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium">
-                      E-mail cadastrado no evento
+                      {t('certificateEmission.emailLabel')}
                     </Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="exemplo@email.com"
+                      placeholder={t('certificateEmission.emailPlaceholder')}
                       className="border-gray-300"
                       required
                     />
@@ -299,14 +312,14 @@ const CertificadoEmissao = () => {
                   {/* Nome Completo */}
                   <div className="space-y-2">
                     <Label htmlFor="fullName" className="text-sm font-medium">
-                      Nome completo (máx. 50 caracteres)
+                      {t('certificateEmission.nameLabel')}
                     </Label>
                     <Input
                       id="fullName"
                       type="text"
                       value={formData.fullName}
                       onChange={(e) => handleInputChange('fullName', e.target.value)}
-                      placeholder="Nome que aparecerá no certificado"
+                      placeholder={t('certificateEmission.namePlaceholder')}
                       maxLength={50}
                       className="border-gray-300"
                       required
@@ -316,14 +329,12 @@ const CertificadoEmissao = () => {
                   {/* Confirmação de Presença */}
                   <div className="bg-civeni-blue/5 p-4 rounded-lg space-y-4 border border-civeni-blue/20">
                     <div>
-                      <h3 className="font-semibold text-civeni-blue mb-1">Confirmação de Presença</h3>
+                      <h3 className="font-semibold text-civeni-blue mb-1">{t('certificateEmission.presenceConfirmation')}</h3>
                        <p className="text-xs text-civeni-blue/80 mb-3">
-                         Digite as{' '}
-                         <span className="font-medium">palavras-chave informadas</span>{' '}
-                         durante o evento.
+                         {t('certificateEmission.keywordsInstruction')}
                        </p>
                        <p className="text-xs text-civeni-blue font-medium">
-                         Atenção: É necessário acertar pelo menos 2 de 3 palavras.
+                         {t('certificateEmission.keywordsMinimum')}
                        </p>
                     </div>
                     
@@ -331,7 +342,7 @@ const CertificadoEmissao = () => {
                       {formData.keywords.map((keyword, index) => (
                         <div key={index}>
                           <Label htmlFor={`keyword-${index}`} className="text-xs font-medium text-civeni-blue">
-                            Palavra-chave {index + 1}:
+                            {t('certificateEmission.keywordLabel')} {index + 1}:
                           </Label>
                           <Input
                             id={`keyword-${index}`}
@@ -363,8 +374,8 @@ const CertificadoEmissao = () => {
                       
                        {!result.success && typeof result.matched === 'number' && (
                          <p className="text-xs text-red-600 mt-2">
-                           Você acertou {result.matched}/3 palavras-chave. 
-                           Mínimo necessário: {event.event_certificates?.required_correct || 2}/3.
+                           {t('certificateEmission.youGot')} {result.matched}/3 {t('certificateEmission.keywordsCorrect')}. 
+                           {t('certificateEmission.minimumRequired')}: {event.event_certificates?.required_correct || 2}/3.
                          </p>
                        )}
                       
@@ -377,11 +388,11 @@ const CertificadoEmissao = () => {
                             size="sm"
                           >
                             <Download className="h-4 w-4 mr-2" />
-                            Baixar Certificado
+                            {t('certificateSuccess.downloadPdf')}
                           </Button>
                           {result.code && (
                             <p className="text-xs text-civeni-green mt-2 text-center">
-                              Código: {result.code}
+                              {t('certificateSuccess.code')}: {result.code}
                             </p>
                           )}
                         </div>
@@ -398,10 +409,10 @@ const CertificadoEmissao = () => {
                     {loading ? (
                       <>
                         <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        Processando...
+                        {t('certificateEmission.processing')}
                       </>
                     ) : (
-                      'EMITA SEU CERTIFICADO!'
+                      t('certificateEmission.submitButton')
                     )}
                   </Button>
                   
