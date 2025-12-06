@@ -140,7 +140,17 @@ interface LayoutConfig {
   };
 }
 
-// Criar PDF usando layout_config do evento
+// Cores do gradiente CIVENI
+const CIVENI_COLORS = {
+  blue: { r: 0.008, g: 0.106, b: 0.227 },      // #021b3a
+  purple: { r: 0.451, g: 0.106, b: 0.298 },   // #731b4c
+  red: { r: 0.773, g: 0.114, b: 0.231 },      // #c51d3b
+  white: { r: 1, g: 1, b: 1 },
+  gold: { r: 0.855, g: 0.647, b: 0.125 },     // #DAA520
+  darkText: { r: 0.1, g: 0.1, b: 0.1 },
+};
+
+// Criar PDF com design premium usando cores do CIVENI
 const createCertificatePdf = async (
   options: CertificatePdfOptions & { layoutConfig?: LayoutConfig; eventName?: string },
 ): Promise<Uint8Array> => {
@@ -152,260 +162,443 @@ const createCertificatePdf = async (
 
   const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  if (!layoutConfig || !layoutConfig.header || !layoutConfig.body || !layoutConfig.footer) {
-    throw new Error("layout_config incompleto ou ausente");
-  }
+  console.log("Gerando certificado com design CIVENI premium");
 
-  console.log("Usando layout_config para gerar PDF");
-  
   // Preparar dados para substituição
   const dateStr = issueDate.toLocaleDateString(
-    language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : "pt-BR",
+    language === "en-US" ? "en-US" : language === "es-ES" ? "es-ES" : language === "tr-TR" ? "tr-TR" : "pt-BR",
   );
-  const locationParts: string[] = [];
-  if (city) locationParts.push(city);
-  if (country) locationParts.push(country);
   
-  const placeholderData: Record<string, string> = {
-    nome_participante: fullName,
-    tipo_participacao: language === "en-US" ? "participant" : "participante",
-    nome_evento: eventName || eventSlug,
-    data_evento: dateStr,
-    carga_horaria: hours || "20",
-    data_emissao: dateStr,
-    codigo_verificacao: code,
-    nome_reitor: "Dra. Maria Emilia Camargo",
-    nome_coordenador: "Dra. Marcela Tardanza Martins"
-  };
+  // ===== BACKGROUND BRANCO =====
+  page.drawRectangle({
+    x: 0,
+    y: 0,
+    width: width,
+    height: height,
+    color: rgb(1, 1, 1),
+  });
 
-  // Background
-  if (layoutConfig.background?.color) {
-    const bgColor = hexToRgb(layoutConfig.background.color);
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width: width,
-      height: height,
-      color: rgb(bgColor.r, bgColor.g, bgColor.b),
+  // ===== BORDA GRADIENTE EXTERNA (azul -> roxo -> vermelho) =====
+  const borderWidth = 8;
+  const margin = 20;
+  
+  // Borda externa - simulando gradiente com múltiplas linhas
+  // Top (azul para roxo para vermelho)
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = progress < 0.5 
+      ? rgb(
+          CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * (progress * 2),
+          CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * (progress * 2),
+          CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * (progress * 2)
+        )
+      : rgb(
+          CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * ((progress - 0.5) * 2)
+        );
+    
+    page.drawLine({
+      start: { x: margin, y: height - margin - i },
+      end: { x: width - margin, y: height - margin - i },
+      thickness: 1,
+      color,
+    });
+  }
+  
+  // Bottom
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = progress < 0.5 
+      ? rgb(
+          CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * (progress * 2),
+          CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * (progress * 2),
+          CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * (progress * 2)
+        )
+      : rgb(
+          CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * ((progress - 0.5) * 2),
+          CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * ((progress - 0.5) * 2)
+        );
+    
+    page.drawLine({
+      start: { x: margin, y: margin + i },
+      end: { x: width - margin, y: margin + i },
+      thickness: 1,
+      color,
+    });
+  }
+  
+  // Left side
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = rgb(
+      CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * progress,
+      CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * progress,
+      CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * progress
+    );
+    
+    page.drawLine({
+      start: { x: margin + i, y: margin },
+      end: { x: margin + i, y: height - margin },
+      thickness: 1,
+      color,
+    });
+  }
+  
+  // Right side
+  for (let i = 0; i < borderWidth; i++) {
+    const progress = i / borderWidth;
+    const color = rgb(
+      CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * progress,
+      CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * progress,
+      CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * progress
+    );
+    
+    page.drawLine({
+      start: { x: width - margin - i, y: margin },
+      end: { x: width - margin - i, y: height - margin },
+      thickness: 1,
+      color,
     });
   }
 
-  // Borda dupla com gradiente simulado
-  if (layoutConfig.border?.enabled && layoutConfig.border.thickness) {
-    const borderColor = layoutConfig.border.gradient?.from 
-      ? hexToRgb(layoutConfig.border.gradient.from)
-      : { r: 0.12, g: 0.25, b: 0.69 };
+  // ===== BORDA INTERNA ELEGANTE =====
+  const innerMargin = margin + borderWidth + 6;
+  page.drawRectangle({
+    x: innerMargin,
+    y: innerMargin,
+    width: width - 2 * innerMargin,
+    height: height - 2 * innerMargin,
+    borderColor: rgb(CIVENI_COLORS.gold.r, CIVENI_COLORS.gold.g, CIVENI_COLORS.gold.b),
+    borderWidth: 1,
+  });
+
+  // ===== HEADER GRADIENTE =====
+  const headerHeight = 80;
+  const headerY = height - margin - borderWidth - headerHeight;
+  
+  // Fundo do header com gradiente horizontal simulado
+  const headerSteps = 50;
+  const stepWidth = (width - 2 * innerMargin) / headerSteps;
+  
+  for (let i = 0; i < headerSteps; i++) {
+    const progress = i / headerSteps;
+    let r, g, b;
     
-    const thickness = layoutConfig.border.thickness;
-    const margin = 30;
-    
-    // Borda externa
-    page.drawRectangle({
-      x: margin,
-      y: margin,
-      width: width - 2 * margin,
-      height: height - 2 * margin,
-      borderColor: rgb(borderColor.r, borderColor.g, borderColor.b),
-      borderWidth: thickness,
-    });
-    
-    // Se for double, adicionar segunda borda
-    if (layoutConfig.border.style === 'double') {
-      const innerMargin = margin + thickness + 2;
-      const secondColor = layoutConfig.border.gradient?.to 
-        ? hexToRgb(layoutConfig.border.gradient.to)
-        : borderColor;
-        
-      page.drawRectangle({
-        x: innerMargin,
-        y: innerMargin,
-        width: width - 2 * innerMargin,
-        height: height - 2 * innerMargin,
-        borderColor: rgb(secondColor.r, secondColor.g, secondColor.b),
-        borderWidth: thickness - 1,
-      });
+    if (progress < 0.33) {
+      const p = progress / 0.33;
+      r = CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * p;
+      g = CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * p;
+      b = CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * p;
+    } else if (progress < 0.66) {
+      const p = (progress - 0.33) / 0.33;
+      r = CIVENI_COLORS.purple.r;
+      g = CIVENI_COLORS.purple.g;
+      b = CIVENI_COLORS.purple.b;
+    } else {
+      const p = (progress - 0.66) / 0.34;
+      r = CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * p;
+      g = CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * p;
+      b = CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * p;
     }
+    
+    page.drawRectangle({
+      x: innerMargin + i * stepWidth,
+      y: headerY,
+      width: stepWidth + 1,
+      height: headerHeight,
+      color: rgb(r, g, b),
+    });
   }
 
-  let currentY = height - 100;
-
-  // Header - Title
-  const headerTitle = replacePlaceholders(layoutConfig.header.title, placeholderData);
-  const titleColor = hexToRgb(layoutConfig.header.titleColor);
-  const titleSize = 36;
-  const titleWidth = titleFont.widthOfTextAtSize(headerTitle, titleSize);
+  // ===== TÍTULO PRINCIPAL =====
+  const titleText = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
+    : language === "es-ES" ? "CERTIFICADO DE PARTICIPACIÓN"
+    : language === "tr-TR" ? "KATILIM SERTİFİKASI"
+    : "CERTIFICADO DE PARTICIPAÇÃO";
   
-  page.drawText(headerTitle, {
+  const titleSize = 32;
+  const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
+  
+  page.drawText(titleText, {
     x: (width - titleWidth) / 2,
-    y: currentY,
+    y: headerY + (headerHeight / 2) - 5,
     size: titleSize,
     font: titleFont,
-    color: rgb(titleColor.r, titleColor.g, titleColor.b),
+    color: rgb(1, 1, 1),
   });
-  
-  currentY -= 50;
 
-  // Header - Subtitle
-  if (layoutConfig.header.subtitle) {
-    const headerSubtitle = replacePlaceholders(layoutConfig.header.subtitle, placeholderData);
-    const subtitleColor = hexToRgb(layoutConfig.header.subtitleColor);
-    const subtitleSize = 14;
-    const subtitleWidth = textFont.widthOfTextAtSize(headerSubtitle, subtitleSize);
-    
-    page.drawText(headerSubtitle, {
-      x: (width - subtitleWidth) / 2,
-      y: currentY,
-      size: subtitleSize,
-      font: textFont,
-      color: rgb(subtitleColor.r, subtitleColor.g, subtitleColor.b),
-    });
-    
-    currentY -= 70;
-  }
-
-  // Body - Certify Label
-  const certifyLabel = replacePlaceholders(layoutConfig.body.certifyLabel, placeholderData);
-  const certifyLabelColor = hexToRgb(layoutConfig.body.certifyLabelColor);
-  const certifyLabelSize = 12;
-  const certifyLabelWidth = textFont.widthOfTextAtSize(certifyLabel, certifyLabelSize);
+  // ===== SUBTÍTULO DO EVENTO =====
+  const subtitleText = "III CIVENI 2025 – International Multidisciplinary Congress";
+  const subtitleSize = 11;
+  const subtitleWidth = textFont.widthOfTextAtSize(subtitleText, subtitleSize);
   
-  page.drawText(certifyLabel, {
-    x: (width - certifyLabelWidth) / 2,
-    y: currentY,
-    size: certifyLabelSize,
+  page.drawText(subtitleText, {
+    x: (width - subtitleWidth) / 2,
+    y: headerY + 12,
+    size: subtitleSize,
     font: textFont,
-    color: rgb(certifyLabelColor.r, certifyLabelColor.g, certifyLabelColor.b),
+    color: rgb(1, 1, 1),
   });
-  
-  currentY -= 35;
 
-  // Body - Participant Name
-  const participantName = replacePlaceholders(layoutConfig.body.participantNamePlaceholder, placeholderData);
-  const nameColor = hexToRgb(layoutConfig.body.participantNameStyle.color);
-  const nameSize = layoutConfig.body.participantNameStyle.fontSize || 32;
-  const nameWidth = titleFont.widthOfTextAtSize(participantName, nameSize);
+  let currentY = headerY - 50;
+
+  // ===== TEXTO "CERTIFICAMOS QUE" =====
+  const certifyText = language === "en-US" ? "We hereby certify that"
+    : language === "es-ES" ? "Certificamos que"
+    : language === "tr-TR" ? "İşbu belge ile tasdik ederiz ki"
+    : "Certificamos que";
   
-  page.drawText(participantName, {
+  const certifySize = 14;
+  const certifyWidth = italicFont.widthOfTextAtSize(certifyText, certifySize);
+  
+  page.drawText(certifyText, {
+    x: (width - certifyWidth) / 2,
+    y: currentY,
+    size: certifySize,
+    font: italicFont,
+    color: rgb(0.4, 0.4, 0.4),
+  });
+
+  currentY -= 45;
+
+  // ===== NOME DO PARTICIPANTE =====
+  const nameSize = 36;
+  const nameWidth = titleFont.widthOfTextAtSize(fullName.toUpperCase(), nameSize);
+  
+  page.drawText(fullName.toUpperCase(), {
     x: (width - nameWidth) / 2,
     y: currentY,
     size: nameSize,
     font: titleFont,
-    color: rgb(nameColor.r, nameColor.g, nameColor.b),
+    color: rgb(CIVENI_COLORS.blue.r, CIVENI_COLORS.blue.g, CIVENI_COLORS.blue.b),
   });
-  
-  currentY -= 55;
 
-  // Body - Main Text
-  const mainText = replacePlaceholders(layoutConfig.body.mainText, placeholderData);
-  const mainTextColor = hexToRgb(layoutConfig.body.mainTextColor);
-  const mainTextSize = 12;
-  const maxTextWidth = width - 150;
-  const textLines = wrapText(mainText, maxTextWidth, textFont, mainTextSize);
-  
-  for (const line of textLines) {
-    const lineWidth = textFont.widthOfTextAtSize(line, mainTextSize);
-    page.drawText(line, {
-      x: (width - lineWidth) / 2,
-      y: currentY,
-      size: mainTextSize,
-      font: textFont,
-      color: rgb(mainTextColor.r, mainTextColor.g, mainTextColor.b),
-    });
-    currentY -= 18;
-  }
+  // Linha decorativa abaixo do nome
+  const lineWidth = Math.min(nameWidth + 60, width - 200);
+  page.drawLine({
+    start: { x: (width - lineWidth) / 2, y: currentY - 10 },
+    end: { x: (width + lineWidth) / 2, y: currentY - 10 },
+    thickness: 2,
+    color: rgb(CIVENI_COLORS.gold.r, CIVENI_COLORS.gold.g, CIVENI_COLORS.gold.b),
+  });
 
-  // Footer - Location/Date
-  currentY = 130;
-  const footerLocation = replacePlaceholders(layoutConfig.footer.locationDateText, placeholderData);
-  const footerColor = hexToRgb(layoutConfig.footer.locationDateColor);
-  const footerSize = 11;
-  const footerWidth = textFont.widthOfTextAtSize(footerLocation, footerSize);
+  currentY -= 50;
+
+  // ===== TEXTO PRINCIPAL =====
+  const participationType = language === "en-US" ? "participant" 
+    : language === "es-ES" ? "participante"
+    : language === "tr-TR" ? "katılımcı"
+    : "participante";
   
-  page.drawText(footerLocation, {
-    x: (width - footerWidth) / 2,
+  const mainTextLine1 = language === "en-US" 
+    ? `participated as ${participationType} in the`
+    : language === "es-ES"
+    ? `participó como ${participationType} en el`
+    : language === "tr-TR"
+    ? `${participationType} olarak katılmıştır:`
+    : `participou como ${participationType} do`;
+
+  const mainTextSize = 13;
+  const mainTextWidth1 = textFont.widthOfTextAtSize(mainTextLine1, mainTextSize);
+  
+  page.drawText(mainTextLine1, {
+    x: (width - mainTextWidth1) / 2,
     y: currentY,
-    size: footerSize,
+    size: mainTextSize,
     font: textFont,
-    color: rgb(footerColor.r, footerColor.g, footerColor.b),
+    color: rgb(0.3, 0.3, 0.3),
   });
 
-  // Footer - Signatures
-  if (layoutConfig.footer.signatures && layoutConfig.footer.signatures.length > 0) {
-    const sigY = 85;
-    const sigSpacing = width / (layoutConfig.footer.signatures.length + 1);
-    
-    layoutConfig.footer.signatures.forEach((sig, index) => {
-      const sigX = sigSpacing * (index + 1);
-      const sigName = replacePlaceholders(sig.name, placeholderData);
-      const sigLabel = sig.label;
-      
-      // Linha de assinatura
-      page.drawLine({
-        start: { x: sigX - 80, y: sigY + 5 },
-        end: { x: sigX + 80, y: sigY + 5 },
-        thickness: 1,
-        color: rgb(0, 0, 0),
-      });
-      
-      // Nome
-      const nameWidth = titleFont.widthOfTextAtSize(sigName, 9);
-      page.drawText(sigName, {
-        x: sigX - nameWidth / 2,
-        y: sigY - 10,
-        size: 9,
-        font: titleFont,
-        color: rgb(0, 0, 0),
-      });
-      
-      // Cargo
-      const labelWidth = textFont.widthOfTextAtSize(sigLabel, 8);
-      page.drawText(sigLabel, {
-        x: sigX - labelWidth / 2,
-        y: sigY - 24,
-        size: 8,
-        font: textFont,
-        color: rgb(0.4, 0.4, 0.4),
-      });
-    });
-  }
+  currentY -= 28;
 
-  // Badge
-  if (layoutConfig.badge?.enabled && layoutConfig.badge.text) {
-    const badgeText = layoutConfig.badge.text;
-    const badgeColor = hexToRgb(layoutConfig.badge.textColor);
-    const badgeBg = layoutConfig.badge.backgroundGradient?.from 
-      ? hexToRgb(layoutConfig.badge.backgroundGradient.from)
-      : { r: 0.12, g: 0.25, b: 0.69 };
+  // Nome do evento em destaque
+  const eventDisplayName = eventName || "III CIVENI 2025";
+  const eventNameSize = 16;
+  const eventNameWidth = titleFont.widthOfTextAtSize(eventDisplayName, eventNameSize);
+  
+  page.drawText(eventDisplayName, {
+    x: (width - eventNameWidth) / 2,
+    y: currentY,
+    size: eventNameSize,
+    font: titleFont,
+    color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
+  });
+
+  currentY -= 30;
+
+  // Informações adicionais
+  const hoursText = language === "en-US" 
+    ? `with a total workload of ${hours || "20"} hours.`
+    : language === "es-ES"
+    ? `con una carga horaria total de ${hours || "20"} horas.`
+    : language === "tr-TR"
+    ? `toplam ${hours || "20"} saat iş yükü ile.`
+    : `com carga horária total de ${hours || "20"} horas.`;
+  
+  const hoursWidth = textFont.widthOfTextAtSize(hoursText, mainTextSize);
+  
+  page.drawText(hoursText, {
+    x: (width - hoursWidth) / 2,
+    y: currentY,
+    size: mainTextSize,
+    font: textFont,
+    color: rgb(0.3, 0.3, 0.3),
+  });
+
+  // ===== FOOTER COM GRADIENTE =====
+  const footerHeight = 65;
+  const footerY = innerMargin;
+  
+  // Fundo do footer com gradiente
+  for (let i = 0; i < headerSteps; i++) {
+    const progress = i / headerSteps;
+    let r, g, b;
     
-    // Fundo do badge
+    if (progress < 0.33) {
+      const p = progress / 0.33;
+      r = CIVENI_COLORS.blue.r + (CIVENI_COLORS.purple.r - CIVENI_COLORS.blue.r) * p;
+      g = CIVENI_COLORS.blue.g + (CIVENI_COLORS.purple.g - CIVENI_COLORS.blue.g) * p;
+      b = CIVENI_COLORS.blue.b + (CIVENI_COLORS.purple.b - CIVENI_COLORS.blue.b) * p;
+    } else if (progress < 0.66) {
+      r = CIVENI_COLORS.purple.r;
+      g = CIVENI_COLORS.purple.g;
+      b = CIVENI_COLORS.purple.b;
+    } else {
+      const p = (progress - 0.66) / 0.34;
+      r = CIVENI_COLORS.purple.r + (CIVENI_COLORS.red.r - CIVENI_COLORS.purple.r) * p;
+      g = CIVENI_COLORS.purple.g + (CIVENI_COLORS.red.g - CIVENI_COLORS.purple.g) * p;
+      b = CIVENI_COLORS.purple.b + (CIVENI_COLORS.red.b - CIVENI_COLORS.purple.b) * p;
+    }
+    
     page.drawRectangle({
-      x: width - 160,
-      y: 30,
-      width: 140,
-      height: 25,
-      color: rgb(badgeBg.r, badgeBg.g, badgeBg.b),
-    });
-    
-    // Texto do badge
-    const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 9);
-    page.drawText(badgeText, {
-      x: width - 90 - badgeTextWidth / 2,
-      y: 38,
-      size: 9,
-      font: titleFont,
-      color: rgb(badgeColor.r, badgeColor.g, badgeColor.b),
+      x: innerMargin + i * stepWidth,
+      y: footerY,
+      width: stepWidth + 1,
+      height: footerHeight,
+      color: rgb(r, g, b),
     });
   }
 
-  // Código de verificação
-  const codeLabel = language === "en-US" ? "Code:" : "Código:";
-  page.drawText(`${codeLabel} ${code}`, {
-    x: 50,
-    y: 40,
+  // ===== ASSINATURAS =====
+  const sigY = 145;
+  const sigSpacing = width / 3;
+  
+  const signatures = [
+    { 
+      name: "Dra. Maria Emilia Camargo", 
+      role: language === "en-US" ? "Dean of International Relations/VCCU" 
+        : language === "es-ES" ? "Decana de Relaciones Internacionales/VCCU"
+        : language === "tr-TR" ? "Uluslararası İlişkiler Dekanı/VCCU"
+        : "Reitora de Relações Internacionais/VCCU"
+    },
+    { 
+      name: "Dra. Marcela Tardanza Martins", 
+      role: language === "en-US" ? "Dean of Academic Relations/VCCU"
+        : language === "es-ES" ? "Decana de Relaciones Académicas/VCCU"
+        : language === "tr-TR" ? "Akademik İlişkiler Dekanı/VCCU"
+        : "Reitora de Relações Acadêmicas/VCCU"
+    }
+  ];
+  
+  signatures.forEach((sig, index) => {
+    const sigX = sigSpacing * (index + 1);
+    
+    // Linha de assinatura
+    page.drawLine({
+      start: { x: sigX - 90, y: sigY + 5 },
+      end: { x: sigX + 90, y: sigY + 5 },
+      thickness: 1,
+      color: rgb(0.6, 0.6, 0.6),
+    });
+    
+    // Nome
+    const sigNameWidth = titleFont.widthOfTextAtSize(sig.name, 10);
+    page.drawText(sig.name, {
+      x: sigX - sigNameWidth / 2,
+      y: sigY - 12,
+      size: 10,
+      font: titleFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+    
+    // Cargo
+    const sigRoleWidth = textFont.widthOfTextAtSize(sig.role, 8);
+    page.drawText(sig.role, {
+      x: sigX - sigRoleWidth / 2,
+      y: sigY - 25,
+      size: 8,
+      font: textFont,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+  });
+
+  // ===== LOCAL E DATA NO FOOTER =====
+  const locationText = `Celebration, Florida – USA, ${dateStr}`;
+  const locationWidth = textFont.widthOfTextAtSize(locationText, 10);
+  
+  page.drawText(locationText, {
+    x: (width - locationWidth) / 2,
+    y: footerY + footerHeight - 20,
+    size: 10,
+    font: textFont,
+    color: rgb(1, 1, 1),
+  });
+
+  // ===== CÓDIGO DE VERIFICAÇÃO =====
+  const codeLabel = language === "en-US" ? "Verification Code:" 
+    : language === "es-ES" ? "Código de Verificación:"
+    : language === "tr-TR" ? "Doğrulama Kodu:"
+    : "Código de Verificação:";
+  
+  const codeText = `${codeLabel} ${code}`;
+  
+  page.drawText(codeText, {
+    x: innerMargin + 15,
+    y: footerY + 15,
+    size: 9,
+    font: textFont,
+    color: rgb(1, 1, 1),
+  });
+
+  // URL de verificação
+  const verifyUrl = `civeni.com/verificar-certificado`;
+  const verifyWidth = textFont.widthOfTextAtSize(verifyUrl, 8);
+  
+  page.drawText(verifyUrl, {
+    x: width - innerMargin - verifyWidth - 15,
+    y: footerY + 15,
     size: 8,
     font: textFont,
-    color: rgb(0.5, 0.5, 0.5),
+    color: rgb(0.9, 0.9, 0.9),
+  });
+
+  // ===== BADGE DO EVENTO =====
+  const badgeWidth = 120;
+  const badgeHeight = 25;
+  const badgeX = width - innerMargin - badgeWidth - 10;
+  const badgeY = footerY + footerHeight + 5;
+  
+  page.drawRectangle({
+    x: badgeX,
+    y: badgeY,
+    width: badgeWidth,
+    height: badgeHeight,
+    color: rgb(CIVENI_COLORS.gold.r, CIVENI_COLORS.gold.g, CIVENI_COLORS.gold.b),
+  });
+  
+  const badgeText = "III CIVENI 2025";
+  const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 10);
+  
+  page.drawText(badgeText, {
+    x: badgeX + (badgeWidth - badgeTextWidth) / 2,
+    y: badgeY + 8,
+    size: 10,
+    font: titleFont,
+    color: rgb(0.1, 0.1, 0.1),
   });
 
   return await pdfDoc.save();
