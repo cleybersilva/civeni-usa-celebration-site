@@ -36,37 +36,28 @@ const normalizeText = (text: string): string => {
 };
 
 // Sanitiza texto para fontes padrão PDF (WinAnsi encoding)
-// Remove/substitui caracteres que não são suportados pela codificação WinAnsi
+// Remove/substitui apenas caracteres que NÃO são suportados pela codificação WinAnsi
+// Nota: Caracteres acentuados latinos (Ç, ç, Ã, ã, Á, á, É, é, Í, í, Ó, ó, Ú, ú, Ñ, ñ, etc.) 
+// SÃO suportados pela codificação WinAnsi e NÃO devem ser substituídos
 const sanitizeForPdf = (text: string): string => {
   if (!text) return "";
   
-  // Mapa de caracteres turcos e outros não suportados para equivalentes ASCII
+  // Mapa APENAS de caracteres turcos e outros que NÃO são suportados pelo WinAnsi
+  // Caracteres latinos acentuados (português, espanhol) são MANTIDOS pois WinAnsi os suporta
   const charMap: Record<string, string> = {
-    "\u0130": "I",  // İ
-    "\u0131": "i",  // ı
-    "\u011E": "G",  // Ğ
-    "\u011F": "g",  // ğ
-    "\u015E": "S",  // Ş
-    "\u015F": "s",  // ş
-    "\u00DC": "U",  // Ü
-    "\u00FC": "u",  // ü
-    "\u00D6": "O",  // Ö
-    "\u00F6": "o",  // ö
-    "\u00C7": "C",  // Ç
-    "\u00E7": "c",  // ç
-    "\u00E3": "a",  // ã
-    "\u00C3": "A",  // Ã
-    "\u00F5": "o",  // õ
-    "\u00D5": "O",  // Õ
-    "\u00F1": "n",  // ñ
-    "\u00D1": "N",  // Ñ
-    "\u2013": "-",  // –
-    "\u2014": "-",  // —
-    "\u2018": "'",  // '
-    "\u2019": "'",  // '
-    "\u201C": '"',  // "
-    "\u201D": '"',  // "
-    "\u2026": "...",// …
+    "\u0130": "I",  // İ (turco - NÃO suportado)
+    "\u0131": "i",  // ı (turco - NÃO suportado)
+    "\u011E": "G",  // Ğ (turco - NÃO suportado)
+    "\u011F": "g",  // ğ (turco - NÃO suportado)
+    "\u015E": "S",  // Ş (turco - NÃO suportado)
+    "\u015F": "s",  // ş (turco - NÃO suportado)
+    "\u2013": "-",  // – (en dash)
+    "\u2014": "-",  // — (em dash)
+    "\u2018": "'",  // ' (curly quote)
+    "\u2019": "'",  // ' (curly quote)
+    "\u201C": '"',  // " (curly quote)
+    "\u201D": '"',  // " (curly quote)
+    "\u2026": "...",// … (ellipsis)
   };
   
   let result = text;
@@ -74,7 +65,7 @@ const sanitizeForPdf = (text: string): string => {
     result = result.replace(new RegExp(char, "g"), replacement);
   }
   
-  // Remove qualquer caractere não ASCII restante que possa causar problemas
+  // Remove apenas caracteres fora do range Latin-1 Supplement (WinAnsi suporta até 0xFF)
   result = result.replace(/[^\x00-\xFF]/g, "");
   
   return result;
