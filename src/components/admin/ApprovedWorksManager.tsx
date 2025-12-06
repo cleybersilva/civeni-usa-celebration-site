@@ -597,27 +597,25 @@ export const ApprovedWorksManager = () => {
             
             return (
               <AccordionItem key={area} value={area} className="border rounded-lg overflow-hidden">
-                <AccordionTrigger className={`px-4 py-3 ${getAreaBadgeColor(area)} text-white hover:no-underline`}>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <FileText className="w-5 h-5" />
-                    <span className="font-semibold">ÁREA: {area}</span>
-                    <Badge variant="secondary" className="ml-2">
-                      {areaWorks.length} artigos
-                    </Badge>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="ml-auto"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenImport(area);
-                      }}
-                    >
-                      <Upload className="w-4 h-4 mr-1" />
-                      Importar
-                    </Button>
-                  </div>
-                </AccordionTrigger>
+                <div className={`px-4 py-3 ${getAreaBadgeColor(area)} text-white flex items-center gap-3 flex-wrap`}>
+                  <AccordionTrigger className="flex-1 hover:no-underline p-0 [&>svg]:text-white">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5" />
+                      <span className="font-semibold">ÁREA: {area}</span>
+                      <Badge variant="secondary" className="ml-2">
+                        {areaWorks.length} artigos
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleOpenImport(area)}
+                  >
+                    <Upload className="w-4 h-4 mr-1" />
+                    Importar
+                  </Button>
+                </div>
                 <AccordionContent className="p-0">
                   {areaWorks.length === 0 ? (
                     <div className="p-8 text-center text-muted-foreground">
