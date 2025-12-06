@@ -363,7 +363,7 @@ const createCertificatePdf = async (
   // ===== VCCU LOGO NO HEADER (lado esquerdo) =====
   let vccuLogoImage = null;
   try {
-    const vccuLogoUrl = "https://civeni.com/uploads/civeni-2025-logo-sidebar.png";
+    const vccuLogoUrl = "https://civeni.com/uploads/vccu-logo-certificate.png";
     const vccuLogoResponse = await fetch(vccuLogoUrl);
     if (vccuLogoResponse.ok) {
       const vccuLogoBytes = await vccuLogoResponse.arrayBuffer();
@@ -670,7 +670,7 @@ const createCertificatePdf = async (
   // ===== CIVENI LOGO CENTRALIZADO ENTRE ASSINATURAS =====
   let civeniLogoImage = null;
   try {
-    const civeniLogoUrl = "https://civeni.com/assets/civeni-2025-logo.png";
+    const civeniLogoUrl = "https://civeni.com/uploads/civeni-logo-certificate.png";
     const civeniLogoResponse = await fetch(civeniLogoUrl);
     if (civeniLogoResponse.ok) {
       const civeniLogoBytes = await civeniLogoResponse.arrayBuffer();
