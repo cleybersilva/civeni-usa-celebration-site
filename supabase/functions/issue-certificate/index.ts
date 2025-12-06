@@ -620,14 +620,14 @@ const createCertificatePdf = async (
   const maxTextWidth = width - 120; // Margem para texto
   
   // Texto principal completo traduzido nos 4 idiomas - Nome do evento em NEGRITO
-  const eventNameRaw = language === "en-US" 
+  const certEventNameRaw = language === "en-US" 
     ? "III CIVENI - International Multidisciplinary Congress of VCCU"
     : language === "es-ES"
     ? "III CIVENI - Congreso Internacional Multidisciplinario de VCCU"
     : language === "tr-TR"
     ? "III CIVENI - VCCU Uluslararasi Multidisipliner Kongresi"
     : "III CIVENI - Congresso Internacional Multidisciplinar da VCCU";
-  const eventName = sanitizeForPdf(eventNameRaw);
+  const certEventName = sanitizeForPdf(certEventNameRaw);
 
   const participationTextRaw = language === "en-US" 
     ? "For participation in the"
@@ -651,9 +651,9 @@ const createCertificatePdf = async (
   currentY -= 20;
 
   // Desenhar nome do evento em NEGRITO (usando titleFont que é bold)
-  const eventNameWidth = titleFont.widthOfTextAtSize(eventName, mainTextSize + 1);
-  page.drawText(eventName, {
-    x: (width - eventNameWidth) / 2,
+  const certEventNameWidth = titleFont.widthOfTextAtSize(certEventName, mainTextSize + 1);
+  page.drawText(certEventName, {
+    x: (width - certEventNameWidth) / 2,
     y: currentY,
     size: mainTextSize + 1,
     font: titleFont,
