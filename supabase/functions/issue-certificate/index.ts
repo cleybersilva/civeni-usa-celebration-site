@@ -491,18 +491,15 @@ const createCertificatePdf = async (
   // Calcular posições - VCCU logo esquerda, título centro, CIVENI logo direita
   const logoSize = 55;
   const civeniHeaderLogoSize = 50;
-  const logoGap = 15;
+  const sideMargin = 25; // Margem igual para ambas as logos
   
-  // Calcular largura total do conteúdo: VCCU logo + gap + título + gap + CIVENI logo
-  const vccuWidth = vccuLogoImage ? logoSize + logoGap : 0;
-  const civeniWidth = civeniHeaderLogoImage ? logoGap + civeniHeaderLogoSize * 2.5 : 0; // CIVENI logo é mais largo
-  const totalContentWidth = vccuWidth + titleWidth + civeniWidth;
-  const contentStartX = (width - totalContentWidth) / 2;
+  // Calcular largura do logo CIVENI
+  const civeniLogoWidth = civeniHeaderLogoImage ? civeniHeaderLogoSize * 2.5 : 0;
   
-  // Desenhar logo VCCU se carregado (esquerda do título)
+  // Desenhar logo VCCU se carregado (esquerda)
   if (vccuLogoImage) {
     const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
-    const logoX = contentStartX;
+    const logoX = sideMargin;
     const logoY = headerY + (headerHeight - logoSize) / 2;
     
     page.drawImage(vccuLogoImage, {
@@ -513,8 +510,8 @@ const createCertificatePdf = async (
     });
   }
   
-  // Posição X do título (após o logo VCCU)
-  const titleX = vccuLogoImage ? contentStartX + logoSize + logoGap : (width - titleWidth) / 2;
+  // Título centralizado no meio do header
+  const titleX = (width - titleWidth) / 2;
   
   page.drawText(titleText, {
     x: titleX,
@@ -524,11 +521,23 @@ const createCertificatePdf = async (
     color: rgb(1, 1, 1),
   });
   
-  // Desenhar logo CIVENI à direita do título
+  // Desenhar logo CIVENI à direita com realce branco
   if (civeniHeaderLogoImage) {
     const civeniLogoDims = civeniHeaderLogoImage.scale(civeniHeaderLogoSize / civeniHeaderLogoImage.height);
-    const civeniLogoX = titleX + titleWidth + logoGap;
+    const civeniLogoX = width - sideMargin - civeniLogoDims.width;
     const civeniLogoY = headerY + (headerHeight - civeniLogoDims.height) / 2;
+    
+    // Desenhar realce/fundo branco arredondado atrás do logo
+    const padding = 8;
+    page.drawRectangle({
+      x: civeniLogoX - padding,
+      y: civeniLogoY - padding,
+      width: civeniLogoDims.width + padding * 2,
+      height: civeniLogoDims.height + padding * 2,
+      color: rgb(1, 1, 1), // Branco
+      borderColor: rgb(0.9, 0.9, 0.9),
+      borderWidth: 1,
+    });
     
     page.drawImage(civeniHeaderLogoImage, {
       x: civeniLogoX,
