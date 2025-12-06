@@ -615,23 +615,20 @@ const createCertificatePdf = async (
 
   currentY -= 50;
 
-  // ===== TEXTO PRINCIPAL =====
-  const participationTypeRaw = language === "en-US" ? "participant" 
-    : language === "es-ES" ? "participante"
-    : language === "tr-TR" ? "katilimci"
-    : "participante";
-  const participationType = sanitizeForPdf(participationTypeRaw);
+  // ===== TEXTO PRINCIPAL - DESCRIÇÃO COMPLETA DO EVENTO =====
+  const mainTextSize = 12;
+  const maxTextWidth = width - 120; // Margem para texto
   
+  // Texto principal completo traduzido nos 4 idiomas
   const mainTextLine1Raw = language === "en-US" 
-    ? `participated as ${participationType} in the`
+    ? "For participation in the III International Multidisciplinary Congress CIVENI of Veni,"
     : language === "es-ES"
-    ? `participo como ${participationType} en el`
+    ? "Por la participación en el III Congreso Internacional Multidisciplinario CIVENI de Veni,"
     : language === "tr-TR"
-    ? `${participationType} olarak katilmistir:`
-    : `participou como ${participationType} do`;
+    ? "Veni'nin III. Uluslararasi Multidisipliner CIVENI Kongresi'ne katilimi icin,"
+    : "Pela participação no III Congresso Internacional Multidisciplinar CIVENI da Veni,";
   const mainTextLine1 = sanitizeForPdf(mainTextLine1Raw);
 
-  const mainTextSize = 13;
   const mainTextWidth1 = textFont.widthOfTextAtSize(mainTextLine1, mainTextSize);
   
   page.drawText(mainTextLine1, {
@@ -642,38 +639,66 @@ const createCertificatePdf = async (
     color: rgb(0.3, 0.3, 0.3),
   });
 
-  currentY -= 28;
+  currentY -= 20;
 
-  // Nome do evento em destaque
-  const eventDisplayNameRaw = eventName || "III CIVENI 2025";
-  const eventDisplayName = sanitizeForPdf(eventDisplayNameRaw);
-  const eventNameSize = 16;
-  const eventNameWidth = titleFont.widthOfTextAtSize(eventDisplayName, eventNameSize);
+  // Tema do evento
+  const mainTextLine2Raw = language === "en-US" 
+    ? 'with the theme "Knowledge in Connection: Innovation, Justice and Humanity'
+    : language === "es-ES"
+    ? 'con el tema "Conocimiento en Conexión: Innovación, Justicia y Humanidad'
+    : language === "tr-TR"
+    ? '"Baglantida Bilgi: Cagdas Toplumda Inovasyon, Adalet ve Insanlik" temasinda,'
+    : 'com o tema "Conhecimento em Conexão: Inovação, Justiça e Humanidade';
+  const mainTextLine2 = sanitizeForPdf(mainTextLine2Raw);
   
-  page.drawText(eventDisplayName, {
-    x: (width - eventNameWidth) / 2,
+  const mainTextWidth2 = textFont.widthOfTextAtSize(mainTextLine2, mainTextSize);
+  
+  page.drawText(mainTextLine2, {
+    x: (width - mainTextWidth2) / 2,
     y: currentY,
-    size: eventNameSize,
-    font: titleFont,
-    color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
+    size: mainTextSize,
+    font: textFont,
+    color: rgb(0.3, 0.3, 0.3),
   });
 
-  currentY -= 30;
+  currentY -= 20;
 
-  // Informações adicionais
-  const hoursTextRaw = language === "en-US" 
-    ? `with a total workload of ${hours || "20"} hours.`
+  // Continuação do tema (para PT, EN, ES)
+  const mainTextLine3Raw = language === "en-US" 
+    ? 'in Contemporary Society", promoted by Veni Creator Christian University,'
     : language === "es-ES"
-    ? `con una carga horaria total de ${hours || "20"} horas.`
+    ? 'en la Sociedad Contemporánea", promovido por la Universidad Cristiana Veni Creator,'
     : language === "tr-TR"
-    ? `toplam ${hours || "20"} saat is yuku ile.`
-    : `com carga horaria total de ${hours || "20"} horas.`;
-  const hoursText = sanitizeForPdf(hoursTextRaw);
+    ? "Veni Creator Hristiyan Universitesi tarafindan duzenlenen,"
+    : 'na Sociedade Contemporânea", promovido pela Universidade Cristã Veni Creator,';
+  const mainTextLine3 = sanitizeForPdf(mainTextLine3Raw);
   
-  const hoursWidth = textFont.widthOfTextAtSize(hoursText, mainTextSize);
+  const mainTextWidth3 = textFont.widthOfTextAtSize(mainTextLine3, mainTextSize);
   
-  page.drawText(hoursText, {
-    x: (width - hoursWidth) / 2,
+  page.drawText(mainTextLine3, {
+    x: (width - mainTextWidth3) / 2,
+    y: currentY,
+    size: mainTextSize,
+    font: textFont,
+    color: rgb(0.3, 0.3, 0.3),
+  });
+
+  currentY -= 20;
+
+  // Data do evento
+  const mainTextLine4Raw = language === "en-US" 
+    ? `from December 11 to 13, 2025, with a total workload of ${hours || "20"} hours.`
+    : language === "es-ES"
+    ? `del 11 al 13 de diciembre de 2025, con una carga horaria de ${hours || "20"} horas.`
+    : language === "tr-TR"
+    ? `11-13 Aralik 2025 tarihleri arasinda, toplam ${hours || "20"} saat is yukuyle.`
+    : `de 11 a 13 de dezembro de 2025, com carga horária de ${hours || "20"} horas.`;
+  const mainTextLine4 = sanitizeForPdf(mainTextLine4Raw);
+  
+  const mainTextWidth4 = textFont.widthOfTextAtSize(mainTextLine4, mainTextSize);
+  
+  page.drawText(mainTextLine4, {
+    x: (width - mainTextWidth4) / 2,
     y: currentY,
     size: mainTextSize,
     font: textFont,
