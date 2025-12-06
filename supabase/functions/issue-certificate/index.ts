@@ -519,6 +519,7 @@ const handler = async (req: Request): Promise<Response> => {
         nameMin: "Nome deve ter pelo menos 2 caracteres",
         tooManyAttempts: "Muitas tentativas. Tente novamente em 1 hora.",
         eventNotFound: "Evento não encontrado ou certificados não habilitados",
+        emailNotRegistered: "E-mail não encontrado. Verifique se você utilizou o mesmo e-mail da sua inscrição no CIVENI.",
         keywordsMismatch: (matched: number, required: number) =>
           `Você acertou ${matched}/3 palavras-chave. Mínimo necessário: ${required}/3`,
         alreadyIssued: (date: string) => `Certificado já emitido em ${date}`,
@@ -529,6 +530,7 @@ const handler = async (req: Request): Promise<Response> => {
         nameMin: "Name must be at least 2 characters",
         tooManyAttempts: "Too many attempts. Try again in 1 hour.",
         eventNotFound: "Event not found or certificates not enabled",
+        emailNotRegistered: "Email not found. Please verify you are using the same email from your CIVENI registration.",
         keywordsMismatch: (matched: number, required: number) =>
           `You got ${matched}/3 keywords correct. Minimum required: ${required}/3`,
         alreadyIssued: (date: string) => `Certificate already issued on ${date}`,
@@ -539,6 +541,7 @@ const handler = async (req: Request): Promise<Response> => {
         nameMin: "El nombre debe tener al menos 2 caracteres",
         tooManyAttempts: "Demasiados intentos. Inténtelo de nuevo en 1 hora.",
         eventNotFound: "Evento no encontrado o certificados no habilitados",
+        emailNotRegistered: "Correo electrónico no encontrado. Verifique que esté utilizando el mismo correo de su inscripción en CIVENI.",
         keywordsMismatch: (matched: number, required: number) =>
           `Acertó ${matched}/3 palabras clave. Mínimo requerido: ${required}/3`,
         alreadyIssued: (date: string) => `Certificado ya emitido el ${date}`,
@@ -555,7 +558,32 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Verificar palavras-chave
+    // VALIDAÇÃO 1: Verificar se o e-mail existe na tabela de inscrições com pagamento confirmado
+    const { data: registration, error: registrationError } = await supabase
+      .from("event_registrations")
+      .select("id, email, full_name, payment_status")
+      .ilike("email", normalizedEmail)
+      .eq("payment_status", "completed")
+      .maybeSingle();
+
+    if (registrationError) {
+      console.error("Error checking registration:", registrationError);
+    }
+
+    if (!registration) {
+      console.log("Email not found in registrations:", normalizedEmail);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: msg.emailNotRegistered,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+
+    console.log("Registration found for email:", normalizedEmail, "Name:", registration.full_name);
+
+    // VALIDAÇÃO 2: Verificar palavras-chave
     const normalizedUserKeywords = keywords.map(normalizeText);
     const normalizedOfficialKeywords = eventCert.keywords.map(normalizeText);
 
