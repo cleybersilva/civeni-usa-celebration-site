@@ -1,7 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+// Resend API client manual implementation
+const RESEND_API_URL = "https://api.resend.com/emails";
+
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,11 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const emailResponse = await resend.emails.send({
-      from: 'CIVENI 2025 <onboarding@resend.dev>',
-      to: [email],
-      subject: `Seu certificado do ${eventName} está disponível!`,
-      html: `
+    const emailHtml = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -94,13 +92,28 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </body>
         </html>
-      `,
+      `;
+
+    const emailResponse = await fetch(RESEND_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'CIVENI 2025 <onboarding@resend.dev>',
+        to: [email],
+        subject: `Seu certificado do ${eventName} está disponível!`,
+        html: emailHtml,
+      }),
     });
 
-    console.log('Email enviado com sucesso:', emailResponse);
+    const emailData = await emailResponse.json();
+
+    console.log('Email enviado com sucesso:', emailData);
 
     return new Response(
-      JSON.stringify({ success: true, emailResponse }),
+      JSON.stringify({ success: true, emailResponse: emailData }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
 
