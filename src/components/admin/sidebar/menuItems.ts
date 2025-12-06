@@ -157,6 +157,13 @@ export const createMenuItems = (
       isPriority: false
     },
     {
+      id: 'lista-aprovados',
+      label: 'Lista Artigos/Projetos',
+      icon: FileText,
+      show: hasPermission('trabalhos') || isAdminRoot(),
+      isPriority: false
+    },
+    {
       id: 'transmissao-live',
       label: t('admin.menu.liveStream', 'Transmissão Ao Vivo'),
       icon: Play,

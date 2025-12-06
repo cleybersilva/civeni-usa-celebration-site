@@ -59,6 +59,7 @@ const Header = () => {
       title: t('header.papers'),
       items: [
         { name: t('header.submissionArticleConsortium'), href: '/submissao-trabalhos' },
+        { name: t('header.approvedList', 'Lista'), href: '/lista-apresentacao' },
         { name: t('header.oralPresentation'), href: '/apresentacao-oral' },
         { name: t('header.posterSessions'), href: '/sessoes-poster' },
         { name: t('header.manuscripts'), href: '/manuscritos' },

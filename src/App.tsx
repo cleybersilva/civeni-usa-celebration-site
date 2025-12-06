@@ -36,6 +36,7 @@ import PoliticasPrivacidade from "./pages/PoliticasPrivacidade";
 import SejaNossoParceiro from "./pages/SejaNossoParceiro";
 import SubmissaoTrabalhos from "./pages/SubmissaoTrabalhos";
 import ApresentacaoOral from "./pages/ApresentacaoOral";
+import ListaApresentacao from "./pages/ListaApresentacao";
 import SessoesPoster from "./pages/SessoesPoster";
 import EnvioVideos from "./pages/EnvioVideos";
 import TemplatesArtigosSlides from "./pages/TemplatesArtigosSlides";
@@ -88,6 +89,7 @@ function App() {
                 <Route path="/seja-nosso-parceiro" element={<SejaNossoParceiro />} />
                 <Route path="/submissao-trabalhos" element={<SubmissaoTrabalhos />} />
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
+                <Route path="/lista-apresentacao" element={<ListaApresentacao />} />
                 <Route path="/sessoes-poster" element={<SessoesPoster />} />
                 {/* Redirect /manuscritos para /envio-de-videos */}
                 <Route path="/manuscritos" element={<Navigate to="/envio-de-videos" replace />} />
