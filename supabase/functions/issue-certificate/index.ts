@@ -363,13 +363,21 @@ const createCertificatePdf = async (
   // ===== VCCU LOGO NO HEADER (lado esquerdo) =====
   let vccuLogoImage = null;
   try {
-    const vccuLogoUrl = "https://civeni.com/uploads/vccu-logo-certificate.png";
+    // Usar logo do sidebar que já é um PNG válido no projeto
+    const vccuLogoUrl = "https://civeni.com/uploads/civeni-2025-logo-sidebar.png";
     const vccuLogoResponse = await fetch(vccuLogoUrl);
+    console.log("VCCU logo fetch response status:", vccuLogoResponse.status);
     if (vccuLogoResponse.ok) {
       const vccuLogoBytes = new Uint8Array(await vccuLogoResponse.arrayBuffer());
+      console.log("VCCU logo bytes length:", vccuLogoBytes.length);
+      console.log("VCCU logo first 8 bytes:", Array.from(vccuLogoBytes.slice(0, 8)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
+      
       // Detectar formato da imagem pelos bytes mágicos
       const isPng = vccuLogoBytes[0] === 0x89 && vccuLogoBytes[1] === 0x50 && vccuLogoBytes[2] === 0x4E && vccuLogoBytes[3] === 0x47;
       const isJpg = vccuLogoBytes[0] === 0xFF && vccuLogoBytes[1] === 0xD8;
+      const isWebP = vccuLogoBytes[8] === 0x57 && vccuLogoBytes[9] === 0x45 && vccuLogoBytes[10] === 0x42 && vccuLogoBytes[11] === 0x50;
+      
+      console.log("VCCU logo format detection - isPng:", isPng, "isJpg:", isJpg, "isWebP:", isWebP);
       
       if (isPng) {
         vccuLogoImage = await pdfDoc.embedPng(vccuLogoBytes);
@@ -378,7 +386,7 @@ const createCertificatePdf = async (
         vccuLogoImage = await pdfDoc.embedJpg(vccuLogoBytes);
         console.log("VCCU logo embedded as JPG successfully");
       } else {
-        console.log("VCCU logo format not recognized, skipping");
+        console.log("VCCU logo format not recognized (WebP?), cannot embed in PDF - WebP is not supported by pdf-lib");
       }
     }
   } catch (logoError) {
@@ -681,13 +689,20 @@ const createCertificatePdf = async (
   // ===== CIVENI LOGO CENTRALIZADO ENTRE ASSINATURAS =====
   let civeniLogoImage = null;
   try {
-    const civeniLogoUrl = "https://civeni.com/uploads/civeni-logo-certificate.png";
+    // Usar logo principal do CIVENI que existe no assets
+    const civeniLogoUrl = "https://civeni.com/assets/civeni-2025-logo.png";
     const civeniLogoResponse = await fetch(civeniLogoUrl);
+    console.log("CIVENI logo fetch response status:", civeniLogoResponse.status);
     if (civeniLogoResponse.ok) {
       const civeniLogoBytes = new Uint8Array(await civeniLogoResponse.arrayBuffer());
+      console.log("CIVENI logo bytes length:", civeniLogoBytes.length);
+      console.log("CIVENI logo first 8 bytes:", Array.from(civeniLogoBytes.slice(0, 8)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
+      
       // Detectar formato da imagem pelos bytes mágicos
       const isPng = civeniLogoBytes[0] === 0x89 && civeniLogoBytes[1] === 0x50 && civeniLogoBytes[2] === 0x4E && civeniLogoBytes[3] === 0x47;
       const isJpg = civeniLogoBytes[0] === 0xFF && civeniLogoBytes[1] === 0xD8;
+      
+      console.log("CIVENI logo format detection - isPng:", isPng, "isJpg:", isJpg);
       
       if (isPng) {
         civeniLogoImage = await pdfDoc.embedPng(civeniLogoBytes);
@@ -696,7 +711,7 @@ const createCertificatePdf = async (
         civeniLogoImage = await pdfDoc.embedJpg(civeniLogoBytes);
         console.log("CIVENI logo embedded as JPG successfully");
       } else {
-        console.log("CIVENI logo format not recognized, skipping");
+        console.log("CIVENI logo format not recognized (WebP?), cannot embed in PDF");
       }
     }
   } catch (logoError) {
