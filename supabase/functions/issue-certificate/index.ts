@@ -550,21 +550,11 @@ const createCertificatePdf = async (
     color: rgb(1, 1, 1),
   });
   
-  // Desenhar logo CIVENI à direita do título com realce branco
+  // Desenhar logo CIVENI à direita do título (sem fundo branco)
   if (civeniHeaderLogoImage) {
     const civeniLogoDims = civeniHeaderLogoImage.scale(civeniHeaderLogoSize / civeniHeaderLogoImage.height);
     const civeniLogoX = titleX + titleWidth + logoGap;
     const civeniLogoY = headerY + (headerHeight - civeniLogoDims.height) / 2;
-    
-    // Realce branco discreto atrás da logo CIVENI
-    const padding = 5;
-    page.drawRectangle({
-      x: civeniLogoX - padding,
-      y: civeniLogoY - padding,
-      width: civeniLogoDims.width + padding * 2,
-      height: civeniLogoDims.height + padding * 2,
-      color: rgb(1, 1, 1), // Branco
-    });
     
     page.drawImage(civeniHeaderLogoImage, {
       x: civeniLogoX,
