@@ -35,6 +35,51 @@ const normalizeText = (text: string): string => {
     .trim();
 };
 
+// Sanitiza texto para fontes padrão PDF (WinAnsi encoding)
+// Remove/substitui caracteres que não são suportados pela codificação WinAnsi
+const sanitizeForPdf = (text: string): string => {
+  if (!text) return "";
+  
+  // Mapa de caracteres turcos e outros não suportados para equivalentes ASCII
+  const charMap: Record<string, string> = {
+    "\u0130": "I",  // İ
+    "\u0131": "i",  // ı
+    "\u011E": "G",  // Ğ
+    "\u011F": "g",  // ğ
+    "\u015E": "S",  // Ş
+    "\u015F": "s",  // ş
+    "\u00DC": "U",  // Ü
+    "\u00FC": "u",  // ü
+    "\u00D6": "O",  // Ö
+    "\u00F6": "o",  // ö
+    "\u00C7": "C",  // Ç
+    "\u00E7": "c",  // ç
+    "\u00E3": "a",  // ã
+    "\u00C3": "A",  // Ã
+    "\u00F5": "o",  // õ
+    "\u00D5": "O",  // Õ
+    "\u00F1": "n",  // ñ
+    "\u00D1": "N",  // Ñ
+    "\u2013": "-",  // –
+    "\u2014": "-",  // —
+    "\u2018": "'",  // '
+    "\u2019": "'",  // '
+    "\u201C": '"',  // "
+    "\u201D": '"',  // "
+    "\u2026": "...",// …
+  };
+  
+  let result = text;
+  for (const [char, replacement] of Object.entries(charMap)) {
+    result = result.replace(new RegExp(char, "g"), replacement);
+  }
+  
+  // Remove qualquer caractere não ASCII restante que possa causar problemas
+  result = result.replace(/[^\x00-\xFF]/g, "");
+  
+  return result;
+};
+
 const generateCode = (): string => {
   const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
   let result = "";
@@ -62,9 +107,10 @@ function replacePlaceholders(text: string, data: Record<string, string>): string
   return result;
 }
 
-// Helper para quebrar texto em linhas
+// Helper para quebrar texto em linhas (usa texto já sanitizado)
 function wrapText(text: string, maxWidth: number, font: any, fontSize: number): string[] {
-  const words = text.split(' ');
+  const sanitizedText = sanitizeForPdf(text);
+  const words = sanitizedText.split(' ');
   const lines: string[] = [];
   let currentLine = '';
 
@@ -315,10 +361,11 @@ const createCertificatePdf = async (
   }
 
   // ===== TÍTULO PRINCIPAL =====
-  const titleText = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
-    : language === "es-ES" ? "CERTIFICADO DE PARTICIPACIÓN"
-    : language === "tr-TR" ? "KATILIM SERTİFİKASI"
-    : "CERTIFICADO DE PARTICIPAÇÃO";
+  const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
+    : language === "es-ES" ? "CERTIFICADO DE PARTICIPACION"
+    : language === "tr-TR" ? "KATILIM SERTIFIKASI"
+    : "CERTIFICADO DE PARTICIPACAO";
+  const titleText = sanitizeForPdf(titleTextRaw);
   
   const titleSize = 32;
   const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
@@ -332,7 +379,8 @@ const createCertificatePdf = async (
   });
 
   // ===== SUBTÍTULO DO EVENTO =====
-  const subtitleText = "III CIVENI 2025 – International Multidisciplinary Congress";
+  const subtitleTextRaw = "III CIVENI 2025 - International Multidisciplinary Congress";
+  const subtitleText = sanitizeForPdf(subtitleTextRaw);
   const subtitleSize = 11;
   const subtitleWidth = textFont.widthOfTextAtSize(subtitleText, subtitleSize);
   
@@ -347,10 +395,11 @@ const createCertificatePdf = async (
   let currentY = headerY - 50;
 
   // ===== TEXTO "CERTIFICAMOS QUE" =====
-  const certifyText = language === "en-US" ? "We hereby certify that"
+  const certifyTextRaw = language === "en-US" ? "We hereby certify that"
     : language === "es-ES" ? "Certificamos que"
-    : language === "tr-TR" ? "İşbu belge ile tasdik ederiz ki"
+    : language === "tr-TR" ? "Isbu belge ile tasdik ederiz ki"
     : "Certificamos que";
+  const certifyText = sanitizeForPdf(certifyTextRaw);
   
   const certifySize = 14;
   const certifyWidth = italicFont.widthOfTextAtSize(certifyText, certifySize);
@@ -366,10 +415,11 @@ const createCertificatePdf = async (
   currentY -= 45;
 
   // ===== NOME DO PARTICIPANTE =====
+  const sanitizedName = sanitizeForPdf(fullName.toUpperCase());
   const nameSize = 36;
-  const nameWidth = titleFont.widthOfTextAtSize(fullName.toUpperCase(), nameSize);
+  const nameWidth = titleFont.widthOfTextAtSize(sanitizedName, nameSize);
   
-  page.drawText(fullName.toUpperCase(), {
+  page.drawText(sanitizedName, {
     x: (width - nameWidth) / 2,
     y: currentY,
     size: nameSize,
@@ -389,18 +439,20 @@ const createCertificatePdf = async (
   currentY -= 50;
 
   // ===== TEXTO PRINCIPAL =====
-  const participationType = language === "en-US" ? "participant" 
+  const participationTypeRaw = language === "en-US" ? "participant" 
     : language === "es-ES" ? "participante"
-    : language === "tr-TR" ? "katılımcı"
+    : language === "tr-TR" ? "katilimci"
     : "participante";
+  const participationType = sanitizeForPdf(participationTypeRaw);
   
-  const mainTextLine1 = language === "en-US" 
+  const mainTextLine1Raw = language === "en-US" 
     ? `participated as ${participationType} in the`
     : language === "es-ES"
-    ? `participó como ${participationType} en el`
+    ? `participo como ${participationType} en el`
     : language === "tr-TR"
-    ? `${participationType} olarak katılmıştır:`
+    ? `${participationType} olarak katilmistir:`
     : `participou como ${participationType} do`;
+  const mainTextLine1 = sanitizeForPdf(mainTextLine1Raw);
 
   const mainTextSize = 13;
   const mainTextWidth1 = textFont.widthOfTextAtSize(mainTextLine1, mainTextSize);
@@ -416,7 +468,8 @@ const createCertificatePdf = async (
   currentY -= 28;
 
   // Nome do evento em destaque
-  const eventDisplayName = eventName || "III CIVENI 2025";
+  const eventDisplayNameRaw = eventName || "III CIVENI 2025";
+  const eventDisplayName = sanitizeForPdf(eventDisplayNameRaw);
   const eventNameSize = 16;
   const eventNameWidth = titleFont.widthOfTextAtSize(eventDisplayName, eventNameSize);
   
@@ -431,13 +484,14 @@ const createCertificatePdf = async (
   currentY -= 30;
 
   // Informações adicionais
-  const hoursText = language === "en-US" 
+  const hoursTextRaw = language === "en-US" 
     ? `with a total workload of ${hours || "20"} hours.`
     : language === "es-ES"
     ? `con una carga horaria total de ${hours || "20"} horas.`
     : language === "tr-TR"
-    ? `toplam ${hours || "20"} saat iş yükü ile.`
-    : `com carga horária total de ${hours || "20"} horas.`;
+    ? `toplam ${hours || "20"} saat is yuku ile.`
+    : `com carga horaria total de ${hours || "20"} horas.`;
+  const hoursText = sanitizeForPdf(hoursTextRaw);
   
   const hoursWidth = textFont.widthOfTextAtSize(hoursText, mainTextSize);
   
@@ -489,18 +543,18 @@ const createCertificatePdf = async (
   
   const signatures = [
     { 
-      name: "Dra. Maria Emilia Camargo", 
-      role: language === "en-US" ? "Dean of International Relations/VCCU" 
+      name: sanitizeForPdf("Dra. Maria Emilia Camargo"), 
+      role: sanitizeForPdf(language === "en-US" ? "Dean of International Relations/VCCU" 
         : language === "es-ES" ? "Decana de Relaciones Internacionales/VCCU"
-        : language === "tr-TR" ? "Uluslararası İlişkiler Dekanı/VCCU"
-        : "Reitora de Relações Internacionais/VCCU"
+        : language === "tr-TR" ? "Uluslararasi Iliskiler Dekani/VCCU"
+        : "Reitora de Relacoes Internacionais/VCCU")
     },
     { 
-      name: "Dra. Marcela Tardanza Martins", 
-      role: language === "en-US" ? "Dean of Academic Relations/VCCU"
-        : language === "es-ES" ? "Decana de Relaciones Académicas/VCCU"
-        : language === "tr-TR" ? "Akademik İlişkiler Dekanı/VCCU"
-        : "Reitora de Relações Acadêmicas/VCCU"
+      name: sanitizeForPdf("Dra. Marcela Tardanza Martins"), 
+      role: sanitizeForPdf(language === "en-US" ? "Dean of Academic Relations/VCCU"
+        : language === "es-ES" ? "Decana de Relaciones Academicas/VCCU"
+        : language === "tr-TR" ? "Akademik Iliskiler Dekani/VCCU"
+        : "Reitora de Relacoes Academicas/VCCU")
     }
   ];
   
@@ -537,7 +591,7 @@ const createCertificatePdf = async (
   });
 
   // ===== LOCAL E DATA NO FOOTER =====
-  const locationText = `Celebration, Florida – USA, ${dateStr}`;
+  const locationText = sanitizeForPdf(`Celebration, Florida - USA, ${dateStr}`);
   const locationWidth = textFont.widthOfTextAtSize(locationText, 10);
   
   page.drawText(locationText, {
@@ -549,10 +603,11 @@ const createCertificatePdf = async (
   });
 
   // ===== CÓDIGO DE VERIFICAÇÃO =====
-  const codeLabel = language === "en-US" ? "Verification Code:" 
-    : language === "es-ES" ? "Código de Verificación:"
-    : language === "tr-TR" ? "Doğrulama Kodu:"
-    : "Código de Verificação:";
+  const codeLabelRaw = language === "en-US" ? "Verification Code:" 
+    : language === "es-ES" ? "Codigo de Verificacion:"
+    : language === "tr-TR" ? "Dogrulama Kodu:"
+    : "Codigo de Verificacao:";
+  const codeLabel = sanitizeForPdf(codeLabelRaw);
   
   const codeText = `${codeLabel} ${code}`;
   
