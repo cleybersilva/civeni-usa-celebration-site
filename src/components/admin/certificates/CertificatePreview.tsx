@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
+import civeniLogo from '@/assets/civeni-2025-logo.png';
 
 interface CertificateLayoutConfig {
   background: {
@@ -14,13 +15,11 @@ interface CertificateLayoutConfig {
     thickness: number;
     gradient: {
       from: string;
-      via?: string;
       to: string;
     };
   };
   header: {
     logoUrl?: string;
-    logoPosition?: 'left' | 'center' | 'right';
     showLogo: boolean;
     title: string;
     titleColor: string;
@@ -43,10 +42,6 @@ interface CertificateLayoutConfig {
   footer: {
     locationDateText: string;
     locationDateColor: string;
-    signatureCount?: number;
-    signatureLayout?: 'sides' | 'center' | 'left' | 'right';
-    showCenterLogo?: boolean;
-    centerLogoUrl?: string;
     signatures: Array<{
       label: string;
       name: string;
@@ -55,7 +50,7 @@ interface CertificateLayoutConfig {
   };
   badge: {
     enabled: boolean;
-    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'bottom-center';
+    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
     text: string;
     backgroundGradient: {
       from: string;
@@ -89,27 +84,24 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({
 }) => {
   const replacePlaceholders = (text: string): string => {
     return text
-      .replace(/\{\{nome_participante\}\}/g, sampleData.nome_participante)
-      .replace(/\{\{tipo_participacao\}\}/g, sampleData.tipo_participacao)
-      .replace(/\{\{nome_evento\}\}/g, sampleData.nome_evento)
-      .replace(/\{\{data_evento\}\}/g, sampleData.data_evento)
-      .replace(/\{\{carga_horaria\}\}/g, sampleData.carga_horaria)
-      .replace(/\{\{data_emissao\}\}/g, sampleData.data_emissao)
-      .replace(/\{\{nome_reitor\}\}/g, sampleData.nome_reitor || 'Nome do Reitor')
-      .replace(/\{\{nome_coordenador\}\}/g, sampleData.nome_coordenador || 'Nome do Coordenador');
+      .replace(/{{nome_participante}}/g, sampleData.nome_participante)
+      .replace(/{{tipo_participacao}}/g, sampleData.tipo_participacao)
+      .replace(/{{nome_evento}}/g, sampleData.nome_evento)
+      .replace(/{{data_evento}}/g, sampleData.data_evento)
+      .replace(/{{carga_horaria}}/g, sampleData.carga_horaria)
+      .replace(/{{data_emissao}}/g, sampleData.data_emissao)
+      .replace(/{{nome_reitor}}/g, sampleData.nome_reitor || 'Nome do Reitor')
+      .replace(/{{nome_coordenador}}/g, sampleData.nome_coordenador || 'Nome do Coordenador');
   };
 
   const backgroundStyle = layoutConfig.background.type === 'gradient' 
     ? { background: `linear-gradient(135deg, ${layoutConfig.background.gradientFrom}, ${layoutConfig.background.gradientTo})` }
     : { backgroundColor: layoutConfig.background.color };
 
-  // Borda com gradiente Civeni (azul -> roxo -> vermelho)
-  const borderGradient = `linear-gradient(135deg, ${layoutConfig.border.gradient.from}, ${layoutConfig.border.gradient.via || '#731B4C'}, ${layoutConfig.border.gradient.to})`;
-  
   const borderStyle = layoutConfig.border.enabled
     ? {
-        border: `${layoutConfig.border.thickness}px solid transparent`,
-        backgroundImage: `linear-gradient(white, white), ${borderGradient}`,
+        border: `${layoutConfig.border.thickness}px ${layoutConfig.border.style} transparent`,
+        backgroundImage: `linear-gradient(white, white), linear-gradient(135deg, ${layoutConfig.border.gradient.from}, ${layoutConfig.border.gradient.to})`,
         backgroundOrigin: 'border-box',
         backgroundClip: 'padding-box, border-box'
       }
@@ -119,48 +111,13 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({
     'top-left': 'top-4 left-4',
     'top-right': 'top-4 right-4',
     'bottom-left': 'bottom-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2'
+    'bottom-right': 'bottom-4 right-4'
   }[layoutConfig.badge.position];
-
-  const signatureCount = layoutConfig.footer.signatureCount || 2;
-  const signatureLayout = layoutConfig.footer.signatureLayout || 'sides';
-  const showCenterLogo = layoutConfig.footer.showCenterLogo ?? true;
-
-  // Determinar classes de alinhamento para assinaturas
-  const getSignatureContainerClass = () => {
-    if (signatureCount === 1) {
-      switch (signatureLayout) {
-        case 'left': return 'justify-start';
-        case 'right': return 'justify-end';
-        case 'center': 
-        default: return 'justify-center';
-      }
-    }
-    return 'justify-between';
-  };
-
-  // Determinar posição do logo do header
-  const getHeaderLogoClass = () => {
-    switch (layoutConfig.header.logoPosition) {
-      case 'left': return 'mr-4';
-      case 'right': return 'ml-4 order-last';
-      case 'center':
-      default: return 'mx-auto mb-4';
-    }
-  };
-
-  const getHeaderContainerClass = () => {
-    if (layoutConfig.header.logoPosition === 'center') {
-      return 'flex flex-col items-center';
-    }
-    return 'flex items-center justify-center';
-  };
 
   return (
     <Card className="overflow-hidden shadow-2xl" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
       <div 
-        className="relative p-12 min-h-[700px] flex flex-col justify-between"
+        className="relative p-16 min-h-[800px] flex flex-col justify-between"
         style={{
           ...backgroundStyle,
           ...borderStyle
@@ -169,52 +126,47 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({
         {/* Badge */}
         {layoutConfig.badge.enabled && (
           <div 
-            className={`absolute ${badgePosition} px-5 py-2 rounded-full shadow-lg z-10`}
+            className={`absolute ${badgePosition} px-6 py-2 rounded-full shadow-lg z-10`}
             style={{
               background: `linear-gradient(135deg, ${layoutConfig.badge.backgroundGradient.from}, ${layoutConfig.badge.backgroundGradient.to})`,
               color: layoutConfig.badge.textColor
             }}
           >
-            <span className="font-bold text-xs">{layoutConfig.badge.text}</span>
+            <span className="font-bold text-sm">{layoutConfig.badge.text}</span>
           </div>
         )}
 
         {/* Header */}
-        <div className={`text-center space-y-2 ${getHeaderContainerClass()}`}>
-          {layoutConfig.header.showLogo && layoutConfig.header.logoUrl && (
+        <div className="text-center space-y-4">
+          {layoutConfig.header.showLogo && (
             <img 
-              src={layoutConfig.header.logoUrl}
+              src={layoutConfig.header.logoUrl || civeniLogo}
               alt="Logo" 
-              className={`w-16 h-auto ${getHeaderLogoClass()}`}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
+              className="w-24 h-auto mx-auto"
             />
           )}
-          <div className={layoutConfig.header.logoPosition !== 'center' ? 'flex-1' : ''}>
-            <h1 
-              className="text-3xl font-bold tracking-wider"
-              style={{ color: layoutConfig.header.titleColor }}
-            >
-              {layoutConfig.header.title}
-            </h1>
-            <p 
-              className="text-sm mt-1"
-              style={{ color: layoutConfig.header.subtitleColor }}
-            >
-              {layoutConfig.header.subtitle}
-            </p>
-          </div>
+          <h1 
+            className="text-5xl font-bold tracking-wider"
+            style={{ color: layoutConfig.header.titleColor }}
+          >
+            {layoutConfig.header.title}
+          </h1>
+          <p 
+            className="text-xl"
+            style={{ color: layoutConfig.header.subtitleColor }}
+          >
+            {layoutConfig.header.subtitle}
+          </p>
         </div>
 
         {/* Body */}
         <div 
-          className="space-y-6 my-8"
+          className="space-y-8 my-12"
           style={{ textAlign: layoutConfig.body.alignment }}
         >
-          <div className="space-y-1">
+          <div className="space-y-2">
             <p 
-              className="text-xs"
+              className="text-sm"
               style={{ color: layoutConfig.body.certifyLabelColor }}
             >
               {layoutConfig.body.certifyLabel}
@@ -232,7 +184,7 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({
           </div>
           
           <p 
-            className="text-sm leading-relaxed max-w-2xl mx-auto px-4"
+            className="text-lg leading-relaxed max-w-3xl mx-auto"
             style={{ color: layoutConfig.body.mainTextColor }}
           >
             {replacePlaceholders(layoutConfig.body.mainText)}
@@ -240,95 +192,33 @@ const CertificatePreview: React.FC<CertificatePreviewProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           <p 
-            className="text-center text-xs"
+            className="text-center text-sm"
             style={{ color: layoutConfig.footer.locationDateColor }}
           >
             {replacePlaceholders(layoutConfig.footer.locationDateText)}
           </p>
           
-          {/* Container de assinaturas */}
-          <div className={`flex ${getSignatureContainerClass()} items-end gap-4 px-8`}>
-            {/* Primeira assinatura */}
-            {layoutConfig.footer.signatures[0] && (
-              <div className="text-center space-y-1 flex-shrink-0" style={{ minWidth: '150px' }}>
-                {layoutConfig.footer.signatures[0].signatureImageUrl ? (
+          <div className={`flex ${layoutConfig.footer.signatures.length === 1 ? 'justify-center' : 'justify-around'} items-end gap-8`}>
+            {layoutConfig.footer.signatures.map((signature, index) => (
+              <div key={index} className="text-center space-y-2">
+                {signature.signatureImageUrl ? (
                   <img 
-                    src={layoutConfig.footer.signatures[0].signatureImageUrl} 
+                    src={signature.signatureImageUrl} 
                     alt="Assinatura"
-                    className="w-24 h-12 object-contain mx-auto"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+                    className="w-32 h-16 object-contain mx-auto"
                   />
                 ) : (
-                  <div className="w-24 h-12 border-b-2 border-gray-400 mx-auto"></div>
+                  <div className="w-32 h-16 border-t-2 border-gray-400 mx-auto"></div>
                 )}
                 <div>
-                  <p className="font-bold text-xs">{replacePlaceholders(layoutConfig.footer.signatures[0].name)}</p>
-                  <p className="text-[10px] text-gray-600">{layoutConfig.footer.signatures[0].label}</p>
+                  <p className="font-bold text-sm">{replacePlaceholders(signature.name)}</p>
+                  <p className="text-xs text-gray-600">{signature.label}</p>
                 </div>
               </div>
-            )}
-
-            {/* Logo central (entre assinaturas) - apenas quando tem 2 assinaturas */}
-            {signatureCount === 2 && showCenterLogo && layoutConfig.footer.centerLogoUrl && (
-              <div className="flex-shrink-0 flex items-center justify-center">
-                <img 
-                  src={layoutConfig.footer.centerLogoUrl}
-                  alt="Logo CIVENI"
-                  className="h-12 w-auto object-contain"
-                  onError={(e) => {
-                    // Fallback para texto
-                    const parent = (e.target as HTMLImageElement).parentElement;
-                    if (parent) {
-                      parent.innerHTML = '<span class="text-xs font-bold text-purple-700">III CIVENI 2025</span>';
-                    }
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Segunda assinatura (apenas se signatureCount === 2) */}
-            {signatureCount === 2 && layoutConfig.footer.signatures[1] && (
-              <div className="text-center space-y-1 flex-shrink-0" style={{ minWidth: '150px' }}>
-                {layoutConfig.footer.signatures[1].signatureImageUrl ? (
-                  <img 
-                    src={layoutConfig.footer.signatures[1].signatureImageUrl} 
-                    alt="Assinatura"
-                    className="w-24 h-12 object-contain mx-auto"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-24 h-12 border-b-2 border-gray-400 mx-auto"></div>
-                )}
-                <div>
-                  <p className="font-bold text-xs">{replacePlaceholders(layoutConfig.footer.signatures[1].name)}</p>
-                  <p className="text-[10px] text-gray-600">{layoutConfig.footer.signatures[1].label}</p>
-                </div>
-              </div>
-            )}
+            ))}
           </div>
-
-          {/* Logo central para 1 assinatura (abaixo da assinatura) */}
-          {signatureCount === 1 && showCenterLogo && layoutConfig.footer.centerLogoUrl && (
-            <div className="flex justify-center mt-4">
-              <img 
-                src={layoutConfig.footer.centerLogoUrl}
-                alt="Logo CIVENI"
-                className="h-10 w-auto object-contain"
-                onError={(e) => {
-                  const parent = (e.target as HTMLImageElement).parentElement;
-                  if (parent) {
-                    parent.innerHTML = '<span class="text-xs font-bold text-purple-700">III CIVENI 2025</span>';
-                  }
-                }}
-              />
-            </div>
-          )}
         </div>
       </div>
     </Card>
