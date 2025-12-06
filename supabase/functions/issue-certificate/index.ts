@@ -752,8 +752,9 @@ const createCertificatePdf = async (
     : "de 11 a 13 de dezembro de 2025, com carga horária de";
   const datePart1 = sanitizeForPdf(datePart1Raw);
   
-  // Horas em NEGRITO
-  const hoursTextRaw = `${hours || "60"} ${language === "en-US" ? "hours" : language === "es-ES" ? "horas" : language === "tr-TR" ? "saat" : "horas"}.`;
+  // Horas em NEGRITO - remover sufixo "h" se existir no valor do banco
+  const hoursValue = (hours || "60").replace(/h$/i, "").trim();
+  const hoursTextRaw = `${hoursValue} ${language === "en-US" ? "hours" : language === "es-ES" ? "horas" : language === "tr-TR" ? "saat" : "horas"}.`;
   const hoursText = sanitizeForPdf(hoursTextRaw);
   
   // Calcular larguras
