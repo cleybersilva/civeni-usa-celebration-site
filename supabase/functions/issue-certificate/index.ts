@@ -504,11 +504,11 @@ const createCertificatePdf = async (
   }
 
   // ===== TÍTULO PRINCIPAL =====
-  // Usar texto com acentos corretos para português
+  // Usar texto com acentos corretos para português e espanhol
   const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
-    : language === "es-ES" ? "CERTIFICADO DE PARTICIPACION"
+    : language === "es-ES" ? "CERTIFICADO DE PARTICIPACIÓN"
     : language === "tr-TR" ? "KATILIM SERTIFIKASI"
-    : "CERTIFICADO DE PARTICIPACAO";
+    : "CERTIFICADO DE PARTICIPAÇÃO";
   const titleText = sanitizeForPdf(titleTextRaw);
   
   const titleSize = 28;
