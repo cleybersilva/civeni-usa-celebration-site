@@ -477,6 +477,32 @@ const createCertificatePdf = async (
     console.log("Could not load CIVENI header logo:", headerLogoError);
   }
 
+  // ===== CARREGAR ASSINATURA DA ACILINA =====
+  let signatureImage = null;
+  try {
+    const signatureUrl = "https://drive.google.com/uc?export=download&id=1r-vokG2OeDBViQuvWVFuGGqYLbu40FR3";
+    console.log("Loading signature from:", signatureUrl);
+    
+    const signatureResponse = await fetch(signatureUrl);
+    if (signatureResponse.ok) {
+      const signatureBytes = new Uint8Array(await signatureResponse.arrayBuffer());
+      console.log("Signature bytes length:", signatureBytes.length);
+      
+      const isPng = signatureBytes[0] === 0x89 && signatureBytes[1] === 0x50 && signatureBytes[2] === 0x4E && signatureBytes[3] === 0x47;
+      const isJpg = signatureBytes[0] === 0xFF && signatureBytes[1] === 0xD8;
+      
+      if (isPng) {
+        signatureImage = await pdfDoc.embedPng(signatureBytes);
+        console.log("Signature embedded as PNG successfully");
+      } else if (isJpg) {
+        signatureImage = await pdfDoc.embedJpg(signatureBytes);
+        console.log("Signature embedded as JPG successfully");
+      }
+    }
+  } catch (sigError) {
+    console.log("Could not load signature:", sigError);
+  }
+
   // ===== TÍTULO PRINCIPAL =====
   // Usar texto com acentos corretos para português
   const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
@@ -717,6 +743,18 @@ const createCertificatePdf = async (
     : "Presidente da VCCU");
   
   const sigX = width / 2; // Centralizado
+  
+  // Desenhar imagem da assinatura acima da linha
+  if (signatureImage) {
+    const sigImgHeight = 40;
+    const sigImgDims = signatureImage.scale(sigImgHeight / signatureImage.height);
+    page.drawImage(signatureImage, {
+      x: sigX - sigImgDims.width / 2,
+      y: sigY + 10,
+      width: sigImgDims.width,
+      height: sigImgDims.height,
+    });
+  }
   
   // Linha de assinatura
   page.drawLine({
