@@ -95,25 +95,57 @@ export const ApprovedWorksManager = () => {
 
   const getAdminSession = () => {
     const sessionRaw = localStorage.getItem('adminSession');
-    if (!sessionRaw) throw new Error('Sessão administrativa inválida. Faça login novamente.');
+    if (!sessionRaw) {
+      console.error('[getAdminSession] No adminSession in localStorage');
+      throw new Error('Sessão administrativa inválida. Faça login novamente.');
+    }
     
     const parsed = JSON.parse(sessionRaw);
     const email = parsed?.user?.email || '';
-    const token = parsed?.session_token || parsed?.sessionToken;
+    const token = parsed?.session_token;
+    const expires = parsed?.expires;
     
-    if (!email || !token) throw new Error('Sessão administrativa inválida. Faça login novamente.');
+    console.log('[getAdminSession] Session data:', { 
+      email, 
+      hasToken: !!token, 
+      expires: expires ? new Date(expires).toISOString() : 'N/A',
+      now: new Date().toISOString(),
+      isExpired: expires ? Date.now() > expires : 'unknown'
+    });
+    
+    if (!email || !token) {
+      console.error('[getAdminSession] Missing email or token:', { email, hasToken: !!token });
+      throw new Error('Sessão administrativa inválida. Faça login novamente.');
+    }
+    
+    // Check if session is expired locally
+    if (expires && Date.now() > expires) {
+      console.error('[getAdminSession] Session expired locally');
+      localStorage.removeItem('adminSession');
+      throw new Error('Sessão expirada. Faça login novamente.');
+    }
+    
     return { email, token };
   };
 
   const createMutation = useMutation({
     mutationFn: async (data: WorkFormData) => {
       const { email, token } = getAdminSession();
+      console.log('[createMutation] Calling RPC with:', { 
+        email, 
+        tokenPrefix: token?.substring(0, 8) + '...',
+        workData: data 
+      });
       const { data: result, error } = await supabase.rpc('admin_upsert_approved_work', {
         work_data: data as any,
         user_email: email,
         session_token: token,
       });
-      if (error) throw error;
+      if (error) {
+        console.error('[createMutation] RPC error:', error);
+        throw error;
+      }
+      console.log('[createMutation] RPC success:', result);
       return result;
     },
     onSuccess: () => {
@@ -123,6 +155,7 @@ export const ApprovedWorksManager = () => {
       resetForm();
     },
     onError: (error: any) => {
+      console.error('[createMutation] Error:', error);
       toast.error(`Erro ao criar artigo: ${error.message}`);
     },
   });
