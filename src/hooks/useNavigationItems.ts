@@ -79,13 +79,6 @@ export function useNavigationItems() {
   // Upsert mutation
   const upsertMutation = useMutation({
     mutationFn: async (formData: NavigationItemFormData) => {
-      const sessionToken = localStorage.getItem('admin_session_token');
-      const userEmail = localStorage.getItem('admin_email');
-
-      if (!sessionToken || !userEmail) {
-        throw new Error('Sessão não encontrada');
-      }
-
       const { data, error } = await supabase.rpc('admin_upsert_navigation_item', {
         p_id: formData.id || null,
         p_type: formData.type,
