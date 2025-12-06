@@ -366,9 +366,20 @@ const createCertificatePdf = async (
     const vccuLogoUrl = "https://civeni.com/uploads/vccu-logo-certificate.png";
     const vccuLogoResponse = await fetch(vccuLogoUrl);
     if (vccuLogoResponse.ok) {
-      const vccuLogoBytes = await vccuLogoResponse.arrayBuffer();
-      vccuLogoImage = await pdfDoc.embedPng(new Uint8Array(vccuLogoBytes));
-      console.log("VCCU logo embedded successfully");
+      const vccuLogoBytes = new Uint8Array(await vccuLogoResponse.arrayBuffer());
+      // Detectar formato da imagem pelos bytes mágicos
+      const isPng = vccuLogoBytes[0] === 0x89 && vccuLogoBytes[1] === 0x50 && vccuLogoBytes[2] === 0x4E && vccuLogoBytes[3] === 0x47;
+      const isJpg = vccuLogoBytes[0] === 0xFF && vccuLogoBytes[1] === 0xD8;
+      
+      if (isPng) {
+        vccuLogoImage = await pdfDoc.embedPng(vccuLogoBytes);
+        console.log("VCCU logo embedded as PNG successfully");
+      } else if (isJpg) {
+        vccuLogoImage = await pdfDoc.embedJpg(vccuLogoBytes);
+        console.log("VCCU logo embedded as JPG successfully");
+      } else {
+        console.log("VCCU logo format not recognized, skipping");
+      }
     }
   } catch (logoError) {
     console.log("Could not load VCCU logo, continuing without it:", logoError);
@@ -673,9 +684,20 @@ const createCertificatePdf = async (
     const civeniLogoUrl = "https://civeni.com/uploads/civeni-logo-certificate.png";
     const civeniLogoResponse = await fetch(civeniLogoUrl);
     if (civeniLogoResponse.ok) {
-      const civeniLogoBytes = await civeniLogoResponse.arrayBuffer();
-      civeniLogoImage = await pdfDoc.embedPng(new Uint8Array(civeniLogoBytes));
-      console.log("CIVENI logo embedded successfully");
+      const civeniLogoBytes = new Uint8Array(await civeniLogoResponse.arrayBuffer());
+      // Detectar formato da imagem pelos bytes mágicos
+      const isPng = civeniLogoBytes[0] === 0x89 && civeniLogoBytes[1] === 0x50 && civeniLogoBytes[2] === 0x4E && civeniLogoBytes[3] === 0x47;
+      const isJpg = civeniLogoBytes[0] === 0xFF && civeniLogoBytes[1] === 0xD8;
+      
+      if (isPng) {
+        civeniLogoImage = await pdfDoc.embedPng(civeniLogoBytes);
+        console.log("CIVENI logo embedded as PNG successfully");
+      } else if (isJpg) {
+        civeniLogoImage = await pdfDoc.embedJpg(civeniLogoBytes);
+        console.log("CIVENI logo embedded as JPG successfully");
+      } else {
+        console.log("CIVENI logo format not recognized, skipping");
+      }
     }
   } catch (logoError) {
     console.log("Could not load CIVENI logo, continuing without it:", logoError);
