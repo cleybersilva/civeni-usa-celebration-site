@@ -417,7 +417,32 @@ const createCertificatePdf = async (
     console.log("Could not load VCCU logo, continuing without it:", logoError);
   }
 
+  // ===== CARREGAR LOGO CIVENI PARA O CABEÇALHO =====
+  let civeniHeaderLogoImage = null;
+  try {
+    const civeniHeaderLogoUrl = "https://civeni.com/uploads/civeni-2025-logo-header.png";
+    console.log("Trying CIVENI header logo URL:", civeniHeaderLogoUrl);
+    const civeniHeaderResponse = await fetch(civeniHeaderLogoUrl);
+    
+    if (civeniHeaderResponse.ok) {
+      const civeniHeaderBytes = new Uint8Array(await civeniHeaderResponse.arrayBuffer());
+      const isPng = civeniHeaderBytes[0] === 0x89 && civeniHeaderBytes[1] === 0x50 && civeniHeaderBytes[2] === 0x4E && civeniHeaderBytes[3] === 0x47;
+      const isJpg = civeniHeaderBytes[0] === 0xFF && civeniHeaderBytes[1] === 0xD8;
+      
+      if (isPng) {
+        civeniHeaderLogoImage = await pdfDoc.embedPng(civeniHeaderBytes);
+        console.log("CIVENI header logo embedded as PNG successfully");
+      } else if (isJpg) {
+        civeniHeaderLogoImage = await pdfDoc.embedJpg(civeniHeaderBytes);
+        console.log("CIVENI header logo embedded as JPG successfully");
+      }
+    }
+  } catch (headerLogoError) {
+    console.log("Could not load CIVENI header logo:", headerLogoError);
+  }
+
   // ===== TÍTULO PRINCIPAL =====
+  // Usar texto com acentos corretos para português
   const titleTextRaw = language === "en-US" ? "CERTIFICATE OF PARTICIPATION" 
     : language === "es-ES" ? "CERTIFICADO DE PARTICIPACION"
     : language === "tr-TR" ? "KATILIM SERTIFIKASI"
@@ -427,13 +452,18 @@ const createCertificatePdf = async (
   const titleSize = 28;
   const titleWidth = titleFont.widthOfTextAtSize(titleText, titleSize);
   
-  // Calcular posições - logo e título próximos e centralizados juntos
+  // Calcular posições - VCCU logo esquerda, título centro, CIVENI logo direita
   const logoSize = 55;
-  const logoGap = 15; // Espaço entre logo e título
-  const totalContentWidth = (vccuLogoImage ? logoSize + logoGap : 0) + titleWidth;
+  const civeniHeaderLogoSize = 50;
+  const logoGap = 15;
+  
+  // Calcular largura total do conteúdo: VCCU logo + gap + título + gap + CIVENI logo
+  const vccuWidth = vccuLogoImage ? logoSize + logoGap : 0;
+  const civeniWidth = civeniHeaderLogoImage ? logoGap + civeniHeaderLogoSize * 2.5 : 0; // CIVENI logo é mais largo
+  const totalContentWidth = vccuWidth + titleWidth + civeniWidth;
   const contentStartX = (width - totalContentWidth) / 2;
   
-  // Desenhar logo VCCU se carregado
+  // Desenhar logo VCCU se carregado (esquerda do título)
   if (vccuLogoImage) {
     const logoDims = vccuLogoImage.scale(logoSize / vccuLogoImage.height);
     const logoX = contentStartX;
@@ -447,7 +477,7 @@ const createCertificatePdf = async (
     });
   }
   
-  // Posição X do título (após o logo ou centralizado se não houver logo)
+  // Posição X do título (após o logo VCCU)
   const titleX = vccuLogoImage ? contentStartX + logoSize + logoGap : (width - titleWidth) / 2;
   
   page.drawText(titleText, {
@@ -457,6 +487,20 @@ const createCertificatePdf = async (
     font: titleFont,
     color: rgb(1, 1, 1),
   });
+  
+  // Desenhar logo CIVENI à direita do título
+  if (civeniHeaderLogoImage) {
+    const civeniLogoDims = civeniHeaderLogoImage.scale(civeniHeaderLogoSize / civeniHeaderLogoImage.height);
+    const civeniLogoX = titleX + titleWidth + logoGap;
+    const civeniLogoY = headerY + (headerHeight - civeniLogoDims.height) / 2;
+    
+    page.drawImage(civeniHeaderLogoImage, {
+      x: civeniLogoX,
+      y: civeniLogoY,
+      width: civeniLogoDims.width,
+      height: civeniLogoDims.height,
+    });
+  }
 
   // ===== SUBTÍTULO DO EVENTO =====
   const subtitleTextRaw = "III CIVENI 2025 - International Multidisciplinary Congress";
@@ -697,86 +741,7 @@ const createCertificatePdf = async (
     color: rgb(0.9, 0.9, 0.9),
   });
 
-  // ===== CIVENI LOGO CENTRALIZADO ENTRE ASSINATURAS =====
-  let civeniLogoImage = null;
-  try {
-    // Tentar carregar logo CIVENI de diferentes URLs
-    const civeniLogoUrls = [
-      "https://civeni.com/assets/civeni-2025-logo.png",
-      "https://civeni.com/uploads/civeni-2025-logo-sidebar.png"
-    ];
-    
-    for (const civeniLogoUrl of civeniLogoUrls) {
-      try {
-        console.log("Trying CIVENI logo URL:", civeniLogoUrl);
-        const civeniLogoResponse = await fetch(civeniLogoUrl);
-        console.log("CIVENI logo fetch response status:", civeniLogoResponse.status);
-        
-        if (civeniLogoResponse.ok) {
-          const civeniLogoBytes = new Uint8Array(await civeniLogoResponse.arrayBuffer());
-          console.log("CIVENI logo bytes length:", civeniLogoBytes.length);
-          console.log("CIVENI logo first 12 bytes:", Array.from(civeniLogoBytes.slice(0, 12)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
-          
-          // Detectar formato da imagem pelos bytes mágicos
-          const isPng = civeniLogoBytes[0] === 0x89 && civeniLogoBytes[1] === 0x50 && civeniLogoBytes[2] === 0x4E && civeniLogoBytes[3] === 0x47;
-          const isJpg = civeniLogoBytes[0] === 0xFF && civeniLogoBytes[1] === 0xD8;
-          // WebP: RIFF....WEBP
-          const isWebP = civeniLogoBytes[0] === 0x52 && civeniLogoBytes[1] === 0x49 && civeniLogoBytes[2] === 0x46 && civeniLogoBytes[3] === 0x46 &&
-                         civeniLogoBytes[8] === 0x57 && civeniLogoBytes[9] === 0x45 && civeniLogoBytes[10] === 0x42 && civeniLogoBytes[11] === 0x50;
-          
-          console.log("CIVENI logo format detection - isPng:", isPng, "isJpg:", isJpg, "isWebP:", isWebP);
-          
-          if (isPng) {
-            civeniLogoImage = await pdfDoc.embedPng(civeniLogoBytes);
-            console.log("CIVENI logo embedded as PNG successfully");
-            break;
-          } else if (isJpg) {
-            civeniLogoImage = await pdfDoc.embedJpg(civeniLogoBytes);
-            console.log("CIVENI logo embedded as JPG successfully");
-            break;
-          } else if (isWebP) {
-            console.log("CIVENI logo is WebP format - NOT SUPPORTED by pdf-lib, trying next URL");
-            continue;
-          } else {
-            console.log("CIVENI logo format unknown, trying next URL");
-            continue;
-          }
-        }
-      } catch (urlError) {
-        console.log("Error loading CIVENI logo from URL:", civeniLogoUrl, urlError);
-        continue;
-      }
-    }
-  } catch (logoError) {
-    console.log("Could not load CIVENI logo, continuing without it:", logoError);
-  }
-
-  // Desenhar logo CIVENI centralizado abaixo da assinatura (acima do rodapé)
-  if (civeniLogoImage) {
-    const civeniLogoHeight = 45; // Tamanho um pouco menor
-    const civeniLogoDims = civeniLogoImage.scale(civeniLogoHeight / civeniLogoImage.height);
-    const civeniLogoX = (width - civeniLogoDims.width) / 2;
-    const civeniLogoY = sigY - 75; // Posicionado abaixo da assinatura, mas acima do rodapé
-    
-    page.drawImage(civeniLogoImage, {
-      x: civeniLogoX,
-      y: civeniLogoY,
-      width: civeniLogoDims.width,
-      height: civeniLogoDims.height,
-    });
-  } else {
-    // Fallback caso o logo não carregue - desenhar texto simples
-    const badgeText = "III CIVENI 2025";
-    const badgeTextWidth = titleFont.widthOfTextAtSize(badgeText, 12);
-    
-    page.drawText(badgeText, {
-      x: (width - badgeTextWidth) / 2,
-      y: sigY - 65,
-      size: 12,
-      font: titleFont,
-      color: rgb(CIVENI_COLORS.purple.r, CIVENI_COLORS.purple.g, CIVENI_COLORS.purple.b),
-    });
-  }
+  // Logo CIVENI foi movida para o cabeçalho - não desenhar abaixo da assinatura
 
   return await pdfDoc.save();
 };
