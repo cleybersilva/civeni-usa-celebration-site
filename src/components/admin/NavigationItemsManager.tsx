@@ -41,6 +41,7 @@ export function NavigationItemsManager() {
     deleteItem,
     toggleVisibility,
     toggleStatus,
+    toggleRestricted,
     isUpserting,
     isDeleting,
   } = useNavigationItems();
@@ -267,11 +268,18 @@ export function NavigationItemsManager() {
                         </Button>
                       </TableCell>
                       <TableCell className="text-center">
-                        {item.restricted_to_registered ? (
-                          <Lock className="h-4 w-4 text-amber-600 mx-auto" />
-                        ) : (
-                          <Unlock className="h-4 w-4 text-muted-foreground mx-auto" />
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleRestricted(item)}
+                          title={item.restricted_to_registered ? 'Remover restrição' : 'Restringir a inscritos'}
+                        >
+                          {item.restricted_to_registered ? (
+                            <Lock className="h-4 w-4 text-amber-600" />
+                          ) : (
+                            <Unlock className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </Button>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
