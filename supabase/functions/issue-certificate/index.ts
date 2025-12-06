@@ -619,24 +619,45 @@ const createCertificatePdf = async (
   const mainTextSize = 12;
   const maxTextWidth = width - 120; // Margem para texto
   
-  // Texto principal completo traduzido nos 4 idiomas
-  const mainTextLine1Raw = language === "en-US" 
-    ? "For participation in the III International Multidisciplinary Congress CIVENI of Veni,"
+  // Texto principal completo traduzido nos 4 idiomas - Nome do evento em NEGRITO
+  const eventNameRaw = language === "en-US" 
+    ? "III CIVENI - International Multidisciplinary Congress of VCCU"
     : language === "es-ES"
-    ? "Por la participación en el III Congreso Internacional Multidisciplinario CIVENI de Veni,"
+    ? "III CIVENI - Congreso Internacional Multidisciplinario de VCCU"
     : language === "tr-TR"
-    ? "Veni'nin III. Uluslararasi Multidisipliner CIVENI Kongresi'ne katilimi icin,"
-    : "Pela participação no III Congresso Internacional Multidisciplinar CIVENI da Veni,";
-  const mainTextLine1 = sanitizeForPdf(mainTextLine1Raw);
+    ? "III CIVENI - VCCU Uluslararasi Multidisipliner Kongresi"
+    : "III CIVENI - Congresso Internacional Multidisciplinar da VCCU";
+  const eventName = sanitizeForPdf(eventNameRaw);
 
-  const mainTextWidth1 = textFont.widthOfTextAtSize(mainTextLine1, mainTextSize);
-  
-  page.drawText(mainTextLine1, {
-    x: (width - mainTextWidth1) / 2,
+  const participationTextRaw = language === "en-US" 
+    ? "For participation in the"
+    : language === "es-ES"
+    ? "Por la participación en el"
+    : language === "tr-TR"
+    ? "Katilimi icin:"
+    : "Pela participação no";
+  const participationText = sanitizeForPdf(participationTextRaw);
+
+  // Desenhar texto de participação
+  const participationWidth = textFont.widthOfTextAtSize(participationText, mainTextSize);
+  page.drawText(participationText, {
+    x: (width - participationWidth) / 2,
     y: currentY,
     size: mainTextSize,
     font: textFont,
     color: rgb(0.3, 0.3, 0.3),
+  });
+
+  currentY -= 20;
+
+  // Desenhar nome do evento em NEGRITO (usando titleFont que é bold)
+  const eventNameWidth = titleFont.widthOfTextAtSize(eventName, mainTextSize + 1);
+  page.drawText(eventName, {
+    x: (width - eventNameWidth) / 2,
+    y: currentY,
+    size: mainTextSize + 1,
+    font: titleFont,
+    color: rgb(CIVENI_COLORS.blue.r, CIVENI_COLORS.blue.g, CIVENI_COLORS.blue.b),
   });
 
   currentY -= 20;
