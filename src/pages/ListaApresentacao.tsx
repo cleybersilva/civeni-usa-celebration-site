@@ -208,8 +208,8 @@ const ListaApresentacao = () => {
                               <TableHeader>
                                 <TableRow className="bg-gray-50">
                                   <TableHead className="w-20 text-center font-bold">Nº</TableHead>
-                                  <TableHead className="font-bold">{t('works.approvedList.tableTitle', 'Título')}</TableHead>
-                                  <TableHead className="w-64 font-bold">{t('works.approvedList.tableAuthor', 'Autor Responsável')}</TableHead>
+                                  <TableHead className="text-center font-bold">{t('works.approvedList.tableTitle', 'Título')}</TableHead>
+                                  <TableHead className="w-64 text-center font-bold">{t('works.approvedList.tableAuthor', 'Autor Responsável')}</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -221,10 +221,10 @@ const ListaApresentacao = () => {
                                     <TableCell className="text-center font-semibold text-civeni-blue">
                                       {work.numero}
                                     </TableCell>
-                                    <TableCell className="font-medium">
+                                    <TableCell className="text-center font-medium">
                                       {work.titulo}
                                     </TableCell>
-                                    <TableCell className="text-gray-600">
+                                    <TableCell className="text-center text-gray-600">
                                       {work.autor_responsavel}
                                     </TableCell>
                                   </TableRow>
