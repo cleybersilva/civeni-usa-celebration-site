@@ -91,9 +91,10 @@ function App() {
                 <Route path="/apresentacao-oral" element={<ApresentacaoOral />} />
                 <Route path="/lista-apresentacao" element={<ListaApresentacao />} />
                 <Route path="/sessoes-poster" element={<SessoesPoster />} />
-                {/* Redirect /manuscritos para /envio-de-videos */}
-                <Route path="/manuscritos" element={<Navigate to="/envio-de-videos" replace />} />
-                <Route path="/envio-de-videos" element={<EnvioVideos />} />
+                {/* Redirect /manuscritos para /envio-videos */}
+                <Route path="/manuscritos" element={<Navigate to="/envio-videos" replace />} />
+                <Route path="/envio-videos" element={<EnvioVideos />} />
+                <Route path="/envio-de-videos" element={<Navigate to="/envio-videos" replace />} />
                 <Route path="/templates-artigos-slides" element={<TemplatesArtigosSlides />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/eventos" element={<Eventos />} />
