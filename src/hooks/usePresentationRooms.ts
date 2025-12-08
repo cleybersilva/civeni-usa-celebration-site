@@ -116,9 +116,9 @@ export const usePublicPresentationRoomsWithAssignments = () => {
         .from('presentation_rooms')
         .select('*')
         .eq('status', 'publicado')
+        .order('ordem_sala', { ascending: true, nullsFirst: false })
         .order('data_apresentacao', { ascending: true })
-        .order('horario_inicio_sala', { ascending: true })
-        .order('ordem_sala', { ascending: true });
+        .order('horario_inicio_sala', { ascending: true });
 
       if (roomsError) throw roomsError;
 
