@@ -330,14 +330,13 @@ export const PresentationRoomsManager = () => {
 
   useEffect(() => {
     if (rooms && rooms.length > 0) {
-      setOrderedIds((prev) => {
-        if (prev.length === 0) return rooms.map((room) => room.id);
-        const existing = prev.filter((id) => rooms.some((room) => room.id === id));
-        const missing = rooms
-          .map((room) => room.id)
-          .filter((id) => !existing.includes(id));
-        return [...existing, ...missing];
+      // Sort rooms by ordem_sala from database first, then use that order
+      const sortedByDbOrder = [...rooms].sort((a, b) => {
+        const orderA = a.ordem_sala ?? 9999;
+        const orderB = b.ordem_sala ?? 9999;
+        return orderA - orderB;
       });
+      setOrderedIds(sortedByDbOrder.map((room) => room.id));
     }
   }, [rooms]);
 
