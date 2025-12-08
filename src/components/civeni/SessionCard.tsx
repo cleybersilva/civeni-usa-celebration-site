@@ -104,26 +104,37 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
     if (!title) return title;
     
     const sessionTitles = t('schedule.sessionTitles', { returnObjects: true }) as Record<string, string>;
-    if (!sessionTitles || Object.keys(sessionTitles).length === 0) return title;
+    
+    // Early return if no translations available
+    if (!sessionTitles || typeof sessionTitles !== 'object' || Object.keys(sessionTitles).length === 0) {
+      return title;
+    }
     
     // Try exact match first
     if (sessionTitles[title]) {
       return sessionTitles[title];
     }
     
-    // Try with normalized whitespace
-    const normalizedTitle = title.replace(/\s+/g, ' ').trim();
+    // Try with normalized whitespace (remove extra spaces, trim, handle newlines)
+    const normalizedTitle = title.replace(/[\s\n\r]+/g, ' ').trim();
     if (sessionTitles[normalizedTitle]) {
       return sessionTitles[normalizedTitle];
     }
     
-    // Try matching normalized keys
+    // Try matching normalized keys against normalized title
     for (const [key, value] of Object.entries(sessionTitles)) {
       if (key && value) {
-        const normalizedKey = key.replace(/\s+/g, ' ').trim();
+        const normalizedKey = key.replace(/[\s\n\r]+/g, ' ').trim();
         if (normalizedTitle === normalizedKey) {
           return value;
         }
+      }
+    }
+    
+    // Try partial match (for titles with trailing/leading spaces in DB)
+    for (const [key, value] of Object.entries(sessionTitles)) {
+      if (key && value && normalizedTitle === key.trim()) {
+        return value;
       }
     }
     
