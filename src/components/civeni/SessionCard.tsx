@@ -103,38 +103,34 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
   const getTranslatedSessionTitle = (title: string) => {
     if (!title) return title;
     
-    // Get current language - if Portuguese, return original
     const currentLang = i18n.language;
-    console.log('🔍 SessionCard - Language:', currentLang, 'Title:', title.substring(0, 40));
     
+    // If Portuguese, return original
     if (currentLang === 'pt' || currentLang === 'pt-BR') {
       return title;
     }
     
-    const sessionTitles = t('schedule.sessionTitles', { returnObjects: true }) as Record<string, string>;
+    // Get translations directly from resource bundle
+    const resources = i18n.getResourceBundle(currentLang, 'translation') as Record<string, any>;
+    const sessionTitles = resources?.schedule?.sessionTitles as Record<string, string> | undefined;
     
-    console.log('🔍 SessionTitles object type:', typeof sessionTitles, 'Keys count:', sessionTitles ? Object.keys(sessionTitles).length : 0);
-    
-    // Early return if no translations available
-    if (!sessionTitles || typeof sessionTitles !== 'object' || Object.keys(sessionTitles).length === 0) {
-      console.log('❌ No sessionTitles found!');
+    if (!sessionTitles || typeof sessionTitles !== 'object') {
+      console.log('❌ No sessionTitles in bundle for', currentLang);
       return title;
     }
     
-    // Normalize function for comparison
+    // Normalize function
     const normalize = (str: string) => str.replace(/[\s\n\r]+/g, ' ').trim().toLowerCase();
     const normalizedTitle = normalize(title);
     
     // Try exact match first
     if (sessionTitles[title]) {
-      console.log('✅ Exact match found for:', title.substring(0, 30));
       return sessionTitles[title];
     }
     
     // Try normalized match
     for (const [key, value] of Object.entries(sessionTitles)) {
       if (key && value && normalize(key) === normalizedTitle) {
-        console.log('✅ Normalized match found for:', title.substring(0, 30));
         return value;
       }
     }
@@ -145,27 +141,32 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
       if (key && value) {
         const keyNoPunct = normalize(key).replace(/[.!?]+$/, '');
         if (titleNoPunct === keyNoPunct) {
-          console.log('✅ NoPunct match found for:', title.substring(0, 30));
           return value;
         }
       }
     }
     
-    console.log('❌ No translation found for:', title.substring(0, 50), '| Normalized:', normalizedTitle.substring(0, 50));
+    console.log('❌ No translation for:', title.substring(0, 40));
     return title;
   };
 
   const getTranslatedSessionDescription = (description: string) => {
     if (!description) return description;
     
-    // Get current language - if Portuguese, return original
     const currentLang = i18n.language;
+    
+    // If Portuguese, return original
     if (currentLang === 'pt' || currentLang === 'pt-BR') {
       return description;
     }
     
-    const sessionDescriptions = t('schedule.sessionDescriptions', { returnObjects: true }) as Record<string, string>;
-    if (!sessionDescriptions || Object.keys(sessionDescriptions).length === 0) return description;
+    // Get translations directly from resource bundle
+    const resources = i18n.getResourceBundle(currentLang, 'translation') as Record<string, any>;
+    const sessionDescriptions = resources?.schedule?.sessionDescriptions as Record<string, string> | undefined;
+    
+    if (!sessionDescriptions || typeof sessionDescriptions !== 'object') {
+      return description;
+    }
     
     // Normalize function
     const normalize = (str: string) => str.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -183,7 +184,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
       }
     }
     
-    // Try partial replacement for descriptions containing translatable parts
+    // Try partial replacement
     let translatedDesc = description;
     for (const [key, value] of Object.entries(sessionDescriptions)) {
       if (key && value && translatedDesc.includes(key)) {
