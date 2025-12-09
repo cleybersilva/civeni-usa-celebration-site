@@ -105,14 +105,19 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
     
     // Get current language - if Portuguese, return original
     const currentLang = i18n.language;
+    console.log('🔍 SessionCard - Language:', currentLang, 'Title:', title.substring(0, 40));
+    
     if (currentLang === 'pt' || currentLang === 'pt-BR') {
       return title;
     }
     
     const sessionTitles = t('schedule.sessionTitles', { returnObjects: true }) as Record<string, string>;
     
+    console.log('🔍 SessionTitles object type:', typeof sessionTitles, 'Keys count:', sessionTitles ? Object.keys(sessionTitles).length : 0);
+    
     // Early return if no translations available
     if (!sessionTitles || typeof sessionTitles !== 'object' || Object.keys(sessionTitles).length === 0) {
+      console.log('❌ No sessionTitles found!');
       return title;
     }
     
@@ -122,12 +127,14 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
     
     // Try exact match first
     if (sessionTitles[title]) {
+      console.log('✅ Exact match found for:', title.substring(0, 30));
       return sessionTitles[title];
     }
     
     // Try normalized match
     for (const [key, value] of Object.entries(sessionTitles)) {
       if (key && value && normalize(key) === normalizedTitle) {
+        console.log('✅ Normalized match found for:', title.substring(0, 30));
         return value;
       }
     }
@@ -138,11 +145,13 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, isLive, isNext }) =>
       if (key && value) {
         const keyNoPunct = normalize(key).replace(/[.!?]+$/, '');
         if (titleNoPunct === keyNoPunct) {
+          console.log('✅ NoPunct match found for:', title.substring(0, 30));
           return value;
         }
       }
     }
     
+    console.log('❌ No translation found for:', title.substring(0, 50), '| Normalized:', normalizedTitle.substring(0, 50));
     return title;
   };
 
