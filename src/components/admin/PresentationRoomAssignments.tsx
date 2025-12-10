@@ -22,7 +22,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Search, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePresentationRoomDetails } from '@/hooks/usePresentationRooms';
 
@@ -81,6 +81,7 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
     autores: '',
     ordem: null,
   });
+  const [editingWorkId, setEditingWorkId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<AssignmentFormData>({
     submission_id: '',
@@ -312,7 +313,7 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
   };
 
   const createWorkMutation = useMutation({
-    mutationFn: async (data: RoomWorkFormData) => {
+    mutationFn: async (data: RoomWorkFormData & { id?: string }) => {
       const savedSession = localStorage.getItem('adminSession');
       if (!savedSession) {
         throw new Error('Sessão não encontrada');
@@ -327,6 +328,7 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
         'admin_upsert_room_work',
         {
           work_data: {
+            ...(data.id && { id: data.id }),
             sala_id: roomId,
             titulo_apresentacao: data.titulo_apresentacao,
             autores: data.autores,
@@ -342,11 +344,12 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['room-works', roomId] });
-      toast.success('Trabalho manual adicionado!');
+      toast.success(editingWorkId ? 'Trabalho manual atualizado!' : 'Trabalho manual adicionado!');
       setWorkForm({ titulo_apresentacao: '', autores: '', ordem: null });
+      setEditingWorkId(null);
     },
     onError: (error) => {
-      toast.error(`Erro ao adicionar trabalho manual: ${error.message}`);
+      toast.error(`Erro ao salvar trabalho manual: ${error.message}`);
     },
   });
 
@@ -389,7 +392,21 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
       toast.error('Informe título e autores do trabalho');
       return;
     }
-    createWorkMutation.mutate(workForm);
+    createWorkMutation.mutate(editingWorkId ? { ...workForm, id: editingWorkId } : workForm);
+  };
+
+  const handleEditWork = (work: any) => {
+    setEditingWorkId(work.id);
+    setWorkForm({
+      titulo_apresentacao: work.titulo_apresentacao,
+      autores: work.autores,
+      ordem: work.ordem,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingWorkId(null);
+    setWorkForm({ titulo_apresentacao: '', autores: '', ordem: null });
   };
 
 
@@ -731,10 +748,24 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
               required
             />
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            {editingWorkId && (
+              <Button type="button" variant="outline" onClick={handleCancelEdit} className="w-full md:w-auto">
+                Cancelar
+              </Button>
+            )}
             <Button type="submit" className="w-full md:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar
+              {editingWorkId ? (
+                <>
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Salvar
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar
+                </>
+              )}
             </Button>
           </div>
         </form>
@@ -759,13 +790,22 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
                   {work.autores}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deleteWorkMutation.mutate(work.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditWork(work)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteWorkMutation.mutate(work.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
