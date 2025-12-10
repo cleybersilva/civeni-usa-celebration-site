@@ -4757,6 +4757,7 @@ export type Database = {
         Args: { session_token: string; user_email: string; video_id: string }
         Returns: Json
       }
+      admin_delete_manual_work: { Args: { p_id: string }; Returns: boolean }
       admin_delete_navigation_item: { Args: { p_id: string }; Returns: boolean }
       admin_delete_presentation_assignment: {
         Args: {
@@ -4817,6 +4818,16 @@ export type Database = {
       }
       admin_upsert_live_stream_video: {
         Args: { session_token: string; user_email: string; video_data: Json }
+        Returns: Json
+      }
+      admin_upsert_manual_work: {
+        Args: {
+          p_autores?: string
+          p_id?: string
+          p_ordem?: number
+          p_sala_id?: string
+          p_titulo_apresentacao?: string
+        }
         Returns: Json
       }
       admin_upsert_navigation_item: {
