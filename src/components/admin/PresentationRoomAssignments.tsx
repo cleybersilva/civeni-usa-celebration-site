@@ -314,28 +314,14 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
 
   const createWorkMutation = useMutation({
     mutationFn: async (data: RoomWorkFormData & { id?: string }) => {
-      const savedSession = localStorage.getItem('adminSession');
-      if (!savedSession) {
-        throw new Error('Sessão não encontrada');
-      }
-
-      const sessionData = JSON.parse(savedSession);
-      if (!sessionData.session_token || !sessionData.user?.email) {
-        throw new Error('Sessão inválida');
-      }
-
       const { data: result, error } = await supabase.rpc(
-        'admin_upsert_room_work',
+        'admin_upsert_manual_work',
         {
-          work_data: {
-            ...(data.id && { id: data.id }),
-            sala_id: roomId,
-            titulo_apresentacao: data.titulo_apresentacao,
-            autores: data.autores,
-            ordem: data.ordem,
-          } as any,
-          user_email: sessionData.user.email,
-          session_token: sessionData.session_token,
+          p_id: data.id || null,
+          p_sala_id: roomId,
+          p_titulo_apresentacao: data.titulo_apresentacao,
+          p_autores: data.autores,
+          p_ordem: data.ordem,
         }
       );
 
@@ -355,22 +341,10 @@ export const PresentationRoomAssignments = ({ roomId, onBack }: Props) => {
 
   const deleteWorkMutation = useMutation({
     mutationFn: async (id: string) => {
-      const savedSession = localStorage.getItem('adminSession');
-      if (!savedSession) {
-        throw new Error('Sessão não encontrada');
-      }
-
-      const sessionData = JSON.parse(savedSession);
-      if (!sessionData.session_token || !sessionData.user?.email) {
-        throw new Error('Sessão inválida');
-      }
-
       const { data: result, error } = await supabase.rpc(
-        'admin_delete_room_work',
+        'admin_delete_manual_work',
         {
-          work_id: id,
-          user_email: sessionData.user.email,
-          session_token: sessionData.session_token,
+          p_id: id,
         }
       );
 
