@@ -14,7 +14,7 @@ interface TimezonesDisplayProps {
 }
 
 const TIMEZONES: TimezoneInfo[] = [
-  { country: 'EUA', emoji: '🇺🇸', timezone: 'America/Manaus' },
+  { country: 'EUA', emoji: '🇺🇸', timezone: 'America/New_York' },
   { country: 'Brasil', emoji: '🇧🇷', timezone: 'America/Fortaleza' },
   { country: 'Portugal', emoji: '🇵🇹', timezone: 'Europe/Lisbon' },
   { country: 'Ucrânia', emoji: '🇺🇦', timezone: 'Europe/Kiev' },
