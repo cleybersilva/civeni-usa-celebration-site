@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Eye, CheckCircle, XCircle, Trash2, ExternalLink, Search, Plus, Edit, Archive } from 'lucide-react';
+import { Eye, CheckCircle, XCircle, Trash2, ExternalLink, Search, Plus, Edit, Archive, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -236,6 +237,46 @@ const VideoSubmissionsManager = () => {
     }
   };
 
+  const handleExportXLSX = () => {
+    if (filteredSubmissions.length === 0) {
+      toast.error('Nenhum dado para exportar');
+      return;
+    }
+
+    const exportData = filteredSubmissions.map((sub) => ({
+      'Data de Envio': format(new Date(sub.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }),
+      'Nome': sub.nome,
+      'E-mail': sub.email,
+      'Tipo de Participante': sub.tipo_participante,
+      'Curso': sub.curso || '',
+      'Turma': sub.turma || '',
+      'Título do Trabalho': sub.work_title || '',
+      'URL do Vídeo': sub.video_url_original,
+      'Plataforma': sub.video_platform || '',
+      'Categoria': sub.category || '',
+      'Modalidade': sub.modality || '',
+      'Status': sub.status.charAt(0).toUpperCase() + sub.status.slice(1),
+      'Parecer': sub.parecer || '',
+      'Observações': sub.observacoes || '',
+      'Origem': sub.submission_origin === 'site' ? 'Site' : 'SaaS',
+      'Edição do Evento': sub.event_edition,
+      'Arquivado': sub.is_deleted ? 'Sim' : 'Não',
+      'Última Atualização': format(new Date(sub.updated_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Envio de Vídeos');
+    
+    // Ajustar largura das colunas
+    const colWidths = Object.keys(exportData[0]).map(key => ({ wch: Math.max(key.length, 15) }));
+    worksheet['!cols'] = colWidths;
+
+    const fileName = `envio_videos_civeni_${format(new Date(), 'yyyy-MM-dd_HHmm')}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+    toast.success('Arquivo exportado com sucesso!');
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
       pendente: 'secondary',
@@ -294,10 +335,16 @@ const VideoSubmissionsManager = () => {
             {showArchived && ' (incluindo excluídas)'}
           </p>
         </div>
-        <Button onClick={handleCreate} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-          <Plus className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-          Criar novo envio
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button onClick={handleExportXLSX} variant="outline" size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
+            <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            Exportar Excel
+          </Button>
+          <Button onClick={handleCreate} size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
+            <Plus className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            Criar novo envio
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}
