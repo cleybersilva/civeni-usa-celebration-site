@@ -117,8 +117,10 @@ const CertificateManager = () => {
       
       if (data) {
         setEvents(data);
+        // Garantir que, por padrão, o evento principal do CIVENI seja selecionado
         if (data.length > 0 && !selectedEvent) {
-          setSelectedEvent(data[0].id);
+          const civeniEvent = data.find((e) => e.slug === 'iii-civeni-2025');
+          setSelectedEvent((civeniEvent || data[0]).id);
         }
       }
     } catch (error) {

@@ -1090,11 +1090,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     // VALIDAÇÃO 2: Verificar palavras-chave
     const normalizedUserKeywords = keywords.map(normalizeText);
-    const normalizedOfficialKeywords = eventCert.keywords.map(normalizeText);
+    const normalizedOfficialKeywords = (eventCert.keywords || []).map(normalizeText);
+
+    console.log("[issue-certificate] User keywords:", keywords, "normalized:", normalizedUserKeywords);
+    console.log("[issue-certificate] Official keywords:", eventCert.keywords, "normalized:", normalizedOfficialKeywords);
 
     const matchedCount = normalizedUserKeywords.filter((userKw) =>
       normalizedOfficialKeywords.includes(userKw) && userKw.length > 0
     ).length;
+
+    console.log("[issue-certificate] matchedCount=", matchedCount, "required=", eventCert.required_correct);
 
     // Registrar tentativa
     await supabase.from("certificate_attempts").insert({
