@@ -367,13 +367,6 @@ const CertificadoEmissao = () => {
                         </span>
                       </div>
                       
-                       {!result.success && typeof result.matched === 'number' && (
-                         <p className="text-xs text-red-600 mt-2">
-                           {t('certificateEmission.youGot')} {result.matched}/3 {t('certificateEmission.keywordsCorrect')}. 
-                           {t('certificateEmission.minimumRequired')}: {event.event_certificates?.required_correct || 2}/3.
-                         </p>
-                       )}
-                      
                       {result.success && result.pdfUrl && (
                         <div className="mt-3">
                           <Button
