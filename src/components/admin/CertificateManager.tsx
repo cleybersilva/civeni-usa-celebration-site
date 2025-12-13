@@ -281,12 +281,13 @@ const CertificateManager = () => {
 
       console.log('[CertificateManager] Config salva com sucesso:', data);
 
+      // Recarregar config do banco para garantir sincronização
+      await loadCertificateConfig();
+
       toast({
         title: "Sucesso",
         description: "Configurações salvas com sucesso!"
       });
-
-      await loadCertificateConfig();
     } catch (error: any) {
       console.error('[CertificateManager] Erro ao salvar config:', error);
       toast({
@@ -299,7 +300,13 @@ const CertificateManager = () => {
     }
   };
   const updateKeyword = (index: number, value: string) => {
-    const newKeywords = [...(config.keywords || ['', '', ''])];
+    // Sempre trabalhar com exatamente 3 keywords
+    const currentKeywords = config.keywords || ['', '', ''];
+    const newKeywords = [
+      currentKeywords[0] || '',
+      currentKeywords[1] || '',
+      currentKeywords[2] || ''
+    ];
     newKeywords[index] = value;
     setConfig(prev => ({ ...prev, keywords: newKeywords }));
   };
@@ -704,11 +711,11 @@ const CertificateManager = () => {
                     Configure as 3 palavras-chave que serão solicitadas durante a emissão do certificado.
                   </p>
                   <div className="grid md:grid-cols-3 gap-3">
-                    {(config.keywords || ['', '', '']).map((keyword, index) => (
+                    {[0, 1, 2].map((index) => (
                       <div key={index} className="space-y-2">
                         <Label>Palavra-chave {index + 1}</Label>
                         <Input
-                          value={keyword}
+                          value={config.keywords?.[index] || ''}
                           onChange={(e) => updateKeyword(index, e.target.value)}
                           placeholder={`Digite a ${index + 1}ª palavra-chave`}
                         />
