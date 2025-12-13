@@ -133,6 +133,7 @@ const CertificateManager = () => {
 
     console.log('[CertificateManager] Carregando config para evento:', selectedEvent);
 
+    // Adicionar timestamp para forçar bypass de cache
     const { data, error } = await supabase
       .from('event_certificates')
       .select('*')
@@ -144,15 +145,21 @@ const CertificateManager = () => {
     }
 
     if (data) {
-      console.log('[CertificateManager] Config carregada:', data);
-      // Garante que keywords é array com 3 elementos
+      console.log('[CertificateManager] Config carregada do banco:', {
+        keywords: data.keywords,
+        required_correct: data.required_correct,
+        is_enabled: data.is_enabled
+      });
+      // Garante que keywords é array com 3 elementos (pega só os 3 primeiros únicos)
       const keywordsArray = Array.isArray(data.keywords) ? data.keywords : [];
-      while (keywordsArray.length < 3) {
-        keywordsArray.push('');
+      const uniqueKeywords = [...new Set(keywordsArray)].slice(0, 3);
+      while (uniqueKeywords.length < 3) {
+        uniqueKeywords.push('');
       }
+      console.log('[CertificateManager] Keywords processadas para UI:', uniqueKeywords);
       setConfig({
         ...data,
-        keywords: keywordsArray.slice(0, 3)
+        keywords: uniqueKeywords
       });
     } else {
       console.log('[CertificateManager] Nenhuma config encontrada, usando padrão');
@@ -280,13 +287,14 @@ const CertificateManager = () => {
       }
 
       console.log('[CertificateManager] Config salva com sucesso:', data);
+      console.log('[CertificateManager] Keywords salvas:', keywordsForDb.slice(0, 3));
 
       // Recarregar config do banco para garantir sincronização
       await loadCertificateConfig();
 
       toast({
         title: "Sucesso",
-        description: "Configurações salvas com sucesso!"
+        description: `Configurações salvas! Keywords: ${cleanedKeywords.join(', ')}`
       });
     } catch (error: any) {
       console.error('[CertificateManager] Erro ao salvar config:', error);
