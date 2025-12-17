@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
+import Stripe from "https://esm.sh/stripe@14.21.0";
 import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 
 const corsHeaders = {
@@ -1066,9 +1067,8 @@ const handler = async (req: Request): Promise<Response> => {
     // VALIDAÇÃO 1: Verificar se o e-mail existe na tabela de inscrições com pagamento confirmado
     const { data: registration, error: registrationError } = await supabase
       .from("event_registrations")
-      .select("id, email, full_name, payment_status")
+      .select("id, email, full_name, payment_status, stripe_session_id")
       .ilike("email", normalizedEmail)
-      .eq("payment_status", "completed")
       .maybeSingle();
 
     if (registrationError) {
@@ -1077,6 +1077,67 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!registration) {
       console.log("Email not found in registrations:", normalizedEmail);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: msg.emailNotRegistered,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+
+    let isPaymentCompleted = registration.payment_status === "completed";
+
+    // Se a inscrição está 'pending' mas o Stripe já marcou como pago, atualizar para 'completed'
+    if (!isPaymentCompleted && registration.stripe_session_id) {
+      try {
+        const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+          apiVersion: "2023-10-16",
+        });
+
+        const session = await stripe.checkout.sessions.retrieve(registration.stripe_session_id);
+
+        console.log(
+          "[issue-certificate] Registration not completed; Stripe session:",
+          registration.stripe_session_id,
+          "payment_status=",
+          session.payment_status,
+        );
+
+        if (session.payment_status === "paid") {
+          isPaymentCompleted = true;
+
+          const { error: updateError } = await supabase
+            .from("event_registrations")
+            .update({
+              payment_status: "completed",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", registration.id);
+
+          if (updateError) {
+            console.error(
+              "[issue-certificate] Failed to update registration payment_status to completed:",
+              updateError,
+            );
+          }
+        }
+      } catch (err) {
+        console.error(
+          "[issue-certificate] Stripe payment verification failed for session:",
+          registration.stripe_session_id,
+          err,
+        );
+      }
+    }
+
+    if (!isPaymentCompleted) {
+      console.log(
+        "Email found but payment not completed:",
+        normalizedEmail,
+        "status=",
+        registration.payment_status,
+      );
       return new Response(
         JSON.stringify({
           success: false,
