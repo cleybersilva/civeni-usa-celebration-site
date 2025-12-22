@@ -360,8 +360,8 @@ const createCertificatePdf = async (
     // Tentar carregar logo VCCU de diferentes URLs
     // Google Drive link convertido para download direto
     const vccuLogoUrls = [
-      // Google Drive link para logo CIVENI cabeça colorida
-      "https://drive.google.com/uc?export=download&id=1525O_m180-994B4PJJWr39pxN54oHT8V"
+      // Google Drive link para logo CIVENI cabeça colorida (IV CIVENI)
+      "https://drive.google.com/uc?export=download&id=1GuqO-hpGvoBlbr6rUuvZIS457792VRwM"
     ];
     
     for (const vccuLogoUrl of vccuLogoUrls) {
