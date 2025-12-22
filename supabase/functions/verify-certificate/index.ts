@@ -44,8 +44,7 @@ const handler = async (req: Request): Promise<Response> => {
         id,
         full_name,
         issued_at,
-        event_id,
-        events(slug, name)
+        event_id
       `)
       .eq('code', code)
       .single();
@@ -61,6 +60,20 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Fetch event details separately
+    let eventName = 'Evento CIVENI';
+    if (certificate.event_id) {
+      const { data: eventData } = await supabase
+        .from('events')
+        .select('slug')
+        .eq('id', certificate.event_id)
+        .single();
+      
+      if (eventData?.slug) {
+        eventName = eventData.slug;
+      }
+    }
+
     console.log('Certificate found:', certificate);
 
     return new Response(
@@ -68,8 +81,11 @@ const handler = async (req: Request): Promise<Response> => {
         valid: true,
         message: 'Certificado válido e autêntico',
         holderName: certificate.full_name,
-        eventSlug: (certificate.events as any)?.name || (certificate.events as any)?.slug || 'Evento CIVENI',
+        eventSlug: eventName,
         issuedAt: certificate.issued_at
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
       }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
