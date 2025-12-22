@@ -415,9 +415,8 @@ const createCertificatePdf = async (
     // Tentar múltiplas URLs para a logo do CIVENI
     // O Lovable CDN converte imagens para WebP, então precisamos usar uma fonte externa
     const civeniHeaderLogoUrls = [
-      // Google Drive link para logo CIVENI III 2025
-      "https://drive.google.com/uc?export=download&id=1zmZx3PQZbV-pYokpLBTNYfry1hVuQ70k",
-      "https://civeni.com/uploads/civeni-2025-logo-header.png"
+      // Logo IV CIVENI com texto em branco
+      "https://civeni.com/uploads/ivciveni-logo-certificate.png"
     ];
     
     for (const civeniHeaderLogoUrl of civeniHeaderLogoUrls) {
