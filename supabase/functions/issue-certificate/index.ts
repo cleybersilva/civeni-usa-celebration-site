@@ -1064,18 +1064,17 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // VALIDAÇÃO 1: Verificar se o e-mail existe na tabela de inscrições com pagamento confirmado
-    const { data: registration, error: registrationError } = await supabase
+    // VALIDAÇÃO 1: Verificar se o e-mail existe na tabela de inscrições - buscar TODOS os registros
+    const { data: registrations, error: registrationError } = await supabase
       .from("event_registrations")
       .select("id, email, full_name, payment_status, stripe_session_id")
-      .ilike("email", normalizedEmail)
-      .maybeSingle();
+      .ilike("email", normalizedEmail);
 
     if (registrationError) {
       console.error("Error checking registration:", registrationError);
     }
 
-    if (!registration) {
+    if (!registrations || registrations.length === 0) {
       console.log("Email not found in registrations:", normalizedEmail);
       return new Response(
         JSON.stringify({
@@ -1086,57 +1085,68 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    let isPaymentCompleted = registration.payment_status === "completed";
+    console.log(`[issue-certificate] Found ${registrations.length} registration(s) for email:`, normalizedEmail);
 
-    // Se a inscrição está 'pending' mas o Stripe já marcou como pago, atualizar para 'completed'
-    if (!isPaymentCompleted && registration.stripe_session_id) {
-      try {
-        const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-          apiVersion: "2023-10-16",
-        });
+    // Primeiro, verificar se algum registro já tem payment_status = 'completed'
+    let validRegistration = registrations.find(r => r.payment_status === "completed");
 
-        const session = await stripe.checkout.sessions.retrieve(registration.stripe_session_id);
+    // Se nenhum registro está 'completed', verificar cada stripe_session_id no Stripe
+    if (!validRegistration) {
+      const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+        apiVersion: "2023-10-16",
+      });
 
-        console.log(
-          "[issue-certificate] Registration not completed; Stripe session:",
-          registration.stripe_session_id,
-          "payment_status=",
-          session.payment_status,
-        );
+      for (const reg of registrations) {
+        if (reg.stripe_session_id) {
+          try {
+            const session = await stripe.checkout.sessions.retrieve(reg.stripe_session_id);
 
-        if (session.payment_status === "paid") {
-          isPaymentCompleted = true;
+            console.log(
+              "[issue-certificate] Checking Stripe session:",
+              reg.stripe_session_id,
+              "payment_status=",
+              session.payment_status,
+            );
 
-          const { error: updateError } = await supabase
-            .from("event_registrations")
-            .update({
-              payment_status: "completed",
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", registration.id);
+            if (session.payment_status === "paid") {
+              // Atualizar este registro para 'completed'
+              const { error: updateError } = await supabase
+                .from("event_registrations")
+                .update({
+                  payment_status: "completed",
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", reg.id);
 
-          if (updateError) {
+              if (updateError) {
+                console.error(
+                  "[issue-certificate] Failed to update registration payment_status:",
+                  updateError,
+                );
+              } else {
+                console.log("[issue-certificate] Updated registration", reg.id, "to completed");
+              }
+
+              validRegistration = { ...reg, payment_status: "completed" };
+              break; // Encontrou um pagamento válido, parar a busca
+            }
+          } catch (err) {
             console.error(
-              "[issue-certificate] Failed to update registration payment_status to completed:",
-              updateError,
+              "[issue-certificate] Stripe verification failed for session:",
+              reg.stripe_session_id,
+              err,
             );
           }
         }
-      } catch (err) {
-        console.error(
-          "[issue-certificate] Stripe payment verification failed for session:",
-          registration.stripe_session_id,
-          err,
-        );
       }
     }
 
-    if (!isPaymentCompleted) {
+    if (!validRegistration) {
       console.log(
-        "Email found but payment not completed:",
+        "Email found but no completed payment in any registration:",
         normalizedEmail,
-        "status=",
-        registration.payment_status,
+        "Total registrations:",
+        registrations.length,
       );
       return new Response(
         JSON.stringify({
@@ -1147,7 +1157,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log("Registration found for email:", normalizedEmail, "Name:", registration.full_name);
+    console.log("Valid registration found for email:", normalizedEmail, "Name:", validRegistration.full_name);
 
     // VALIDAÇÃO 2: Verificar palavras-chave
     const normalizedUserKeywords = keywords.map(normalizeText);
