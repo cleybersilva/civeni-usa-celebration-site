@@ -13,8 +13,16 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const url = new URL(req.url);
-    const code = url.pathname.split('/').pop();
+    let code: string | null = null;
+
+    // Support both GET with URL param and POST with body
+    if (req.method === 'GET') {
+      const url = new URL(req.url);
+      code = url.pathname.split('/').pop() || url.searchParams.get('code');
+    } else if (req.method === 'POST') {
+      const body = await req.json();
+      code = body.code;
+    }
 
     if (!code) {
       return new Response(
@@ -23,9 +31,11 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    console.log('Verifying certificate with code:', code);
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     const { data: certificate, error } = await supabase
@@ -34,12 +44,14 @@ const handler = async (req: Request): Promise<Response> => {
         id,
         full_name,
         issued_at,
-        events(slug)
+        event_id,
+        events(slug, name)
       `)
       .eq('code', code)
       .single();
 
     if (error || !certificate) {
+      console.log('Certificate not found or error:', error);
       return new Response(
         JSON.stringify({ 
           valid: false, 
@@ -49,12 +61,14 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    console.log('Certificate found:', certificate);
+
     return new Response(
       JSON.stringify({ 
         valid: true,
-        message: 'Certificado válido',
+        message: 'Certificado válido e autêntico',
         holderName: certificate.full_name,
-        eventSlug: (certificate.events as any)?.slug || 'evento',
+        eventSlug: (certificate.events as any)?.name || (certificate.events as any)?.slug || 'Evento CIVENI',
         issuedAt: certificate.issued_at
       }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }

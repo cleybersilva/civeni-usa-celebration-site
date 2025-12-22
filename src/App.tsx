@@ -103,6 +103,8 @@ function App() {
                 <Route path="/certificado-emissao" element={<CertificadoEmissao />} />
                 <Route path="/certificado-sucesso" element={<CertificateSuccessPage />} />
                 <Route path="/certificados/verify/:code" element={<VerificarCertificado />} />
+                <Route path="/verificar-certificado" element={<VerificarCertificado />} />
+                <Route path="/verificar-certificado/:code" element={<VerificarCertificado />} />
                 <Route path="/registration/success" element={<RegistrationSuccess />} />
                 <Route path="/registration/canceled" element={<RegistrationCanceled />} />
                 <Route path="/work-submission/success" element={<WorkSubmissionSuccess />} />
