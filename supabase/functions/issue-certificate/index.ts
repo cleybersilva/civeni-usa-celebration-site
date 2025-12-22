@@ -360,8 +360,8 @@ const createCertificatePdf = async (
     // Tentar carregar logo VCCU de diferentes URLs
     // Google Drive link convertido para download direto
     const vccuLogoUrls = [
-      // Google Drive link para logo CIVENI cabeça colorida (IV CIVENI)
-      "https://drive.google.com/uc?export=download&id=1GuqO-hpGvoBlbr6rUuvZIS457792VRwM"
+      // Google Drive link para logo lado esquerdo
+      "https://drive.google.com/uc?export=download&id=1525O_m180-994B4PJJWr39pxN54oHT8V"
     ];
     
     for (const vccuLogoUrl of vccuLogoUrls) {
@@ -415,8 +415,8 @@ const createCertificatePdf = async (
     // Tentar múltiplas URLs para a logo do CIVENI
     // O Lovable CDN converte imagens para WebP, então precisamos usar uma fonte externa
     const civeniHeaderLogoUrls = [
-      // Google Drive link para logo IV CIVENI com texto branco
-      "https://drive.google.com/uc?export=download&id=1zmZx3PQZbV-pYokpLBTNYfry1hVuQ70k"
+      // Google Drive link para logo lado direito (IV CIVENI)
+      "https://drive.google.com/uc?export=download&id=1GuqO-hpGvoBlbr6rUuvZIS457792VRwM"
     ];
     
     for (const civeniHeaderLogoUrl of civeniHeaderLogoUrls) {
