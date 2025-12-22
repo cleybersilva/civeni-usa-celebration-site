@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!code) {
       return new Response(
         JSON.stringify({ valid: false, message: 'Código não fornecido' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -56,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
           valid: false, 
           message: 'Certificado não encontrado ou inválido' 
         }),
-        { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
