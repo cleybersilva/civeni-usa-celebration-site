@@ -35,6 +35,12 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  // IMPORTANT: never try to cache or modify non-GET requests (e.g. Supabase functions POST)
+  if (event.request.method && event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // Network-first strategy for navigation requests
   if (event.request.mode === 'navigate') {
     event.respondWith(
