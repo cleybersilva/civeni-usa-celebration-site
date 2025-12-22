@@ -86,10 +86,6 @@ const handler = async (req: Request): Promise<Response> => {
       }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
-
   } catch (error: any) {
     console.error('Error in verify-certificate function:', error);
     return new Response(
